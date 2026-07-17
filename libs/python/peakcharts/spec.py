@@ -10,40 +10,16 @@ from dataclasses import dataclass, field, fields
 from typing import List, Optional, Union
 
 from .util import esc
+from .validate import SpecError, validate
 
 
-def _num(v) -> float:
-    """Coerce a data value to float; non-numeric/None -> 0.0 (never crash)."""
-    try:
-        return float(v)
-    except (TypeError, ValueError):
-        return 0.0
+def _opt_float(d: dict, key: str) -> Optional[float]:
+    """Float if the key is present (validation guarantees it's numeric), else None.
 
-
-def _int(v, default: int) -> int:
-    """Coerce to int; non-numeric/None -> default (never crash)."""
-    try:
-        return int(v)
-    except (TypeError, ValueError):
-        return default
-
-
-def _float(v, default: float) -> float:
-    """Coerce to float; fallback to default on error."""
-    try:
-        return float(v)
-    except (TypeError, ValueError):
-        return default
-
-
-def _float_or_none(v) -> Optional[float]:
-    """Coerce to float or return None on error/null."""
-    if v is None:
-        return None
-    try:
-        return float(v)
-    except (TypeError, ValueError):
-        return None
+    This is NOT coercion: a default is supplied only when the key is ABSENT;
+    malformed values are already rejected by validate() before we get here.
+    """
+    return float(d[key]) if key in d else None
 
 
 @dataclass
@@ -208,13 +184,21 @@ class ChartSpec:
 
     @staticmethod
     def from_dict(d: dict) -> "ChartSpec":
-        """Build a ChartSpec from a plain dict (parsed JSON). Unknown keys ignored."""
+        """Build a ChartSpec from a plain dict (parsed JSON).
+
+        The dict is validated first (same rules as the Go renderer); a malformed
+        spec raises SpecError. Unknown keys are ignored. Values are trusted after
+        validation, so parsing does no coercion — defaults apply only on absence.
+        """
+        errs = validate(d)
+        if errs:
+            raise SpecError(errs)
         series = []
         for i, s in enumerate(d.get("series", [])):
             m = s.get("marker")
             marker = None
             if m is not None:
-                r = _float(m.get("radius"), 3.5)
+                r = float(m.get("radius", 3.5))
                 marker = Marker(
                     enabled=m.get("enabled", True),
                     symbol=m.get("symbol") or "circle",
@@ -227,16 +211,16 @@ class ChartSpec:
                     # matches Go's decoder byte-for-byte; do NOT drop partial stops.
                     stops=[
                         GradientStop(
-                            offset=_float(st.get("offset"), 0.0),
+                            offset=float(st.get("offset", 0.0)),
                             color=st.get("color", ""),
-                            opacity=_float_or_none(st.get("opacity")),
+                            opacity=_opt_float(st, "opacity"),
                         )
                         for st in c.get("stops", [])
                     ],
-                    x1=_float(c.get("x1"), 0.0),
-                    y1=_float(c.get("y1"), 0.0),
-                    x2=_float(c.get("x2"), 0.0),
-                    y2=_float(c.get("y2"), 1.0),
+                    x1=float(c.get("x1", 0.0)),
+                    y1=float(c.get("y1", 0.0)),
+                    x2=float(c.get("x2", 0.0)),
+                    y2=float(c.get("y2", 1.0)),
                 )
             else:
                 color = c
@@ -247,18 +231,18 @@ class ChartSpec:
                     type=p.get("type") or "hatch",
                     color=p.get("color") or "#333333",
                     background=p.get("background"),
-                    size=_float(p.get("size"), 8.0),
-                    angle=_float(p.get("angle"), 45.0),
-                    stroke_width=_float(p.get("strokeWidth"), 1.5),
+                    size=float(p.get("size", 8.0)),
+                    angle=float(p.get("angle", 45.0)),
+                    stroke_width=float(p.get("strokeWidth", 1.5)),
                 )
             series.append(
                 Series(
                     name=s.get("name") or f"Series {i + 1}",
-                    data=[_num(v) for v in (s.get("data") or [])],
+                    data=[float(v) for v in s["data"]],
                     color=color,
-                    fill_opacity=_float(s.get("fillOpacity"), 0.0),
+                    fill_opacity=float(s.get("fillOpacity", 0.0)),
                     pattern=pattern,
-                    line_width=_float_or_none(s.get("lineWidth")),
+                    line_width=_opt_float(s, "lineWidth"),
                     dash_style=s.get("dashStyle") or "solid",
                     step=s.get("step"),
                     curve=s.get("curve"),
@@ -287,17 +271,17 @@ class ChartSpec:
             x_axis=Axis(
                 title=xa.get("title"),
                 categories=xa.get("categories"),
-                min=_float_or_none(xa.get("min")),
-                max=_float_or_none(xa.get("max")),
+                min=_opt_float(xa, "min"),
+                max=_opt_float(xa, "max"),
             ),
             y_axis=Axis(
                 title=ya.get("title"),
-                min=_float_or_none(ya.get("min")),
-                max=_float_or_none(ya.get("max")),
+                min=_opt_float(ya, "min"),
+                max=_opt_float(ya, "max"),
                 grid_line=grid,
             ),
-            width=_int(d.get("width", 820), 820),
-            height=_int(d.get("height", 460), 460),
+            width=int(d.get("width", 820)),
+            height=int(d.get("height", 460)),
             legend=bool(d.get("legend", True)),
             responsive=bool(d.get("responsive", False)),
             a11y=bool(d.get("a11y", True)),

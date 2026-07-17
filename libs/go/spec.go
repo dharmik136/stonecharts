@@ -255,6 +255,20 @@ func resolveTheme(raw json.RawMessage) *Theme {
 	return &base
 }
 
+// pxInt is an int that also accepts an integer-valued JSON float (e.g. 5.0).
+// The validator already guarantees width/height are integer-valued numbers; this
+// lets the struct decode 5.0 the same way Python's int(5.0) does, keeping parity.
+type pxInt int
+
+func (n *pxInt) UnmarshalJSON(b []byte) error {
+	var f float64
+	if err := json.Unmarshal(b, &f); err != nil {
+		return err
+	}
+	*n = pxInt(f)
+	return nil
+}
+
 type ChartSpec struct {
 	Type       string          `json:"type"`
 	ID         string          `json:"id,omitempty"`
@@ -262,8 +276,8 @@ type ChartSpec struct {
 	theme      *Theme          // resolved (set in applyDefaults)
 	Title      string          `json:"title,omitempty"`
 	Subtitle   string   `json:"subtitle,omitempty"`
-	Width      int      `json:"width,omitempty"`
-	Height     int      `json:"height,omitempty"`
+	Width      pxInt    `json:"width,omitempty"`
+	Height     pxInt    `json:"height,omitempty"`
 	Legend     *bool    `json:"legend,omitempty"`
 	A11y       *bool    `json:"a11y,omitempty"` // nil -> true
 	Responsive bool     `json:"responsive,omitempty"`
@@ -320,8 +334,16 @@ func (a *Axis) gridDashStyle() string {
 }
 
 // FromJSON parses a spec (matching spec/chart-spec.schema.json) and applies defaults.
-// Unknown keys are ignored (forward-compatible).
+// The spec is strictly validated first (same rules + error text as the Python
+// renderer); a malformed spec returns a *SpecError. Unknown keys are ignored.
 func FromJSON(b []byte) (*ChartSpec, error) {
+	var raw interface{}
+	if err := json.Unmarshal(b, &raw); err != nil {
+		return nil, err
+	}
+	if errs := validate(raw); len(errs) > 0 {
+		return nil, &SpecError{Errors: errs}
+	}
 	var c ChartSpec
 	if err := json.Unmarshal(b, &c); err != nil {
 		return nil, err

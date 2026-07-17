@@ -102,6 +102,32 @@ func TestA11yToggle(t *testing.T) {
 	}
 }
 
+// TestInvalidFixturesParity checks every shared invalid fixture is rejected with
+// the exact expected errors — the SAME file the Python suite checks, so both
+// renderers reject identically.
+func TestInvalidFixturesParity(t *testing.T) {
+	b, err := os.ReadFile("../../charts/line-basic/invalid-fixtures.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cases []struct {
+		Spec   interface{} `json:"spec"`
+		Errors []string    `json:"errors"`
+	}
+	if err := json.Unmarshal(b, &cases); err != nil {
+		t.Fatal(err)
+	}
+	if len(cases) == 0 {
+		t.Fatal("no invalid fixtures")
+	}
+	for _, c := range cases {
+		got := validate(c.Spec)
+		if !reflect.DeepEqual(got, c.Errors) {
+			t.Errorf("spec %v:\n got  %v\n want %v", c.Spec, got, c.Errors)
+		}
+	}
+}
+
 // TestThemeJSONParity keeps the baked light/dark themes in lockstep with the
 // canonical spec/themes/*.json (the single source of truth). If they drift, the
 // two languages could theme differently.

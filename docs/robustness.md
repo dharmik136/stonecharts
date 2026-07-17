@@ -11,7 +11,24 @@ unless noted.
 | 1 | **Multi-chart `<defs>` id collision** — two charts with the default `id` both emit `pk-grad-0`; a second chart's `url(#…)` fill resolved to the first's gradient. | **Fixed.** The runtime uniquifies each chart's `<defs>` ids on load (`pkc0-…`, `pkc1-…`) and rewrites that chart's own refs. Static SVG bytes unchanged. For pure-static multi-embed (no runtime), set a unique `id` per chart. |
 | 2 | **Float parity** — `data-y` diverged on floats needing >6 sig figs (Py `%g` vs Go shortest); `int(v)` could overflow Go's int64. | **Fixed.** Both `fmt_num`/`fmtNum` use `%g`/6-sig, guard `NaN`/`Inf` → `"0"`, and bound the integer path to `|v| < 1e18`. Golden: `adversarial.svg`. |
 | 3 | **XSS** — color and `id` fields were injected raw into SVG attributes. | **Fixed.** Every color sink (series color, gradient stops, pattern color/bg, custom theme colors + palette) and the chart `id` are escaped. Test: `test_xss_escaping` / `TestXSSEscaping`. |
-| 4 | **Malformed specs** — `data:null`, `data:[1,null,3]`, `width:"auto"` crashed Python. | **Fixed.** `_num`/`_int` coerce (bad → `0.0` / default). Both languages produce valid SVG or a clean error, never a panic. Test: `test_malformed_no_crash` / `TestMalformedNoPanic`. |
+| 4 | **Malformed specs** — `data:null`, `data:[1,null,3]`, `width:"auto"` crashed Python; and Python-vs-Go handling of malformed numeric fields diverged. | **Fixed — strict, both languages.** A shared validator (`validate.py` / `validate.go`, identical rules + error text) runs before parsing and **rejects** malformed input with structured errors (`$.series[0].marker.radius: expected number, received string`). Defaults apply only when a field is absent — never as a cover for a wrong-typed value. Tests: `test_invalid_fixtures_parity` / `TestInvalidFixturesParity` assert both renderers reject the **same** shared fixtures with the **same** errors. |
+
+## Spec-validation policy (the trust boundary)
+
+> The core guarantee: **the same spec produces the same SVG — or the same
+> validation error — in every renderer.**
+
+- **Strict, not coercing.** A property present with the wrong type is an error; it
+  is never silently replaced with a default. Silent coercion turns a broken client
+  integration into a plausible-but-wrong chart.
+- **Numeric fields reject** strings, booleans, null, NaN and Infinity. `width`/
+  `height` additionally require an integer value.
+- **Defaults apply only on absence.** Absent ≠ malformed.
+- **Errors are structured and identical across languages** (path + expected +
+  received), verified by the shared `charts/line-basic/invalid-fixtures.json`.
+- **Coercion belongs at the boundary, not in the parser.** If a web form or legacy
+  source needs lenient input, normalize it in an explicitly-named input adapter
+  *before* it becomes a canonical spec — do not weaken the renderer's spec parser.
 
 ## Known limitations (mitigations, not bugs)
 

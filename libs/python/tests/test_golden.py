@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT / "libs" / "python"))
 
 from peakcharts import ChartSpec, THEMES  # noqa: E402
 from peakcharts.render import render_svg  # noqa: E402
+from peakcharts.validate import SpecError, validate  # noqa: E402
 
 CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 
@@ -72,18 +73,32 @@ def test_xss_escaping():
     assert "<script>alert(1)</script>" not in render_html(spec)
 
 
-def test_malformed_no_crash():
-    """Malformed specs must coerce to valid SVG, never raise on render."""
-    bad = [
-        {"type": "line", "series": [{"name": "s", "data": None}]},
-        {"type": "line", "series": [{"name": "s", "data": [1, None, 3]}]},
-        {"type": "line", "width": "auto", "series": [{"name": "s", "data": [1, 2]}]},
+def test_valid_edges_render():
+    """Absent/degenerate-but-valid specs still render (absent != malformed)."""
+    for spec in [
         {"type": "line", "series": []},
         {"type": "line", "series": [{"name": "s", "data": []}]},
-    ]
-    for spec in bad:
+        {"type": "line", "width": 5.0, "series": [{"name": "s", "data": [1, 2]}]},
+        {"type": "line", "frob": 1, "series": [{"name": "s", "data": [1, 2], "wib": 9}]},
+    ]:
         svg = render_svg(ChartSpec.from_dict(spec))
         assert svg.startswith("<svg") and svg.endswith("</svg>")
+
+
+def test_invalid_fixtures_parity():
+    """Every shared invalid fixture is rejected with the exact expected errors — the
+    SAME file the Go suite checks, so both renderers reject identically."""
+    cases = json.loads(
+        (ROOT / "charts" / "line-basic" / "invalid-fixtures.json").read_text(encoding="utf-8")
+    )
+    assert cases, "no invalid fixtures"
+    for c in cases:
+        assert validate(c["spec"]) == c["errors"], c["spec"]
+        try:
+            ChartSpec.from_dict(c["spec"])
+            raise AssertionError(f"not rejected: {c['spec']}")
+        except SpecError:
+            pass
 
 
 def test_a11y_toggle():

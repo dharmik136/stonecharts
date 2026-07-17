@@ -1,0 +1,264 @@
+[
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        {
+          "name": "s",
+          "data": null
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data: expected array, received null"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            null,
+            3
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[1]: expected number, received null"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "width": "auto",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.width: expected integer, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "width": 5.7,
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.width: expected integer, received non-integer number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            2
+          ],
+          "marker": {
+            "radius": ""
+          }
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].marker.radius: expected number, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            2
+          ],
+          "marker": {
+            "radius": true
+          }
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].marker.radius: expected number, received boolean"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line"
+    },
+    "errors": [
+      "$.series: required"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            2
+          ],
+          "color": 5
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].color: expected string or gradient object, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ],
+          "fillOpacity": null
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].fillOpacity: expected number, received null"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ],
+          "color": {
+            "stops": [
+              {
+                "offset": "x",
+                "color": "#f00"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].color.stops[0].offset: expected number, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "theme": {
+        "name": "light",
+        "palette": [
+          1,
+          2
+        ]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.theme.palette[0]: expected string, received number",
+      "$.theme.palette[1]: expected string, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "xAxis": {
+        "categories": [
+          "a",
+          2,
+          "c"
+        ]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.xAxis.categories[1]: expected string, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": [
+        5
+      ]
+    },
+    "errors": [
+      "$.series[0]: expected object, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "series": "nope"
+    },
+    "errors": [
+      "$.series: expected array, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "width": "x",
+      "series": [
+        {
+          "name": 5,
+          "data": [
+            "a",
+            2
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.width: expected integer, received string",
+      "$.series[0].name: expected string, received number",
+      "$.series[0].data[0]: expected number, received string"
+    ]
+  }
+]

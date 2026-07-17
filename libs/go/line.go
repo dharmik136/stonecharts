@@ -187,7 +187,7 @@ func a11ySummary(spec *ChartSpec) string {
 // renderLineSVG mirrors libs/python/peakcharts/charts/line.py exactly so the two
 // libraries emit byte-identical SVG for the same spec (see charts/line-basic/golden).
 func renderLineSVG(spec *ChartSpec) string {
-	W, H := spec.Width, spec.Height
+	W, H := int(spec.Width), int(spec.Height)
 	theme := spec.theme
 	if theme == nil {
 		t := lightTheme()
