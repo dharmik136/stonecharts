@@ -4,7 +4,8 @@
  * spec/svg-contract.md (classes: pk-chart, pk-series, pk-point, pk-legend-item;
  * data-* attributes on points/series). Server-rendered SVG stays fully visible
  * without JS; this only *enhances* it (tooltip, point highlight, legend toggle,
- * crosshair). See spec/svg-contract.md for the contract this depends on.
+ * crosshair, keyboard navigation). See spec/svg-contract.md for the contract this
+ * depends on.
  *
  * Proprietary. Copyright (c) 2026 Dharmik Shingala. All rights reserved.
  * No use, copying, or distribution without written permission. See LICENSE.
@@ -32,48 +33,61 @@
     }
     var crosshair = svg.querySelector(".pk-crosshair");
 
-    function moveTip(e) {
+    function positionTip(clientX, clientY) {
       var r = wrap.getBoundingClientRect();
       var tw = tip.offsetWidth, th = tip.offsetHeight;
-      var x = e.clientX - r.left + 14;
-      var y = e.clientY - r.top + 14;
-      if (x + tw > r.width) x = e.clientX - r.left - tw - 14;
-      if (y + th > r.height) y = e.clientY - r.top - th - 14;
+      var x = clientX - r.left + 14;
+      var y = clientY - r.top + 14;
+      if (x + tw > r.width) x = clientX - r.left - tw - 14;
+      if (y + th > r.height) y = clientY - r.top - th - 14;
       tip.style.left = x + "px";
       tip.style.top = y + "px";
     }
+    function moveTip(e) { positionTip(e.clientX, e.clientY); }
 
-    // Tooltip + highlight on data points.
+    // Show/hide tooltip + highlight + crosshair for one point. Shared by mouse
+    // (hover) and keyboard (focus/arrows). atPoint=true anchors the tooltip to the
+    // point's own position (keyboard) instead of the cursor (mouse).
+    function showPoint(pt, atPoint) {
+      pt.setAttribute("r", pt.getAttribute("data-r-hover") || "6");
+      var name = pt.getAttribute("data-series-name") || "";
+      var color = pt.getAttribute("data-color") || "#333";
+      tip.innerHTML =
+        '<div class="pk-tt-title">' + escapeHtml(pt.getAttribute("data-x")) + "</div>" +
+        '<div class="pk-tt-row"><span class="pk-tt-dot" style="background:' + color + '"></span>' +
+        escapeHtml(name) + ": <b>" + escapeHtml(pt.getAttribute("data-y")) + "</b></div>";
+      tip.style.display = "block";
+      if (crosshair) {
+        crosshair.setAttribute("x1", pt.getAttribute("cx"));
+        crosshair.setAttribute("x2", pt.getAttribute("cx"));
+        crosshair.style.display = "";
+      }
+      if (atPoint) {
+        var pr = pt.getBoundingClientRect();
+        positionTip(pr.left + pr.width / 2, pr.top + pr.height / 2);
+      }
+    }
+    function hidePoint(pt) {
+      pt.setAttribute("r", pt.getAttribute("data-r") || "3.5");
+      tip.style.display = "none";
+      if (crosshair) crosshair.style.display = "none";
+    }
+
+    // Tooltip + highlight on data points (mouse).
     var points = svg.querySelectorAll(".pk-point");
     for (var i = 0; i < points.length; i++) {
       (function (pt) {
-        var rBase = pt.getAttribute("data-r") || "3.5";
-        var rHover = pt.getAttribute("data-r-hover") || "6";
-        pt.addEventListener("mouseenter", function () {
-          pt.setAttribute("r", rHover);
-          var name = pt.getAttribute("data-series-name") || "";
-          var color = pt.getAttribute("data-color") || "#333";
-          var xl = pt.getAttribute("data-x");
-          var yl = pt.getAttribute("data-y");
-          tip.innerHTML =
-            '<div class="pk-tt-title">' + escapeHtml(xl) + "</div>" +
-            '<div class="pk-tt-row"><span class="pk-tt-dot" style="background:' + color + '"></span>' +
-            escapeHtml(name) + ": <b>" + escapeHtml(yl) + "</b></div>";
-          tip.style.display = "block";
-          if (crosshair) {
-            crosshair.setAttribute("x1", pt.getAttribute("cx"));
-            crosshair.setAttribute("x2", pt.getAttribute("cx"));
-            crosshair.style.display = "";
-          }
-        });
+        pt.addEventListener("mouseenter", function () { showPoint(pt, false); });
         pt.addEventListener("mousemove", moveTip);
-        pt.addEventListener("mouseleave", function () {
-          pt.setAttribute("r", rBase);
-          tip.style.display = "none";
-          if (crosshair) crosshair.style.display = "none";
-        });
+        pt.addEventListener("mouseleave", function () { hidePoint(pt); });
       })(points[i]);
     }
+
+    // Keyboard navigation: the chart is a single focus stop; arrow keys walk the
+    // points (Left/Right within a series, Up/Down across series, Home/End, Esc).
+    // Sighted keyboard users get the visual tooltip; screen-reader users have the
+    // data table. tabindex is set here at runtime so the static SVG stays unchanged.
+    setupKeyboard(svg, points, showPoint, hidePoint);
 
     // Legend click toggles the whole series on/off.
     var items = svg.querySelectorAll(".pk-legend-item");
@@ -91,6 +105,42 @@
         });
       })(items[j]);
     }
+  }
+
+  function setupKeyboard(svg, points, showPoint, hidePoint) {
+    if (!points.length) return;
+    // Group points by series in DOM order: series[] holds per-series point arrays.
+    var series = [], byKey = {};
+    for (var i = 0; i < points.length; i++) {
+      var k = points[i].getAttribute("data-series") || "0";
+      if (!byKey[k]) { byKey[k] = []; series.push(byKey[k]); }
+      byKey[k].push(points[i]);
+    }
+    var si = 0, pi = 0, active = null;
+    function go(ns, np) {
+      var col = series[ns];
+      if (!col) return;
+      np = Math.max(0, Math.min(np, col.length - 1));
+      if (active) hidePoint(active);
+      si = ns; pi = np; active = col[pi];
+      showPoint(active, true);
+    }
+    function clear() { if (active) { hidePoint(active); active = null; } }
+    svg.setAttribute("tabindex", "0");
+    svg.addEventListener("focus", function () { if (!active) go(si, pi); });
+    svg.addEventListener("blur", clear);
+    svg.addEventListener("keydown", function (e) {
+      var k = e.key;
+      if (k === "ArrowRight") go(si, pi + 1);
+      else if (k === "ArrowLeft") go(si, pi - 1);
+      else if (k === "ArrowDown") go(Math.min(si + 1, series.length - 1), pi);
+      else if (k === "ArrowUp") go(Math.max(si - 1, 0), pi);
+      else if (k === "Home") go(si, 0);
+      else if (k === "End") go(si, series[si].length - 1);
+      else if (k === "Escape") { clear(); svg.blur(); }
+      else return;
+      e.preventDefault();
+    });
   }
 
   function escapeHtml(s) {
