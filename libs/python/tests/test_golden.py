@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / "libs" / "python"))
 from peakcharts import ChartSpec  # noqa: E402
 from peakcharts.render import render_svg  # noqa: E402
 
-CASES = ["basic", "styled", "markers", "spline"]
+CASES = ["basic", "styled", "markers", "spline", "gradient"]
 
 
 def _check(name: str):
@@ -42,6 +42,10 @@ def test_line_markers_golden():
 
 def test_line_spline_golden():
     _check("spline")
+
+
+def test_line_gradient_golden():
+    _check("gradient")
 
 
 # Edge-case vectors from the Phase-3 QA report: flat data, extrema, single/dual

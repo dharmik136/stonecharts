@@ -11,6 +11,11 @@
       "enum": ["line"],
       "description": "Chart type id; maps to charts/<id>/design.md. Grows as chart types are added."
     },
+    "id": {
+      "type": "string",
+      "default": "pk",
+      "description": "Chart instance id, used to namespace <defs> ids (gradients/patterns) so multiple charts on one page don't collide. Set a unique value per chart when embedding several."
+    },
     "title": { "type": "string" },
     "subtitle": { "type": "string" },
     "width": { "type": "integer", "minimum": 100, "default": 820 },
@@ -30,6 +35,43 @@
     }
   },
   "definitions": {
+    "gradient": {
+      "type": "object",
+      "description": "Linear gradient. Direction is x1,y1 -> x2,y2 in 0..1 objectBoundingBox coords (default 0,0 -> 0,1 = vertical top-to-bottom). No trig, so both renderers format it identically.",
+      "required": ["stops"],
+      "properties": {
+        "type": { "type": "string", "enum": ["linearGradient"], "default": "linearGradient" },
+        "x1": { "type": "number", "default": 0 },
+        "y1": { "type": "number", "default": 0 },
+        "x2": { "type": "number", "default": 0 },
+        "y2": { "type": "number", "default": 1 },
+        "stops": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["offset", "color"],
+            "properties": {
+              "offset": { "type": "number", "minimum": 0, "maximum": 1 },
+              "color": { "type": "string" },
+              "opacity": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "pattern": {
+      "type": "object",
+      "description": "Hatch (diagonal-line) fill for the area under the line. Print- and colorblind-friendly. Renders as an SVG <pattern> tile.",
+      "properties": {
+        "type": { "type": "string", "enum": ["hatch"], "default": "hatch" },
+        "color": { "type": "string", "default": "#333333", "description": "Hatch line color." },
+        "background": { "type": "string", "description": "Optional solid tile background behind the hatch lines." },
+        "size": { "type": "number", "default": 8, "description": "Tile size in px (line spacing)." },
+        "angle": { "type": "number", "default": 45, "description": "Hatch rotation in degrees." },
+        "strokeWidth": { "type": "number", "default": 1.5 }
+      }
+    },
     "axis": {
       "type": "object",
       "properties": {
@@ -75,9 +117,20 @@
           "description": "y-values; x comes from xAxis.categories (or 0..n-1)."
         },
         "color": {
-          "type": "string",
-          "description": "Optional hex color; defaults from the palette by series index."
+          "description": "Series color: a hex string, or a linear-gradient object (fades between stops). Gradient applies to the stroke and area fill; markers/legend use the first stop's color.",
+          "oneOf": [
+            { "type": "string" },
+            { "$ref": "#/definitions/gradient" }
+          ]
         },
+        "fillOpacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0,
+          "description": "Fill the area under the line down to the zero baseline at this opacity. 0 = no fill (default). Any value > 0 turns a line chart into an area chart."
+        },
+        "pattern": { "$ref": "#/definitions/pattern" },
         "lineWidth": { "type": "number", "default": 2 },
         "dashStyle": {
           "type": "string",

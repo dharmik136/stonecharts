@@ -7,7 +7,7 @@ with spec/chart-spec.schema.json and libs/go/spec.go.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 @dataclass
@@ -18,10 +18,39 @@ class Marker:
 
 
 @dataclass
+class GradientStop:
+    offset: float
+    color: str
+    opacity: Optional[float] = None
+
+
+@dataclass
+class Gradient:
+    """Linear gradient. Direction x1,y1 -> x2,y2 in 0..1 bounding-box coords."""
+    stops: List[GradientStop]
+    x1: float = 0.0
+    y1: float = 0.0
+    x2: float = 0.0
+    y2: float = 1.0
+
+
+@dataclass
+class Pattern:
+    type: str = "hatch"
+    color: str = "#333333"
+    background: Optional[str] = None
+    size: float = 8.0
+    angle: float = 45.0
+    stroke_width: float = 1.5
+
+
+@dataclass
 class Series:
     name: str
     data: List[float]
-    color: Optional[str] = None
+    color: Optional[Union[str, Gradient]] = None
+    fill_opacity: float = 0.0            # >0 -> area fill under the line
+    pattern: Optional[Pattern] = None    # hatch fill for the area
     line_width: Optional[float] = None   # None -> default 2
     dash_style: str = "solid"            # solid | dashed | dotted
     step: Optional[str] = None           # None | before | after | center
@@ -49,6 +78,7 @@ class Axis:
 class ChartSpec:
     series: List[Series]
     type: str = "line"
+    id: str = "pk"
     title: Optional[str] = None
     subtitle: Optional[str] = None
     x_axis: Axis = field(default_factory=Axis)
@@ -71,11 +101,42 @@ class ChartSpec:
                     symbol=m.get("symbol", "circle"),
                     radius=float(m.get("radius", 3.5)),
                 )
+            c = s.get("color")
+            if isinstance(c, dict):
+                color: Optional[Union[str, Gradient]] = Gradient(
+                    stops=[
+                        GradientStop(
+                            offset=float(st["offset"]),
+                            color=st["color"],
+                            opacity=st.get("opacity"),
+                        )
+                        for st in c.get("stops", [])
+                    ],
+                    x1=float(c.get("x1", 0.0)),
+                    y1=float(c.get("y1", 0.0)),
+                    x2=float(c.get("x2", 0.0)),
+                    y2=float(c.get("y2", 1.0)),
+                )
+            else:
+                color = c
+            p = s.get("pattern")
+            pattern = None
+            if p is not None:
+                pattern = Pattern(
+                    type=p.get("type", "hatch"),
+                    color=p.get("color", "#333333"),
+                    background=p.get("background"),
+                    size=float(p.get("size", 8.0)),
+                    angle=float(p.get("angle", 45.0)),
+                    stroke_width=float(p.get("strokeWidth", 1.5)),
+                )
             series.append(
                 Series(
                     name=s.get("name", f"Series {i + 1}"),
                     data=[float(v) for v in s["data"]],
-                    color=s.get("color"),
+                    color=color,
+                    fill_opacity=float(s.get("fillOpacity", 0.0)),
+                    pattern=pattern,
                     line_width=s.get("lineWidth"),
                     dash_style=s.get("dashStyle", "solid"),
                     step=s.get("step"),
@@ -98,6 +159,7 @@ class ChartSpec:
         return ChartSpec(
             series=series,
             type=d.get("type", "line"),
+            id=d.get("id", "pk"),
             title=d.get("title"),
             subtitle=d.get("subtitle"),
             x_axis=Axis(

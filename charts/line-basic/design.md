@@ -37,6 +37,7 @@ or x/y correlation with no shared x ordering (use scatter). See
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"line"` |
+| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
 | `width` / `height` | int | 820 / 460 | px |
@@ -49,7 +50,9 @@ or x/y correlation with no shared x ordering (use scatter). See
 | `yAxis.gridLine` | object | `{enabled:true, color:#e8e8ee, dashStyle:solid}` | horizontal gridline styling; `dashStyle` ∈ solid/dashed/dotted |
 | `series[].name` | string | `Series i` | legend + tooltip name |
 | `series[].data` | number[] | — | y-values, length `N` |
-| `series[].color` | string | palette by index | hex, e.g. `#2f7ed8` |
+| `series[].color` | string \| gradient | palette by index | hex `#2f7ed8`, or a `{type:linearGradient, x1,y1,x2,y2, stops:[{offset,color,opacity}]}` object (applies to stroke + area fill; markers/legend use stop 0) |
+| `series[].fillOpacity` | number | 0 | fill the area under the line at this opacity (>0 turns it into an area chart) |
+| `series[].pattern` | object | — | hatch fill for the area: `{type:hatch, color, background, size, angle, strokeWidth}` |
 | `series[].lineWidth` | number | 2 | line thickness (px) |
 | `series[].dashStyle` | string | solid | line dash: solid/dashed/dotted |
 | `series[].step` | string | — | stepped line: before/after/center |

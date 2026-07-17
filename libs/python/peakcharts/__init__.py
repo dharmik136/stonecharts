@@ -14,7 +14,7 @@ Build a chart spec, render it to a self-contained interactive HTML document.
     )
     save_html(spec, "chart.html")
 """
-from .spec import Axis, ChartSpec, Series
+from .spec import Axis, ChartSpec, Gradient, GradientStop, Marker, Pattern, Series
 from .render import render_html, render_svg, save_html
 
 __version__ = "0.1.0"
@@ -22,6 +22,10 @@ __all__ = [
     "ChartSpec",
     "Series",
     "Axis",
+    "Marker",
+    "Gradient",
+    "GradientStop",
+    "Pattern",
     "render_html",
     "render_svg",
     "save_html",

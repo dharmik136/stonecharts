@@ -132,6 +132,45 @@ func markerSVG(symbol string, x, y, r float64, common, color string) string {
 	}
 }
 
+// gradientDef mirrors line.py _gradient_def: a <linearGradient> with x1,y1->x2,y2
+// direction and offset/color/opacity stops.
+func gradientDef(gid string, g *Gradient) string {
+	var b strings.Builder
+	b.WriteString(`<linearGradient id="` + gid + `" x1="` + fmtNum(g.x1()) +
+		`" y1="` + fmtNum(g.y1()) + `" x2="` + fmtNum(g.x2()) + `" y2="` + fmtNum(g.y2()) + `">`)
+	for _, st := range g.Stops {
+		b.WriteString(`<stop offset="` + fmtNum(st.Offset) + `" stop-color="` + st.Color + `"`)
+		if st.Opacity != nil {
+			b.WriteString(` stop-opacity="` + fmtNum(*st.Opacity) + `"`)
+		}
+		b.WriteString(`/>`)
+	}
+	b.WriteString(`</linearGradient>`)
+	return b.String()
+}
+
+// patternDef mirrors line.py _pattern_def: a diagonal hatch tile.
+func patternDef(pid string, pat *Pattern) string {
+	sz := fmtNum(pat.size())
+	var b strings.Builder
+	b.WriteString(`<pattern id="` + pid + `" patternUnits="userSpaceOnUse" width="` + sz +
+		`" height="` + sz + `" patternTransform="rotate(` + fmtNum(pat.angle()) + `)">`)
+	if pat.Background != "" {
+		b.WriteString(`<rect width="` + sz + `" height="` + sz + `" fill="` + pat.Background + `"/>`)
+	}
+	b.WriteString(`<line x1="0" y1="0" x2="0" y2="` + sz + `" stroke="` + pat.hatchColor() +
+		`" stroke-width="` + fmtNum(pat.strokeWidth()) + `"/></pattern>`)
+	return b.String()
+}
+
+// seriesStyle holds the resolved paint refs for one series.
+type seriesStyle struct {
+	stroke   string // line stroke ref (hex or url(#grad))
+	solid    string // representative solid for markers/legend/data-color
+	areaFill string // "" = no area fill; else hex/url(#grad)/url(#pat)
+	areaOp   string // fill-opacity attribute (with leading space) or ""
+}
+
 // renderLineSVG mirrors libs/python/peakcharts/charts/line.py exactly so the two
 // libraries emit byte-identical SVG for the same spec (see charts/line-basic/golden).
 func renderLineSVG(spec *ChartSpec) string {
@@ -207,6 +246,42 @@ func renderLineSVG(spec *ChartSpec) string {
 		return plotY + plotH*(1-(v-yMin)/(yMax-yMin))
 	}
 
+	// Resolve per-series styling and collect <defs>. Defs are emitted ONLY when a
+	// series needs them, so default output stays byte-identical.
+	var defs strings.Builder
+	styles := make([]seriesStyle, len(spec.Series))
+	for si := range spec.Series {
+		s := &spec.Series[si]
+		grad, solidHex := s.colorSpec()
+		var stroke, fillColor, solid string
+		if grad != nil {
+			gid := spec.ID + "-grad-" + strconv.Itoa(si)
+			defs.WriteString(gradientDef(gid, grad))
+			stroke = "url(#" + gid + ")"
+			fillColor = stroke
+			if len(grad.Stops) > 0 {
+				solid = grad.Stops[0].Color
+			} else {
+				solid = palette[si%len(palette)]
+			}
+		} else if solidHex != "" {
+			stroke, fillColor, solid = solidHex, solidHex, solidHex
+		} else {
+			c := palette[si%len(palette)]
+			stroke, fillColor, solid = c, c, c
+		}
+		var areaFill, areaOp string
+		if s.Pattern != nil {
+			pid := spec.ID + "-pat-" + strconv.Itoa(si)
+			defs.WriteString(patternDef(pid, s.Pattern))
+			areaFill = "url(#" + pid + ")"
+		} else if s.FillOpacity > 0 {
+			areaFill = fillColor
+			areaOp = ` fill-opacity="` + fmtNum(s.FillOpacity) + `"`
+		}
+		styles[si] = seriesStyle{stroke: stroke, solid: solid, areaFill: areaFill, areaOp: areaOp}
+	}
+
 	var p strings.Builder
 	if spec.Responsive {
 		p.WriteString(fmt.Sprintf(
@@ -216,6 +291,13 @@ func renderLineSVG(spec *ChartSpec) string {
 		p.WriteString(fmt.Sprintf(
 			`<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
 			W, H, W, H))
+	}
+
+	// Gradient / pattern defs (only present when a series needs them).
+	if defs.Len() > 0 {
+		p.WriteString(`<defs>`)
+		p.WriteString(defs.String())
+		p.WriteString(`</defs>`)
 	}
 
 	ty := 26
@@ -287,10 +369,8 @@ func renderLineSVG(spec *ChartSpec) string {
 
 	// Series.
 	for si, s := range spec.Series {
-		color := s.Color
-		if color == "" {
-			color = palette[si%len(palette)]
-		}
+		st := styles[si]
+		color := st.solid
 		pts := make([][2]float64, len(s.Data))
 		for i, v := range s.Data {
 			pts[i] = [2]float64{xpix(i), ypix(v)}
@@ -306,9 +386,18 @@ func renderLineSVG(spec *ChartSpec) string {
 			lineDashAttr = ` stroke-dasharray="` + da + `"`
 		}
 		p.WriteString(fmt.Sprintf(`<g class="pk-series" data-series="%d">`, si))
+		// Area fill (under the line, drawn first so the line sits on top).
+		if st.areaFill != "" && len(pts) > 0 {
+			base := ypix(0.0)
+			areaD := d + " L" + f1(pts[len(pts)-1][0]) + " " + f1(base) +
+				" L" + f1(pts[0][0]) + " " + f1(base) + " Z"
+			p.WriteString(fmt.Sprintf(
+				`<path class="pk-series-area" data-series="%d" d="%s" fill="%s"%s stroke="none"/>`,
+				si, areaD, st.areaFill, st.areaOp))
+		}
 		p.WriteString(fmt.Sprintf(
 			`<path class="pk-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
-			si, d, color, fmtNum(s.lineWidth()), lineDashAttr))
+			si, d, st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
 		if s.markerEnabled() {
 			radius := s.markerRadius()
 			radiusHover := radius + 2.5
@@ -345,10 +434,7 @@ func renderLineSVG(spec *ChartSpec) string {
 		ly := float64(H - lyBase)
 		p.WriteString(`<g class="pk-legend">`)
 		for si, s := range spec.Series {
-			color := s.Color
-			if color == "" {
-				color = palette[si%len(palette)]
-			}
+			color := styles[si].solid
 			p.WriteString(fmt.Sprintf(`<g class="pk-legend-item" data-series="%d">`, si))
 			p.WriteString(fmt.Sprintf(
 				`<rect x="%s" y="%s" width="14" height="4" rx="2" fill="%s"/>`,

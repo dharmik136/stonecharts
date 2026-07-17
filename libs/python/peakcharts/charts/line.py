@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 from typing import List
 
-from ..spec import ChartSpec, GridLine, Marker
+from ..spec import ChartSpec, Gradient, GridLine, Marker, Pattern
 from ..util import esc, fmt_num, nice_ticks
 
 # Default categorical palette (original values; not copied from any library).
@@ -113,6 +113,35 @@ def _marker(symbol, x, y, r, common, color) -> str:
     return f'<circle {common} cx="{x:.1f}" cy="{y:.1f}" r="{fmt_num(r)}" {fs}/>'
 
 
+def _gradient_def(gid: str, g: Gradient) -> str:
+    """<linearGradient> def. Direction is x1,y1->x2,y2 (objectBoundingBox)."""
+    stops = []
+    for st in g.stops:
+        op = f' stop-opacity="{fmt_num(st.opacity)}"' if st.opacity is not None else ""
+        stops.append(f'<stop offset="{fmt_num(st.offset)}" stop-color="{st.color}"{op}/>')
+    return (
+        f'<linearGradient id="{gid}" x1="{fmt_num(g.x1)}" y1="{fmt_num(g.y1)}" '
+        f'x2="{fmt_num(g.x2)}" y2="{fmt_num(g.y2)}">' + "".join(stops) + "</linearGradient>"
+    )
+
+
+def _pattern_def(pid: str, pat: Pattern) -> str:
+    """<pattern> def: a diagonal hatch tile (userSpaceOnUse, rotated)."""
+    sz = fmt_num(pat.size)
+    bg = (
+        f'<rect width="{sz}" height="{sz}" fill="{pat.background}"/>'
+        if pat.background else ""
+    )
+    hatch = (
+        f'<line x1="0" y1="0" x2="0" y2="{sz}" stroke="{pat.color}" '
+        f'stroke-width="{fmt_num(pat.stroke_width)}"/>'
+    )
+    return (
+        f'<pattern id="{pid}" patternUnits="userSpaceOnUse" width="{sz}" height="{sz}" '
+        f'patternTransform="rotate({fmt_num(pat.angle)})">' + bg + hatch + "</pattern>"
+    )
+
+
 def render_svg(spec: ChartSpec) -> str:
     W, H = spec.width, spec.height
 
@@ -147,6 +176,35 @@ def render_svg(spec: ChartSpec) -> str:
     def ypix(v: float) -> float:
         return plot_y + plot_h * (1 - (v - y_min) / (y_max - y_min))
 
+    # Resolve per-series styling and collect <defs> (gradients/patterns). Defs are
+    # emitted ONLY when something needs them, so default output stays byte-identical.
+    defs_parts: List[str] = []
+    sstyle = []
+    for si, s in enumerate(spec.series):
+        if isinstance(s.color, Gradient):
+            gid = f"{spec.id}-grad-{si}"
+            defs_parts.append(_gradient_def(gid, s.color))
+            ref = f"url(#{gid})"
+            stroke = ref
+            fill_color = ref
+            solid = s.color.stops[0].color if s.color.stops else PALETTE[si % len(PALETTE)]
+        elif s.color:
+            stroke = fill_color = solid = s.color
+        else:
+            stroke = fill_color = solid = PALETTE[si % len(PALETTE)]
+        if s.pattern is not None:
+            pid = f"{spec.id}-pat-{si}"
+            defs_parts.append(_pattern_def(pid, s.pattern))
+            area_fill = f"url(#{pid})"
+            area_op = ""
+        elif s.fill_opacity > 0:
+            area_fill = fill_color
+            area_op = f' fill-opacity="{fmt_num(s.fill_opacity)}"'
+        else:
+            area_fill = None
+            area_op = ""
+        sstyle.append((stroke, solid, area_fill, area_op))
+
     p: List[str] = []
     _font = 'font-family="Segoe UI, Helvetica, Arial, sans-serif"'
     if spec.responsive:
@@ -160,6 +218,10 @@ def render_svg(spec: ChartSpec) -> str:
             f'<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" '
             f'width="{W}" height="{H}" viewBox="0 0 {W} {H}" {_font}>'
         )
+
+    # Gradient / pattern defs (only present when a series needs them).
+    if defs_parts:
+        p.append("<defs>" + "".join(defs_parts) + "</defs>")
 
     # Titles.
     ty = 26
@@ -232,16 +294,24 @@ def render_svg(spec: ChartSpec) -> str:
 
     # Series: one group per series (data-series drives legend toggle).
     for si, s in enumerate(spec.series):
-        color = s.color or PALETTE[si % len(PALETTE)]
+        stroke, color, area_fill, area_op = sstyle[si]
         pts = [(xpix(i), ypix(v)) for i, v in enumerate(s.data)]
         d = _spline_d(pts) if s.curve == "monotone" else _path_d(pts, s.step)
         lw = s.line_width if s.line_width is not None else 2
         line_dash = _dash_array(s.dash_style)
         line_dash_attr = f' stroke-dasharray="{line_dash}"' if line_dash else ""
         p.append(f'<g class="pk-series" data-series="{si}">')
+        # Area fill (under the line, drawn first so the line sits on top).
+        if area_fill is not None and pts:
+            base = ypix(0.0)
+            area_d = f"{d} L{pts[-1][0]:.1f} {base:.1f} L{pts[0][0]:.1f} {base:.1f} Z"
+            p.append(
+                f'<path class="pk-series-area" data-series="{si}" d="{area_d}" '
+                f'fill="{area_fill}"{area_op} stroke="none"/>'
+            )
         p.append(
             f'<path class="pk-series-line" data-series="{si}" d="{d}" fill="none" '
-            f'stroke="{color}" stroke-width="{fmt_num(lw)}" stroke-linejoin="round" '
+            f'stroke="{stroke}" stroke-width="{fmt_num(lw)}" stroke-linejoin="round" '
             f'stroke-linecap="round"{line_dash_attr}/>'
         )
         mk = s.marker or Marker()
@@ -268,7 +338,7 @@ def render_svg(spec: ChartSpec) -> str:
         ly = H - (10 + (18 if spec.x_axis.title else 0))
         p.append('<g class="pk-legend">')
         for si, s in enumerate(spec.series):
-            color = s.color or PALETTE[si % len(PALETTE)]
+            color = sstyle[si][1]
             p.append(f'<g class="pk-legend-item" data-series="{si}">')
             p.append(
                 f'<rect x="{lx:.1f}" y="{ly-9:.1f}" width="14" height="4" rx="2" fill="{color}"/>'

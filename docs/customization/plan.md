@@ -36,7 +36,10 @@ two non-negotiables. Source research: `docs/research/design-customization-brief.
    (before/after/center).  ✅ done
 3. **Phase 3 — Spline:** `series.curve: "monotone"` (Fritsch–Carlson, identical math
    both languages, golden-tested).  ✅ done
-4. **Phase 4 — Gradients & patterns:** `<defs>` + gradient/pattern fills.
+4. **Phase 4 — Gradients & patterns:** `<defs>` + gradient/pattern fills.  ✅ done
+   `series.color` as a linear gradient (stroke + area), `series.fillOpacity` (area
+   under the line → area chart), `series.pattern` (hatch fill), chart `id` namespaces
+   `<defs>` ids. Defs emitted only when needed, so `basic.svg` stays byte-identical.
 5. **Phase 5 — Themes, a11y, deeper interactivity:** shared `spec/themes/*.json`
    (light/dark, colorblind-safe palette), ARIA/`<desc>`/data-table, keyboard nav.
 

@@ -7,6 +7,7 @@
 package peakcharts
 
 import (
+	"bytes"
 	"encoding/json"
 	"strconv"
 )
@@ -17,15 +18,86 @@ type Marker struct {
 	Radius  float64 `json:"radius,omitempty"`  // 0 -> default 3.5
 }
 
+type GradientStop struct {
+	Offset  float64  `json:"offset"`
+	Color   string   `json:"color"`
+	Opacity *float64 `json:"opacity,omitempty"` // nil -> no stop-opacity attr
+}
+
+// Gradient direction is x1,y1 -> x2,y2 in 0..1 objectBoundingBox coords.
+// Pointers distinguish "absent" from 0 so defaults (0,0,0,1) match Python exactly.
+type Gradient struct {
+	Type  string         `json:"type,omitempty"`
+	X1    *float64       `json:"x1,omitempty"`
+	Y1    *float64       `json:"y1,omitempty"`
+	X2    *float64       `json:"x2,omitempty"`
+	Y2    *float64       `json:"y2,omitempty"`
+	Stops []GradientStop `json:"stops"`
+}
+
+func fdef(p *float64, def float64) float64 {
+	if p != nil {
+		return *p
+	}
+	return def
+}
+func (g *Gradient) x1() float64 { return fdef(g.X1, 0) }
+func (g *Gradient) y1() float64 { return fdef(g.Y1, 0) }
+func (g *Gradient) x2() float64 { return fdef(g.X2, 0) }
+func (g *Gradient) y2() float64 { return fdef(g.Y2, 1) }
+
+// Pattern is a diagonal hatch fill for the area under the line.
+type Pattern struct {
+	Type        string   `json:"type,omitempty"`
+	Color       string   `json:"color,omitempty"`
+	Background  string   `json:"background,omitempty"`
+	Size        *float64 `json:"size,omitempty"`
+	Angle       *float64 `json:"angle,omitempty"`
+	StrokeWidth *float64 `json:"strokeWidth,omitempty"`
+}
+
+func (p *Pattern) size() float64        { return fdef(p.Size, 8) }
+func (p *Pattern) angle() float64       { return fdef(p.Angle, 45) }
+func (p *Pattern) strokeWidth() float64 { return fdef(p.StrokeWidth, 1.5) }
+func (p *Pattern) hatchColor() string {
+	if p.Color != "" {
+		return p.Color
+	}
+	return "#333333"
+}
+
 type Series struct {
-	Name      string    `json:"name"`
-	Data      []float64 `json:"data"`
-	Color     string    `json:"color,omitempty"`
-	LineWidth float64   `json:"lineWidth,omitempty"` // 0 -> default 2
-	DashStyle string    `json:"dashStyle,omitempty"` // "" -> solid
-	Step      string    `json:"step,omitempty"`      // "" | before | after | center
-	Curve     string    `json:"curve,omitempty"`     // "" / linear | monotone
-	Marker    *Marker   `json:"marker,omitempty"`
+	Name        string          `json:"name"`
+	Data        []float64       `json:"data"`
+	Color       json.RawMessage `json:"color,omitempty"`       // hex string OR gradient object
+	FillOpacity float64         `json:"fillOpacity,omitempty"` // >0 -> area fill
+	Pattern     *Pattern        `json:"pattern,omitempty"`     // hatch fill for the area
+	LineWidth   float64         `json:"lineWidth,omitempty"`   // 0 -> default 2
+	DashStyle   string          `json:"dashStyle,omitempty"`   // "" -> solid
+	Step        string          `json:"step,omitempty"`        // "" | before | after | center
+	Curve       string          `json:"curve,omitempty"`       // "" / linear | monotone
+	Marker      *Marker         `json:"marker,omitempty"`
+}
+
+// colorSpec resolves Color (a hex string or a gradient object).
+// Returns (gradient, solidHex); solid "" means unset -> caller uses the palette.
+func (s *Series) colorSpec() (*Gradient, string) {
+	raw := bytes.TrimSpace([]byte(s.Color))
+	if len(raw) == 0 || string(raw) == "null" {
+		return nil, ""
+	}
+	if raw[0] == '"' {
+		var str string
+		if json.Unmarshal(raw, &str) == nil {
+			return nil, str
+		}
+		return nil, ""
+	}
+	var g Gradient
+	if json.Unmarshal(raw, &g) == nil {
+		return &g, ""
+	}
+	return nil, ""
 }
 
 func (s *Series) lineWidth() float64 {
@@ -66,6 +138,7 @@ type Axis struct {
 
 type ChartSpec struct {
 	Type       string   `json:"type"`
+	ID         string   `json:"id,omitempty"`
 	Title      string   `json:"title,omitempty"`
 	Subtitle   string   `json:"subtitle,omitempty"`
 	Width      int      `json:"width,omitempty"`
@@ -82,6 +155,9 @@ type ChartSpec struct {
 func (c *ChartSpec) applyDefaults() {
 	if c.Type == "" {
 		c.Type = "line"
+	}
+	if c.ID == "" {
+		c.ID = "pk"
 	}
 	if c.Width == 0 {
 		c.Width = 820
