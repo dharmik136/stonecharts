@@ -1,0 +1,72 @@
+name: Defect
+description: Report incorrect, unsafe, divergent, or regressed behavior.
+title: "[Defect]: "
+labels: ["type:defect", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Provide a minimal reproducible specification and identify the affected contract.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: State the failure and its impact in one concise paragraph.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include the smallest chart spec, exact command, and deterministic steps.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Link the requirement, ADR, schema rule, or contract when known.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      multiple: true
+      options:
+        - Specification or validation
+        - Python renderer
+        - Go renderer
+        - Canonical SVG bytes
+        - Browser runtime or accessibility
+        - Packaging or release
+        - Documentation or governance
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: 0.0.1-alpha.1 or commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Paste errors, hashes, screenshots, or reduced output. Remove secrets.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I removed credentials, private customer data, and unrelated output.
+          required: true
+        - label: I searched existing issues for the same failure.
+          required: true

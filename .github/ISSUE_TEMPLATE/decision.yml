@@ -1,0 +1,45 @@
+name: Decision Record
+description: Open a bounded product, architecture, release, or operating decision.
+title: "[Decision]: "
+labels: ["type:decision", "status:triage"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Decision question
+      description: Write one question that can end in a clear decision.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and constraints
+      description: State facts, guarantees, deadlines, and non-negotiable boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Viable options
+      description: Include benefits, costs, risks, and reversibility for each option.
+    validations:
+      required: true
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Current recommendation
+      description: Name the preferred option and the evidence supporting it.
+    validations:
+      required: true
+  - type: input
+    id: decide_by
+    attributes:
+      label: Decide by
+      placeholder: milestone, date, or blocking event
+    validations:
+      required: true
+  - type: input
+    id: references
+    attributes:
+      label: Related IDs and links
+      placeholder: ADR, requirement, risk, issue, benchmark, or research link

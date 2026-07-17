@@ -30,6 +30,13 @@ Document status and classification are authoritative in each file's metadata.
 - [Requirements and traceability guide](requirements/README.md)
 - [Risk register](governance/risk-register.yaml)
 
+## Project execution
+
+- [Project operating model](project/README.md)
+- [Workstreams](project/workstreams.md)
+- [Milestone map](project/milestones.md)
+- [Open decision backlog](project/decisions.md)
+
 ## Architecture and contracts
 
 - [System design](architecture/system-design.md)

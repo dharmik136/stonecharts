@@ -1,0 +1,9 @@
+# Current ownership is explicit; add real maintainers here as the team grows.
+* @dharmik136
+
+# Contract and release surfaces always require maintainer review.
+/spec/ @dharmik136
+/docs/architecture/ @dharmik136
+/docs/contracts/ @dharmik136
+/docs/releases/ @dharmik136
+/runtime/ @dharmik136

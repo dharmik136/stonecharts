@@ -10,6 +10,8 @@ intellectual property.
 1. Confirm authorization and the intended requirement or defect ID.
 2. Read [`docs/README.md`](docs/README.md), the applicable contracts, and the
    [renderer constitution](docs/architecture/renderer-constitution.md).
+   Use the [project operating model](docs/project/README.md) for work-item status,
+   acceptance, and evidence rules.
 3. For a contract or architecture change, update the requirement and ADR before code.
 4. Keep one change focused enough to review and revert independently.
 
@@ -41,4 +43,3 @@ reviewed direct Python-to-Go diff and records any intentional golden changes.
 The pull request or change record links requirements, ADRs, risks, tests, compatibility
 impact, security impact, and release target. Self-review is identified as self-review;
 it is not described as independent approval.
-

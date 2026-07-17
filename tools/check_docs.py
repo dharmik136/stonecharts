@@ -34,6 +34,7 @@ CONTROLLED_DIRS = (
     DOCS / "quality",
     DOCS / "security",
     DOCS / "releases",
+    DOCS / "project",
     DOCS / "customization",
     DOCS / "roadmap",
 )

@@ -1,0 +1,73 @@
+name: Planned Work Item
+description: Propose implementation, qualification, documentation, or operations work.
+title: "[Work]: "
+labels: ["type:work", "status:triage"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Required outcome
+      description: Describe the externally verifiable result.
+    validations:
+      required: true
+  - type: dropdown
+    id: workstream
+    attributes:
+      label: Workstream
+      options:
+        - Product contract and governance
+        - Renderer correctness and active scope
+        - Parity and conformance
+        - Runtime, browser, and accessibility
+        - Customization, layout, and visual profiles
+        - Packaging, release, and supply chain
+        - Documentation and developer experience
+        - Chart or language expansion
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options:
+        - 0.0.1-alpha.1
+        - Post-alpha
+        - Unscheduled
+    validations:
+      required: true
+  - type: input
+    id: traceability
+    attributes:
+      label: Requirement, ADR, contract, or risk IDs
+      placeholder: REQ-DET-001, SC-ARCH-ADR-0001, RISK-DET-001
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable pass/fail conditions.
+      placeholder: "- [ ] ..."
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification and evidence
+      description: Name tests, benchmarks, reviews, or release evidence that will prove completion.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and compatibility impact
+      description: Include blocking decisions, other work, migrations, and affected public surfaces.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Proposed priority
+      options:
+        - P0 - release or security blocker
+        - P1 - required for target milestone
+        - P2 - valuable but deferrable
+        - P3 - exploratory or backlog
+    validations:
+      required: true
