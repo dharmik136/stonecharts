@@ -24,6 +24,8 @@ evidence. It is intentionally lighter than the governance layer: project trackin
 coordinates execution but cannot redefine a requirement, ADR, contract, risk, or
 release gate.
 
+Execution board: [StoneCharts GitHub Project #2](https://github.com/users/dharmik136/projects/2).
+
 ## Sources of truth
 
 Precedence is explicit:

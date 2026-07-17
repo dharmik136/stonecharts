@@ -6,7 +6,8 @@ chart "recipe" produces the same interactive chart in Python, Go, and beyond.
 
 StoneCharts is currently entering a governed Alpha qualification phase. Product scope,
 guarantees, requirements, architecture decisions, risks, evidence, and release gates
-are indexed in [`docs/README.md`](docs/README.md).
+are indexed in [`docs/README.md`](docs/README.md). Execution is tracked in the private
+[StoneCharts GitHub Project](https://github.com/users/dharmik136/projects/2).
 
 **Not** a fork or copy of any commercial charting library. The chart-type catalog
 is inspired by common visualization types (line, bar, pie, scatter, heatmap, …);

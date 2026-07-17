@@ -32,6 +32,7 @@ Document status and classification are authoritative in each file's metadata.
 
 ## Project execution
 
+- [StoneCharts GitHub Project](https://github.com/users/dharmik136/projects/2)
 - [Project operating model](project/README.md)
 - [Workstreams](project/workstreams.md)
 - [Milestone map](project/milestones.md)
