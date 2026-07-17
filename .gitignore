@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Generated example outputs (goldens under charts/*/golden are committed)
+*.out.html
+
+# Tooling / editors
+.playwright-mcp/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
