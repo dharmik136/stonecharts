@@ -6,8 +6,8 @@
 
 - **Chart id:** `line-basic`
 - **Spec `type`:** `"line"`
-- **Status:** Python ✅ · Go ⏳
-- **Renderers:** `libs/python/peakcharts/charts/line.py`
+- **Status:** Python ✅ · Go ✅ (byte-identical, golden-tested)
+- **Renderers:** `libs/python/peakcharts/charts/line.py` · `libs/go/line.go`
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md)
 
 ## What it is
@@ -90,7 +90,12 @@ save_html(ChartSpec(
 ), "out.html")
 ```
 
-**Go —** _(pending; same spec, same output)._
+**Go —** same spec, byte-identical output:
+```go
+import "peakcharts"
+spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
+peakcharts.SaveHTML(spec, "out.html", "")
+```
 
 ## Output & interactivity
 

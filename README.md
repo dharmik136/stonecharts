@@ -51,11 +51,29 @@ spec = ChartSpec(
 save_html(spec, "chart.html")   # self-contained interactive HTML
 ```
 
+## Quickstart (Go)
+
+```bash
+cd libs/go
+go test ./...                                              # golden test vs the shared reference
+go run ./cmd/line_basic ../../charts/line-basic/examples/basic.json out.svg out.html
+```
+
+```go
+import "peakcharts"
+
+spec, _ := peakcharts.FromJSON(specJSON)   // matches spec/chart-spec.schema.json
+peakcharts.SaveHTML(spec, "chart.html", "")
+```
+
 ## Status
 
 | Chart | Spec | Python | Go | Interactivity |
 |-------|------|--------|----|----|
-| Basic line (`line-basic`) | ✅ | ✅ | ⏳ | tooltip · highlight · legend toggle · crosshair |
+| Basic line (`line-basic`) | ✅ | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+
+Python and Go render **byte-identical SVG** from the same spec, pinned by golden
+tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
 Roadmap: replicate the common chart-type catalog one type at a time (bar/column,
 area, pie, scatter, bubble, heatmap, gauge, …), each with its own `design.md`.

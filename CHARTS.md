@@ -37,7 +37,7 @@ schema), and the one render call — nothing more is needed.
 
 | Chart id | Fits this data | Use when | Not for | Status | Recipe |
 |----------|----------------|----------|---------|--------|--------|
-| `line-basic` | categories[N] + one-or-more series of N numbers | trend / compare a few series over shared x | part-to-whole, x/y correlation, distributions | Python ✅ · Go ⏳ | [design.md](charts/line-basic/design.md) |
+| `line-basic` | categories[N] + one-or-more series of N numbers | trend / compare a few series over shared x | part-to-whole, x/y correlation, distributions | Python ✅ · Go ✅ | [design.md](charts/line-basic/design.md) |
 
 _Everything below is the coverage roadmap (the chart-type checklist), added one
 at a time, each becoming a row above with its own `charts/<id>/design.md`:_
