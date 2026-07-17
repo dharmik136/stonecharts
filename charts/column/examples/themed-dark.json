@@ -1,0 +1,28 @@
+{
+  "type": "column",
+  "theme": "dark",
+  "title": "CPU Time Breakdown by Stage",
+  "subtitle": "Percent-stacked, dark theme, gradient bar fill",
+  "stacking": "percent",
+  "xAxis": {
+    "title": "Build",
+    "categories": ["v1.2", "v1.3", "v1.4", "v1.5"]
+  },
+  "yAxis": { "title": "Share of CPU" },
+  "series": [
+    { "name": "parse", "data": [120, 138, 145, 160] },
+    {
+      "name": "compile",
+      "data": [300, 280, 265, 240],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      }
+    },
+    { "name": "link", "data": [80, 92, 110, 130] }
+  ]
+}

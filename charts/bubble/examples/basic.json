@@ -1,21 +1,16 @@
 {
   "type": "bubble",
-  "title": "Basic Bubble Chart",
-  "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
-  },
+  "title": "Endpoint Latency vs Payload",
+  "subtitle": "Bubble area = requests per minute",
+  "xAxis": { "title": "Payload size (KB)" },
+  "yAxis": { "title": "p95 latency (ms)" },
+  "sizeLegend": true,
   "series": [
     {
-      "name": "Telemetry",
-      "data": [
-        10.0,
-        20.0,
-        30.0
-      ]
+      "name": "Checkout API",
+      "x":    [2, 8, 15, 30, 55, 90],
+      "data": [45, 62, 78, 120, 180, 260],
+      "z":    [1200, 3400, 800, 5600, 2100, 900]
     }
   ]
 }

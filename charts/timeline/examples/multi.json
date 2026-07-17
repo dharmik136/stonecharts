@@ -1,0 +1,35 @@
+{
+  "type": "timeline",
+  "title": "Deploys vs Incidents — May–Jun 2026",
+  "subtitle": "Two event streams sharing one datetime axis, in parallel lanes",
+  "orientation": "horizontal",
+  "leaders": true,
+  "xAxis": {
+    "type": "datetime",
+    "title": "Date"
+  },
+  "series": [
+    {
+      "name": "Deploys",
+      "color": "#2f7ed8",
+      "marker": { "symbol": "circle", "radius": 5 },
+      "data": [1777939200000, 1779148800000, 1780963200000, 1782172800000],
+      "labels": [
+        "v4.4.0 — cache layer",
+        "v4.5.0 — query planner",
+        "v4.6.0 — cold-start fix",
+        "v4.6.1 — hotfix"
+      ]
+    },
+    {
+      "name": "Incidents",
+      "color": "#e04b4b",
+      "marker": { "symbol": "diamond", "radius": 5.5 },
+      "data": [1778544000000, 1781395200000],
+      "labels": [
+        "INC-114 — cache stampede",
+        "INC-120 — auth latency spike"
+      ]
+    }
+  ]
+}

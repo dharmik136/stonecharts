@@ -1,21 +1,10 @@
 {
   "type": "arearange",
-  "title": "Basic Area Range",
-  "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
-  },
+  "title": "Request Latency Band",
+  "subtitle": "p50-p95 over the day",
+  "xAxis": { "title": "Hour", "categories": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"] },
+  "yAxis": { "title": "Latency (ms)" },
   "series": [
-    {
-      "name": "P50-P95",
-      "data": [
-        1.2,
-        2.5,
-        3.1
-      ]
-    }
+    { "name": "p50-p95", "data": [120, 135, 180, 240, 210, 150], "low": [60, 68, 95, 140, 120, 80] }
   ]
 }

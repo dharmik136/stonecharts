@@ -1,20 +1,22 @@
 {
   "type": "boxplot",
-  "title": "Basic Boxplot",
+  "title": "API Latency Distribution by Endpoint",
+  "subtitle": "Response time (ms), 5-number summary per endpoint",
   "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
+    "title": "Endpoint",
+    "categories": ["/login", "/search", "/cart", "/checkout", "/profile"]
   },
+  "yAxis": { "title": "Response time (ms)" },
   "series": [
     {
-      "name": "Latency Distribution",
-      "data": [
-        20.0,
-        25.0,
-        22.0
+      "name": "Response time (ms)",
+      "data": [24, 88, 35, 130, 28],
+      "boxData": [
+        { "low": 12, "q1": 18, "median": 24,  "q3": 33,  "high": 48  },
+        { "low": 40, "q1": 65, "median": 88,  "q3": 120, "high": 190 },
+        { "low": 20, "q1": 28, "median": 35,  "q3": 44,  "high": 60  },
+        { "low": 55, "q1": 90, "median": 130, "q3": 180, "high": 260 },
+        { "low": 15, "q1": 22, "median": 28,  "q3": 36,  "high": 52  }
       ]
     }
   ]

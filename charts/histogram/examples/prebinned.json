@@ -1,0 +1,18 @@
+{
+  "type": "histogram",
+  "title": "Heap Allocation Size Distribution",
+  "subtitle": "Pre-binned sample counts, density-normalized",
+  "preBinned": true,
+  "normalization": "density",
+  "xAxis": {
+    "title": "Allocation size (KB)",
+    "binEdges": [0, 4, 8, 16, 32, 64, 128, 256, 512]
+  },
+  "yAxis": { "title": "Density" },
+  "series": [
+    {
+      "name": "Allocations",
+      "data": [1240, 3105, 2870, 1560, 720, 310, 95, 22]
+    }
+  ]
+}

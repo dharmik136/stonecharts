@@ -1,0 +1,15 @@
+{
+  "type": "bubble",
+  "title": "Benchmark Samples (equal weight)",
+  "subtitle": "All-equal z → fixed radius (RMIN+RMAX)/2; clamped axes",
+  "xAxis": { "title": "Threads", "min": 0, "max": 64 },
+  "yAxis": { "title": "Throughput (kops/s)", "min": 0, "max": 500 },
+  "series": [
+    {
+      "name": "engine-v2",
+      "x":    [1, 4, 8, 16, 32, 48],
+      "data": [42, 150, 268, 360, 430, 455],
+      "z":    [500, 500, 500, 500, 500, 500]
+    }
+  ]
+}

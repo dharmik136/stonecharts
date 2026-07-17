@@ -1,0 +1,26 @@
+{
+  "type": "windbarb",
+  "title": "Cape Grim (Tasmania) — Wind Strip",
+  "subtitle": "Southern-hemisphere barbs (mirrored feathers), offset lane, knots",
+  "speedUnit": "kt",
+  "hemisphere": "S",
+  "yOffset": -120,
+  "barbLength": 22,
+  "xAxis": {
+    "title": "Hour (AEST)",
+    "type": "datetime",
+    "categories": [
+      "2024-07-03T00:00", "2024-07-03T04:00", "2024-07-03T08:00",
+      "2024-07-03T12:00", "2024-07-03T16:00", "2024-07-03T20:00"
+    ]
+  },
+  "yAxis": { "title": "Wind speed (kt)" },
+  "series": [
+    {
+      "name": "Cape Grim 10 m",
+      "color": "#3f9b6a",
+      "data":      [22, 30, 41, 55, 48, 35],
+      "direction": [250, 260, 275, 290, 280, 265]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "waterfall",
+  "theme": "dark",
+  "title": "Request Latency Budget",
+  "subtitle": "Per-stage contribution to p95, dark theme",
+  "intermediateSumIndices": [3],
+  "sumIndices": [6],
+  "upColor": "#e0794b",
+  "downColor": "#3ec8a0",
+  "totalColor": "#8a7ff0",
+  "connector": { "enabled": true, "dashStyle": "dotted" },
+  "xAxis": {
+    "title": "Stage",
+    "categories": ["Edge", "Auth", "Gateway", "Ingress p95", "Service", "Cache hit", "Total p95"]
+  },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    { "name": "Latency", "data": [8, 14, 22, 0, 61, -12, 0] }
+  ]
+}

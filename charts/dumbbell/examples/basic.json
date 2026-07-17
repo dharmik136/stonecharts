@@ -1,21 +1,20 @@
 {
   "type": "dumbbell",
-  "title": "Basic Dumbbell Chart",
+  "title": "Median Latency: Before vs After Caching",
+  "subtitle": "One dumbbell per endpoint — the gap is the improvement",
   "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
+    "title": "Endpoint",
+    "categories": ["/login", "/search", "/cart", "/checkout", "/invoice"]
   },
+  "yAxis": { "title": "p50 latency (ms)" },
   "series": [
     {
-      "name": "Before/After",
-      "data": [
-        12.0,
-        14.0,
-        13.0
-      ]
+      "name": "p50 latency",
+      "lowName": "After",
+      "highName": "Before",
+      "data": [42, 68, 55, 96, 71],
+      "high": [88, 152, 119, 210, 164],
+      "marker": { "symbol": "circle", "radius": 5 }
     }
   ]
 }

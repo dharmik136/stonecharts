@@ -1,22 +1,14 @@
 {
   "type": "area",
-  "title": "Basic Area Chart",
+  "title": "Memory Usage by Region",
+  "subtitle": "Resident set over time, overlaid areas",
   "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
+    "title": "Time",
+    "categories": ["10:00", "10:05", "10:10", "10:15", "10:20", "10:25"]
   },
+  "yAxis": { "title": "RSS (MB)" },
   "series": [
-    {
-      "name": "Tokyo",
-      "data": [
-        7.0,
-        6.9,
-        9.5
-      ],
-      "fillOpacity": 0.3
-    }
+    { "name": "us-east", "data": [420, 460, 510, 540, 505, 530], "fillOpacity": 0.35 },
+    { "name": "eu-west", "data": [300, 330, 355, 390, 410, 400], "fillOpacity": 0.35 }
   ]
 }

@@ -1,21 +1,14 @@
 {
   "type": "scatter",
-  "title": "Basic Scatter Plot",
-  "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
-  },
+  "title": "Response Latency by Sample",
+  "subtitle": "One unconnected point per request",
+  "xAxis": { "title": "Sample #" },
+  "yAxis": { "title": "Latency (ms)" },
   "series": [
     {
-      "name": "Latency vs Size",
-      "data": [
-        12.0,
-        15.0,
-        18.0
-      ]
+      "name": "checkout-api",
+      "data": [42, 55, 38, 61, 47, 90, 52, 44, 73, 58, 49, 66, 51, 39, 63],
+      "marker": { "symbol": "circle", "radius": 4 }
     }
   ]
 }

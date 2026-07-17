@@ -1,21 +1,14 @@
 {
   "type": "combo",
-  "title": "Basic Combo Chart",
+  "title": "Deploys per Day",
+  "subtitle": "Daily count (columns) vs 3-day average (line)",
   "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
+    "title": "Day",
+    "categories": ["Mon", "Tue", "Wed", "Thu", "Fri"]
   },
+  "yAxis": { "title": "Deploys" },
   "series": [
-    {
-      "name": "Target",
-      "data": [
-        5.0,
-        6.0,
-        7.0
-      ]
-    }
+    { "name": "Deploys",   "type": "column", "data": [8, 5, 11, 6, 9] },
+    { "name": "3-day avg", "type": "line",   "data": [8, 7, 8, 7.3, 8.7], "color": "#e0703c" }
   ]
 }

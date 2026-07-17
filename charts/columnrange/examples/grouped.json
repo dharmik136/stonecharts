@@ -1,0 +1,15 @@
+{
+  "type": "columnrange",
+  "title": "Latency Spread by Service",
+  "subtitle": "p10–p90 response-time band, two series grouped side-by-side",
+  "grouping": true,
+  "xAxis": {
+    "title": "Endpoint",
+    "categories": ["/auth", "/search", "/cart", "/checkout", "/orders"]
+  },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    { "name": "api-gateway", "data": [18, 24, 21, 33, 27], "high": [92, 140, 118, 210, 165] },
+    { "name": "edge-cache",  "data": [8, 11, 9, 14, 12],   "high": [40, 62, 51, 88, 70] }
+  ]
+}

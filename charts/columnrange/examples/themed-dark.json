@@ -1,0 +1,28 @@
+{
+  "type": "columnrange",
+  "theme": "dark",
+  "title": "Thermal Envelope by Rack",
+  "subtitle": "Min–max inlet temperature, dark theme, gradient floating-bar fill",
+  "grouping": true,
+  "xAxis": {
+    "title": "Rack",
+    "categories": ["R1", "R2", "R3", "R4"]
+  },
+  "yAxis": { "title": "Inlet °C" },
+  "series": [
+    { "name": "Row A", "data": [17.5, 18.2, 16.9, 19.1], "high": [27.3, 29.0, 26.4, 31.2] },
+    {
+      "name": "Row B",
+      "data": [19.0, 20.1, 18.4, 21.0],
+      "high": [30.1, 32.4, 29.8, 34.6],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      }
+    }
+  ]
+}

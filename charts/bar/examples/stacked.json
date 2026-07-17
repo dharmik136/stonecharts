@@ -1,0 +1,16 @@
+{
+  "type": "bar",
+  "title": "Errors by Service",
+  "subtitle": "Stacked horizontal bars, last hour",
+  "stacking": "normal",
+  "xAxis": {
+    "title": "Service",
+    "categories": ["auth", "catalog", "cart", "payments", "shipping", "search"]
+  },
+  "yAxis": { "title": "Errors" },
+  "series": [
+    { "name": "5xx",      "data": [12, 8, 5, 21, 14, 6] },
+    { "name": "4xx",      "data": [40, 33, 28, 19, 25, 44] },
+    { "name": "Timeouts", "data": [6, 3, 2, 11, 7, 4] }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "arearange",
+  "id": "forecast",
+  "subtype": "areasplinerange",
+  "title": "Temperature Forecast Range",
+  "subtitle": "Smooth min-max band (areasplinerange) with bounding stroke",
+  "xAxis": { "title": "Day", "categories": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+  "yAxis": { "title": "Temperature (°C)" },
+  "series": [
+    {
+      "name": "Min-Max",
+      "data": [14.2, 16.8, 19.5, 21.0, 18.3, 15.6, 13.9],
+      "low": [6.1, 7.4, 9.8, 11.2, 8.7, 5.9, 4.3],
+      "color": "#f7a35c",
+      "fillOpacity": 0.3,
+      "lineWidth": 1.5,
+      "curve": "monotone"
+    }
+  ]
+}

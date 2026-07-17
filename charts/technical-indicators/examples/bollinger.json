@@ -1,0 +1,30 @@
+{
+  "type": "technical-indicators",
+  "title": "Request Throughput with Bollinger Bands",
+  "subtitle": "Base req/s line + Bollinger(10, 2) band and mid SMA(10); incident window shaded",
+  "xAxis": {
+    "title": "Interval",
+    "categories": ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "t10", "t11", "t12", "t13", "t14", "t15", "t16", "t17", "t18", "t19", "t20", "t21", "t22", "t23"],
+    "plotBands": [
+      { "from": 13, "to": 16, "color": "#f2b13422", "label": "Incident window" }
+    ]
+  },
+  "yAxis": { "title": "Requests / s" },
+  "series": [
+    {
+      "name": "Throughput",
+      "type": "line",
+      "data": [1180, 1205, 1240, 1198, 1256, 1288, 1264, 1231, 1279, 1302, 1290, 1268, 1315, 1342, 1520, 1610, 1498, 1350, 1288, 1264, 1240, 1272, 1298, 1310],
+      "color": "#2f7ed8",
+      "indicators": [
+        {
+          "type": "bollinger",
+          "period": 10,
+          "params": { "stdDev": 2 },
+          "color": "#9b8cf7",
+          "params_fill_opacity": 0.15
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "waterfall",
+  "title": "Revenue to Net Profit",
+  "subtitle": "Q3 income-statement bridge",
+  "intermediateSumIndices": [2],
+  "sumIndices": [6],
+  "yAxis": {
+    "title": "USD (millions)",
+    "gridLine": { "color": "#eceef5", "dashStyle": "dashed" }
+  },
+  "xAxis": {
+    "title": "Line",
+    "categories": ["Revenue", "COGS", "Gross profit", "OpEx", "R&D", "Tax", "Net profit"]
+  },
+  "series": [
+    { "name": "P&L", "data": [42.0, -16.5, 0, -9.2, -4.8, -3.1, 0] }
+  ]
+}

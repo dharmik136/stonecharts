@@ -1,0 +1,15 @@
+{
+  "type": "funnel",
+  "subtype": "neck",
+  "neckWidth": 0.25,
+  "neckHeight": 0.3,
+  "title": "Sales Pipeline",
+  "subtitle": "Area/neck funnel — narrow closing neck",
+  "legend": false,
+  "xAxis": {
+    "categories": ["Leads", "Qualified", "Proposal", "Negotiation", "Closed Won"]
+  },
+  "series": [
+    { "name": "Deals", "data": [1250, 640, 310, 140, 72] }
+  ]
+}

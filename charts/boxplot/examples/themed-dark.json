@@ -1,0 +1,37 @@
+{
+  "type": "boxplot",
+  "theme": "dark",
+  "title": "GC Pause Distribution by Region",
+  "subtitle": "Dark theme, horizontal, samples mode with jittered scatter overlay",
+  "orientation": "horizontal",
+  "scatterOverlay": true,
+  "xAxis": {
+    "title": "Region",
+    "categories": ["Region A", "Region B", "Region C"]
+  },
+  "yAxis": { "title": "GC pause (ms)" },
+  "series": [
+    {
+      "name": "GC pause (ms)",
+      "data": [12, 19, 14],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      },
+      "samples": [
+        [6, 8, 9, 11, 12, 13, 15, 16, 22, 42],
+        [9, 12, 14, 18, 19, 21, 25, 27, 38],
+        [7, 9, 11, 13, 14, 17, 19, 28, 55, 60]
+      ],
+      "boxData": [
+        { "low": 6, "q1": 9,  "median": 12, "q3": 16, "high": 24, "outliers": [42] },
+        { "low": 9, "q1": 14, "median": 19, "q3": 27, "high": 40, "outliers": [] },
+        { "low": 7, "q1": 10, "median": 14, "q3": 20, "high": 30, "outliers": [55, 60] }
+      ]
+    }
+  ]
+}

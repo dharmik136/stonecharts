@@ -1,0 +1,44 @@
+{
+  "type": "xrange",
+  "title": "Release Windows — Fleet Rollout",
+  "subtitle": "Dark theme, gradient span fill (defs pre-pass) + custom-colored series (epoch-hour)",
+  "id": "rollout",
+  "theme": "dark",
+  "xAxis": { "title": "Hour", "type": "datetime", "min": 0, "max": 48 },
+  "yAxis": {
+    "title": "Region",
+    "categories": ["us-east", "us-west", "eu-central", "ap-south"]
+  },
+  "series": [
+    {
+      "name": "canary",
+      "color": "#8b9bb4",
+      "data": [0, 3, 6, 9],
+      "spans": [
+        { "x": 0, "x2": 4,  "y": 0, "id": "c-e", "name": "canary us-east" },
+        { "x": 3, "x2": 7,  "y": 1, "id": "c-w", "name": "canary us-west",  "dependency": ["c-e"] },
+        { "x": 6, "x2": 10, "y": 2, "id": "c-c", "name": "canary eu",       "dependency": ["c-w"] },
+        { "x": 9, "x2": 13, "y": 3, "id": "c-s", "name": "canary ap",       "dependency": ["c-c"] }
+      ]
+    },
+    {
+      "name": "full rollout",
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 1, "y2": 0,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      },
+      "data": [12, 16, 20, 24, 46],
+      "spans": [
+        { "x": 12, "x2": 30, "y": 0, "id": "f-e", "name": "rollout us-east",  "dependency": ["c-e"] },
+        { "x": 16, "x2": 34, "y": 1, "id": "f-w", "name": "rollout us-west",  "dependency": ["c-w", "f-e"] },
+        { "x": 20, "x2": 40, "y": 2, "id": "f-c", "name": "rollout eu",       "dependency": ["c-c", "f-w"] },
+        { "x": 24, "x2": 46, "y": 3, "id": "f-s", "name": "rollout ap",       "dependency": ["c-s", "f-c"] },
+        { "x": 46, "x2": 46, "y": 3, "id": "done", "name": "fleet complete", "milestone": true, "dependency": ["f-s"] }
+      ]
+    }
+  ]
+}

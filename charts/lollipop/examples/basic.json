@@ -1,21 +1,17 @@
 {
   "type": "lollipop",
-  "title": "Basic Lollipop Chart",
+  "title": "p99 Latency by Endpoint",
+  "subtitle": "Single series, one centered stem per category",
   "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
+    "title": "Endpoint",
+    "categories": ["/login", "/search", "/cart", "/checkout", "/invoice", "/profile"]
   },
+  "yAxis": { "title": "p99 latency (ms)" },
   "series": [
     {
-      "name": "Lollipop Metrics",
-      "data": [
-        8.5,
-        9.2,
-        7.8
-      ]
+      "name": "p99",
+      "data": [82, 145, 96, 210, 168, 74],
+      "marker": { "symbol": "circle", "radius": 5 }
     }
   ]
 }

@@ -1,29 +1,16 @@
 {
   "type": "column",
-  "title": "Stacked Column Chart",
+  "title": "Errors by Class per Interval",
+  "subtitle": "Stacked counts, 5-minute buckets",
+  "stacking": "normal",
   "xAxis": {
-    "categories": [
-      "Apples",
-      "Oranges",
-      "Pears"
-    ]
+    "title": "Interval",
+    "categories": ["12:00", "12:05", "12:10", "12:15", "12:20", "12:25"]
   },
+  "yAxis": { "title": "Errors" },
   "series": [
-    {
-      "name": "John",
-      "data": [
-        5.0,
-        3.0,
-        4.0
-      ]
-    },
-    {
-      "name": "Jane",
-      "data": [
-        2.0,
-        5.0,
-        6.0
-      ]
-    }
+    { "name": "5xx",      "data": [12, 18, 9, 24, 15, 7] },
+    { "name": "4xx",      "data": [34, 41, 28, 52, 39, 22] },
+    { "name": "Timeouts", "data": [5, 8, 3, 11, 6, 2] }
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "type": "combo",
+  "title": "Adversarial <combo> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field of both mark kinds",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<script>alert(1)</script>", "a\"b", "c<d", "e&f"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "bars <script>&\"'",
+      "type": "column",
+      "data": [12, 34, 7, 21],
+      "color": "#2f7ed8\"><script>"
+    },
+    {
+      "name": "line </g>&\"'<x>",
+      "type": "line",
+      "data": [30, 18, 25, 14],
+      "color": "#e0703c\"><b>",
+      "marker": { "symbol": "triangle" }
+    }
+  ]
+}

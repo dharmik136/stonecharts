@@ -1,0 +1,17 @@
+{
+  "type": "streamgraph",
+  "title": "Requests by Service",
+  "subtitle": "Silhouette (inside-out) baseline — requests per second",
+  "offset": "silhouette",
+  "xAxis": {
+    "title": "Day",
+    "categories": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  },
+  "yAxis": { "title": "Relative volume" },
+  "series": [
+    { "name": "checkout", "data": [820, 910, 880, 940, 1020, 640, 590] },
+    { "name": "catalog",  "data": [1500, 1580, 1520, 1610, 1720, 1180, 1090] },
+    { "name": "search",   "data": [1100, 1160, 1140, 1190, 1260, 900, 850] },
+    { "name": "profile",  "data": [430, 460, 450, 470, 500, 380, 360] }
+  ]
+}

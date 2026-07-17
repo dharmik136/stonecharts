@@ -1,0 +1,25 @@
+{
+  "type": "timeline",
+  "title": "Platform 2.0 Release Roadmap",
+  "subtitle": "Vertical milestone timeline — time runs top-to-bottom",
+  "orientation": "vertical",
+  "leaders": true,
+  "xAxis": {
+    "type": "datetime",
+    "title": "Milestone date"
+  },
+  "series": [
+    {
+      "name": "Milestones",
+      "marker": { "symbol": "square", "radius": 5 },
+      "data": [1768435200000, 1772323200000, 1777593600000, 1782864000000, 1789430400000],
+      "labels": [
+        "Alpha — internal dogfood",
+        "Beta — design partners",
+        "RC1 — feature freeze",
+        "GA — general availability",
+        "v2.1 — multi-region"
+      ]
+    }
+  ]
+}

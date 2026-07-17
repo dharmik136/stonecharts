@@ -1,0 +1,23 @@
+{
+  "type": "windbarb",
+  "title": "Buoy 41010 — Wind Over 24h",
+  "subtitle": "Three-hourly barbs on a datetime axis, metres per second",
+  "speedUnit": "mps",
+  "xAxis": {
+    "title": "Time (UTC)",
+    "type": "datetime",
+    "categories": [
+      "2024-09-12T00:00Z", "2024-09-12T03:00Z", "2024-09-12T06:00Z",
+      "2024-09-12T09:00Z", "2024-09-12T12:00Z", "2024-09-12T15:00Z",
+      "2024-09-12T18:00Z", "2024-09-12T21:00Z"
+    ]
+  },
+  "yAxis": { "title": "Wind speed (m/s)" },
+  "series": [
+    {
+      "name": "41010 anemometer",
+      "data":      [4, 7, 11, 15, 18, 14, 9, 6],
+      "direction": [80, 95, 110, 130, 155, 180, 205, 230]
+    }
+  ]
+}

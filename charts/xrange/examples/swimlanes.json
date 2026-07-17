@@ -1,0 +1,36 @@
+{
+  "type": "xrange",
+  "title": "CI Pipeline — Parallel Workers",
+  "subtitle": "Per-thread swimlanes: two workers sharing stage rows (wall-clock seconds)",
+  "id": "ci",
+  "xAxis": { "title": "Elapsed (s)", "type": "datetime", "min": 0, "max": 240 },
+  "yAxis": {
+    "title": "Stage",
+    "categories": ["checkout", "build", "unit-tests", "integration", "package", "deploy"]
+  },
+  "series": [
+    {
+      "name": "worker-1",
+      "color": "#2f7ed8",
+      "data": [0, 18, 62, 96, 170, 205],
+      "spans": [
+        { "x": 0,   "x2": 18,  "y": 0, "id": "w1-co",  "name": "clone" },
+        { "x": 18,  "x2": 62,  "y": 1, "id": "w1-bd",  "name": "compile",       "dependency": ["w1-co"] },
+        { "x": 62,  "x2": 96,  "y": 2, "id": "w1-ut",  "name": "unit suite A",  "dependency": ["w1-bd"] },
+        { "x": 96,  "x2": 170, "y": 3, "id": "w1-it",  "name": "integration A", "dependency": ["w1-ut"] },
+        { "x": 170, "x2": 205, "y": 4, "id": "w1-pk",  "name": "package",       "dependency": ["w1-it"] },
+        { "x": 205, "x2": 232, "y": 5, "id": "w1-dp",  "name": "deploy canary", "dependency": ["w1-pk"] }
+      ]
+    },
+    {
+      "name": "worker-2",
+      "color": "#f2a13c",
+      "data": [20, 66, 108],
+      "spans": [
+        { "x": 20,  "x2": 66,  "y": 1, "id": "w2-bd",  "name": "compile cache" },
+        { "x": 66,  "x2": 108, "y": 2, "id": "w2-ut",  "name": "unit suite B",  "dependency": ["w2-bd"] },
+        { "x": 108, "x2": 188, "y": 3, "id": "w2-it",  "name": "integration B", "dependency": ["w2-ut"] }
+      ]
+    }
+  ]
+}

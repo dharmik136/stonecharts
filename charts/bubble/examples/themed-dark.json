@@ -1,0 +1,33 @@
+{
+  "type": "bubble",
+  "theme": "dark",
+  "title": "Cost vs Utilization by Service",
+  "subtitle": "Dark theme, gradient bubble fill, bubble area = monthly spend",
+  "xAxis": { "title": "CPU utilization (%)" },
+  "yAxis": { "title": "Requests served (millions)" },
+  "sizeLegend": { "buckets": 3, "title": "Monthly spend ($)" },
+  "series": [
+    {
+      "name": "api-gateway",
+      "x":    [35, 52, 68, 74, 88],
+      "data": [12, 18, 26, 31, 44],
+      "z":    [4200, 6800, 9100, 12500, 18000],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      },
+      "fillOpacity": 0.7
+    },
+    {
+      "name": "batch-worker",
+      "x":    [22, 41, 55, 63, 79],
+      "data": [4, 7, 11, 15, 22],
+      "z":    [1500, 3200, 5400, 7800, 11000],
+      "fillOpacity": 0.7
+    }
+  ]
+}

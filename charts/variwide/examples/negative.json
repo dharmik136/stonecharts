@@ -1,0 +1,18 @@
+{
+  "type": "variwide",
+  "title": "Budget Variance by Team, Weighted by Budget Size",
+  "subtitle": "Bar height = variance vs plan (%, negative = under budget); bar width = budget size (k USD)",
+  "xAxis": {
+    "title": "Team",
+    "categories": ["Platform", "Growth", "Data", "Support", "Design"]
+  },
+  "yAxis": { "title": "Variance vs plan (%)" },
+  "series": [
+    {
+      "name": "variance",
+      "data": [12.5, -8.0, 4.2, -3.5, 18.0],
+      "widths": [1200, 640, 880, 410, 220],
+      "color": "#e0663e"
+    }
+  ]
+}

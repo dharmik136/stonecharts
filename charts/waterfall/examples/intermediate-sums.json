@@ -1,0 +1,18 @@
+{
+  "type": "waterfall",
+  "title": "Engineering Budget Bridge — FY25",
+  "subtitle": "Planned deltas with a mid-year subtotal and year-end total",
+  "intermediateSumIndices": [4],
+  "sumIndices": [8],
+  "upColor": "#2e9e5b",
+  "downColor": "#d9534f",
+  "totalColor": "#4b6cb7",
+  "xAxis": {
+    "title": "Line item",
+    "categories": ["Base", "Headcount", "Tooling", "Cloud", "H1 subtotal", "Contractors", "Savings", "Travel", "FY total"]
+  },
+  "yAxis": { "title": "Budget (USD, thousands)" },
+  "series": [
+    { "name": "Budget", "data": [800, 260, 90, 140, 0, 180, -120, 40, 0] }
+  ]
+}

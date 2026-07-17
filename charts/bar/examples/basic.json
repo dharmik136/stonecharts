@@ -1,21 +1,13 @@
 {
   "type": "bar",
-  "title": "Basic Horizontal Bar Chart",
+  "title": "Top API Endpoints by Request Volume",
+  "subtitle": "Last 24 hours, ranked",
   "xAxis": {
-    "categories": [
-      "A",
-      "B",
-      "C"
-    ]
+    "title": "Endpoint",
+    "categories": ["/api/login", "/api/search", "/api/orders", "/api/profile", "/api/checkout", "/api/logout"]
   },
+  "yAxis": { "title": "Requests (thousands)" },
   "series": [
-    {
-      "name": "Sales",
-      "data": [
-        100.0,
-        200.0,
-        150.0
-      ]
-    }
+    { "name": "Requests", "data": [182, 164, 97, 88, 64, 41] }
   ]
 }

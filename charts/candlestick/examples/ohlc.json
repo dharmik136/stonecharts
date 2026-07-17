@@ -1,0 +1,27 @@
+{
+  "type": "candlestick",
+  "title": "Market Index — OHLC Bars",
+  "subtitle": "OHLC bar subtype on a datetime x-axis",
+  "subtype": "ohlc",
+  "xAxis": {
+    "title": "Date",
+    "type": "datetime",
+    "categories": ["2024-03-01", "2024-03-04", "2024-03-05", "2024-03-06", "2024-03-07", "2024-03-08", "2024-03-11"]
+  },
+  "yAxis": { "title": "Index level" },
+  "series": [
+    {
+      "name": "IDX-500",
+      "data": [5130.1, 5117.6, 5160.4, 5155.2, 5098.3, 5129.7, 5170.8],
+      "ohlc": [
+        { "open": 5090.2, "high": 5137.0, "low": 5081.5, "close": 5130.1 },
+        { "open": 5130.1, "high": 5149.4, "low": 5104.0, "close": 5117.6 },
+        { "open": 5117.6, "high": 5165.0, "low": 5112.3, "close": 5160.4 },
+        { "open": 5160.4, "high": 5178.9, "low": 5150.1, "close": 5155.2 },
+        { "open": 5155.2, "high": 5157.0, "low": 5090.6, "close": 5098.3 },
+        { "open": 5098.3, "high": 5134.2, "low": 5096.0, "close": 5129.7 },
+        { "open": 5129.7, "high": 5175.5, "low": 5127.4, "close": 5170.8 }
+      ]
+    }
+  ]
+}

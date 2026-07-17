@@ -1,0 +1,31 @@
+{
+  "type": "arearange",
+  "theme": "dark",
+  "title": "Latency Percentile Bands",
+  "subtitle": "p05-p50 and p50-p95 (dark theme, gradient fill)",
+  "xAxis": { "title": "Hour", "categories": ["00:00", "06:00", "12:00", "18:00", "23:00"] },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    {
+      "name": "p50-p95",
+      "data": [180, 210, 320, 260, 190],
+      "low": [95, 120, 180, 150, 100],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#7cb5ec", "opacity": 0.6 },
+          { "offset": 1, "color": "#7cb5ec", "opacity": 0.15 }
+        ]
+      },
+      "fillOpacity": 0.5
+    },
+    {
+      "name": "p05-p50",
+      "data": [95, 120, 180, 150, 100],
+      "low": [40, 52, 70, 66, 48],
+      "color": "#90ed7d",
+      "fillOpacity": 0.35
+    }
+  ]
+}
