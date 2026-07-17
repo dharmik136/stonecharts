@@ -1,0 +1,21 @@
+{
+  "type": "candlestick",
+  "title": "Basic Financial Candlestick",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Stock Price",
+      "data": [
+        150.0,
+        155.0,
+        152.0
+      ]
+    }
+  ]
+}

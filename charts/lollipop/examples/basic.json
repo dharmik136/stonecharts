@@ -1,0 +1,21 @@
+{
+  "type": "lollipop",
+  "title": "Basic Lollipop Chart",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Lollipop Metrics",
+      "data": [
+        8.5,
+        9.2,
+        7.8
+      ]
+    }
+  ]
+}

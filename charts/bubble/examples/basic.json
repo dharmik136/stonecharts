@@ -1,0 +1,21 @@
+{
+  "type": "bubble",
+  "title": "Basic Bubble Chart",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Telemetry",
+      "data": [
+        10.0,
+        20.0,
+        30.0
+      ]
+    }
+  ]
+}

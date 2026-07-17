@@ -1,0 +1,21 @@
+{
+  "type": "timeline",
+  "title": "Basic Timeline",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Deploys",
+      "data": [
+        1.0,
+        2.0,
+        3.0
+      ]
+    }
+  ]
+}

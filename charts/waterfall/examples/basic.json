@@ -1,0 +1,21 @@
+{
+  "type": "waterfall",
+  "title": "Basic Waterfall",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Revenue",
+      "data": [
+        120.0,
+        -30.0,
+        40.0
+      ]
+    }
+  ]
+}

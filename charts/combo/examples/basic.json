@@ -1,0 +1,21 @@
+{
+  "type": "combo",
+  "title": "Basic Combo Chart",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Target",
+      "data": [
+        5.0,
+        6.0,
+        7.0
+      ]
+    }
+  ]
+}

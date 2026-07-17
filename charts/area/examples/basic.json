@@ -1,0 +1,22 @@
+{
+  "type": "area",
+  "title": "Basic Area Chart",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Tokyo",
+      "data": [
+        7.0,
+        6.9,
+        9.5
+      ],
+      "fillOpacity": 0.3
+    }
+  ]
+}

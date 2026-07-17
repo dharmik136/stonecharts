@@ -38,6 +38,13 @@ schema), and the one render call — nothing more is needed.
 | Chart id | Fits this data | Use when | Not for | Status | Recipe |
 |----------|----------------|----------|---------|--------|--------|
 | `line-basic` | categories[N] + one-or-more series of N numbers | trend / compare a few series over shared x | part-to-whole, x/y correlation, distributions | Python ✅ · Go ✅ | [design.md](charts/line-basic/design.md) |
+| `column` | categories[N] + series of numbers | compare categories vertically (grouped/stacked) | trend (use line), correlation (use scatter) | Scaffolded | [design.md](charts/column/design.md) |
+| `bar` | categories[N] + series of numbers | compare categories horizontally (grouped/stacked) | trend (use line), correlation (use scatter) | Scaffolded | [design.md](charts/bar/design.md) |
+| `area` | categories[N] + series of numbers | trend + volume/magnitude under line | part-to-whole | Scaffolded | [design.md](charts/area/design.md) |
+| `scatter` | series of [x,y] coordinates | correlation between two numeric variables | category ranking | Scaffolded | [design.md](charts/scatter/design.md) |
+| `bubble` | series of [x,y,z] coordinates | correlation + bubble size representing volume | simple comparison | Scaffolded | [design.md](charts/bubble/design.md) |
+| `boxplot` | 5-number distributions per category | statistical summary of latency distributions | single trends | Scaffolded | [design.md](charts/boxplot/design.md) |
+| `waterfall` | stage-by-stage delta calculations | budget or latency breakdowns with running totals | raw distributions | Scaffolded | [design.md](charts/waterfall/design.md) |
 
 _Everything below is the coverage roadmap (the chart-type checklist), added one
 at a time, each becoming a row above with its own `charts/<id>/design.md`:_

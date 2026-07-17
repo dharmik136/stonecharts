@@ -1,0 +1,21 @@
+{
+  "type": "dumbbell",
+  "title": "Basic Dumbbell Chart",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Before/After",
+      "data": [
+        12.0,
+        14.0,
+        13.0
+      ]
+    }
+  ]
+}

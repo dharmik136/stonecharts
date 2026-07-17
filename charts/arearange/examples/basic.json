@@ -1,0 +1,21 @@
+{
+  "type": "arearange",
+  "title": "Basic Area Range",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "P50-P95",
+      "data": [
+        1.2,
+        2.5,
+        3.1
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "type": "columnrange",
+  "title": "Basic Column Range",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Range",
+      "data": [
+        5.0,
+        10.0,
+        15.0
+      ]
+    }
+  ]
+}

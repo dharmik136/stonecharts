@@ -1,0 +1,21 @@
+{
+  "type": "xrange",
+  "title": "Basic X-Range / Gantt",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Span Timeline",
+      "data": [
+        4.0,
+        5.0,
+        6.0
+      ]
+    }
+  ]
+}

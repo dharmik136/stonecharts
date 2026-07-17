@@ -1,0 +1,21 @@
+{
+  "type": "scatter",
+  "title": "Basic Scatter Plot",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Latency vs Size",
+      "data": [
+        12.0,
+        15.0,
+        18.0
+      ]
+    }
+  ]
+}

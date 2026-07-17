@@ -1,0 +1,21 @@
+{
+  "type": "boxplot",
+  "title": "Basic Boxplot",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Latency Distribution",
+      "data": [
+        20.0,
+        25.0,
+        22.0
+      ]
+    }
+  ]
+}

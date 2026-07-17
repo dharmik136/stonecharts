@@ -1,0 +1,21 @@
+{
+  "type": "streamgraph",
+  "title": "Basic Streamgraph",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Logs",
+      "data": [
+        10.0,
+        15.0,
+        8.0
+      ]
+    }
+  ]
+}

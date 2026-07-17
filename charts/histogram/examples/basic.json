@@ -1,0 +1,21 @@
+{
+  "type": "histogram",
+  "title": "Basic Histogram",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Latency Frequency",
+      "data": [
+        10.0,
+        50.0,
+        30.0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "type": "bar",
+  "title": "Basic Horizontal Bar Chart",
+  "xAxis": {
+    "categories": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "series": [
+    {
+      "name": "Sales",
+      "data": [
+        100.0,
+        200.0,
+        150.0
+      ]
+    }
+  ]
+}
