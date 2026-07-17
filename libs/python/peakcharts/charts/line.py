@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import List
 
-from ..spec import ChartSpec, GridLine
+from ..spec import ChartSpec, GridLine, Marker
 from ..util import esc, fmt_num, nice_ticks
 
 # Default categorical palette (original values; not copied from any library).
@@ -24,6 +24,51 @@ _DASH = {"dashed": "5 5", "dotted": "2 3"}
 
 def _dash_array(style: str) -> str:
     return _DASH.get(style, "")
+
+
+def _path_d(pts, step) -> str:
+    """Build the line path 'd'. step in {None, before, after, center}."""
+    if not step:
+        return " ".join(
+            ("M" if i == 0 else "L") + f"{x:.1f} {y:.1f}" for i, (x, y) in enumerate(pts)
+        )
+    parts: List[str] = []
+    for i, (x, y) in enumerate(pts):
+        if i == 0:
+            parts.append(f"M{x:.1f} {y:.1f}")
+            continue
+        px, py = pts[i - 1]
+        if step == "before":
+            parts.append(f"L{px:.1f} {y:.1f}")
+            parts.append(f"L{x:.1f} {y:.1f}")
+        elif step == "center":
+            mx = (px + x) / 2
+            parts.append(f"L{mx:.1f} {py:.1f}")
+            parts.append(f"L{mx:.1f} {y:.1f}")
+            parts.append(f"L{x:.1f} {y:.1f}")
+        else:  # after
+            parts.append(f"L{x:.1f} {py:.1f}")
+            parts.append(f"L{x:.1f} {y:.1f}")
+    return " ".join(parts)
+
+
+def _marker(symbol, x, y, r, common, color) -> str:
+    """One data-point marker. `common` = the shared class + data-* attributes.
+    Non-circle shapes carry cx/cy attrs so the JS runtime (crosshair) still works."""
+    fs = f'fill="{color}" stroke="#fff" stroke-width="1"'
+    if symbol == "square":
+        return (
+            f'<rect {common} cx="{x:.1f}" cy="{y:.1f}" x="{x-r:.1f}" y="{y-r:.1f}" '
+            f'width="{2*r:.1f}" height="{2*r:.1f}" {fs}/>'
+        )
+    if symbol == "triangle":
+        poly = f"{x:.1f},{y-r:.1f} {x-r:.1f},{y+r:.1f} {x+r:.1f},{y+r:.1f}"
+        return f'<polygon {common} cx="{x:.1f}" cy="{y:.1f}" points="{poly}" {fs}/>'
+    if symbol == "diamond":
+        poly = f"{x:.1f},{y-r:.1f} {x+r:.1f},{y:.1f} {x:.1f},{y+r:.1f} {x-r:.1f},{y:.1f}"
+        return f'<polygon {common} cx="{x:.1f}" cy="{y:.1f}" points="{poly}" {fs}/>'
+    # circle (default)
+    return f'<circle {common} cx="{x:.1f}" cy="{y:.1f}" r="{fmt_num(r)}" {fs}/>'
 
 
 def render_svg(spec: ChartSpec) -> str:
@@ -147,22 +192,29 @@ def render_svg(spec: ChartSpec) -> str:
     for si, s in enumerate(spec.series):
         color = s.color or PALETTE[si % len(PALETTE)]
         pts = [(xpix(i), ypix(v)) for i, v in enumerate(s.data)]
-        d = " ".join(
-            ("M" if i == 0 else "L") + f"{x:.1f} {y:.1f}" for i, (x, y) in enumerate(pts)
-        )
+        d = _path_d(pts, s.step)
+        lw = s.line_width if s.line_width is not None else 2
+        line_dash = _dash_array(s.dash_style)
+        line_dash_attr = f' stroke-dasharray="{line_dash}"' if line_dash else ""
         p.append(f'<g class="pk-series" data-series="{si}">')
         p.append(
             f'<path class="pk-series-line" data-series="{si}" d="{d}" fill="none" '
-            f'stroke="{color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+            f'stroke="{color}" stroke-width="{fmt_num(lw)}" stroke-linejoin="round" '
+            f'stroke-linecap="round"{line_dash_attr}/>'
         )
-        for i, (x, y) in enumerate(pts):
-            xlabel = cats[i] if i < len(cats) else str(i)
-            p.append(
-                f'<circle class="pk-point" data-series="{si}" data-series-name="{esc(s.name)}" '
-                f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(s.data[i]))}" data-color="{color}" '
-                f'data-r="3.5" data-r-hover="6" cx="{x:.1f}" cy="{y:.1f}" r="3.5" '
-                f'fill="{color}" stroke="#fff" stroke-width="1"/>'
-            )
+        mk = s.marker or Marker()
+        if mk.enabled:
+            radius = mk.radius
+            radius_hover = radius + 2.5
+            for i, (x, y) in enumerate(pts):
+                xlabel = cats[i] if i < len(cats) else str(i)
+                common = (
+                    f'class="pk-point" data-series="{si}" data-series-name="{esc(s.name)}" '
+                    f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(s.data[i]))}" '
+                    f'data-color="{color}" data-r="{fmt_num(radius)}" '
+                    f'data-r-hover="{fmt_num(radius_hover)}"'
+                )
+                p.append(_marker(mk.symbol, x, y, radius, common, color))
         p.append("</g>")
 
     # Legend (bottom center).

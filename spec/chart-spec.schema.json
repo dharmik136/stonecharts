@@ -77,6 +77,30 @@
         "color": {
           "type": "string",
           "description": "Optional hex color; defaults from the palette by series index."
+        },
+        "lineWidth": { "type": "number", "default": 2 },
+        "dashStyle": {
+          "type": "string",
+          "enum": ["solid", "dashed", "dotted"],
+          "default": "solid"
+        },
+        "step": {
+          "type": "string",
+          "enum": ["before", "after", "center"],
+          "description": "Draw as a stepped line instead of straight segments."
+        },
+        "marker": {
+          "type": "object",
+          "description": "Data-point markers. Defaults reproduce the built-in circle (r 3.5).",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "symbol": {
+              "type": "string",
+              "enum": ["circle", "square", "triangle", "diamond"],
+              "default": "circle"
+            },
+            "radius": { "type": "number", "default": 3.5 }
+          }
         }
       }
     }

@@ -11,10 +11,42 @@ import (
 	"strconv"
 )
 
+type Marker struct {
+	Enabled *bool   `json:"enabled,omitempty"` // nil -> true
+	Symbol  string  `json:"symbol,omitempty"`  // circle | square | triangle | diamond
+	Radius  float64 `json:"radius,omitempty"`  // 0 -> default 3.5
+}
+
 type Series struct {
-	Name  string    `json:"name"`
-	Data  []float64 `json:"data"`
-	Color string    `json:"color,omitempty"`
+	Name      string    `json:"name"`
+	Data      []float64 `json:"data"`
+	Color     string    `json:"color,omitempty"`
+	LineWidth float64   `json:"lineWidth,omitempty"` // 0 -> default 2
+	DashStyle string    `json:"dashStyle,omitempty"` // "" -> solid
+	Step      string    `json:"step,omitempty"`      // "" | before | after | center
+	Marker    *Marker   `json:"marker,omitempty"`
+}
+
+func (s *Series) lineWidth() float64 {
+	if s.LineWidth != 0 {
+		return s.LineWidth
+	}
+	return 2
+}
+func (s *Series) markerEnabled() bool {
+	return s.Marker == nil || s.Marker.Enabled == nil || *s.Marker.Enabled
+}
+func (s *Series) markerSymbol() string {
+	if s.Marker != nil && s.Marker.Symbol != "" {
+		return s.Marker.Symbol
+	}
+	return "circle"
+}
+func (s *Series) markerRadius() float64 {
+	if s.Marker != nil && s.Marker.Radius != 0 {
+		return s.Marker.Radius
+	}
+	return 3.5
 }
 
 type GridLine struct {

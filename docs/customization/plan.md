@@ -30,9 +30,10 @@ two non-negotiables. Source research: `docs/research/design-customization-brief.
 
 ## Roadmap (build in this order — cheap + static first)
 1. **Phase 1 — Sizing & gridlines:** `responsive` (viewBox + `preserveAspectRatio`
-   + `width:100%`), `yAxis.gridLine {enabled, color, dashStyle}`.  ← in progress
-2. **Phase 2 — Line styles & markers:** `series.dashStyle`, `series.marker {symbol,
-   radius}`, `series.step`.
+   + `width:100%`), `yAxis.gridLine {enabled, color, dashStyle}`.  ✅ done
+2. **Phase 2 — Line styles & markers:** `series.dashStyle` + `lineWidth`,
+   `series.marker {symbol, radius}` (circle/square/triangle/diamond), `series.step`
+   (before/after/center).  ✅ done
 3. **Phase 3 — Spline:** `series.curve: "monotone"` (Fritsch–Carlson, identical math
    both languages, golden-tested).
 4. **Phase 4 — Gradients & patterns:** `<defs>` + gradient/pattern fills.

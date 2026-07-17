@@ -9,7 +9,7 @@ import (
 // (charts/line-basic/golden/*.svg), which the Python renderer also matches.
 // If this and the Python test both pass, the two libraries are provably in sync.
 func TestGolden(t *testing.T) {
-	for _, name := range []string{"basic", "styled"} {
+	for _, name := range []string{"basic", "styled", "markers"} {
 		specBytes, err := os.ReadFile("../../charts/line-basic/examples/" + name + ".json")
 		if err != nil {
 			t.Fatal(err)

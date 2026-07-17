@@ -23,6 +23,59 @@ func dashArray(style string) string {
 	}
 }
 
+// pathD builds the line path 'd'. step in {"", before, after, center}.
+// Mirrors line.py _path_d (parts joined by a single space).
+func pathD(pts [][2]float64, step string) string {
+	parts := make([]string, 0, len(pts)*2)
+	if step == "" {
+		for i, pt := range pts {
+			pre := "L"
+			if i == 0 {
+				pre = "M"
+			}
+			parts = append(parts, pre+f1(pt[0])+" "+f1(pt[1]))
+		}
+		return strings.Join(parts, " ")
+	}
+	for i, pt := range pts {
+		x, y := pt[0], pt[1]
+		if i == 0 {
+			parts = append(parts, "M"+f1(x)+" "+f1(y))
+			continue
+		}
+		px, py := pts[i-1][0], pts[i-1][1]
+		switch step {
+		case "before":
+			parts = append(parts, "L"+f1(px)+" "+f1(y), "L"+f1(x)+" "+f1(y))
+		case "center":
+			mx := (px + x) / 2
+			parts = append(parts, "L"+f1(mx)+" "+f1(py), "L"+f1(mx)+" "+f1(y), "L"+f1(x)+" "+f1(y))
+		default: // after
+			parts = append(parts, "L"+f1(x)+" "+f1(py), "L"+f1(x)+" "+f1(y))
+		}
+	}
+	return strings.Join(parts, " ")
+}
+
+// markerSVG renders one data-point marker. `common` = shared class + data-* attrs.
+// Non-circle shapes carry cx/cy attrs so the JS runtime (crosshair) still works.
+func markerSVG(symbol string, x, y, r float64, common, color string) string {
+	fs := fmt.Sprintf(`fill="%s" stroke="#fff" stroke-width="1"`, color)
+	switch symbol {
+	case "square":
+		return fmt.Sprintf(`<rect %s cx="%s" cy="%s" x="%s" y="%s" width="%s" height="%s" %s/>`,
+			common, f1(x), f1(y), f1(x-r), f1(y-r), f1(2*r), f1(2*r), fs)
+	case "triangle":
+		poly := f1(x) + "," + f1(y-r) + " " + f1(x-r) + "," + f1(y+r) + " " + f1(x+r) + "," + f1(y+r)
+		return fmt.Sprintf(`<polygon %s cx="%s" cy="%s" points="%s" %s/>`, common, f1(x), f1(y), poly, fs)
+	case "diamond":
+		poly := f1(x) + "," + f1(y-r) + " " + f1(x+r) + "," + f1(y) + " " + f1(x) + "," + f1(y+r) + " " + f1(x-r) + "," + f1(y)
+		return fmt.Sprintf(`<polygon %s cx="%s" cy="%s" points="%s" %s/>`, common, f1(x), f1(y), poly, fs)
+	default: // circle
+		return fmt.Sprintf(`<circle %s cx="%s" cy="%s" r="%s" %s/>`, common, f1(x), f1(y), fmtNum(r), fs)
+	}
+}
+
 // renderLineSVG mirrors libs/python/peakcharts/charts/line.py exactly so the two
 // libraries emit byte-identical SVG for the same spec (see charts/line-basic/golden).
 func renderLineSVG(spec *ChartSpec) string {
@@ -182,34 +235,33 @@ func renderLineSVG(spec *ChartSpec) string {
 		if color == "" {
 			color = palette[si%len(palette)]
 		}
-		var d strings.Builder
+		pts := make([][2]float64, len(s.Data))
 		for i, v := range s.Data {
-			x, y := xpix(i), ypix(v)
-			if i > 0 {
-				d.WriteString(" ")
-			}
-			if i == 0 {
-				d.WriteString("M")
-			} else {
-				d.WriteString("L")
-			}
-			d.WriteString(f1(x))
-			d.WriteString(" ")
-			d.WriteString(f1(y))
+			pts[i] = [2]float64{xpix(i), ypix(v)}
+		}
+		d := pathD(pts, s.Step)
+		lineDashAttr := ""
+		if da := dashArray(s.DashStyle); da != "" {
+			lineDashAttr = ` stroke-dasharray="` + da + `"`
 		}
 		p.WriteString(fmt.Sprintf(`<g class="pk-series" data-series="%d">`, si))
 		p.WriteString(fmt.Sprintf(
-			`<path class="pk-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`,
-			si, d.String(), color))
-		for i, v := range s.Data {
-			x, y := xpix(i), ypix(v)
-			xlabel := strconv.Itoa(i)
-			if i < len(cats) {
-				xlabel = cats[i]
+			`<path class="pk-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
+			si, d, color, fmtNum(s.lineWidth()), lineDashAttr))
+		if s.markerEnabled() {
+			radius := s.markerRadius()
+			radiusHover := radius + 2.5
+			symbol := s.markerSymbol()
+			for i, pt := range pts {
+				xlabel := strconv.Itoa(i)
+				if i < len(cats) {
+					xlabel = cats[i]
+				}
+				common := fmt.Sprintf(
+					`class="pk-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="%s" data-r-hover="%s"`,
+					si, esc(s.Name), esc(xlabel), esc(fmtNum(s.Data[i])), color, fmtNum(radius), fmtNum(radiusHover))
+				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, color))
 			}
-			p.WriteString(fmt.Sprintf(
-				`<circle class="pk-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="3.5" data-r-hover="6" cx="%s" cy="%s" r="3.5" fill="%s" stroke="#fff" stroke-width="1"/>`,
-				si, esc(s.Name), esc(xlabel), esc(fmtNum(v)), color, f1(x), f1(y), color))
 		}
 		p.WriteString(`</g>`)
 	}

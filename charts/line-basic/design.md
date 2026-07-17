@@ -50,6 +50,10 @@ or x/y correlation with no shared x ordering (use scatter). See
 | `series[].name` | string | `Series i` | legend + tooltip name |
 | `series[].data` | number[] | — | y-values, length `N` |
 | `series[].color` | string | palette by index | hex, e.g. `#2f7ed8` |
+| `series[].lineWidth` | number | 2 | line thickness (px) |
+| `series[].dashStyle` | string | solid | line dash: solid/dashed/dotted |
+| `series[].step` | string | — | stepped line: before/after/center |
+| `series[].marker` | object | `{enabled:true, symbol:circle, radius:3.5}` | point markers; `symbol` ∈ circle/square/triangle/diamond |
 
 Full schema: [`spec/chart-spec.schema.json`](../../spec/chart-spec.schema.json).
 

@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / "libs" / "python"))
 from peakcharts import ChartSpec  # noqa: E402
 from peakcharts.render import render_svg  # noqa: E402
 
-CASES = ["basic", "styled"]
+CASES = ["basic", "styled", "markers"]
 
 
 def _check(name: str):
@@ -34,6 +34,10 @@ def test_line_basic_golden():
 
 def test_line_styled_golden():
     _check("styled")
+
+
+def test_line_markers_golden():
+    _check("markers")
 
 
 if __name__ == "__main__":

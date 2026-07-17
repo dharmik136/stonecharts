@@ -11,10 +11,21 @@ from typing import List, Optional
 
 
 @dataclass
+class Marker:
+    enabled: bool = True
+    symbol: str = "circle"     # circle | square | triangle | diamond
+    radius: float = 3.5
+
+
+@dataclass
 class Series:
     name: str
     data: List[float]
     color: Optional[str] = None
+    line_width: Optional[float] = None   # None -> default 2
+    dash_style: str = "solid"            # solid | dashed | dotted
+    step: Optional[str] = None           # None | before | after | center
+    marker: Optional[Marker] = None
 
 
 @dataclass
@@ -49,14 +60,27 @@ class ChartSpec:
     @staticmethod
     def from_dict(d: dict) -> "ChartSpec":
         """Build a ChartSpec from a plain dict (parsed JSON). Unknown keys ignored."""
-        series = [
-            Series(
-                name=s.get("name", f"Series {i + 1}"),
-                data=[float(v) for v in s["data"]],
-                color=s.get("color"),
+        series = []
+        for i, s in enumerate(d.get("series", [])):
+            m = s.get("marker")
+            marker = None
+            if m is not None:
+                marker = Marker(
+                    enabled=m.get("enabled", True),
+                    symbol=m.get("symbol", "circle"),
+                    radius=float(m.get("radius", 3.5)),
+                )
+            series.append(
+                Series(
+                    name=s.get("name", f"Series {i + 1}"),
+                    data=[float(v) for v in s["data"]],
+                    color=s.get("color"),
+                    line_width=s.get("lineWidth"),
+                    dash_style=s.get("dashStyle", "solid"),
+                    step=s.get("step"),
+                    marker=marker,
+                )
             )
-            for i, s in enumerate(d.get("series", []))
-        ]
         xa = d.get("xAxis") or {}
         ya = d.get("yAxis") or {}
 
