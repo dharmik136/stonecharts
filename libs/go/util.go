@@ -74,12 +74,17 @@ func esc(s string) string {
 	return r.Replace(s)
 }
 
-// fmtNum mirrors Python fmt_num: drop trailing .0, else shortest round-trip.
+// fmtNum mirrors Python fmt_num byte-for-byte: drop trailing .0, else 6
+// significant figures (%g). NaN/Inf -> "0"; the integer fast-path is bounded to
+// |v| < 1e18 so int(v) can't overflow int64 (Python uses the same bound).
 func fmtNum(v float64) string {
-	if v == math.Trunc(v) {
+	if math.IsNaN(v) || math.IsInf(v, 0) {
+		return "0"
+	}
+	if v == math.Trunc(v) && math.Abs(v) < 1e18 {
 		return strconv.Itoa(int(v))
 	}
-	return strconv.FormatFloat(v, 'g', -1, 64)
+	return strconv.FormatFloat(v, 'g', 6, 64)
 }
 
 // f1 mirrors Python f"{v:.1f}".

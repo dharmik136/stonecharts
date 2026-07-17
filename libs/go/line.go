@@ -134,7 +134,7 @@ func gradientDef(gid string, g *Gradient) string {
 	b.WriteString(`<linearGradient id="` + gid + `" x1="` + fmtNum(g.x1()) +
 		`" y1="` + fmtNum(g.y1()) + `" x2="` + fmtNum(g.x2()) + `" y2="` + fmtNum(g.y2()) + `">`)
 	for _, st := range g.Stops {
-		b.WriteString(`<stop offset="` + fmtNum(st.Offset) + `" stop-color="` + st.Color + `"`)
+		b.WriteString(`<stop offset="` + fmtNum(st.Offset) + `" stop-color="` + esc(st.Color) + `"`)
 		if st.Opacity != nil {
 			b.WriteString(` stop-opacity="` + fmtNum(*st.Opacity) + `"`)
 		}
@@ -151,9 +151,9 @@ func patternDef(pid string, pat *Pattern) string {
 	b.WriteString(`<pattern id="` + pid + `" patternUnits="userSpaceOnUse" width="` + sz +
 		`" height="` + sz + `" patternTransform="rotate(` + fmtNum(pat.angle()) + `)">`)
 	if pat.Background != "" {
-		b.WriteString(`<rect width="` + sz + `" height="` + sz + `" fill="` + pat.Background + `"/>`)
+		b.WriteString(`<rect width="` + sz + `" height="` + sz + `" fill="` + esc(pat.Background) + `"/>`)
 	}
-	b.WriteString(`<line x1="0" y1="0" x2="0" y2="` + sz + `" stroke="` + pat.hatchColor() +
+	b.WriteString(`<line x1="0" y1="0" x2="0" y2="` + sz + `" stroke="` + esc(pat.hatchColor()) +
 		`" stroke-width="` + fmtNum(pat.strokeWidth()) + `"/></pattern>`)
 	return b.String()
 }
@@ -273,6 +273,7 @@ func renderLineSVG(spec *ChartSpec) string {
 
 	// Resolve per-series styling and collect <defs>. Defs are emitted ONLY when a
 	// series needs them, so default output stays byte-identical.
+	cid := esc(spec.ID) // namespaces <defs> ids; escaped so a hostile id can't inject
 	var defs strings.Builder
 	styles := make([]seriesStyle, len(spec.Series))
 	for si := range spec.Series {
@@ -280,24 +281,25 @@ func renderLineSVG(spec *ChartSpec) string {
 		grad, solidHex := s.colorSpec()
 		var stroke, fillColor, solid string
 		if grad != nil {
-			gid := spec.ID + "-grad-" + strconv.Itoa(si)
+			gid := cid + "-grad-" + strconv.Itoa(si)
 			defs.WriteString(gradientDef(gid, grad))
 			stroke = "url(#" + gid + ")"
 			fillColor = stroke
 			if len(grad.Stops) > 0 {
-				solid = grad.Stops[0].Color
+				solid = esc(grad.Stops[0].Color)
 			} else {
-				solid = palette[si%len(palette)]
+				solid = esc(palette[si%len(palette)])
 			}
 		} else if solidHex != "" {
-			stroke, fillColor, solid = solidHex, solidHex, solidHex
+			c := esc(solidHex)
+			stroke, fillColor, solid = c, c, c
 		} else {
-			c := palette[si%len(palette)]
+			c := esc(palette[si%len(palette)])
 			stroke, fillColor, solid = c, c, c
 		}
 		var areaFill, areaOp string
 		if s.Pattern != nil {
-			pid := spec.ID + "-pat-" + strconv.Itoa(si)
+			pid := cid + "-pat-" + strconv.Itoa(si)
 			defs.WriteString(patternDef(pid, s.Pattern))
 			areaFill = "url(#" + pid + ")"
 		} else if s.FillOpacity > 0 {

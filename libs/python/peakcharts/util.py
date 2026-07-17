@@ -50,7 +50,13 @@ def esc(s) -> str:
 
 
 def fmt_num(v: float) -> str:
-    """Compact number formatting: drop trailing .0, keep meaningful decimals."""
-    if v == int(v):
+    """Compact number formatting: drop trailing .0, else 6 significant figures.
+
+    Must stay byte-identical to Go fmtNum (libs/go/util.go). NaN/Inf -> "0"; the
+    integer fast-path is bounded to |v| < 1e18 so int(v) can't overflow Go's int64.
+    """
+    if not math.isfinite(v):
+        return "0"
+    if v == int(v) and abs(v) < 1e18:
         return str(int(v))
     return f"{v:g}"

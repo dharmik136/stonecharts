@@ -9,6 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field, fields
 from typing import List, Optional, Union
 
+from .util import esc
+
 
 @dataclass
 class Marker:
@@ -138,9 +140,17 @@ def resolve_theme(value) -> Theme:
         base = THEMES.get(value.get("name", "light"), THEMES["light"])
         t = Theme(**{f.name: getattr(base, f.name) for f in fields(base)})
         t.name = value.get("name", base.name)
+        # Custom theme values are user input -> escape so a hostile color can't
+        # break out of the SVG attribute it lands in.
         for k, attr in _THEME_KEYS.items():
             if k in value:
-                setattr(t, attr, value[k])
+                v = value[k]
+                if attr == "palette" and isinstance(v, list):
+                    setattr(t, attr, [esc(c) for c in v])
+                elif v is None:
+                    setattr(t, attr, None)
+                else:
+                    setattr(t, attr, esc(v))
         return t
     return THEMES["light"]
 

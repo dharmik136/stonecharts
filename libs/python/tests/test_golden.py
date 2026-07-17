@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / "libs" / "python"))
 from peakcharts import ChartSpec, THEMES  # noqa: E402
 from peakcharts.render import render_svg  # noqa: E402
 
-CASES = ["basic", "styled", "markers", "spline", "gradient", "dark"]
+CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial"]
 
 
 def _check(name: str):
@@ -50,6 +50,26 @@ def test_line_gradient_golden():
 
 def test_line_dark_golden():
     _check("dark")
+
+
+def test_line_adversarial_golden():
+    _check("adversarial")
+
+
+def test_xss_escaping():
+    """Hostile strings in every user-facing field must be escaped, never injected."""
+    x = '"><script>alert(1)</script>'
+    spec = ChartSpec.from_dict({
+        "id": x, "type": "line", "title": x, "subtitle": x,
+        "theme": {"name": "light", "gridColor": x, "palette": [x]},
+        "xAxis": {"title": x, "categories": [x, "b", "c"]}, "yAxis": {"title": x},
+        "series": [{"name": x, "data": [1, 2, 3], "color": x,
+                    "pattern": {"type": "hatch", "color": x, "background": x},
+                    "fillOpacity": 0.3}],
+    })
+    from peakcharts.render import render_html
+    assert "<script>alert(1)</script>" not in render_svg(spec)
+    assert "<script>alert(1)</script>" not in render_html(spec)
 
 
 def test_a11y_toggle():

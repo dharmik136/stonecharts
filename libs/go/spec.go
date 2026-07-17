@@ -210,41 +210,47 @@ func resolveTheme(raw json.RawMessage) *Theme {
 	if !ok {
 		base = lightTheme()
 	}
+	// Custom theme values are user input -> escape so a hostile color can't break
+	// out of the SVG attribute it lands in.
 	if over.Name != "" {
 		base.Name = over.Name
 	}
 	if over.Background != "" {
-		base.Background = over.Background
+		base.Background = esc(over.Background)
 	}
 	if over.TitleColor != "" {
-		base.TitleColor = over.TitleColor
+		base.TitleColor = esc(over.TitleColor)
 	}
 	if over.SubtitleColor != "" {
-		base.SubtitleColor = over.SubtitleColor
+		base.SubtitleColor = esc(over.SubtitleColor)
 	}
 	if over.AxisLabelColor != "" {
-		base.AxisLabelColor = over.AxisLabelColor
+		base.AxisLabelColor = esc(over.AxisLabelColor)
 	}
 	if over.AxisTitleColor != "" {
-		base.AxisTitleColor = over.AxisTitleColor
+		base.AxisTitleColor = esc(over.AxisTitleColor)
 	}
 	if over.GridColor != "" {
-		base.GridColor = over.GridColor
+		base.GridColor = esc(over.GridColor)
 	}
 	if over.AxisLineColor != "" {
-		base.AxisLineColor = over.AxisLineColor
+		base.AxisLineColor = esc(over.AxisLineColor)
 	}
 	if over.CrosshairColor != "" {
-		base.CrosshairColor = over.CrosshairColor
+		base.CrosshairColor = esc(over.CrosshairColor)
 	}
 	if over.MarkerHalo != "" {
-		base.MarkerHalo = over.MarkerHalo
+		base.MarkerHalo = esc(over.MarkerHalo)
 	}
 	if over.LegendTextColor != "" {
-		base.LegendTextColor = over.LegendTextColor
+		base.LegendTextColor = esc(over.LegendTextColor)
 	}
 	if len(over.Palette) > 0 {
-		base.Palette = over.Palette
+		pal := make([]string, len(over.Palette))
+		for i, c := range over.Palette {
+			pal[i] = esc(c)
+		}
+		base.Palette = pal
 	}
 	return &base
 }

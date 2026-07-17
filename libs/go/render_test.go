@@ -12,7 +12,7 @@ import (
 // (charts/line-basic/golden/*.svg), which the Python renderer also matches.
 // If this and the Python test both pass, the two libraries are provably in sync.
 func TestGolden(t *testing.T) {
-	for _, name := range []string{"basic", "styled", "markers", "spline", "gradient", "dark"} {
+	for _, name := range []string{"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial"} {
 		specBytes, err := os.ReadFile("../../charts/line-basic/examples/" + name + ".json")
 		if err != nil {
 			t.Fatal(err)
@@ -30,6 +30,33 @@ func TestGolden(t *testing.T) {
 			t.Errorf("%s: SVG != golden (got %d bytes, want %d bytes)", name, len(got), len(want))
 		}
 	}
+}
+
+// TestXSSEscaping verifies hostile strings in user-facing fields are escaped.
+func TestXSSEscaping(t *testing.T) {
+	x := `"><script>alert(1)</script>`
+	specJSON := `{"id":` + jsonStr(x) + `,"type":"line","title":` + jsonStr(x) +
+		`,"subtitle":` + jsonStr(x) + `,"theme":{"name":"light","gridColor":` + jsonStr(x) +
+		`,"palette":[` + jsonStr(x) + `]},"xAxis":{"title":` + jsonStr(x) +
+		`,"categories":[` + jsonStr(x) + `,"b","c"]},"yAxis":{"title":` + jsonStr(x) +
+		`},"series":[{"name":` + jsonStr(x) + `,"data":[1,2,3],"color":` + jsonStr(x) +
+		`,"pattern":{"type":"hatch","color":` + jsonStr(x) + `,"background":` + jsonStr(x) +
+		`},"fillOpacity":0.3}]}`
+	spec, err := FromJSON([]byte(specJSON))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(RenderSVG(spec), "<script>alert(1)</script>") {
+		t.Error("raw <script> leaked into SVG")
+	}
+	if strings.Contains(RenderHTML(spec, ""), "<script>alert(1)</script>") {
+		t.Error("raw <script> leaked into HTML")
+	}
+}
+
+func jsonStr(s string) string {
+	b, _ := json.Marshal(s)
+	return string(b)
 }
 
 // TestA11yToggle verifies a11y is on by default and a11y:false restores the

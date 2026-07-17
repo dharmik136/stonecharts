@@ -1,0 +1,9 @@
+{
+  "type": "line",
+  "title": "Adversarial floats",
+  "subtitle": "fmt_num parity edge cases",
+  "xAxis": { "categories": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"] },
+  "series": [
+    { "name": "s", "data": [0.0000005, 0.15, 2.675, 123456789.123456789, 0.30000000000000004, -2.5, 0.0000000001, 1234567, -0.0, 7.7] }
+  ]
+}

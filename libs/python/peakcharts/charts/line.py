@@ -118,7 +118,7 @@ def _gradient_def(gid: str, g: Gradient) -> str:
     stops = []
     for st in g.stops:
         op = f' stop-opacity="{fmt_num(st.opacity)}"' if st.opacity is not None else ""
-        stops.append(f'<stop offset="{fmt_num(st.offset)}" stop-color="{st.color}"{op}/>')
+        stops.append(f'<stop offset="{fmt_num(st.offset)}" stop-color="{esc(st.color)}"{op}/>')
     return (
         f'<linearGradient id="{gid}" x1="{fmt_num(g.x1)}" y1="{fmt_num(g.y1)}" '
         f'x2="{fmt_num(g.x2)}" y2="{fmt_num(g.y2)}">' + "".join(stops) + "</linearGradient>"
@@ -129,11 +129,11 @@ def _pattern_def(pid: str, pat: Pattern) -> str:
     """<pattern> def: a diagonal hatch tile (userSpaceOnUse, rotated)."""
     sz = fmt_num(pat.size)
     bg = (
-        f'<rect width="{sz}" height="{sz}" fill="{pat.background}"/>'
+        f'<rect width="{sz}" height="{sz}" fill="{esc(pat.background)}"/>'
         if pat.background else ""
     )
     hatch = (
-        f'<line x1="0" y1="0" x2="0" y2="{sz}" stroke="{pat.color}" '
+        f'<line x1="0" y1="0" x2="0" y2="{sz}" stroke="{esc(pat.color)}" '
         f'stroke-width="{fmt_num(pat.stroke_width)}"/>'
     )
     return (
@@ -199,22 +199,23 @@ def render_svg(spec: ChartSpec) -> str:
 
     # Resolve per-series styling and collect <defs> (gradients/patterns). Defs are
     # emitted ONLY when something needs them, so default output stays byte-identical.
+    cid = esc(spec.id)  # namespaces <defs> ids; escaped so a hostile id can't inject
     defs_parts: List[str] = []
     sstyle = []
     for si, s in enumerate(spec.series):
         if isinstance(s.color, Gradient):
-            gid = f"{spec.id}-grad-{si}"
+            gid = f"{cid}-grad-{si}"
             defs_parts.append(_gradient_def(gid, s.color))
             ref = f"url(#{gid})"
             stroke = ref
             fill_color = ref
-            solid = s.color.stops[0].color if s.color.stops else palette[si % len(palette)]
+            solid = esc(s.color.stops[0].color) if s.color.stops else esc(palette[si % len(palette)])
         elif s.color:
-            stroke = fill_color = solid = s.color
+            stroke = fill_color = solid = esc(s.color)
         else:
-            stroke = fill_color = solid = palette[si % len(palette)]
+            stroke = fill_color = solid = esc(palette[si % len(palette)])
         if s.pattern is not None:
-            pid = f"{spec.id}-pat-{si}"
+            pid = f"{cid}-pat-{si}"
             defs_parts.append(_pattern_def(pid, s.pattern))
             area_fill = f"url(#{pid})"
             area_op = ""
