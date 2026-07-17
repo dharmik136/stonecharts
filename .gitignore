@@ -19,3 +19,6 @@ Thumbs.db
 
 # temp render artifacts
 .tmp-*
+
+# machine-specific benchmark output
+benchmark_results.json
