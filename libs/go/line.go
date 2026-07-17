@@ -1,4 +1,4 @@
-package peakcharts
+package stonecharts
 
 import (
 	"fmt"
@@ -115,7 +115,7 @@ func markerSVG(symbol string, x, y, r float64, common, color, halo string) strin
 	}
 }
 
-// renderLineSVG mirrors libs/python/peakcharts/charts/line.py exactly so the two
+// renderLineSVG mirrors libs/python/stonecharts/charts/line.py exactly so the two
 // libraries emit byte-identical SVG for the same spec (see charts/line-basic/golden).
 // It is a one-line delegation to the shared cartesian frame (cartesian.go, §4):
 // point x-scale, include-zero value axis, a11y noun "Line".
@@ -123,7 +123,7 @@ func renderLineSVG(spec *ChartSpec) string {
 	return renderCartesian(spec, "Line", "point", lineMarks, true)
 }
 
-// lineMarks emits the line-specific series marks — one <g class="pk-series">
+// lineMarks emits the line-specific series marks — one <g class="sc-series">
 // per series: area fill, series line, point markers. Moved verbatim from the
 // pre-extraction renderLineSVG series loop; all geometry comes from the frame
 // (f.xpix / f.ypix), never recomputed here.
@@ -147,18 +147,18 @@ func lineMarks(f *cartesianFrame, p *strings.Builder) {
 		if da := dashArray(s.DashStyle); da != "" {
 			lineDashAttr = ` stroke-dasharray="` + da + `"`
 		}
-		p.WriteString(fmt.Sprintf(`<g class="pk-series" data-series="%d">`, si))
+		p.WriteString(fmt.Sprintf(`<g class="sc-series" data-series="%d">`, si))
 		// Area fill (under the line, drawn first so the line sits on top).
 		if st.areaFill != "" && len(pts) > 0 {
 			base := f.ypix(0.0)
 			areaD := d + " L" + f1(pts[len(pts)-1][0]) + " " + f1(base) +
 				" L" + f1(pts[0][0]) + " " + f1(base) + " Z"
 			p.WriteString(fmt.Sprintf(
-				`<path class="pk-series-area" data-series="%d" d="%s" fill="%s"%s stroke="none"/>`,
+				`<path class="sc-series-area" data-series="%d" d="%s" fill="%s"%s stroke="none"/>`,
 				si, areaD, st.areaFill, st.areaOp))
 		}
 		p.WriteString(fmt.Sprintf(
-			`<path class="pk-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
+			`<path class="sc-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
 			si, d, st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
 		if s.markerEnabled() {
 			radius := s.markerRadius()
@@ -170,7 +170,7 @@ func lineMarks(f *cartesianFrame, p *strings.Builder) {
 					xlabel = cats[i]
 				}
 				common := fmt.Sprintf(
-					`class="pk-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="%s" data-r-hover="%s"`,
+					`class="sc-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="%s" data-r-hover="%s"`,
 					si, esc(s.Name), esc(xlabel), esc(fmtNum(s.Data[i])), color, fmtNum(radius), fmtNum(radiusHover))
 				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, color, theme.MarkerHalo))
 			}

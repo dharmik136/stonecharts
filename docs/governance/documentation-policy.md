@@ -1,6 +1,6 @@
 ---
-id: PC-GOV-001
-title: PeakCharts Documentation Control Policy
+id: SC-GOV-001
+title: StoneCharts Documentation Control Policy
 status: proposed
 classification: normative
 owner: maintainer
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Purpose
 
-PeakCharts treats product promises, requirements, architecture decisions, contracts,
+StoneCharts treats product promises, requirements, architecture decisions, contracts,
 quality gates, security controls, and release evidence as versioned product assets.
 This policy keeps those assets reviewable and traceable without equating document
 count with engineering maturity.

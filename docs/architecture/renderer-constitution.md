@@ -1,6 +1,6 @@
 ---
-id: PC-ARCH-002
-title: PeakCharts Renderer Constitution
+id: SC-ARCH-002
+title: StoneCharts Renderer Constitution
 status: proposed
 classification: normative
 owner: maintainer
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Purpose
 
-This constitution defines the admission and maintenance rules for every PeakCharts
+This constitution defines the admission and maintenance rules for every StoneCharts
 language implementation. A binding or wrapper is not automatically a certified
 renderer.
 
@@ -88,6 +88,6 @@ Product documentation may call a language supported only at the Certified level.
 ## Removal and drift
 
 A renderer that misses a mandatory release, lacks a maintainer, or fails the current
-conformance corpus is marked deprecated or experimental. PeakCharts MUST narrow its
+conformance corpus is marked deprecated or experimental. StoneCharts MUST narrow its
 language claim rather than silently shipping unequal implementations.
 

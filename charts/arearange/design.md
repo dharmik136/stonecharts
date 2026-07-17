@@ -1,7 +1,7 @@
 # Chart: Range area (`arearange`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** ([`charts/column/design.md`](../column/design.md)) and the
 > reference recipe ([`charts/line-basic/design.md`](../line-basic/design.md)),
@@ -17,7 +17,7 @@
   once the point model lands — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3
   Rank 10, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/arearange.py` · `libs/go/arearange.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/arearange.py` · `libs/go/arearange.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -83,7 +83,7 @@ discrete category rather than a continuous shaded band (use `columnrange`);
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"arearange"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -145,36 +145,36 @@ The renderer is a **one-line delegation** to the shared frame; it supplies
 band slots) and `include_zero=True`:
 
 ```python
-# libs/python/peakcharts/charts/arearange.py
+# libs/python/stonecharts/charts/arearange.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Range area", "point", _arearange_marks)   # include_zero defaults True
 ```
 ```go
-// libs/go/arearange.go — package peakcharts
+// libs/go/arearange.go — package stonecharts
 func renderAreaRangeSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Range area", "point", areaRangeMarks, true)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
-per series, and inside it **one filled band `<path>`** plus **one `.pk-point`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
+per series, and inside it **one filled band `<path>`** plus **one `.sc-point`
 per datum** (the hoverable elements — the band replaces line's point markers as
-the interactive target, but each datum still gets a `.pk-point` at its high edge
+the interactive target, but each datum still gets a `.sc-point` at its high edge
 for tooltip/crosshair/keyboard nav):
 
 ```html
-<g class="pk-series" data-series="0">
-  <path class="pk-series-range pk-band" data-series="0"
+<g class="sc-series" data-series="0">
+  <path class="sc-series-range sc-band" data-series="0"
         d="M64.0 300.0 L214.0 260.0 L364.0 180.0 … L364.0 240.0 L214.0 300.0 L64.0 340.0 Z"
         fill="#2f7ed8" fill-opacity="0.5" stroke="none"/>
-  <!-- one .pk-point per datum (at the high edge; carries low+high in data-*) -->
-  <circle class="pk-point" data-series="0"
+  <!-- one .sc-point per datum (at the high edge; carries low+high in data-*) -->
+  <circle class="sc-point" data-series="0"
           data-series-name="p50–p95" data-x="00:00" data-low="60" data-high="120" data-y="60–120"
           data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
           cx="64.0" cy="300.0" r="3.5"/>
-  … one .pk-point per datum …
+  … one .sc-point per datum …
 </g>
 ```
 
@@ -193,12 +193,12 @@ for tooltip/crosshair/keyboard nav):
 - **Optional bounding strokes:** when `series[].lineWidth > 0`, additionally
   stroke the two boundaries in the series `stroke` color (dash from
   `series[].dashStyle`). With `lineWidth:0` (default) the band is fill-only.
-- **`.pk-point` per datum:** class `pk-point` is the runtime contract class
+- **`.sc-point` per datum:** class `sc-point` is the runtime contract class
   (tooltip / highlight / crosshair / legend-toggle / keyboard nav). Each datum
   emits one at its **high** edge (`cx = xpix(i)`, `cy = ypix(high)`); it carries
   `data-low`, `data-high`, and a combined `data-y="low–high"` so the tooltip
   shows the interval, not a single number.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (datum x) — the crosshair
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (datum x) — the crosshair
   reads it — and `cy` (the high edge) by convention.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
   index — do not renumber and do not emit a legend from the marks.
@@ -307,14 +307,14 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the
   legend item (do not renumber).
-- **Datum mark:** `.pk-point` carries **all** of `data-series`,
+- **Datum mark:** `.sc-point` carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`
   — plus range-area's `data-low` and `data-high`. `data-y` is the human interval
   `"low–high"` (both via `fmt_num`) so the tooltip shows the band, not one number.
-- **Crosshair anchor:** every `.pk-point` carries `cx` (datum x) and by
+- **Crosshair anchor:** every `.sc-point` carries `cx` (datum x) and by
   convention `cy` (the high edge).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-low = esc(fmt_num(low))`,
@@ -333,7 +333,7 @@ tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
   alongside the §5.4b field drill and the Rank-3 byte-identity gate.
 - **A11y default-on:** `role="img"` + concise `aria-label` + `<desc>` in the SVG;
   the generalized visually-hidden data table in the HTML; keyboard nav walks the
-  per-datum `.pk-point`s. `a11y:false` restores the pre-a11y bytes.
+  per-datum `.sc-point`s. `a11y:false` restores the pre-a11y bytes.
 - **Static-first:** the chart is fully readable with JS disabled — the band is
   server-rendered and filled; the crosshair ships `display:none`; the tooltip is
   JS-only.
@@ -378,7 +378,7 @@ its golden must contain the **escaped** bytes and **no** raw `<script>`.
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/arearange/examples/basic.json")))
 save_html(spec, "out.html")
@@ -386,7 +386,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="arearange",
     title="Request Latency Band",
@@ -400,9 +400,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

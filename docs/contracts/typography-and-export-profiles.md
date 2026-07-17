@@ -1,5 +1,5 @@
 ---
-id: PC-CON-006
+id: SC-CON-006
 title: Typography, Layout, and Export Profiles
 status: proposed
 classification: normative
@@ -47,7 +47,7 @@ compatibility are reviewed.
 
 A pixel or PDF profile records at least:
 
-- PeakCharts release and canonical SVG hash.
+- StoneCharts release and canonical SVG hash.
 - Export engine, exact version, build or container digest, and flags.
 - Font artifact hashes and font configuration.
 - Operating system, architecture, locale, timezone, viewport, scale factor, and color

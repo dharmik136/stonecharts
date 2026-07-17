@@ -1,7 +1,7 @@
 # Chart: Vector plot (`vector-plot`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which itself
 > copies [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the
@@ -15,7 +15,7 @@
   `line` has a live renderer today; vector-plot rides the shared cartesian frame
   once scatter's numeric-x-axis + point model land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2 Family A, §3.2, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/vector_plot.py` · `libs/go/vector_plot.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/vector_plot.py` · `libs/go/vector_plot.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -94,7 +94,7 @@ domain-specific sibling. See [`CHARTS.md`](../../CHARTS.md).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"vector-plot"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -163,14 +163,14 @@ the **numeric** x-scale (`x_scale="linear"`, landed by scatter) and
 **`include_zero=False`** (free numeric x/y):
 
 ```python
-# libs/python/peakcharts/charts/vector_plot.py
+# libs/python/stonecharts/charts/vector_plot.py
 from ._cartesian import render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Vector plot", "linear", _vector_marks, include_zero=False)
 ```
 ```go
-// libs/go/vector_plot.go — package peakcharts
+// libs/go/vector_plot.go — package stonecharts
 func renderVectorPlotSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Vector plot", "linear", vectorMarks, false)
 }
@@ -178,12 +178,12 @@ func renderVectorPlotSVG(spec *ChartSpec) string {
 
 The marks callback first reduces the **global** length-domain
 (§ Length scale), then emits **exactly one**
-`<g class="pk-series" data-series="{si}">` per series, and inside it **one arrow
+`<g class="sc-series" data-series="{si}">` per series, and inside it **one arrow
 `<path>` per point**:
 
 ```html
-<g class="pk-series" data-series="0">
-  <path class="pk-vector pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <path class="sc-vector sc-point" data-series="0"
         data-series-name="10:00 UTC" data-x="30" data-y="25"
         data-direction="90" data-length="12"
         data-color="#2f7ed8" data-r="1.5" data-r-hover="1.5"
@@ -191,13 +191,13 @@ The marks callback first reduces the **global** length-domain
         d="M502.0 188.0 L522.0 188.0 M516.6 183.7 L522.0 188.0 L516.6 192.3"
         fill="none" stroke="#2f7ed8" stroke-width="1.5"
         stroke-linecap="round" stroke-linejoin="round"/>
-  … one .pk-vector.pk-point per point …
+  … one .sc-vector.sc-point per point …
 </g>
 ```
 
-- **Class:** `pk-vector pk-point`. `pk-point` is the **contract** class the
+- **Class:** `sc-vector sc-point`. `sc-point` is the **contract** class the
   runtime keys on (tooltip / highlight / crosshair / legend-toggle / keyboard
-  nav); `pk-vector` is a purely-cosmetic CSS hook (adding a class the runtime
+  nav); `sc-vector` is a purely-cosmetic CSS hook (adding a class the runtime
   must *know about* is out of scope — NN#2). The arrow **is** the hoverable
   point; there are no separate markers.
 - **Geometry:** the arrow is anchored on `(cx, cy) = (fr.xpix(x), fr.ypix(y))`,
@@ -214,7 +214,7 @@ The marks callback first reduces the **global** length-domain
   default is a pinned **`1.5`** (line's is `2`), so a dense field stays legible.
   `stroke-linecap="round"` and `stroke-linejoin="round"` are emitted so the
   shaft and arrowhead read cleanly.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (the arrow's `(x,y)` anchor
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (the arrow's `(x,y)` anchor
   x) — the crosshair reads it — and by convention `cy` (anchor y). The anchor is
   the point location regardless of `rotationOrigin` (which only shifts where the
   glyph sits relative to it).
@@ -222,7 +222,7 @@ The marks callback first reduces the **global** length-domain
   `direction` (degrees) and `length` (magnitude) via `fmt_num`. Alongside the
   inherited `data-x`/`data-y`, they let the tooltip and data table show the full
   `(x, y, direction, length)` tuple.
-- **`data-r` / `data-r-hover`:** carried for `.pk-point` contract conformance
+- **`data-r` / `data-r-hover`:** carried for `.sc-point` contract conformance
   (the runtime calls `pt.setAttribute("r", …)` on hover — a `<path>` ignores `r`,
   harmless). Set both to `fmt_num(lineWidth)` (the glyph does not grow on hover,
   so `data-r-hover == data-r`).
@@ -319,7 +319,7 @@ d = f"M{tailx:.1f} {taily:.1f} L{headx:.1f} {heady:.1f} "
 - **`HEAD_LEN = 6.0` / `HEAD_ANGLE = 25.0` are fixed constants** — pin them so the
   arrowhead is byte-reproducible.
 - **A zero-length arrow (`L == 0`)** collapses the shaft to a point; still emit
-  the path (`tail == head`), so the datum stays a hoverable `.pk-point` with its
+  the path (`tail == head`), so the datum stays a hoverable `.sc-point` with its
   `data-*`. Do **not** skip zero-magnitude points.
 - **Anchor vs origin:** `cx`/`cy` (the crosshair anchor + `data`-implied
   position) always carry `(fr.xpix(x), fr.ypix(y))` — the sample location —
@@ -387,7 +387,7 @@ the bare noun **`"Vector plot"`** — the frame expands it to
 - **`lineWidth` default** — vector-plot's default is **`1.5`**, not line's `2`;
   emit `stroke-width` identically in both languages (absent field → the pinned
   `1.5`). `data-r`/`data-r-hover` mirror it and are equal (no hover growth).
-- **Zero-length arrow** — still emit the `.pk-point` path (tail == head) with its
+- **Zero-length arrow** — still emit the `.sc-point` path (tail == head) with its
   `data-*`; do not drop zero-magnitude datums.
 - **Formatters** — every path/`cx`/`cy` coordinate via `:.1f`/`f1`;
   `data-x`, `data-y`, `data-direction`, `data-length`, `data-r` via
@@ -406,15 +406,15 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the
   legend item (do not renumber).
-- **Datum mark:** `.pk-point` (here also `.pk-vector`) carries **all** of
+- **Datum mark:** `.sc-point` (here also `.sc-vector`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, **`data-direction`**,
   **`data-length`**, `data-color`, `data-r`, `data-r-hover` — `data-direction`
   and `data-length` are the new vector attributes; the tooltip shows the full
   `(x, y, direction, length)` tuple.
-- **Crosshair anchor:** every `.pk-point` carries `cx` (arrow anchor x) and by
+- **Crosshair anchor:** every `.sc-point` carries `cx` (arrow anchor x) and by
   convention `cy` (anchor y).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(fmt_num(x))`; `data-y = esc(fmt_num(y))`;
@@ -483,7 +483,7 @@ marks (§5.5d). `VECTOR_PLOT_CASES =
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/vector-plot/examples/basic.json")))
 save_html(spec, "out.html")
@@ -491,7 +491,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="vector-plot",
     title="Surface Wind Field",
@@ -508,9 +508,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

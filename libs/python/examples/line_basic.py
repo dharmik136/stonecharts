@@ -9,7 +9,7 @@ from pathlib import Path
 # Allow running without installing the package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from peakcharts import Axis, ChartSpec, Series, save_html  # noqa: E402
+from stonecharts import Axis, ChartSpec, Series, save_html  # noqa: E402
 
 spec = ChartSpec(
     title="Monthly Average Temperature",

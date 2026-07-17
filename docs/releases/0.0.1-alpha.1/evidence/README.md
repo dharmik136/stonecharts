@@ -1,6 +1,6 @@
 ---
-id: PC-REL-003
-title: PeakCharts Alpha 1 Evidence Pack Format
+id: SC-REL-003
+title: StoneCharts Alpha 1 Evidence Pack Format
 status: proposed
 classification: normative
 owner: maintainer

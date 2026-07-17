@@ -16,7 +16,7 @@ from .spec import ChartSpec
 from .util import esc, fmt_num
 
 # The canonical shared runtime lives at <repo>/runtime/chart-interactions.js.
-# render.py -> peakcharts -> python -> libs -> <repo>
+# render.py -> stonecharts -> python -> libs -> <repo>
 _RUNTIME_PATH = Path(__file__).resolve().parents[3] / "runtime" / "chart-interactions.js"
 
 # chart type -> SVG renderer. New chart types register here.
@@ -26,17 +26,17 @@ _RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
 }
 
 _CSS = """
-  .pk-chart-wrap{position:relative;display:inline-block;line-height:0}
-  .pk-chart{display:block;background:#fff}
-  .pk-point{cursor:pointer;transition:r .08s ease}
-  .pk-legend-item.pk-hidden{opacity:.35}
-  .pk-tooltip{position:absolute;pointer-events:none;z-index:10;background:rgba(255,255,255,.97);
+  .sc-chart-wrap{position:relative;display:inline-block;line-height:0}
+  .sc-chart{display:block;background:#fff}
+  .sc-point{cursor:pointer;transition:r .08s ease}
+  .sc-legend-item.sc-hidden{opacity:.35}
+  .sc-tooltip{position:absolute;pointer-events:none;z-index:10;background:rgba(255,255,255,.97);
     border:1px solid #d8d8e0;border-radius:6px;box-shadow:0 4px 14px rgba(20,20,40,.14);
     padding:7px 10px;font:12px/1.4 Segoe UI,Helvetica,Arial,sans-serif;color:#22223a;white-space:nowrap}
-  .pk-tt-title{font-weight:600;margin-bottom:2px}
-  .pk-tt-row{display:flex;align-items:center}
-  .pk-tt-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
-  .pk-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;
+  .sc-tt-title{font-weight:600;margin-bottom:2px}
+  .sc-tt-row{display:flex;align-items:center}
+  .sc-tt-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+  .sc-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;
     padding:0!important;margin:-1px!important;overflow:hidden!important;
     clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 """.strip()
@@ -57,7 +57,7 @@ def _data_table(spec: ChartSpec) -> str:
         rows.append(f'<tr><th scope="row">{esc(s.name)}</th>{cells}</tr>')
     caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
     return (
-        f'<table class="pk-visually-hidden">{caption}'
+        f'<table class="sc-visually-hidden">{caption}'
         f'<thead><tr><td></td>{head}</tr></thead>'
         f'<tbody>{"".join(rows)}</tbody></table>'
     )
@@ -77,13 +77,13 @@ def _runtime_js() -> str:
         return _RUNTIME_PATH.read_text(encoding="utf-8")
     except OSError:
         # Degrade gracefully: static chart still renders, just without interactivity.
-        return "/* PeakCharts runtime not found at %s */" % _RUNTIME_PATH
+        return "/* StoneCharts runtime not found at %s */" % _RUNTIME_PATH
 
 
 def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
     """Return a full, self-contained interactive HTML document for the chart."""
     svg = render_svg(spec)
-    title = page_title or spec.title or "PeakCharts"
+    title = page_title or spec.title or "StoneCharts"
     wrap_style = (
         f' style="display:block;width:100%;max-width:{spec.width}px;'
         f'aspect-ratio:{spec.width} / {spec.height}"'
@@ -97,8 +97,8 @@ def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
         f"<title>{esc(title)}</title>\n"
         f"<style>{_CSS}</style></head>\n"
         "<body>\n"
-        f'<div class="pk-chart-wrap"{wrap_style}>{svg}{table}'
-        f'<div class="pk-tooltip" style="display:none"></div></div>\n'
+        f'<div class="sc-chart-wrap"{wrap_style}>{svg}{table}'
+        f'<div class="sc-tooltip" style="display:none"></div></div>\n'
         f"<script>{_runtime_js()}</script>\n"
         "</body></html>\n"
     )

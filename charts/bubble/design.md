@@ -1,7 +1,7 @@
 # Chart: Bubble (`bubble`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which itself
 > copies [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the
@@ -15,7 +15,7 @@
   `line` has a live renderer today; bubble rides the shared cartesian frame once
   scatter's numeric-x-axis + point-model land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 4, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/bubble.py` · `libs/go/bubble.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/bubble.py` · `libs/go/bubble.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -82,7 +82,7 @@ Do **not** use it for: an x/y correlation with **no** third variable (use
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"bubble"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -141,36 +141,36 @@ a marks callback and re-implements no chrome (§5.2). It delegates with the
 **`include_zero=False`** (free numeric x/y):
 
 ```python
-# libs/python/peakcharts/charts/bubble.py
+# libs/python/stonecharts/charts/bubble.py
 from ._cartesian import render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Bubble", "linear", _bubble_marks, include_zero=False)
 ```
 ```go
-// libs/go/bubble.go — package peakcharts
+// libs/go/bubble.go — package stonecharts
 func renderBubbleSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Bubble", "linear", bubbleMarks, false)
 }
 ```
 
 The marks callback first reduces the **global** z-domain (§ Size scale), then emits
-**exactly one** `<g class="pk-series" data-series="{si}">` per series, and inside
+**exactly one** `<g class="sc-series" data-series="{si}">` per series, and inside
 it **one `<circle>` per point**:
 
 ```html
-<g class="pk-series" data-series="0">
-  <circle class="pk-bubble pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <circle class="sc-bubble sc-point" data-series="0"
           data-series-name="Checkout API" data-x="30" data-y="120" data-z="5600"
           data-color="#2f7ed8" data-r="24.7" data-r-hover="24.7"
           cx="512.0" cy="188.0" r="24.7"
           fill="#2f7ed8" fill-opacity="0.65"/>
-  … one .pk-bubble.pk-point per point …
+  … one .sc-bubble.sc-point per point …
 </g>
 ```
 
-- **Class:** `pk-bubble pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-bubble` is a
+- **Class:** `sc-bubble sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-bubble` is a
   purely-cosmetic CSS hook (adding a class the runtime must *know about* is out of
   scope — NN#2). The circle **is** the hoverable point; there are no separate
   markers.
@@ -186,7 +186,7 @@ it **one `<circle>` per point**:
   when present, else the pinned default **`0.65`** — so overlapping bubbles read
   through one another. This is bubble's reinterpretation of `fillOpacity` (line's
   default `0` would make an *invisible* bubble field).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (circle center x) — the
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (circle center x) — the
   crosshair reads it — and `cy` (center y). For a circle these coincide with the
   drawn center.
 - **`data-z`:** the **new** datum attribute — the raw `z` magnitude via `fmt_num`.
@@ -326,14 +326,14 @@ The shared runtime (`runtime/chart-interactions.js`) keys **only** on the select
 highlight, crosshair, legend-toggle, and keyboard nav all work with **zero JS
 changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the legend
   item (do not renumber).
-- **Datum mark:** `.pk-point` (here also `.pk-bubble`) carries **all** of
+- **Datum mark:** `.sc-point` (here also `.sc-bubble`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, **`data-z`**, `data-color`,
   `data-r`, `data-r-hover` — `data-z` is the new bubble attribute; the tooltip shows
   the full `(x, y, z)` triple.
-- **Crosshair anchor:** every `.pk-point` carries `cx` and `cy` (the circle center).
+- **Crosshair anchor:** every `.sc-point` carries `cx` and `cy` (the circle center).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(fmt_num(x))`; `data-y = esc(fmt_num(y))`;
   `data-z = esc(fmt_num(z))`; `data-color = fr.styles[si].solid`;
@@ -397,7 +397,7 @@ hostile strings (`<script>`, `"`, `<`, `&`) in **every** marks-emitted string fi
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/bubble/examples/basic.json")))
 save_html(spec, "out.html")
@@ -405,7 +405,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="bubble",
     title="Endpoint Latency vs Payload",
@@ -420,9 +420,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

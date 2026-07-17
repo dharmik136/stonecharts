@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"os"
 
-	"peakcharts"
+	"stonecharts"
 )
 
 func main() {
@@ -23,12 +23,12 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	spec, err := peakcharts.FromJSON(b)
+	spec, err := stonecharts.FromJSON(b)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	svg := peakcharts.RenderSVG(spec)
+	svg := stonecharts.RenderSVG(spec)
 
 	if len(os.Args) >= 3 {
 		if err := os.WriteFile(os.Args[2], []byte(svg), 0o644); err != nil {
@@ -39,7 +39,7 @@ func main() {
 		fmt.Print(svg)
 	}
 	if len(os.Args) >= 4 {
-		if err := peakcharts.SaveHTML(spec, os.Args[3], ""); err != nil {
+		if err := stonecharts.SaveHTML(spec, os.Args[3], ""); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}

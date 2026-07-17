@@ -1,4 +1,4 @@
-package peakcharts
+package stonecharts
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func renderColumnSVG(spec *ChartSpec) string {
 	return renderCartesian(spec, "Column", "band", columnMarks, true)
 }
 
-// columnMarks emits the column-specific marks — one <g class="pk-series"> per
+// columnMarks emits the column-specific marks — one <g class="sc-series"> per
 // series and one baseline/floating <rect> per datum. All scales come from the
 // frame; this function owns only the pinned band sub-layout and stack transform.
 func columnMarks(f *cartesianFrame, p *strings.Builder) {
@@ -50,7 +50,7 @@ func columnMarks(f *cartesianFrame, p *strings.Builder) {
 	cumulative := make([]float64, f.n)
 	for si, s := range f.spec.Series {
 		st := f.styles[si]
-		p.WriteString(fmt.Sprintf(`<g class="pk-series" data-series="%d">`, si))
+		p.WriteString(fmt.Sprintf(`<g class="sc-series" data-series="%d">`, si))
 		for i, raw := range s.Data {
 			if i >= f.n {
 				break
@@ -91,7 +91,7 @@ func columnMarks(f *cartesianFrame, p *strings.Builder) {
 			}
 			cx := left + barW/2
 			common := fmt.Sprintf(
-				`class="pk-bar pk-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="3.5" data-r-hover="6"`,
+				`class="sc-bar sc-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="3.5" data-r-hover="6"`,
 				si, esc(s.Name), esc(xlabel), esc(fmtNum(raw)), st.solid)
 			p.WriteString(fmt.Sprintf(
 				`<rect %s cx="%s" cy="%s" x="%s" y="%s" width="%s" height="%s" fill="%s"/>`,

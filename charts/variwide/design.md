@@ -1,7 +1,7 @@
 # Chart: Variwide (`variwide`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this recipe copies the
 > Cartesian exemplar [`charts/column/design.md`](../column/design.md) (itself
 > modeled on [`charts/line-basic/design.md`](../line-basic/design.md)) and adds
@@ -19,7 +19,7 @@
   cumulative-width x-scale land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2
   Family A (Variwide row), §3.3 Rank 1, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/variwide.py` · `libs/go/variwide.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/variwide.py` · `libs/go/variwide.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -110,7 +110,7 @@ widths).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"variwide"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -171,14 +171,14 @@ of `"band"` (equal bands). The value axis stays zero-anchored (`include_zero`
 defaults `True` — the bar baseline):
 
 ```python
-# libs/python/peakcharts/charts/variwide.py
+# libs/python/stonecharts/charts/variwide.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Variwide", "variwide", _variwide_marks)  # include_zero defaults True (height baseline)
 ```
 ```go
-// libs/go/variwide.go — package peakcharts
+// libs/go/variwide.go — package stonecharts
 func renderVariwideSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Variwide", "variwide", variwideMarks, true)
 }
@@ -195,23 +195,23 @@ func renderVariwideSVG(spec *ChartSpec) string {
 > line and column goldens are byte-unchanged** after the variwide scale lands
 > (Gate A/C — the new strategy is purely additive).
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 (single series in the canonical case), and inside it **one baseline-anchored
 `<rect>` per category**:
 
 ```html
-<g class="pk-series" data-series="0">
-  <rect class="pk-bar pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <rect class="sc-bar sc-point" data-series="0"
         data-series-name="p95 latency" data-x="search" data-y="176" data-z="610"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="712.4" cy="120.0" x="640.8" y="120.0" width="143.2" height="216.0"
         fill="#2f7ed8"/>
-  … one .pk-bar.pk-point per category …
+  … one .sc-bar.sc-point per category …
 </g>
 ```
 
-- **Class:** `pk-bar pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-bar` is a
+- **Class:** `sc-bar sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-bar` is a
   purely-cosmetic CSS hook (adding a class the runtime must *know about* is out of
   scope — NN#2). The bar **is** the hoverable point; there are no separate markers.
 - **Geometry (x — the net-new).** From the cumulative-width layout below:
@@ -227,7 +227,7 @@ The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}
   **pattern → `url(#pat)`; gradient → `url(#grad)`; else the solid hex.** Never
   read `area_fill` (that is line's under-fill), and never leave a bar unfilled
   (an unfilled variwide bar is a broken static chart — NN#2).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (bar center x = the slot
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (bar center x = the slot
   center `fr.xpix(k)`) — the crosshair reads it — and by convention `cy` (bar
   top). Without `cx` the crosshair breaks.
 - **`data-z`:** each bar additionally carries `data-z = esc(fmt_num(widths[k]))`
@@ -393,14 +393,14 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the
   legend item (do not renumber).
-- **Datum mark:** `.pk-point` (here also `.pk-bar`) carries **all** of
+- **Datum mark:** `.sc-point` (here also `.sc-bar`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`,
   `data-r-hover` (plus the extra `data-z` width metric) — mandatory even though a
   `<rect>` ignores the hover `r`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (bar center x = slot
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (bar center x = slot
   center) and by convention `cy` (bar top).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(height))`;
@@ -458,7 +458,7 @@ the **escaped** bytes and **no** raw `<script>` (§5.5d).
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/variwide/examples/basic.json")))
 save_html(spec, "out.html")
@@ -466,7 +466,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="variwide",
     title="p95 Latency by Service, Weighted by Traffic",
@@ -478,9 +478,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

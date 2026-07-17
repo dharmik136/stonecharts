@@ -1,4 +1,4 @@
-package peakcharts
+package stonecharts
 
 import (
 	"fmt"
@@ -8,17 +8,17 @@ import (
 	"strings"
 )
 
-const cssBlock = `.pk-chart-wrap{position:relative;display:inline-block;line-height:0}
-  .pk-chart{display:block;background:#fff}
-  .pk-point{cursor:pointer;transition:r .08s ease}
-  .pk-legend-item.pk-hidden{opacity:.35}
-  .pk-tooltip{position:absolute;pointer-events:none;z-index:10;background:rgba(255,255,255,.97);
+const cssBlock = `.sc-chart-wrap{position:relative;display:inline-block;line-height:0}
+  .sc-chart{display:block;background:#fff}
+  .sc-point{cursor:pointer;transition:r .08s ease}
+  .sc-legend-item.sc-hidden{opacity:.35}
+  .sc-tooltip{position:absolute;pointer-events:none;z-index:10;background:rgba(255,255,255,.97);
     border:1px solid #d8d8e0;border-radius:6px;box-shadow:0 4px 14px rgba(20,20,40,.14);
     padding:7px 10px;font:12px/1.4 Segoe UI,Helvetica,Arial,sans-serif;color:#22223a;white-space:nowrap}
-  .pk-tt-title{font-weight:600;margin-bottom:2px}
-  .pk-tt-row{display:flex;align-items:center}
-  .pk-tt-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
-  .pk-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;
+  .sc-tt-title{font-weight:600;margin-bottom:2px}
+  .sc-tt-row{display:flex;align-items:center}
+  .sc-tt-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+  .sc-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;
     padding:0!important;margin:-1px!important;overflow:hidden!important;
     clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}`
 
@@ -39,7 +39,7 @@ func dataTable(spec *ChartSpec) string {
 		}
 	}
 	var b strings.Builder
-	b.WriteString(`<table class="pk-visually-hidden">`)
+	b.WriteString(`<table class="sc-visually-hidden">`)
 	if spec.Title != "" {
 		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
 	}
@@ -76,10 +76,10 @@ func RenderSVG(spec *ChartSpec) string {
 }
 
 // runtimeJS loads the shared interaction runtime. Canonical source is
-// <repo>/runtime/chart-interactions.js; override with PEAKCHARTS_RUNTIME.
+// <repo>/runtime/chart-interactions.js; override with STONECHARTS_RUNTIME.
 func runtimeJS() string {
 	candidates := []string{}
-	if p := os.Getenv("PEAKCHARTS_RUNTIME"); p != "" {
+	if p := os.Getenv("STONECHARTS_RUNTIME"); p != "" {
 		candidates = append(candidates, p)
 	}
 	candidates = append(candidates,
@@ -91,7 +91,7 @@ func runtimeJS() string {
 			return string(b)
 		}
 	}
-	return "/* PeakCharts runtime not found */"
+	return "/* StoneCharts runtime not found */"
 }
 
 // RenderHTML returns a self-contained interactive HTML document for the chart.
@@ -102,7 +102,7 @@ func RenderHTML(spec *ChartSpec, pageTitle string) string {
 		title = spec.Title
 	}
 	if title == "" {
-		title = "PeakCharts"
+		title = "StoneCharts"
 	}
 	wrapStyle := ""
 	if spec.Responsive {
@@ -118,7 +118,7 @@ func RenderHTML(spec *ChartSpec, pageTitle string) string {
 		"<title>" + esc(title) + "</title>\n" +
 		"<style>" + cssBlock + "</style></head>\n" +
 		"<body>\n" +
-		`<div class="pk-chart-wrap"` + wrapStyle + `>` + svg + table + `<div class="pk-tooltip" style="display:none"></div></div>` + "\n" +
+		`<div class="sc-chart-wrap"` + wrapStyle + `>` + svg + table + `<div class="sc-tooltip" style="display:none"></div></div>` + "\n" +
 		"<script>" + runtimeJS() + "</script>\n" +
 		"</body></html>\n"
 }

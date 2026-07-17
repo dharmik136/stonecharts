@@ -1,6 +1,6 @@
 ---
-id: PC-REQ-001
-title: PeakCharts Requirements and Traceability Guide
+id: SC-REQ-001
+title: StoneCharts Requirements and Traceability Guide
 status: proposed
 classification: informative
 owner: maintainer

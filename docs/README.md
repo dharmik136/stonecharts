@@ -1,6 +1,6 @@
 ---
-id: PC-GOV-005
-title: PeakCharts Documentation Index
+id: SC-GOV-005
+title: StoneCharts Documentation Index
 status: proposed
 classification: informative
 owner: maintainer
@@ -15,9 +15,9 @@ supersedes: null
 superseded_by: null
 ---
 
-# PeakCharts Documentation
+# StoneCharts Documentation
 
-This index is the entry point to PeakCharts product and engineering controls.
+This index is the entry point to StoneCharts product and engineering controls.
 Document status and classification are authoritative in each file's metadata.
 
 ## Start here

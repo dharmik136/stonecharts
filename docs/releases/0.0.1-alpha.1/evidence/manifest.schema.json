@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peakcharts.dev/releases/0.0.1-alpha.1/evidence/manifest.schema.json",
-  "title": "PeakCharts release evidence manifest",
+  "$id": "https://stonecharts.dev/releases/0.0.1-alpha.1/evidence/manifest.schema.json",
+  "title": "StoneCharts release evidence manifest",
   "type": "object",
   "additionalProperties": false,
   "required": [

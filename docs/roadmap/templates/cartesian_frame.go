@@ -1,5 +1,5 @@
 // CartesianFrame Go Skeleton
-package peakcharts
+package stonecharts
 
 type cartesianFrame struct {
 	spec                       *ChartSpec

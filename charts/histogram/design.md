@@ -1,7 +1,7 @@
 # Chart: Histogram (`histogram`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file mirrors the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which itself
 > copies [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the
@@ -15,7 +15,7 @@
   `line` has a live renderer today; histogram rides the shared cartesian frame
   once the extraction, the numeric x-axis, and binning land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 7, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/histogram.py` · `libs/go/histogram.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/histogram.py` · `libs/go/histogram.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -76,7 +76,7 @@ through `fmt_num`.
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"histogram"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -140,36 +140,36 @@ x-scale** (scatter's, for bin edges) with the **count value-axis zero-anchored**
 (`include_zero=True` — the y baseline):
 
 ```python
-# libs/python/peakcharts/charts/histogram.py
+# libs/python/stonecharts/charts/histogram.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Histogram", "linear", _histogram_marks)  # include_zero defaults True (count baseline)
 ```
 ```go
-// libs/go/histogram.go — package peakcharts
+// libs/go/histogram.go — package stonecharts
 func renderHistogramSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Histogram", "linear", histogramMarks, true)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it **one baseline-anchored `<rect>` per bin** (plus, when an
-`overlay` is set, one derived `.pk-series` for the pareto/bellcurve line):
+`overlay` is set, one derived `.sc-series` for the pareto/bellcurve line):
 
 ```html
-<g class="pk-series" data-series="0">
-  <rect class="pk-bar pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <rect class="sc-bar sc-point" data-series="0"
         data-series-name="Latency" data-x="39–60" data-y="9"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="112.0" cy="180.0" x="80.0" y="180.0" width="64.0" height="156.0"
         fill="#2f7ed8"/>
-  … one .pk-bar.pk-point per bin …
+  … one .sc-bar.sc-point per bin …
 </g>
 ```
 
-- **Class:** `pk-bar pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-bar` is a
+- **Class:** `sc-bar sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-bar` is a
   purely-cosmetic CSS hook (adding a class the runtime must *know about* is out of
   scope — NN#2). The bar **is** the hoverable point; there are no separate markers.
 - **Geometry (contiguous — the load-bearing divergence from column):** a bar for
@@ -187,12 +187,12 @@ per series, and inside it **one baseline-anchored `<rect>` per bin** (plus, when
   **pattern → `url(#pat)`; gradient → `url(#grad)`; else the solid hex.** Never
   read `area_fill` (that is line's under-fill), and never leave a bar unfilled
   (an unfilled histogram is a broken static chart — NN#2).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (bar center x — here the bin
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (bar center x — here the bin
   **midpoint** `fr.xpix((edge(b)+edge(b+1))/2)`) — the crosshair reads it — and by
   convention `cy` (bar top). Without `cx` the crosshair breaks.
 - **Overlay (derived series):** when `overlay` is set the marks append **one more**
-  `<g class="pk-series" data-series="{K}">` after the bars — a `pk-series-line`
-  `<path>` plus `.pk-point`s — for the cumulative-percent (pareto) or normal-fit
+  `<g class="sc-series" data-series="{K}">` after the bars — a `sc-series-line`
+  `<path>` plus `.sc-point`s — for the cumulative-percent (pareto) or normal-fit
   (bellcurve) curve. Its `data-series` index is `len(series)` (it does not renumber
   the bar series), and the shared tail emits its legend swatch.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
@@ -323,13 +323,13 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series (plus one for the
+- **Series group:** `.sc-series[data-series=N]` — one per series (plus one for the
   overlay at index `len(series)`); `N` is the integer series index, **consistent**
   across the group, its points, and the legend item (do not renumber).
-- **Datum mark:** `.pk-point` (here also `.pk-bar`) carries **all** of
+- **Datum mark:** `.sc-point` (here also `.sc-bar`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`,
   `data-r-hover` — mandatory even though a `<rect>` ignores the hover `r`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (bin midpoint x) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (bin midpoint x) and by
   convention `cy` (bar top).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(<bin range label>)` (e.g. `"39–60"` — the bin edges via `fmt_num`,
@@ -387,7 +387,7 @@ run against the histogram marks (§5.5d).
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/histogram/examples/basic.json")))
 save_html(spec, "out.html")
@@ -395,7 +395,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="histogram",
     title="Response Latency Distribution",
@@ -407,9 +407,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

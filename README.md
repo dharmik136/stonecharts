@@ -1,10 +1,10 @@
-# PeakCharts
+# StoneCharts
 
 An original, proprietary charting library. One shared chart-spec model, a
 standalone renderer per language, and a shared interaction runtime — so the same
 chart "recipe" produces the same interactive chart in Python, Go, and beyond.
 
-PeakCharts is currently entering a governed Alpha qualification phase. Product scope,
+StoneCharts is currently entering a governed Alpha qualification phase. Product scope,
 guarantees, requirements, architecture decisions, risks, evidence, and release gates
 are indexed in [`docs/README.md`](docs/README.md).
 
@@ -30,7 +30,7 @@ every renderer here is written from scratch. All rights reserved.
 spec/          shared spec schema + the SVG DOM contract
 runtime/       the shared vanilla-JS interaction runtime (written once)
 charts/<id>/   per-chart docs: design.md, examples/, golden/
-libs/python/   Python renderer (peakcharts package)
+libs/python/   Python renderer (stonecharts package)
 libs/go/       Go renderer
 CHARTS.md      the "smart" router: data + intent -> which chart + its design.md
 ```
@@ -40,7 +40,7 @@ renderer in each `libs/<lang>`. See any chart's `design.md` to generate it.
 
 ## Guarantees & limitations
 
-PeakCharts generates deterministic static SVG without a browser runtime for
+StoneCharts generates deterministic static SVG without a browser runtime for
 supported chart specifications. Go and Python outputs are byte-identical for
 covered fixtures. Canonical output, browser behavior, visual export, and
 customization have separate applicability boundaries in the governed
@@ -65,7 +65,7 @@ python examples/line_basic.py       # writes examples/line_basic.out.html
 ```
 
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 
 spec = ChartSpec(
     title="Monthly Average Temperature",
@@ -84,10 +84,10 @@ go run ./cmd/line_basic ../../charts/line-basic/examples/basic.json out.svg out.
 ```
 
 ```go
-import "peakcharts"
+import "stonecharts"
 
-spec, _ := peakcharts.FromJSON(specJSON)   // matches spec/chart-spec.schema.json
-peakcharts.SaveHTML(spec, "chart.html", "")
+spec, _ := stonecharts.FromJSON(specJSON)   // matches spec/chart-spec.schema.json
+stonecharts.SaveHTML(spec, "chart.html", "")
 ```
 
 ## Status

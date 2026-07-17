@@ -1,4 +1,4 @@
-# Research Brief — PeakCharts Design & Customization Layer
+# Research Brief — StoneCharts Design & Customization Layer
 
 > Hand this whole document to a research agent. It is self-contained: it explains
 > the project, the constraints, exactly what to research, and the exact deliverable
@@ -6,9 +6,9 @@
 
 ---
 
-## 1. What PeakCharts is (context)
+## 1. What StoneCharts is (context)
 
-PeakCharts is an original, **proprietary** (all-rights-reserved) charting library.
+StoneCharts is an original, **proprietary** (all-rights-reserved) charting library.
 It is **not** a fork or copy of any existing library; the Highcharts demo gallery is
 used only as a *checklist of which chart types to support*, never as source to copy.
 
@@ -17,8 +17,8 @@ used only as a *checklist of which chart types to support*, never as source to c
   `series` with data + color, etc. (JSON Schema at `spec/chart-spec.schema.json`).
 - Each language library (**Python and Go** today; more later) has its **own
   renderer** that turns the spec into **SVG**, following a shared DOM contract
-  (`spec/svg-contract.md`): classes like `.pk-chart`, `.pk-series`, `.pk-point`,
-  `.pk-legend-item`, and `data-*` attributes.
+  (`spec/svg-contract.md`): classes like `.sc-chart`, `.sc-series`, `.sc-point`,
+  `.sc-legend-item`, and `data-*` attributes.
 - A single shared **vanilla-JS runtime** (`runtime/chart-interactions.js`, zero deps)
   enhances that SVG with interactivity (tooltip, crosshair, point highlight,
   legend toggle).
@@ -119,7 +119,7 @@ external tooling.
 
 **N. Config/spec-model design** — how the leaders structure their options object
 (Highcharts `options`, ECharts `option`, Vega-Lite grammar, Chart.js `config`).
-Recommend how PeakCharts should split **spec vs theme vs runtime**, defaults and
+Recommend how StoneCharts should split **spec vs theme vs runtime**, defaults and
 inheritance, and how to keep the config JSON-schema-first and cross-language.
 Which properties belong on the chart, the axis, the series, or a global theme.
 
@@ -151,7 +151,7 @@ Which properties belong on the chart, the axis, the series, or a global theme.
 
 ## 6. Repo pointers (only if the agent has access)
 
-`C:\Users\Dharmik Shingala\peakcharts` (private, github.com/dharmik136/peakcharts):
+`C:\Users\Dharmik Shingala\stonecharts` (private, github.com/dharmik136/stonecharts):
 `spec/chart-spec.schema.json`, `spec/svg-contract.md`, `runtime/chart-interactions.js`,
-`libs/python/peakcharts/charts/line.py`, `libs/go/line.go`,
+`libs/python/stonecharts/charts/line.py`, `libs/go/line.go`,
 `charts/line-basic/design.md`, `CHARTS.md`.

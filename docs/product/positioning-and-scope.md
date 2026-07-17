@@ -1,6 +1,6 @@
 ---
-id: PC-PROD-002
-title: PeakCharts Positioning and Alpha Scope
+id: SC-PROD-002
+title: StoneCharts Positioning and Alpha Scope
 status: proposed
 classification: normative
 owner: product-owner
@@ -19,13 +19,13 @@ superseded_by: null
 
 ## Positioning
 
-PeakCharts is a deterministic, multi-language chart specification and native SVG
+StoneCharts is a deterministic, multi-language chart specification and native SVG
 rendering system. Its differentiation is not maximum chart count. It is the ability to
 carry one validated chart contract across language and delivery boundaries with
 explicit, testable guarantees.
 
 Established browser chart libraries provide broad interactive feature catalogs.
-PeakCharts initially serves workflows where native server rendering, canonical output,
+StoneCharts initially serves workflows where native server rendering, canonical output,
 auditability, self-contained artifacts, and cross-language equivalence matter more
 than browser-only breadth.
 

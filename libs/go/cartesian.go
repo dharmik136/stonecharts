@@ -5,7 +5,7 @@
 // background, <defs>, theme resolution, the a11y summary, and the <svg>
 // open/close. Chrome bodies were moved VERBATIM out of line.go so the line
 // goldens are the frozen witness that the extraction changed nothing (§4.6).
-package peakcharts
+package stonecharts
 
 import (
 	"fmt"
@@ -363,11 +363,11 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 	W, H := f.W, f.H
 	if spec.Responsive {
 		p.WriteString(fmt.Sprintf(
-			`<svg class="pk-chart"%s xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid meet" width="100%%" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
+			`<svg class="sc-chart"%s xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid meet" width="100%%" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
 			f.a11yAttr, W, H))
 	} else {
 		p.WriteString(fmt.Sprintf(
-			`<svg class="pk-chart"%s xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
+			`<svg class="sc-chart"%s xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
 			f.a11yAttr, W, H, W, H))
 	}
 
@@ -386,20 +386,20 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 	// Background (only when the theme sets one; light theme -> none).
 	if theme.Background != "" {
 		p.WriteString(fmt.Sprintf(
-			`<rect class="pk-bg" x="0" y="0" width="%d" height="%d" fill="%s"/>`,
+			`<rect class="sc-bg" x="0" y="0" width="%d" height="%d" fill="%s"/>`,
 			W, H, theme.Background))
 	}
 
 	ty := 26
 	if spec.Title != "" {
 		p.WriteString(fmt.Sprintf(
-			`<text class="pk-title" x="%s" y="%d" text-anchor="middle" font-size="17" font-weight="600" fill="%s">%s</text>`,
+			`<text class="sc-title" x="%s" y="%d" text-anchor="middle" font-size="17" font-weight="600" fill="%s">%s</text>`,
 			f1(float64(W)/2), ty, theme.TitleColor, esc(spec.Title)))
 		ty += 20
 	}
 	if spec.Subtitle != "" {
 		p.WriteString(fmt.Sprintf(
-			`<text class="pk-subtitle" x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
+			`<text class="sc-subtitle" x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
 			f1(float64(W)/2), ty, theme.SubtitleColor, esc(spec.Subtitle)))
 	}
 
@@ -410,12 +410,12 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 	if da := dashArray(spec.YAxis.gridDashStyle()); da != "" {
 		gridDashAttr = ` stroke-dasharray="` + da + `"`
 	}
-	p.WriteString(`<g class="pk-axis pk-axis-y">`)
+	p.WriteString(`<g class="sc-axis sc-axis-y">`)
 	for _, tv := range f.yTicks {
 		gy := f.ypix(tv)
 		if gridEnabled {
 			p.WriteString(fmt.Sprintf(
-				`<line class="pk-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"%s/>`,
+				`<line class="sc-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"%s/>`,
 				f1(f.plotX), f1(gy), f1(f.plotX+f.plotW), f1(gy), gridColor, gridDashAttr))
 		}
 		p.WriteString(fmt.Sprintf(
@@ -426,11 +426,11 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 
 	// Axis line.
 	p.WriteString(fmt.Sprintf(
-		`<line class="pk-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"/>`,
+		`<line class="sc-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"/>`,
 		f1(f.plotX), f1(f.plotY+f.plotH), f1(f.plotX+f.plotW), f1(f.plotY+f.plotH), theme.AxisLineColor))
 
 	// X labels.
-	p.WriteString(`<g class="pk-axis pk-axis-x">`)
+	p.WriteString(`<g class="sc-axis sc-axis-x">`)
 	for i := 0; i < f.n && i < len(f.cats); i++ {
 		lx := f.xpix(i)
 		p.WriteString(fmt.Sprintf(
@@ -454,7 +454,7 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 
 	// Crosshair (JS-driven).
 	p.WriteString(fmt.Sprintf(
-		`<line class="pk-crosshair" x1="0" y1="%s" x2="0" y2="%s" stroke="%s" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>`,
+		`<line class="sc-crosshair" x1="0" y1="%s" x2="0" y2="%s" stroke="%s" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>`,
 		f1(f.plotY), f1(f.plotY+f.plotH), theme.CrosshairColor))
 }
 
@@ -479,10 +479,10 @@ func chromeTail(f *cartesianFrame, p *strings.Builder) {
 			lyBase += 18
 		}
 		ly := float64(f.H - lyBase)
-		p.WriteString(`<g class="pk-legend">`)
+		p.WriteString(`<g class="sc-legend">`)
 		for si, s := range spec.Series {
 			color := f.styles[si].solid
-			p.WriteString(fmt.Sprintf(`<g class="pk-legend-item" data-series="%d">`, si))
+			p.WriteString(fmt.Sprintf(`<g class="sc-legend-item" data-series="%d">`, si))
 			p.WriteString(fmt.Sprintf(
 				`<rect x="%s" y="%s" width="14" height="4" rx="2" fill="%s"/>`,
 				f1(lx), f1(ly-9), color))
@@ -512,7 +512,7 @@ func renderCartesian(spec *ChartSpec, noun, xScale string, marks marksFn, includ
 	f := buildFrame(spec, noun, xScale, includeZero)
 	var p strings.Builder
 	chromeHead(f, &p)
-	marks(f, &p) // chart appends its <g class="pk-series">…</g> blocks here
+	marks(f, &p) // chart appends its <g class="sc-series">…</g> blocks here
 	chromeTail(f, &p)
 	return p.String()
 }

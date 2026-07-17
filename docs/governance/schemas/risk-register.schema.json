@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peakcharts.dev/schemas/risk-register.schema.json",
-  "title": "PeakCharts risk register",
+  "$id": "https://stonecharts.dev/schemas/risk-register.schema.json",
+  "title": "StoneCharts risk register",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "title", "status", "owner", "updated", "risks"],
   "properties": {
-    "id": { "const": "PC-GOV-003" },
+    "id": { "const": "SC-GOV-003" },
     "title": { "type": "string" },
     "status": { "enum": ["draft", "proposed", "approved", "archived"] },
     "owner": { "type": "string" },

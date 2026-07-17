@@ -1,7 +1,7 @@
 # Chart: Windbarb (`windbarb`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file copies the
 > [`column`](../column/design.md) exemplar (itself modeled on
 > [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the sibling
@@ -18,7 +18,7 @@
   `line` has a live renderer today; windbarb rides the shared cartesian frame once
   the datetime axis + `{speed, direction}` point model land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2 Family A (Windbarb), §3.2, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/windbarb.py` · `libs/go/windbarb.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/windbarb.py` · `libs/go/windbarb.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Reuses:** [`charts/candlestick`](../candlestick/design.md) (the `datetime` band axis) ·
   [`charts/combo`](../combo/design.md) (the composition layer, when co-plotted in a meteogram)
@@ -79,7 +79,7 @@ See [`CHARTS.md`](../../CHARTS.md).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"windbarb"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -151,49 +151,49 @@ The renderer is a **one-line delegation** to the shared frame; it supplies **onl
 a marks callback and re-implements no chrome (§5.2):
 
 ```python
-# libs/python/peakcharts/charts/windbarb.py
+# libs/python/stonecharts/charts/windbarb.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Windbarb", "band", _windbarb_marks)   # include_zero defaults True
 ```
 ```go
-// libs/go/windbarb.go — package peakcharts
+// libs/go/windbarb.go — package stonecharts
 func renderWindbarbSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Windbarb", "band", windbarbMarks, true)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
-per series, and inside it **one `.pk-point` group per time point** wrapping the
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
+per series, and inside it **one `.sc-point` group per time point** wrapping the
 staff + feathers (or the calm circle), rotated to the wind direction:
 
 ```html
-<g class="pk-series" data-series="0">
-  <g class="pk-barb pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <g class="sc-barb sc-point" data-series="0"
      data-series-name="Buoy 41010" data-x="09:00" data-y="25"
      data-speed="25" data-direction="220" data-color="#2f7ed8"
      data-r="3.5" data-r-hover="6"
      cx="128.4" cy="230.0"
      transform="rotate(220 128.4 230.0)">
-    <line class="pk-staff" x1="128.4" y1="230.0" x2="128.4" y2="210.0"
+    <line class="sc-staff" x1="128.4" y1="230.0" x2="128.4" y2="210.0"
           stroke="#2f7ed8" stroke-width="1.5"/>
-    <line class="pk-feather" x1="128.4" y1="210.0" x2="135.4" y2="207.0"
+    <line class="sc-feather" x1="128.4" y1="210.0" x2="135.4" y2="207.0"
           stroke="#2f7ed8" stroke-width="1.5"/>
-    <line class="pk-feather" x1="128.4" y1="213.0" x2="135.4" y2="210.0"
+    <line class="sc-feather" x1="128.4" y1="213.0" x2="135.4" y2="210.0"
           stroke="#2f7ed8" stroke-width="1.5"/>
-    <line class="pk-feather-half" x1="128.4" y1="216.0" x2="131.9" y2="214.5"
+    <line class="sc-feather-half" x1="128.4" y1="216.0" x2="131.9" y2="214.5"
           stroke="#2f7ed8" stroke-width="1.5"/>
   </g>
-  … one .pk-barb.pk-point per time point (a calm point emits a single
-    <circle class="pk-calm"> with no staff) …
+  … one .sc-barb.sc-point per time point (a calm point emits a single
+    <circle class="sc-calm"> with no staff) …
 </g>
 ```
 
-- **Class:** `pk-barb pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-barb` is a
-  purely-cosmetic CSS hook. The `.pk-point` here is a **`<g>`** because a datum needs
-  several primitives (staff + feathers); the runtime's `querySelectorAll('.pk-point')`,
+- **Class:** `sc-barb sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-barb` is a
+  purely-cosmetic CSS hook. The `.sc-point` here is a **`<g>`** because a datum needs
+  several primitives (staff + feathers); the runtime's `querySelectorAll('.sc-point')`,
   `getAttribute('cx')`, and hover `setAttribute('r', …)` all operate harmlessly on a
   group. The barb **is** the hoverable point; there are no separate markers.
 - **Anchor:** barb center `xc = fr.xpix(i)` (band center); lane
@@ -218,14 +218,14 @@ staff + feathers (or the calm circle), rotated to the wind direction:
   `step` are **fixed constants** (Southern hemisphere negates `featherDX`) — no
   per-point angle math, so all offsets format through `:.1f` identically.
 - **Calm glyph:** when `speed < calmThreshold`, emit a single
-  `<circle class="pk-calm" cx="{xc}" cy="{laneY}" r="{rCalm}" fill="none"
+  `<circle class="sc-calm" cx="{xc}" cy="{laneY}" r="{rCalm}" fill="none"
   stroke="{color}"/>` (no staff, no rotation needed — a circle is rotation-invariant,
   but the `<g>` transform is harmless). Never leave a point unmarked (an empty point
   is a broken static chart — NN#2).
 - **Stroke color:** read `fr.styles[si].stroke` (the resolved series paint —
   solid hex or `url(#grad)`); apply to the staff and every feather stroke, and to the
   flag polygon fill. Cycles the theme palette when `series[].color` is unset.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx = xc` — the crosshair reads it —
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx = xc` — the crosshair reads it —
   and by convention `cy = laneY`.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
   index — do not renumber and do not emit a legend from the marks.
@@ -319,14 +319,14 @@ The shared runtime (`runtime/chart-interactions.js`) keys **only** on the select
 highlight, crosshair, legend-toggle, and keyboard nav all work with **zero JS
 changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the integer
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the integer
   series index, **consistent** across the group, its points, and the legend item (do
   not renumber).
-- **Datum mark:** `.pk-barb.pk-point` (a `<g>`) carries **all** of `data-series`,
+- **Datum mark:** `.sc-barb.sc-point` (a `<g>`) carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`
   (mandatory even though a `<g>` ignores the hover `r`), **plus** the windbarb
   extension `data-speed` and `data-direction`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (barb center) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (barb center) and by
   convention `cy = laneY`.
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(speed))`;
@@ -389,7 +389,7 @@ windbarb marks (§5.5d). `WINDBARB_CASES = ["basic","datetime","southern-hemisph
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/windbarb/examples/basic.json")))
 save_html(spec, "out.html")
@@ -397,7 +397,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="windbarb",
     title="Coastal Wind — Station KBOS",
@@ -413,9 +413,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

@@ -1,7 +1,7 @@
 # Chart: Bar (`bar`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this recipe copies the
 > Cartesian exemplar [`charts/column/design.md`](../column/design.md) (itself
 > modeled on [`charts/line-basic/design.md`](../line-basic/design.md)) and adds
@@ -18,7 +18,7 @@
   same frame column uses — once its orientation parameter lands — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3
   Rank 2, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/bar.py` · `libs/go/bar.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/bar.py` · `libs/go/bar.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -106,7 +106,7 @@ Identical to [`column`](../column/design.md) — bar adds **no new spec field**
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"bar"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -164,7 +164,7 @@ rank-2 net-new. Column/line pass `orientation="vertical"` (the default) and stay
 byte-identical:
 
 ```python
-# libs/python/peakcharts/charts/bar.py
+# libs/python/stonecharts/charts/bar.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -172,7 +172,7 @@ def render_svg(spec) -> str:
     return render_cartesian(spec, "Bar", "band", _bar_marks, orientation="horizontal")
 ```
 ```go
-// libs/go/bar.go — package peakcharts
+// libs/go/bar.go — package stonecharts
 func renderBarSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Bar", "band", barMarks, true, "horizontal")
 }
@@ -190,22 +190,22 @@ func renderBarSVG(spec *ChartSpec) string {
 > column and bar share **one** parameterized marks routine; where they differ is
 > only the final rect write (which pair of coordinates is band vs value).
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it **one baseline-anchored `<rect>` per (category, series)**:
 
 ```html
-<g class="pk-series" data-series="0">
-  <rect class="pk-bar pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <rect class="sc-bar sc-point" data-series="0"
         data-series-name="Requests" data-x="/api/login" data-y="182"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="512.0" cy="96.0" x="72.0" y="80.0" width="440.0" height="32.0"
         fill="#2f7ed8"/>
-  … one .pk-bar.pk-point per category …
+  … one .sc-bar.sc-point per category …
 </g>
 ```
 
-- **Class:** `pk-bar pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-bar` is a
+- **Class:** `sc-bar sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-bar` is a
   purely-cosmetic CSS hook (adding a class the runtime must *know about* is out of
   scope — NN#2). The bar **is** the hoverable point; there are no separate markers.
 - **Geometry (grouped).** Let `xval(v)` be the value-axis pixel on x
@@ -228,7 +228,7 @@ per series, and inside it **one baseline-anchored `<rect>` per (category, series
   **pattern → `url(#pat)`; gradient → `url(#grad)`; else the solid hex.** Never
   read `area_fill` (that is line's under-fill), and never leave a bar unfilled
   (an unfilled bar is a broken static chart — NN#2).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` and by convention `cy`. Under
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` and by convention `cy`. Under
   the transpose the value-end lands on x, so `cx = xval(value)` (the **bar tip**)
   and `cy` = the bar's band center on y (`top(i,k) + barH/2`). The unchanged
   runtime reads `cx` to position the (vertical) crosshair; putting it at the bar
@@ -338,13 +338,13 @@ of them — the runtime is unchanged (§3.3 Rank 2). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the
   legend item (do not renumber).
-- **Datum mark:** `.pk-point` (here also `.pk-bar`) carries **all** of
+- **Datum mark:** `.sc-point` (here also `.sc-bar`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`,
   `data-r-hover` — mandatory even though a `<rect>` ignores the hover `r`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (bar **tip** x =
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (bar **tip** x =
   `xval(value)`) and by convention `cy` (bar band-center y).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(value))` — the **raw** per-series
@@ -400,7 +400,7 @@ bar marks (§5.5d). `BAR_CASES = ["basic","grouped","stacked","dark","adversaria
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/bar/examples/grouped.json")))
 save_html(spec, "out.html")
@@ -408,7 +408,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="bar",
     title="Response Latency by Service",
@@ -423,9 +423,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

@@ -1,7 +1,7 @@
 # Chart: Dumbbell (`dumbbell`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file mirrors the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which copies
 > [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the
@@ -22,7 +22,7 @@
   once extraction and the range point model land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2
   Family A "Dumbbell", §3.3 Rank 10/11, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/dumbbell.py` · `libs/go/dumbbell.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/dumbbell.py` · `libs/go/dumbbell.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -89,7 +89,7 @@ no center y). See [`CHARTS.md`](../../CHARTS.md).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"dumbbell"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -158,7 +158,7 @@ The renderer is a **one-line delegation** to the shared frame; it supplies
 domain over lows∪highs:
 
 ```python
-# libs/python/peakcharts/charts/dumbbell.py
+# libs/python/stonecharts/charts/dumbbell.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -166,28 +166,28 @@ def render_svg(spec) -> str:
     return render_cartesian(spec, "Dumbbell", "band", _dumbbell_marks, include_zero=False)
 ```
 ```go
-// libs/go/dumbbell.go — package peakcharts
+// libs/go/dumbbell.go — package stonecharts
 func renderDumbbellSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Dumbbell", "band", dumbbellMarks, false)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series. Inside it, per category, it emits the **connector first, then the two
 heads** (so the heads always render above the connector), and marks the **high
-head** as the single hoverable `.pk-point` for the range datum:
+head** as the single hoverable `.sc-point` for the range datum:
 
 ```html
-<g class="pk-series" data-series="0">
+<g class="sc-series" data-series="0">
   <!-- connector: one floating <line> low->high per category -->
-  <line class="pk-connector" data-series="0"
+  <line class="sc-connector" data-series="0"
         x1="128.4" y1="336.0" x2="128.4" y2="120.0"
         stroke="#2f7ed8" stroke-width="2"/>
   <!-- low head: decorative endpoint marker -->
-  <circle class="pk-dumbbell-low" data-series="0"
+  <circle class="sc-dumbbell-low" data-series="0"
           cx="128.4" cy="336.0" r="4" fill="#2f7ed8" stroke="#ffffff" stroke-width="1"/>
-  <!-- high head: THE hoverable range datum (.pk-point), carrying BOTH bounds -->
-  <circle class="pk-point pk-dumbbell-high" data-series="0"
+  <!-- high head: THE hoverable range datum (.sc-point), carrying BOTH bounds -->
+  <circle class="sc-point sc-dumbbell-high" data-series="0"
           data-series-name="Latency" data-x="/checkout"
           data-y="210" data-low="150" data-high="210"
           data-color="#2f7ed8" data-r="4" data-r-hover="6"
@@ -198,16 +198,16 @@ head** as the single hoverable `.pk-point` for the range datum:
 
 - **Three marks per datum, one hoverable.** A dumbbell datum is **one
   `{low,high}` range**, so — exactly like column-range's single floating rect and
-  candlestick's single body — it exposes **one** `.pk-point`. The **high head**
-  carries `class="pk-point"` (the **contract** element the runtime keys on:
+  candlestick's single body — it exposes **one** `.sc-point`. The **high head**
+  carries `class="sc-point"` (the **contract** element the runtime keys on:
   tooltip / highlight / crosshair / legend-toggle) and carries **both** bounds via
   `data-low` **and** `data-high`; its `data-y` = the high value (the canonical
-  anchor the unchanged runtime reads). The **connector** (`pk-connector`) and the
-  **low head** (`pk-dumbbell-low`) are decorative CSS hooks carrying only
-  `data-series` (so they hide with the series); `pk-dumbbell-high` on the point is
+  anchor the unchanged runtime reads). The **connector** (`sc-connector`) and the
+  **low head** (`sc-dumbbell-low`) are decorative CSS hooks carrying only
+  `data-series` (so they hide with the series); `sc-dumbbell-high` on the point is
   likewise a cosmetic add — adding a class the runtime must *know about* is out of
   scope (NN#2, §5.3). All three marks sit inside the same
-  `.pk-series[data-series=N]` group, so the legend toggle hides connector **and**
+  `.sc-series[data-series=N]` group, so the legend toggle hides connector **and**
   both heads together.
 - **Head geometry:** each head is line's marker, drawn by the reused
   `_marker`/`markerSVG` helper — the **low** head at `(dumbbellX, ypix(low))`, the
@@ -231,7 +231,7 @@ head** as the single hoverable `.pk-point` for the range datum:
   `fr.styles[si].fill` (that is column/column-range's bar paint — a dumbbell has no
   filled rect) and never read `area_fill` (line's under-fill). The head halo stroke
   is `theme.marker_halo`, as line's marker.
-- **`cx` / `cy`:** the `.pk-point` high head MUST carry `cx` (the dumbbell x) — the
+- **`cx` / `cy`:** the `.sc-point` high head MUST carry `cx` (the dumbbell x) — the
   crosshair reads it — and by convention `cy` (the high head y). Without `cx` the
   crosshair breaks.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
@@ -312,11 +312,11 @@ range). It passes the bare noun **`"Dumbbell"`** — the frame expands it to
   `area_fill` (line's under-fill) is the wrong field and drops the gradient/solid
   split.
 - **Emission order = connector, then low head, then high head** — emit the
-  `.pk-connector` line, then the `.pk-dumbbell-low` head, then the
-  `.pk-point`/`.pk-dumbbell-high` head, inside each series group, so heads render
+  `.sc-connector` line, then the `.sc-dumbbell-low` head, then the
+  `.sc-point`/`.sc-dumbbell-high` head, inside each series group, so heads render
   above the connector identically in both languages.
-- **One `.pk-point` per range datum, on the HIGH head** — do not emit two
-  `.pk-point`s per datum (a range is one datum, per the column-range precedent);
+- **One `.sc-point` per range datum, on the HIGH head** — do not emit two
+  `.sc-point`s per datum (a range is one datum, per the column-range precedent);
   the low head is decorative. `data-y` = the **high** value (canonical anchor);
   `data-low`/`data-high` carry the raw endpoints for the tooltip and the data
   table.
@@ -343,17 +343,17 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its connector, its heads,
   and the legend item (do not renumber). The legend toggle hides the whole group —
   connector and both heads together.
-- **Datum mark:** the **high head** `.pk-point` (here also `.pk-dumbbell-high`)
+- **Datum mark:** the **high head** `.sc-point` (here also `.sc-dumbbell-high`)
   carries **all** of `data-series`, `data-series-name`, `data-x`, `data-y`,
   `data-color`, `data-r`, `data-r-hover`, **plus** `data-low` and `data-high` (the
-  full range). The connector `.pk-connector` and the low head `.pk-dumbbell-low`
+  full range). The connector `.sc-connector` and the low head `.sc-dumbbell-low`
   are decorative and carry only `data-series` (so they hide with the series) — they
-  are **not** `.pk-point`s.
-- **Crosshair anchor:** the `.pk-point` high head carries a `cx` (dumbbell x) and by
+  are **not** `.sc-point`s.
+- **Crosshair anchor:** the `.sc-point` high head carries a `cx` (dumbbell x) and by
   convention `cy` (high head y).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(high))`;
@@ -418,7 +418,7 @@ the XSS tests run against the dumbbell marks (§5.5d).
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/dumbbell/examples/basic.json")))
 save_html(spec, "out.html")
@@ -426,7 +426,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Marker, Series, save_html
+from stonecharts import Axis, ChartSpec, Marker, Series, save_html
 save_html(ChartSpec(
     type="dumbbell",
     title="Median Latency: Before vs After Caching",
@@ -441,9 +441,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

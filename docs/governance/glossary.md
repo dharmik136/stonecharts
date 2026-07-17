@@ -1,6 +1,6 @@
 ---
-id: PC-GOV-002
-title: PeakCharts Controlled Glossary
+id: SC-GOV-002
+title: StoneCharts Controlled Glossary
 status: proposed
 classification: normative
 owner: product-owner
@@ -36,7 +36,7 @@ superseded_by: null
   result captured for one release candidate.
 - **Golden:** A reviewed canonical output fixture. A golden proves regression parity;
   it does not by itself prove that the behavior is semantically correct.
-- **Guarantee profile:** A named boundary describing exactly what PeakCharts commits
+- **Guarantee profile:** A named boundary describing exactly what StoneCharts commits
   to reproduce and the conditions under which the commitment applies.
 - **Renderer:** A language-specific implementation that validates a chart spec and
   produces canonical SVG without requiring a browser.

@@ -1,11 +1,11 @@
-"""PeakCharts — an original, proprietary charting library (Python edition).
+"""StoneCharts — an original, proprietary charting library (Python edition).
 
 Proprietary. Copyright (c) 2026 Dharmik Shingala. All rights reserved.
 
 
 Build a chart spec, render it to a self-contained interactive HTML document.
 
-    from peakcharts import ChartSpec, Series, render_html, save_html
+    from stonecharts import ChartSpec, Series, render_html, save_html
 
     spec = ChartSpec(
         title="Monthly Temperature",

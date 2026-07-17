@@ -15,7 +15,7 @@ to them.
 4. **Open that chart's `design.md`** (linked in the table). It lists every spec
    field, an example spec, and the code to render it in each language.
 5. **Build the spec** to `spec/chart-spec.schema.json` and render with any
-   language library (e.g. Python `peakcharts.save_html(spec, "out.html")`).
+   language library (e.g. Python `stonecharts.save_html(spec, "out.html")`).
 
 An agent should output: the chosen chart id, a filled-in spec (JSON matching the
 schema), and the one render call — nothing more is needed.

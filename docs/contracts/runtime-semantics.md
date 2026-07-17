@@ -1,5 +1,5 @@
 ---
-id: PC-CON-004
+id: SC-CON-004
 title: Browser Runtime Semantics
 status: proposed
 classification: normative
@@ -68,7 +68,7 @@ appearance, and hidden-series navigation are known implementation gaps until
 
 ## Event boundary
 
-PeakCharts prevents default behavior only for handled navigation keys. It does not
+StoneCharts prevents default behavior only for handled navigation keys. It does not
 guarantee browser event object identity or undocumented bubbling details. Host
 applications remain responsible for integration conflicts outside the chart wrapper.
 

@@ -1,6 +1,6 @@
 ---
-id: PC-CON-001
-title: PeakCharts Guarantees and Limits
+id: SC-CON-001
+title: StoneCharts Guarantees and Limits
 status: proposed
 classification: normative
 owner: product-owner
@@ -31,7 +31,7 @@ emit the same UTF-8 SVG bytes. Canonical bytes include XML structure, element an
 attribute order, identifiers, escaped text, numeric strings, whitespace, and line
 endings. SHA-256 equality is the release check.
 
-This is currently fixture-bounded. PeakCharts does not claim that untested inputs are
+This is currently fixture-bounded. StoneCharts does not claim that untested inputs are
 proven merely because covered fixtures pass. Property tests and corpus breadth expand
 confidence without changing the scope wording.
 
@@ -39,7 +39,7 @@ confidence without changing the scope wording.
 
 Self-contained HTML MUST expose the same contracted DOM attributes, tooltip content,
 navigation transitions, legend state, and authored accessibility semantics. Adaptive
-presentation MAY vary with declared environment inputs. PeakCharts does not guarantee
+presentation MAY vary with declared environment inputs. StoneCharts does not guarantee
 identical tooltip screen coordinates, browser event internals, or platform-generated
 accessibility trees.
 

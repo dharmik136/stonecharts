@@ -1,6 +1,6 @@
 ---
-id: PC-CON-003
-title: PeakCharts SVG DOM Contract
+id: SC-CON-003
+title: StoneCharts SVG DOM Contract
 status: proposed
 classification: normative
 owner: maintainer
@@ -25,26 +25,26 @@ the runtime only adds interactivity on top.
 ## Required structure
 
 ```html
-<div class="pk-chart-wrap">           <!-- positioning context for the tooltip -->
-  <svg class="pk-chart" ...>
+<div class="sc-chart-wrap">           <!-- positioning context for the tooltip -->
+  <svg class="sc-chart" ...>
     ...
-    <line class="pk-crosshair" style="display:none" .../>   <!-- optional -->
+    <line class="sc-crosshair" style="display:none" .../>   <!-- optional -->
 
-    <g class="pk-series" data-series="0">                   <!-- one per series -->
-      <path class="pk-series-line" data-series="0" d="..." stroke="COLOR" .../>
-      <circle class="pk-point" data-series="0"
+    <g class="sc-series" data-series="0">                   <!-- one per series -->
+      <path class="sc-series-line" data-series="0" d="..." stroke="COLOR" .../>
+      <circle class="sc-point" data-series="0"
               data-series-name="Tokyo" data-x="Jan" data-y="7"
               data-color="COLOR" data-r="3.5" data-r-hover="6"
               cx=".." cy=".." r="3.5" .../>
       ...
     </g>
 
-    <g class="pk-legend">
-      <g class="pk-legend-item" data-series="0"> ...swatch + label... </g>
+    <g class="sc-legend">
+      <g class="sc-legend-item" data-series="0"> ...swatch + label... </g>
       ...
     </g>
   </svg>
-  <div class="pk-tooltip" style="display:none"></div>       <!-- runtime fills this -->
+  <div class="sc-tooltip" style="display:none"></div>       <!-- runtime fills this -->
 </div>
 ```
 
@@ -52,15 +52,15 @@ the runtime only adds interactivity on top.
 
 | Selector | Purpose | Runtime behavior |
 |----------|---------|------------------|
-| `.pk-chart-wrap` | Positioning context | Holds the absolutely-positioned `.pk-tooltip` |
-| `svg.pk-chart` | The chart root | `PeakCharts.init()` scans for these |
-| `.pk-series[data-series=N]` | Group for series N (line + points) | Legend toggle shows/hides the whole group |
-| `.pk-point` | A data point | Hover → tooltip + enlarge to `data-r-hover`; leave → back to `data-r` |
-| `.pk-legend-item[data-series=N]` | Legend entry for series N | Click → toggle every `[data-series=N]` (adds `.pk-hidden`) |
-| `.pk-crosshair` | Vertical guide line (optional) | Shown at the hovered point's `cx`, hidden on leave |
-| `.pk-tooltip` | Floating tooltip (optional; runtime creates if absent) | Filled from `data-x` / `data-series-name` / `data-y` / `data-color` |
+| `.sc-chart-wrap` | Positioning context | Holds the absolutely-positioned `.sc-tooltip` |
+| `svg.sc-chart` | The chart root | `StoneCharts.init()` scans for these |
+| `.sc-series[data-series=N]` | Group for series N (line + points) | Legend toggle shows/hides the whole group |
+| `.sc-point` | A data point | Hover → tooltip + enlarge to `data-r-hover`; leave → back to `data-r` |
+| `.sc-legend-item[data-series=N]` | Legend entry for series N | Click → toggle every `[data-series=N]` (adds `.sc-hidden`) |
+| `.sc-crosshair` | Vertical guide line (optional) | Shown at the hovered point's `cx`, hidden on leave |
+| `.sc-tooltip` | Floating tooltip (optional; runtime creates if absent) | Filled from `data-x` / `data-series-name` / `data-y` / `data-color` |
 
-## Required `data-*` on `.pk-point`
+## Required `data-*` on `.sc-point`
 
 | Attr | Meaning |
 |------|---------|

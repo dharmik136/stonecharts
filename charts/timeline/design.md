@@ -1,7 +1,7 @@
 # Chart: Timeline (`timeline`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file mirrors the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which copies
 > [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the sibling
@@ -18,7 +18,7 @@
   once the numeric-x-axis lands — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2
   Family A "Timeline" row, §3.2 numeric-x-axis + orientation, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/timeline.py` · `libs/go/timeline.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/timeline.py` · `libs/go/timeline.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -79,7 +79,7 @@ bare-number fast path keeps `x = value`).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"timeline"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -133,7 +133,7 @@ The renderer is a **one-line delegation** to the shared frame; it supplies
 **numeric-x scale** and **`include_zero=False`** (free time axis, §3.2):
 
 ```python
-# libs/python/peakcharts/charts/timeline.py
+# libs/python/stonecharts/charts/timeline.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -141,34 +141,34 @@ def render_svg(spec) -> str:
                             include_zero=False)   # free datetime x, no zero-anchor
 ```
 ```go
-// libs/go/timeline.go — package peakcharts
+// libs/go/timeline.go — package stonecharts
 func renderTimelineSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Timeline", "numeric", timelineMarks, false)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it, **per event**, a **leader line + marker + label**:
 
 ```html
-<g class="pk-series" data-series="0">
-  <line class="pk-leader" data-series="0"
+<g class="sc-series" data-series="0">
+  <line class="sc-leader" data-series="0"
         x1="128.4" y1="230.0" x2="128.4" y2="202.0" stroke="#c8c8d0"/>
-  <circle class="pk-event pk-point" data-series="0"
+  <circle class="sc-event sc-point" data-series="0"
         data-series-name="Deploys" data-x="v4.4.0 — cache layer" data-y="1.77872e+12"
         data-color="#2f7ed8" data-r="5" data-r-hover="8"
         cx="128.4" cy="230.0" r="5" fill="#2f7ed8"/>
-  <text class="pk-label" data-series="0" x="128.4" y="196.0"
+  <text class="sc-label" data-series="0" x="128.4" y="196.0"
         text-anchor="middle">v4.4.0 — cache layer</text>
   … one leader+marker+label per event …
 </g>
 ```
 
-- **Class:** `pk-event pk-point`. `pk-point` is the **contract** class the
-  runtime keys on (tooltip / highlight / crosshair / legend-toggle); `pk-event`
+- **Class:** `sc-event sc-point`. `sc-point` is the **contract** class the
+  runtime keys on (tooltip / highlight / crosshair / legend-toggle); `sc-event`
   is a purely-cosmetic CSS hook (adding a class the runtime must *know about* is
-  out of scope — NN#2). The marker **is** the hoverable point. `pk-leader` and
-  `pk-label` are cosmetic too — they carry `data-series="{si}"` (or sit inside
+  out of scope — NN#2). The marker **is** the hoverable point. `sc-leader` and
+  `sc-label` are cosmetic too — they carry `data-series="{si}"` (or sit inside
   the group) so the legend toggle hides them with the series.
 - **Geometry (horizontal):** `cx = fr.xpix(data[i])` (datetime → pixel via the
   numeric-x scale); `cy = baseY` (the spine, `plot_y + plot_h/2`). The leader
@@ -186,7 +186,7 @@ per series, and inside it, **per event**, a **leader line + marker + label**:
 - **Fill:** read `fr.styles[si].fill` — the resolved marker paint. Resolve as
   **pattern → `url(#pat)`; gradient → `url(#grad)`; else the solid hex.** Never
   read `area_fill` (that is line's under-fill); never leave a marker unfilled.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (marker center on the time
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (marker center on the time
   axis) — the crosshair reads it — and by convention `cy`.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
   index — do not renumber and do not emit a legend from the marks.
@@ -289,14 +289,14 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per event lane; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per event lane; `N` is the
   integer series index, **consistent** across the group, its markers, and the
   legend item (do not renumber). The leader and label carry `data-series="N"`
   (or nest in the group) so they toggle/highlight with the series.
-- **Datum mark:** `.pk-point` (here also `.pk-event`) carries **all** of
+- **Datum mark:** `.sc-point` (here also `.sc-event`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`,
   `data-r-hover`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (marker center on the
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (marker center on the
   time axis) and by convention `cy`.
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(labels[i])` (the event name; falls back to
@@ -363,7 +363,7 @@ witness so the XSS tests run against the timeline marks (§5.5d).
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/timeline/examples/basic.json")))
 save_html(spec, "out.html")
@@ -371,7 +371,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="timeline",
     title="Production Deploys — Q2 2026",
@@ -385,9 +385,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

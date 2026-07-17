@@ -116,17 +116,17 @@ def _line_marks(fr: CartesianFrame, p: list) -> None:
         lw = s.line_width if s.line_width is not None else 2
         line_dash = dash_array(s.dash_style)
         line_dash_attr = f' stroke-dasharray="{line_dash}"' if line_dash else ""
-        p.append(f'<g class="pk-series" data-series="{si}">')
+        p.append(f'<g class="sc-series" data-series="{si}">')
         # Area fill (under the line, drawn first so the line sits on top).
         if st.area_fill is not None and pts:
             base = fr.ypix(0.0)
             area_d = f"{d} L{pts[-1][0]:.1f} {base:.1f} L{pts[0][0]:.1f} {base:.1f} Z"
             p.append(
-                f'<path class="pk-series-area" data-series="{si}" d="{area_d}" '
+                f'<path class="sc-series-area" data-series="{si}" d="{area_d}" '
                 f'fill="{st.area_fill}"{st.area_op} stroke="none"/>'
             )
         p.append(
-            f'<path class="pk-series-line" data-series="{si}" d="{d}" fill="none" '
+            f'<path class="sc-series-line" data-series="{si}" d="{d}" fill="none" '
             f'stroke="{st.stroke}" stroke-width="{fmt_num(lw)}" stroke-linejoin="round" '
             f'stroke-linecap="round"{line_dash_attr}/>'
         )
@@ -137,7 +137,7 @@ def _line_marks(fr: CartesianFrame, p: list) -> None:
             for i, (x, y) in enumerate(pts):
                 xlabel = fr.cats[i] if i < len(fr.cats) else str(i)
                 common = (
-                    f'class="pk-point" data-series="{si}" data-series-name="{esc(s.name)}" '
+                    f'class="sc-point" data-series="{si}" data-series-name="{esc(s.name)}" '
                     f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(s.data[i]))}" '
                     f'data-color="{st.solid}" data-r="{fmt_num(radius)}" '
                     f'data-r-hover="{fmt_num(radius_hover)}"'

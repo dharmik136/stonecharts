@@ -1,7 +1,7 @@
 # Chart: Area (`area`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file mirrors the
 > Cartesian **exemplar** [`charts/column/design.md`](../column/design.md) and the
 > reference recipe [`charts/line-basic/design.md`](../line-basic/design.md), and
@@ -16,7 +16,7 @@
   `line` has a live renderer today; area rides the shared cartesian frame + the
   line renderer once column's stacking transform lands — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 5, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/area.py` · `libs/go/area.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/area.py` · `libs/go/area.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -69,7 +69,7 @@ many series occludes itself — prefer `line-basic` or a stack. See
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"area"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -132,40 +132,40 @@ The renderer is a **one-line delegation** to the shared frame; it supplies
 `include_zero=True` (value axis / zero baseline):
 
 ```python
-# libs/python/peakcharts/charts/area.py
+# libs/python/stonecharts/charts/area.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Area", "point", _area_marks)   # include_zero defaults True
 ```
 ```go
-// libs/go/area.go — package peakcharts
+// libs/go/area.go — package stonecharts
 func renderAreaSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Area", "point", areaMarks, true)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it, in this order: the filled area `<path>`, the top-edge
-`<path>`, then one `<circle>`/marker `.pk-point` per category on the top edge:
+`<path>`, then one `<circle>`/marker `.sc-point` per category on the top edge:
 
 ```html
-<g class="pk-series" data-series="0">
-  <path class="pk-series-area" data-series="0"
+<g class="sc-series" data-series="0">
+  <path class="sc-series-area" data-series="0"
         d="M64.0 300.0 L…  L720.0 96.0 L64.0 240.0 Z"
         fill="#2f7ed8" fill-opacity="0.75" stroke="none"/>
-  <path class="pk-series-line" data-series="0"
+  <path class="sc-series-line" data-series="0"
         d="M64.0 96.0 L…" fill="none" stroke="#2f7ed8" stroke-width="2"
         stroke-linejoin="round" stroke-linecap="round"/>
-  <circle class="pk-point" data-series="0"
+  <circle class="sc-point" data-series="0"
           data-series-name="user" data-x="00:00" data-y="120"
           data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
           cx="64.0" cy="96.0" r="3.5" fill="#2f7ed8"/>
-  … one .pk-point per category on the top edge …
+  … one .sc-point per category on the top edge …
 </g>
 ```
 
-- **Class:** the markers are `pk-point` — the **contract** class the runtime keys
+- **Class:** the markers are `sc-point` — the **contract** class the runtime keys
   on (tooltip / highlight / crosshair / legend-toggle / keyboard nav). Area adds
   **no** new mark class; the point marker is the hoverable element, exactly as in
   line (adding a class the runtime must *know about* is out of scope — NN#2).
@@ -186,11 +186,11 @@ per series, and inside it, in this order: the filled area `<path>`, the top-edge
   the **opposite** of column: area reads `area_fill`/`area_op` (line's under-fill),
   **never** column's `fill` bar-paint field. Never leave an area series unfilled
   under the light theme (an unfilled area chart is a broken static chart — NN#2).
-- **Top-edge line + markers:** the `pk-series-line` and `pk-point` markers are
+- **Top-edge line + markers:** the `sc-series-line` and `sc-point` markers are
   emitted **exactly** as line does — same `_path_d`/`_spline_d`, same `stroke`,
   `stroke-width` via `fmt_num`, `dashStyle`, and marker symbols. Reuse line's code
   path; do not fork it.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx = fr.xpix(i)` (the crosshair
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx = fr.xpix(i)` (the crosshair
   reads it) and `cy` (the top-edge y — `ypix(value)` for basic, `ypix(cumTop)` for
   stacked/percent).
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
@@ -246,7 +246,7 @@ Area inherits, with **zero** re-implementation (§3.1, §4.2):
   only when a series needs them — no empty `<defs>` under the light theme).
 - **The entire line mark toolkit:** `_path_d` (linear + step), `_spline_d`
   (monotone), `_marker` (circle/square/triangle/diamond), the area-fill emit, and
-  the `pk-series-line`/`pk-point` structure — reused, not forked.
+  the `sc-series-line`/`sc-point` structure — reused, not forked.
 - A11y: `role="img"` + `aria-label` + `<desc>` + visually-hidden data table +
   keyboard nav. Responsive `<svg>` viewBox; the shared JS runtime.
 - `esc`, `fmt_num`/`fmtNum` (`%g` 6-sig values), `:.1f`/`f1` (pixel coords) — all
@@ -295,13 +295,13 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes** — area's contract is line's contract plus the stacked fill.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the
   legend item (do not renumber).
-- **Datum mark:** `.pk-point` (a `<circle>`/marker) carries **all** of
+- **Datum mark:** `.sc-point` (a `<circle>`/marker) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`,
   `data-r-hover`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (point x) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (point x) and by
   convention `cy` (top-edge y).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(value))` — the **raw** per-series
@@ -358,7 +358,7 @@ marks (§5.5d). `AREA_CASES = ["basic","stacked","percent","dark","adversarial"]
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/area/examples/stacked.json")))
 save_html(spec, "out.html")
@@ -366,7 +366,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="area",
     title="CPU Time by Subsystem",
@@ -383,9 +383,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

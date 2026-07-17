@@ -1,10 +1,10 @@
-// Package peakcharts is the Go edition of PeakCharts. It builds the same
+// Package stonecharts is the Go edition of StoneCharts. It builds the same
 // language-agnostic chart spec (spec/chart-spec.schema.json) and renders it to
 // contract-compliant SVG (spec/svg-contract.md), byte-compatible with the other
 // language libraries.
 //
 // Proprietary. Copyright (c) 2026 Dharmik Shingala. All rights reserved.
-package peakcharts
+package stonecharts
 
 import (
 	"bytes"
@@ -295,7 +295,7 @@ func (c *ChartSpec) applyDefaults() {
 		c.Type = "line"
 	}
 	if c.ID == "" {
-		c.ID = "pk"
+		c.ID = "sc"
 	}
 	c.theme = resolveTheme(c.Theme)
 	if c.Width == 0 {

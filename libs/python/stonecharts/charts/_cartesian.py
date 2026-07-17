@@ -5,7 +5,7 @@ Extracted verbatim from the line renderer per the §4 extraction contract
 function; the frame owns everything else — margins, scales, ticks, gridlines,
 axis lines/titles, legend, crosshair, background, <defs>, theme resolution,
 the a11y summary, and the <svg> open/close. Per §5's golden rule the marks
-callback draws ONLY the inner content of <g class="pk-series">…</g>; it never
+callback draws ONLY the inner content of <g class="sc-series">…</g>; it never
 re-implements chrome and never computes a scale of its own — the frame owns
 the value-axis domain, including the stacking-aware y-max.
 
@@ -280,13 +280,13 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
     _font = 'font-family="Segoe UI, Helvetica, Arial, sans-serif"'
     if spec.responsive:
         p.append(
-            f'<svg class="pk-chart"{a11y_attr} xmlns="http://www.w3.org/2000/svg" '
+            f'<svg class="sc-chart"{a11y_attr} xmlns="http://www.w3.org/2000/svg" '
             f'viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid meet" '
             f'width="100%" {_font}>'
         )
     else:
         p.append(
-            f'<svg class="pk-chart"{a11y_attr} xmlns="http://www.w3.org/2000/svg" '
+            f'<svg class="sc-chart"{a11y_attr} xmlns="http://www.w3.org/2000/svg" '
             f'width="{W}" height="{H}" viewBox="0 0 {W} {H}" {_font}>'
         )
 
@@ -301,20 +301,20 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
     # Background (only when the theme sets one; light theme -> none).
     if theme.background:
         p.append(
-            f'<rect class="pk-bg" x="0" y="0" width="{W}" height="{H}" fill="{theme.background}"/>'
+            f'<rect class="sc-bg" x="0" y="0" width="{W}" height="{H}" fill="{theme.background}"/>'
         )
 
     # Titles.
     ty = 26
     if spec.title:
         p.append(
-            f'<text class="pk-title" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
+            f'<text class="sc-title" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
             f'font-size="17" font-weight="600" fill="{theme.title_color}">{esc(spec.title)}</text>'
         )
         ty += 20
     if spec.subtitle:
         p.append(
-            f'<text class="pk-subtitle" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
+            f'<text class="sc-subtitle" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
             f'font-size="12" fill="{theme.subtitle_color}">{esc(spec.subtitle)}</text>'
         )
 
@@ -323,12 +323,12 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
     grid_color = gl.color or theme.grid_color
     grid_dash = dash_array(gl.dash_style)
     dash_attr = f' stroke-dasharray="{grid_dash}"' if grid_dash else ''
-    p.append('<g class="pk-axis pk-axis-y">')
+    p.append('<g class="sc-axis sc-axis-y">')
     for tv in y_ticks:
         gy = ypix(tv)
         if gl.enabled:
             p.append(
-                f'<line class="pk-gridline" x1="{plot_x:.1f}" y1="{gy:.1f}" '
+                f'<line class="sc-gridline" x1="{plot_x:.1f}" y1="{gy:.1f}" '
                 f'x2="{plot_x+plot_w:.1f}" y2="{gy:.1f}" stroke="{grid_color}" '
                 f'stroke-width="1"{dash_attr}/>'
             )
@@ -340,12 +340,12 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
 
     # Axis lines.
     p.append(
-        f'<line class="pk-axis-line" x1="{plot_x:.1f}" y1="{plot_y+plot_h:.1f}" '
+        f'<line class="sc-axis-line" x1="{plot_x:.1f}" y1="{plot_y+plot_h:.1f}" '
         f'x2="{plot_x+plot_w:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{theme.axis_line_color}" stroke-width="1"/>'
     )
 
     # X labels.
-    p.append('<g class="pk-axis pk-axis-x">')
+    p.append('<g class="sc-axis sc-axis-x">')
     for i, label in enumerate(cats[:n]):
         lx = xpix(i)
         p.append(
@@ -369,7 +369,7 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
 
     # Crosshair (hidden until a point is hovered; driven by the JS runtime).
     p.append(
-        f'<line class="pk-crosshair" x1="0" y1="{plot_y:.1f}" x2="0" y2="{plot_y+plot_h:.1f}" '
+        f'<line class="sc-crosshair" x1="0" y1="{plot_y:.1f}" x2="0" y2="{plot_y+plot_h:.1f}" '
         f'stroke="{theme.crosshair_color}" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>'
     )
 
@@ -388,10 +388,10 @@ def _chrome_tail(fr: CartesianFrame, p: List[str]) -> None:
         total = sum(est) + gap * (len(spec.series) - 1)
         lx = plot_x + (plot_w - total) / 2
         ly = H - (10 + (18 if spec.x_axis.title else 0))
-        p.append('<g class="pk-legend">')
+        p.append('<g class="sc-legend">')
         for si, s in enumerate(spec.series):
             color = fr.styles[si].solid
-            p.append(f'<g class="pk-legend-item" data-series="{si}">')
+            p.append(f'<g class="sc-legend-item" data-series="{si}">')
             p.append(
                 f'<rect x="{lx:.1f}" y="{ly-9:.1f}" width="14" height="4" rx="2" fill="{color}"/>'
             )
@@ -412,6 +412,6 @@ def render_cartesian(spec: ChartSpec, chart_noun: str, x_scale: str, marks: Mark
     fr = build_frame(spec, chart_noun, x_scale, include_zero)
     p: List[str] = []
     _chrome_head(fr, p)
-    marks(fr, p)          # chart appends its <g class="pk-series">…</g> blocks here
+    marks(fr, p)          # chart appends its <g class="sc-series">…</g> blocks here
     _chrome_tail(fr, p)
     return "".join(p)     # single "".join, NO trailing newline

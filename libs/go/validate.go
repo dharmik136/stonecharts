@@ -1,11 +1,11 @@
-package peakcharts
+package stonecharts
 
 import (
 	"math"
 	"strings"
 )
 
-// Strict chart-spec validation — mirrors libs/python/peakcharts/validate.py
+// Strict chart-spec validation — mirrors libs/python/stonecharts/validate.py
 // byte-for-byte (same rules, same error text, same order) so both renderers accept
 // and reject exactly the same specs. Runs on the generic decoded JSON (interface{})
 // BEFORE unmarshaling into the typed struct; malformed values are errors here,

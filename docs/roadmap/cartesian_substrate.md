@@ -1,5 +1,5 @@
 ---
-id: PC-ARCH-007
+id: SC-ARCH-007
 title: Cartesian Substrate and Layout Roadmap
 status: proposed
 classification: informative
@@ -21,7 +21,7 @@ superseded_by: null
 > **Status:** Roadmap reference. Approved requirements, contracts, and ADRs take
 > precedence over this document.
 
-This document defines the coordinate space, grid layouts, scale projections, and accumulator pipelines shared by all Cartesian/XY chart types in PeakCharts (Line, Area, Column, Bar, Scatter, etc.).
+This document defines the coordinate space, grid layouts, scale projections, and accumulator pipelines shared by all Cartesian/XY chart types in StoneCharts (Line, Area, Column, Bar, Scatter, etc.).
 
 ---
 
@@ -100,5 +100,5 @@ For grouped and stacked siblings, sub-bands and vertical accumulations are calcu
 To prevent visual drift and ensure byte-identity by construction, renderers write into a single string accumulator injected through the layout pipeline:
 
 1.  **Head Chrome (`_chrome_head`):** Outputs SVG root wrapper, accessibility `<desc>` and attributes, chart background, title, subtitle, Y-axis gridlines and labels, axis baseline, X-axis labels, and axis titles.
-2.  **Marks Callback (`marks_fn`):** The chart renderer receives the frame and the accumulator, and appends only its series groups `<g class="pk-series">` and point marks.
+2.  **Marks Callback (`marks_fn`):** The chart renderer receives the frame and the accumulator, and appends only its series groups `<g class="sc-series">` and point marks.
 3.  **Tail Chrome (`_chrome_tail`):** Outputs the legend, closes the SVG, and closes wrappers.

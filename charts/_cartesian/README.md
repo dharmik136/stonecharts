@@ -1,6 +1,6 @@
 ---
-id: PC-ARCH-003
-title: PeakCharts Cartesian Substrate
+id: SC-ARCH-003
+title: StoneCharts Cartesian Substrate
 status: proposed
 classification: normative
 owner: maintainer
@@ -34,9 +34,9 @@ superseded_by: null
 > If this file and the roadmap disagree, approved requirements, contracts, and ADRs
 > decide the behavior; reconcile both engineering documents before implementation.
 
-- **Module (Python):** `libs/python/peakcharts/charts/_cartesian.py`
-- **Module (Go):** `libs/go/cartesian.go` (flat `package peakcharts`)
-- **Reference marks (the exemplar to imitate):** `libs/python/peakcharts/charts/line.py` · `libs/go/line.go`
+- **Module (Python):** `libs/python/stonecharts/charts/_cartesian.py`
+- **Module (Go):** `libs/go/cartesian.go` (flat `package stonecharts`)
+- **Reference marks (the exemplar to imitate):** `libs/python/stonecharts/charts/line.py` · `libs/go/line.go`
 - **Foundation tax:** **$0 — already paid.** The substrate was extracted out of the
   line renderer with Rank 1 (Column). Every sibling reuses and extends it; **never
   fork it.**
@@ -58,7 +58,7 @@ then every sibling is cheap because it reuses the substrate and adds **only its
 marks**.
 
 **The one rule that defines the whole abstraction:** the chart renderer draws **only
-the series marks** — the inner content of `<g class="pk-series">…</g>`. Every piece of
+the series marks** — the inner content of `<g class="sc-series">…</g>`. Every piece of
 chrome — margins, scales, ticks, gridlines, axis lines, axis titles, legend,
 crosshair, background, `<defs>`, theme resolution, a11y summary, `<svg>` open/close,
 **and the value-axis domain including any stacking-aware y-max** — is obtained from the
@@ -86,11 +86,11 @@ geometry and chrome. Canonical field lists live in chart-families.md §4.3
 **Chrome the frame emits** — in the exact **head → marks → tail** order (§4.1):
 
 ```
-<svg …>  <desc>  <defs>  <rect pk-bg>  <text title/subtitle>
-<g pk-axis-y> gridlines+labels  <line pk-axis-line>  <g pk-axis-x> labels
-axis titles (x, rot-y)  <line pk-crosshair>          ┈┈ HEAD (chromeHead)
-      <g class="pk-series">…</g> × N                 ┈┈ YOUR MARKS
-<g pk-legend>…</g>   </svg>                           ┈┈ TAIL (chromeTail)
+<svg …>  <desc>  <defs>  <rect sc-bg>  <text title/subtitle>
+<g sc-axis-y> gridlines+labels  <line sc-axis-line>  <g sc-axis-x> labels
+axis titles (x, rot-y)  <line sc-crosshair>          ┈┈ HEAD (chromeHead)
+      <g class="sc-series">…</g> × N                 ┈┈ YOUR MARKS
+<g sc-legend>…</g>   </svg>                           ┈┈ TAIL (chromeTail)
 ```
 
 The marks are **sandwiched** between head and tail — chrome is not one contiguous
@@ -110,7 +110,7 @@ def render_cartesian(spec, chart_noun, x_scale, marks, include_zero=True) -> str
     fr = build_frame(spec, chart_noun, x_scale, include_zero)
     p = []
     _chrome_head(fr, p)
-    marks(fr, p)          # your <g class="pk-series">…</g> blocks go here
+    marks(fr, p)          # your <g class="sc-series">…</g> blocks go here
     _chrome_tail(fr, p)
     return "".join(p)     # single join, NO trailing newline
 ```
@@ -167,17 +167,17 @@ def render_svg(spec) -> str:
 
 def _column_marks(fr: CartesianFrame, p: list) -> None:
     for si, s in enumerate(fr.spec.series):
-        # emit exactly ONE <g class="pk-series" data-series="{si}">…</g> per series into p
+        # emit exactly ONE <g class="sc-series" data-series="{si}">…</g> per series into p
         ...
 ```
 
 ```go
-// <id>.go — package peakcharts
+// <id>.go — package stonecharts
 func renderColumnSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Column", "band", columnMarks, true)
 }
 func columnMarks(f *cartesianFrame, p *strings.Builder) {
-    for si := range f.spec.Series { /* one <g class="pk-series"> per series into p */ }
+    for si := range f.spec.Series { /* one <g class="sc-series"> per series into p */ }
 }
 ```
 
@@ -186,7 +186,7 @@ frame's a11y summary expands it to `"{noun} chart with N series…"` byte-for-by
 
 ### Hard rules for the marks function (chart-families.md §5.2)
 
-- Emits **exactly one** `<g class="pk-series" data-series="{si}">…</g>` per series, and
+- Emits **exactly one** `<g class="sc-series" data-series="{si}">…</g>` per series, and
   **nothing outside** it.
 - Uses `fr.xpix` / `fr.ypix` / `fr.band_width` for **all** geometry — computes **no**
   scale of its own (the frame owns the value-axis domain, incl. the stacking-aware y-max).
@@ -204,25 +204,25 @@ and keyboard nav all work with **zero JS changes** (adding a behavior that needs
 is out of scope for a chart add — non-negotiable #2).
 
 ```html
-<g class="pk-series" data-series="0">
+<g class="sc-series" data-series="0">
   <!-- optional visible mark(s): bar rect / area path / connecting line -->
-  <rect class="pk-point" data-series="0"
+  <rect class="sc-point" data-series="0"
         data-series-name="Tokyo" data-x="Jan" data-y="7"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="123.4" cy="88.0" x="…" y="…" width="…" height="…" fill="#2f7ed8"/>
-  … one .pk-point per datum …
+  … one .sc-point per datum …
 </g>
 ```
 
-1. **The series group is `.pk-series[data-series=N]`.** `N` is the integer series index,
+1. **The series group is `.sc-series[data-series=N]`.** `N` is the integer series index,
    **consistent** across the group, its points, and the legend item (emitted by the
    shared tail with the same index — do not renumber). The legend toggle flips `display`
    on every `[data-series="N"]`; nested marks inherit from the group.
-2. **The datum mark is `.pk-point`** and MUST carry all of `data-series`,
+2. **The datum mark is `.sc-point`** and MUST carry all of `data-series`,
    `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover` — even
    for non-circular marks (the runtime sets `r` on hover; a `<rect>` ignores it
    harmlessly, but the attributes must be present for the tooltip body).
-3. **Every `.pk-point` MUST carry a `cx`** (and by convention `cy`) — the crosshair reads
+3. **Every `.sc-point` MUST carry a `cx`** (and by convention `cy`) — the crosshair reads
    `cx` to place its vertical guide. For a bar, `cx` = bar center x; `cy` = bar top (or
    center). Without `cx` the crosshair breaks.
 4. **Escaping / formatting inside `data-*`:** `data-series-name` = `esc(s.name)`;
@@ -232,7 +232,7 @@ is out of scope for a chart add — non-negotiable #2).
    use `:.1f`/`f1`. **Under stacking:** geometry uses cumulative baselines, but `data-y`
    MUST carry the **raw per-series segment value**, not the running total — the tooltip
    shows the value the user supplied.
-5. **Do not invent new runtime classes.** Purely-cosmetic classes for CSS (e.g. `pk-bar`)
+5. **Do not invent new runtime classes.** Purely-cosmetic classes for CSS (e.g. `sc-bar`)
    are fine; runtime behavior is driven only by the contract selectors.
 6. **Static-first:** the chart must be fully readable with JS disabled. The crosshair
    ships `display:none`; the tooltip is JS-only; everything else is server-rendered.
@@ -439,8 +439,8 @@ A cartesian chart is done only when **all** hold: `design.md` (self-contained, c
 [line-basic template](../line-basic/design.md)) + `examples/*.json` + `golden/*.svg`
 exist; the renderer is a one-line delegation in **both** languages re-implementing no
 chrome; it is registered in both dispatchers + the schema enum + the shared known-type
-set; marks emit the svg-contract structure exactly (`.pk-series[data-series=N]`,
-`.pk-point` with all `data-*` **and** `cx`, bar fill from `SeriesStyle.fill`, never
+set; marks emit the svg-contract structure exactly (`.sc-series[data-series=N]`,
+`.sc-point` with all `data-*` **and** `cx`, bar fill from `SeriesStyle.fill`, never
 unfilled); every new spec field is present and consistent across schema + both validators
 + both spec models with defaults only on absence, and both validators reject
 `invalid-fixtures.json` identically; if the `data` element type changed, the data table is
@@ -460,8 +460,8 @@ green; both test suites fully green; CHARTS.md + the roadmap ticked.
 | Binding substrate + extraction + coordination contract | [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5 |
 | DOM / `data-*` / runtime selector contract | [`spec/svg-contract.md`](../../spec/svg-contract.md) |
 | `design.md` recipe template | [`charts/line-basic/design.md`](../line-basic/design.md) |
-| Reference marks (imitate these) | `libs/python/peakcharts/charts/line.py` · `libs/go/line.go` |
-| Frame implementation | `libs/python/peakcharts/charts/_cartesian.py` · `libs/go/cartesian.go` |
+| Reference marks (imitate these) | `libs/python/stonecharts/charts/line.py` · `libs/go/line.go` |
+| Frame implementation | `libs/python/stonecharts/charts/_cartesian.py` · `libs/go/cartesian.go` |
 | Spec model / validators / utils | `spec.py`·`spec.go` / `validate.py`·`validate.go` / `util.py`·`util.go` |
 | Themes | `spec/themes/{light,dark}.json` |
 | Golden harness | `libs/python/tests/test_golden.py` · `libs/go/render_test.go` |

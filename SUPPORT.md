@@ -1,12 +1,12 @@
 # Support Policy
 
-PeakCharts is currently an internal proprietary pre-release project. There is no public
+StoneCharts is currently an internal proprietary pre-release project. There is no public
 support commitment, uptime promise, maintenance window, backward-compatibility term,
 or vulnerability response SLA.
 
 Authorized users should provide:
 
-- PeakCharts release, language package version, and source commit when known.
+- StoneCharts release, language package version, and source commit when known.
 - Python/Go/browser/exporter and operating-system versions.
 - A minimal redacted spec that reproduces the issue.
 - Expected result, observed result, and generated artifact hashes.

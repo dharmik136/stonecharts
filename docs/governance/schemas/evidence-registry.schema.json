@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peakcharts.dev/schemas/evidence-registry.schema.json",
-  "title": "PeakCharts evidence registry",
+  "$id": "https://stonecharts.dev/schemas/evidence-registry.schema.json",
+  "title": "StoneCharts evidence registry",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "version", "updated", "evidence"],
   "properties": {
-    "id": { "const": "PC-QUAL-EVIDENCE" },
+    "id": { "const": "SC-QUAL-EVIDENCE" },
     "version": { "type": "integer", "minimum": 1 },
     "updated": { "type": "string", "format": "date" },
     "evidence": {

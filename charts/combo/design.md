@@ -1,7 +1,7 @@
 # Chart: Combo (`combo`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (itself a copy of
 > [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the combo
@@ -14,7 +14,7 @@
 - **Status:** design-complete + examples validated · renderers deferred (only
   `line` has a live renderer today; combo rides the shared cartesian frame once
   extraction lands — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 6, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/combo.py` · `libs/go/combo.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/combo.py` · `libs/go/combo.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Reuses:** [`charts/column`](../column/design.md) (rect-mark + band-layout + stacking) · [`charts/line-basic`](../line-basic/design.md) (path + markers + area)
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
@@ -70,7 +70,7 @@ pie/donut); a **distribution** of raw samples (use `histogram`). See
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"combo"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -131,7 +131,7 @@ The renderer is a **one-line delegation** to the shared frame; it supplies
 series, emits either the column mark or the line mark based on `series[].type`:
 
 ```python
-# libs/python/peakcharts/charts/combo.py
+# libs/python/stonecharts/charts/combo.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -145,7 +145,7 @@ def _combo_marks(fr: CartesianFrame, p: list) -> None:
             _emit_column_series(fr, p, si, s)        # reuses column's rect + band slot
 ```
 ```go
-// libs/go/combo.go — package peakcharts
+// libs/go/combo.go — package stonecharts
 func renderComboSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Combo", "band", comboMarks, true)
 }
@@ -160,44 +160,44 @@ func comboMarks(f *cartesianFrame, p *strings.Builder) {
 }
 ```
 
-Each branch emits **exactly one** `<g class="pk-series" data-series="{si}">` per
+Each branch emits **exactly one** `<g class="sc-series" data-series="{si}">` per
 series — the same envelope for both mark kinds, so the legend toggle and
 keyboard nav treat every series uniformly.
 
-**A `type:"column"` series** emits **one baseline-anchored `<rect class="pk-bar
-pk-point">` per (category, series)** — identical to the Column exemplar:
+**A `type:"column"` series** emits **one baseline-anchored `<rect class="sc-bar
+sc-point">` per (category, series)** — identical to the Column exemplar:
 
 ```html
-<g class="pk-series" data-series="0">
-  <rect class="pk-bar pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <rect class="sc-bar sc-point" data-series="0"
         data-series-name="Requests" data-x="09:00" data-y="42"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="96.0" cy="120.0" x="80.0" y="120.0" width="32.0" height="216.0"
         fill="#2f7ed8"/>
-  … one .pk-bar.pk-point per category …
+  … one .sc-bar.sc-point per category …
 </g>
 ```
 
 **A `type:"line"` series** emits the line envelope — optional area `<path>`, the
-`<path class="pk-series-line">`, then one `<... class="pk-point">` marker per
+`<path class="sc-series-line">`, then one `<... class="sc-point">` marker per
 datum — identical to the Line reference:
 
 ```html
-<g class="pk-series" data-series="1">
-  <path class="pk-series-line" data-series="1" d="M96.0 88.0 L288.0 70.0 …"
+<g class="sc-series" data-series="1">
+  <path class="sc-series-line" data-series="1" d="M96.0 88.0 L288.0 70.0 …"
         fill="none" stroke="#e0703c" stroke-width="2"
         stroke-linejoin="round" stroke-linecap="round"/>
-  <circle class="pk-point" data-series="1" data-series-name="p95 latency"
+  <circle class="sc-point" data-series="1" data-series-name="p95 latency"
           data-x="09:00" data-y="180" data-color="#e0703c"
           data-r="3.5" data-r-hover="6" cx="96.0" cy="88.0" r="3.5" …/>
-  … one .pk-point per category …
+  … one .sc-point per category …
 </g>
 ```
 
-- **Class:** column marks use `pk-bar pk-point`; line marks use
-  `pk-series-line` + `pk-point`. `pk-point` is the **contract** class the runtime
+- **Class:** column marks use `sc-bar sc-point`; line marks use
+  `sc-series-line` + `sc-point`. `sc-point` is the **contract** class the runtime
   keys on (tooltip / highlight / crosshair / legend-toggle / keyboard); the extra
-  `pk-bar` / `pk-series-line` are cosmetic CSS hooks. Adding a class the runtime
+  `sc-bar` / `sc-series-line` are cosmetic CSS hooks. Adding a class the runtime
   must *know about* is out of scope — NN#2.
 - **X alignment (the load-bearing combo detail):** both marks align to the
   **same** band centers. A line-type series places its vertices/markers at
@@ -217,7 +217,7 @@ datum — identical to the Line reference:
   → `url(#grad)`; else the solid hex. Never read `area_fill` (that is line's
   under-fill) and never leave a bar unfilled (NN#2). **Fill (line):** stroke =
   `fr.styles[si].stroke`; optional area = `fr.styles[si].area_fill`.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (band center x for both mark
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (band center x for both mark
   kinds) — the crosshair reads it — and by convention `cy` (bar top / line y).
 - **Draw / z order = series index order.** Marks are appended in `spec.series`
   order, so a series listed later draws **on top**. To get the line above the
@@ -373,16 +373,16 @@ five-place drill when their (lower-priority) validators land.
 The shared runtime (`runtime/chart-interactions.js`) keys **only** on the
 selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
-**zero JS changes** — for both mark kinds, because both emit `.pk-point`.
+**zero JS changes** — for both mark kinds, because both emit `.sc-point`.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series regardless of
+- **Series group:** `.sc-series[data-series=N]` — one per series regardless of
   mark kind; `N` is the integer series index, **consistent** across the group,
   its points, and the legend item (do not renumber).
-- **Datum mark:** `.pk-point` (a column `<rect class="pk-bar pk-point">` or a line
-  `<... class="pk-point">`) carries **all** of `data-series`, `data-series-name`,
+- **Datum mark:** `.sc-point` (a column `<rect class="sc-bar sc-point">` or a line
+  `<... class="sc-point">`) carries **all** of `data-series`, `data-series-name`,
   `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover` — mandatory even
   though a `<rect>` ignores the hover `r`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (band center x, shared by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (band center x, shared by
   both marks) and by convention `cy`.
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(value))` — the **raw** value
@@ -390,7 +390,7 @@ tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
   `data-r`/`data-r-hover = fmt_num(...)`. Pixel attrs use `:.1f`/`f1`.
 - **A11y default-on:** `role="img"` + concise `aria-label` + `<desc>` in the SVG;
   a separate **visually-hidden data table** in the HTML; keyboard nav walks all
-  `.pk-point`s (bars and line points alike). `a11y:false` restores the pre-a11y
+  `.sc-point`s (bars and line points alike). `a11y:false` restores the pre-a11y
   bytes. Combo keeps `data: number[]`, so the existing `number[]` data table
   renders faithfully with **no** generalization (§5.4b-DT applies only when the
   data **element type** changes — combo changes only the per-series mark kind).
@@ -437,7 +437,7 @@ from **either** mark fails a test.
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/combo/examples/basic.json")))
 save_html(spec, "out.html")
@@ -445,7 +445,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="combo",
     title="Deploys per Day",
@@ -460,9 +460,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

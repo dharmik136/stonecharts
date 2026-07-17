@@ -1,6 +1,6 @@
 ---
-id: PC-QUAL-001
-title: PeakCharts Test and Conformance Strategy
+id: SC-QUAL-001
+title: StoneCharts Test and Conformance Strategy
 status: proposed
 classification: normative
 owner: maintainer
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Principle
 
-PeakCharts tests meaning before serialization and serialization before release. Two
+StoneCharts tests meaning before serialization and serialization before release. Two
 implementations can be wrong in exactly the same way, so byte parity is necessary but
 not sufficient.
 

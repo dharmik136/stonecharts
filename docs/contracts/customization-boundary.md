@@ -1,5 +1,5 @@
 ---
-id: PC-CON-005
+id: SC-CON-005
 title: Customization Boundary
 status: proposed
 classification: normative
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Principle
 
-PeakCharts aims for broad visual authorship, not one fixed house style. The certified
+StoneCharts aims for broad visual authorship, not one fixed house style. The certified
 path accepts customization as structured, typed, deterministic data. The boundary
 protects portability and security; it does not prohibit meaningful branding.
 

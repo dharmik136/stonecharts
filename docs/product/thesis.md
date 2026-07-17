@@ -1,6 +1,6 @@
 ---
-id: PC-PROD-001
-title: PeakCharts Product Thesis
+id: SC-PROD-001
+title: StoneCharts Product Thesis
 status: proposed
 classification: normative
 owner: product-owner
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Thesis
 
-PeakCharts turns one structured chart specification into the same validated,
+StoneCharts turns one structured chart specification into the same validated,
 auditable chart across certified programming languages, reports, dashboards, and
 exports.
 
@@ -37,7 +37,7 @@ not provide a reliable or auditable system contract.
 
 ## Product promise
 
-For a supported specification and declared guarantee profile, PeakCharts provides:
+For a supported specification and declared guarantee profile, StoneCharts provides:
 
 1. One language-neutral input model.
 2. Equivalent validation and capability errors in every certified renderer.
@@ -47,7 +47,7 @@ For a supported specification and declared guarantee profile, PeakCharts provide
 6. Release evidence showing which claims were verified for the shipped artifacts.
 
 The exact boundary of each promise is defined by
-[`PC-CON-001`](../contracts/guarantees-and-limits.md). Product language MUST NOT turn
+[`SC-CON-001`](../contracts/guarantees-and-limits.md). Product language MUST NOT turn
 an internal byte-parity oracle into an unsupported claim of universal pixel identity.
 
 ## Primary users
@@ -77,7 +77,7 @@ an internal byte-parity oracle into an unsupported claim of universal pixel iden
 
 ## Non-goals
 
-PeakCharts does not promise arbitrary executable extensions inside certified output,
+StoneCharts does not promise arbitrary executable extensions inside certified output,
 automatic layout intelligence without a declared metrics profile, universal pixel
 identity in uncontrolled viewers, or immediate breadth across every chart type and
 language. Those would weaken the core contract if claimed before they are verified.

@@ -1,6 +1,6 @@
 ---
-id: PC-REL-001
-title: PeakCharts 0.0.1 Alpha 1 Release Plan
+id: SC-REL-001
+title: StoneCharts 0.0.1 Alpha 1 Release Plan
 status: proposed
 classification: normative
 owner: maintainer
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Objective
 
-Ship the first auditable proof of the PeakCharts thesis: line and column rendered
+Ship the first auditable proof of the StoneCharts thesis: line and column rendered
 natively by Python and Go from one released specification, with canonical SVG parity,
 safe validation, bounded customization, qualified browser behavior, and an immutable
 evidence pack.

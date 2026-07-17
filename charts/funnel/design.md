@@ -1,7 +1,7 @@
 # Chart: Funnel / Pyramid (`funnel`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file copies
 > [`charts/line-basic/design.md`](../line-basic/design.md) and the sibling
 > exemplar [`charts/column/design.md`](../column/design.md), then documents the
@@ -14,7 +14,7 @@
 - **Status:** design-complete + examples validated · renderers deferred (only
   `line` has a live renderer today; funnel is validated + design-complete with
   rendering deferred — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2 Family A row, §3.3, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/funnel.py` · `libs/go/funnel.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/funnel.py` · `libs/go/funnel.go`
 - **Substrate:** **none of the shared cartesian frame's axis machinery** — see
   "Reused chrome" below. Funnel is the **only** Family A chart that does **not**
   delegate to [`render_cartesian`](../_cartesian/README.md).
@@ -73,7 +73,7 @@ or a **distribution** of raw samples (use `histogram`). See
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"funnel"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -135,7 +135,7 @@ axis+marks body**, emits its own centered-trapezoid marks. It calls **none** of
 `build_frame` / `xpix` / `ypix` / `nice_ticks` / the axis or gridline emitters.
 
 ```python
-# libs/python/peakcharts/charts/funnel.py  (planned)
+# libs/python/stonecharts/charts/funnel.py  (planned)
 from ._cartesian import resolve_theme, defs_prepass, a11y_summary, chrome_shell
 from ..util import esc, fmt_num
 
@@ -144,29 +144,29 @@ def render_svg(spec) -> str:
     return chrome_shell(spec, "Funnel", _funnel_body)   # _funnel_body emits the trapezoids
 ```
 ```go
-// libs/go/funnel.go — package peakcharts  (planned)
+// libs/go/funnel.go — package stonecharts  (planned)
 func renderFunnelSVG(spec *ChartSpec) string {
     return chromeShell(spec, "Funnel", funnelBody)   // funnelBody emits the trapezoids; no axes
 }
 ```
 
-The body emits **exactly one** `<g class="pk-series" data-series="0">` and, inside
-it, **one centered trapezoid `<polygon class="pk-slice pk-point">` per stage**:
+The body emits **exactly one** `<g class="sc-series" data-series="0">` and, inside
+it, **one centered trapezoid `<polygon class="sc-slice sc-point">` per stage**:
 
 ```html
-<g class="pk-series" data-series="0">
-  <polygon class="pk-slice pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <polygon class="sc-slice sc-point" data-series="0"
            data-series-name="Conversion" data-x="Visitors" data-y="18400"
            data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
            cx="410.0" cy="72.0"
            points="80.0,48.0 740.0,48.0 690.5,144.0 129.5,144.0"
            fill="#2f7ed8"/>
-  … one .pk-slice.pk-point per stage …
+  … one .sc-slice.sc-point per stage …
 </g>
 ```
 
-- **Class:** `pk-slice pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / legend-toggle / keyboard); `pk-slice` is a
+- **Class:** `sc-slice sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / legend-toggle / keyboard); `sc-slice` is a
   purely-cosmetic CSS hook (adding a class the runtime must *know about* is out of
   scope — NN#5). The trapezoid **is** the hoverable point; there are no separate
   markers.
@@ -182,7 +182,7 @@ it, **one centered trapezoid `<polygon class="pk-slice pk-point">` per stage**:
   solid hex**) and paint **every** trapezoid with that single funnel-wide paint.
   Never leave a trapezoid unfilled (an unfilled funnel is a broken static chart —
   NN#5).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (the funnel center x, constant
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (the funnel center x, constant
   for all stages) — the crosshair reads it — and by convention `cy` (the band's
   vertical center).
 - **Labels:** the idiomatic funnel draws the stage label + value (and, optionally,
@@ -308,13 +308,13 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, legend-toggle, and keyboard nav all work with **zero JS
 changes**.
 
-- **Series group:** `.pk-series[data-series=0]` — one group (funnel is
-  single-series); every stage `.pk-point` inside it carries `data-series="0"`,
+- **Series group:** `.sc-series[data-series=0]` — one group (funnel is
+  single-series); every stage `.sc-point` inside it carries `data-series="0"`,
   consistent with the one legend item (do not renumber).
-- **Datum mark:** `.pk-slice.pk-point` per stage carries **all** of `data-series`,
+- **Datum mark:** `.sc-slice.sc-point` per stage carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover` —
   mandatory even though a `<polygon>` ignores the hover `r`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (funnel center x) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (funnel center x) and by
   convention `cy` (band vertical center).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(stage label)`; `data-y = esc(fmt_num(value))` — the raw stage
@@ -368,7 +368,7 @@ marks (§5.5d). `FUNNEL_CASES = ["basic","pyramid","neck","dark","adversarial"]`
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/funnel/examples/basic.json")))
 save_html(spec, "out.html")
@@ -376,7 +376,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="funnel",
     title="Signup Conversion Funnel",
@@ -388,9 +388,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

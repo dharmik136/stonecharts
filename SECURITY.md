@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-PeakCharts is pre-release software. No version is currently designated for production
+StoneCharts is pre-release software. No version is currently designated for production
 security support. The target `0.0.1-alpha.1` release will publish its support status,
 known limits, and security evidence in the release manifest.
 

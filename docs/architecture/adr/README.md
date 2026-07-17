@@ -1,6 +1,6 @@
 ---
-id: PC-ARCH-010
-title: PeakCharts Architecture Decision Log
+id: SC-ARCH-010
+title: StoneCharts Architecture Decision Log
 status: proposed
 classification: informative
 owner: maintainer
@@ -28,4 +28,4 @@ changing the decision requires a superseding ADR.
 | [0003](0003-signed-stacking.md) | Diverging normal stacks; non-negative percent stacks in Alpha 1 | Proposed |
 | [0004](0004-runtime-boundary.md) | Invariant semantics with adaptive viewport presentation | Proposed |
 | [0005](0005-layout-and-fonts.md) | Manual Alpha layout and tiered font/export profiles | Proposed |
-
+| [0006](0006-stonecharts-namespace.md) | One StoneCharts product and technical namespace before Alpha | Proposed |

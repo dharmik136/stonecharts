@@ -1,4 +1,4 @@
-package peakcharts
+package stonecharts
 
 import (
 	"encoding/json"

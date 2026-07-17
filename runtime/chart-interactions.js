@@ -1,7 +1,7 @@
 /*!
- * PeakCharts interaction runtime — shared across all language libraries.
+ * StoneCharts interaction runtime — shared across all language libraries.
  * Vanilla JS, zero dependencies. Operates on any SVG that follows
- * spec/svg-contract.md (classes: pk-chart, pk-series, pk-point, pk-legend-item;
+ * spec/svg-contract.md (classes: sc-chart, sc-series, sc-point, sc-legend-item;
  * data-* attributes on points/series). Server-rendered SVG stays fully visible
  * without JS; this only *enhances* it (tooltip, point highlight, legend toggle,
  * crosshair, keyboard navigation). See spec/svg-contract.md for the contract this
@@ -15,7 +15,7 @@
 
   function init(root) {
     root = root || document;
-    var charts = root.querySelectorAll(".pk-chart");
+    var charts = root.querySelectorAll(".sc-chart");
     for (var i = 0; i < charts.length; i++) setupChart(charts[i]);
   }
 
@@ -23,13 +23,13 @@
 
   // Uniquify this chart's <defs> ids (gradients/patterns) and rewrite its own
   // url(#id) references, so multiple charts on one page can't collide on shared
-  // ids like "pk-grad-0". Runs at load, so the static SVG bytes stay unchanged.
+  // ids like "sc-grad-0". Runs at load, so the static SVG bytes stay unchanged.
   function scopeDefs(svg) {
     var defs = svg.querySelector("defs");
     if (!defs) return;
     var idNodes = defs.querySelectorAll("[id]");
     if (!idNodes.length) return;
-    var uid = "pkc" + (uidCounter++), map = {};
+    var uid = "scc" + (uidCounter++), map = {};
     for (var i = 0; i < idNodes.length; i++) {
       var oldId = idNodes[i].getAttribute("id");
       map[oldId] = uid + "-" + oldId;
@@ -49,19 +49,19 @@
   }
 
   function setupChart(svg) {
-    if (svg.__pkInit) return;
-    svg.__pkInit = true;
+    if (svg.__scInit) return;
+    svg.__scInit = true;
     scopeDefs(svg);
 
-    var wrap = svg.closest(".pk-chart-wrap") || svg.parentNode;
-    var tip = wrap.querySelector(".pk-tooltip");
+    var wrap = svg.closest(".sc-chart-wrap") || svg.parentNode;
+    var tip = wrap.querySelector(".sc-tooltip");
     if (!tip) {
       tip = document.createElement("div");
-      tip.className = "pk-tooltip";
+      tip.className = "sc-tooltip";
       tip.style.display = "none";
       wrap.appendChild(tip);
     }
-    var crosshair = svg.querySelector(".pk-crosshair");
+    var crosshair = svg.querySelector(".sc-crosshair");
 
     function positionTip(clientX, clientY) {
       var r = wrap.getBoundingClientRect();
@@ -83,8 +83,8 @@
       var name = pt.getAttribute("data-series-name") || "";
       var color = pt.getAttribute("data-color") || "#333";
       tip.innerHTML =
-        '<div class="pk-tt-title">' + escapeHtml(pt.getAttribute("data-x")) + "</div>" +
-        '<div class="pk-tt-row"><span class="pk-tt-dot" style="background:' + color + '"></span>' +
+        '<div class="sc-tt-title">' + escapeHtml(pt.getAttribute("data-x")) + "</div>" +
+        '<div class="sc-tt-row"><span class="sc-tt-dot" style="background:' + color + '"></span>' +
         escapeHtml(name) + ": <b>" + escapeHtml(pt.getAttribute("data-y")) + "</b></div>";
       tip.style.display = "block";
       if (crosshair) {
@@ -104,7 +104,7 @@
     }
 
     // Tooltip + highlight on data points (mouse).
-    var points = svg.querySelectorAll(".pk-point");
+    var points = svg.querySelectorAll(".sc-point");
     for (var i = 0; i < points.length; i++) {
       (function (pt) {
         pt.addEventListener("mouseenter", function () { showPoint(pt, false); });
@@ -120,13 +120,13 @@
     setupKeyboard(svg, points, showPoint, hidePoint);
 
     // Legend click toggles the whole series on/off.
-    var items = svg.querySelectorAll(".pk-legend-item");
+    var items = svg.querySelectorAll(".sc-legend-item");
     for (var j = 0; j < items.length; j++) {
       (function (item) {
         item.style.cursor = "pointer";
         item.addEventListener("click", function () {
           var s = item.getAttribute("data-series");
-          var hidden = item.classList.toggle("pk-hidden");
+          var hidden = item.classList.toggle("sc-hidden");
           var members = svg.querySelectorAll('[data-series="' + s + '"]');
           for (var k = 0; k < members.length; k++) {
             if (members[k] === item) continue;
@@ -186,5 +186,5 @@
   if (document.readyState !== "loading") init();
   else document.addEventListener("DOMContentLoaded", function () { init(); });
 
-  if (typeof window !== "undefined") window.PeakCharts = { init: init };
+  if (typeof window !== "undefined") window.StoneCharts = { init: init };
 })();

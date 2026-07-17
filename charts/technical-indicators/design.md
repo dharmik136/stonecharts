@@ -1,7 +1,7 @@
 # Chart: Technical indicators & overlays (`technical-indicators`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** ([`charts/column/design.md`](../column/design.md), itself a copy of
 > [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the sibling
@@ -24,7 +24,7 @@
   cartesian frame once the composition-layer, band-fill, and transform layer land
   — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md)
   §2 Family A "Technical indicators & overlays", §3.2, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/technical_indicators.py` · `libs/go/technical_indicators.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/technical_indicators.py` · `libs/go/technical_indicators.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Reuses:** [`charts/line-basic`](../line-basic/design.md) (path + markers + area) ·
   [`charts/combo`](../combo/design.md) (composition-layer + secondary axis) ·
@@ -93,7 +93,7 @@ independent **authored** measures of different units with no transform (use
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"technical-indicators"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -104,15 +104,15 @@ independent **authored** measures of different units with no transform (use
 | `xAxis.title` | string | — | axis label |
 | `xAxis.type` | string | `category` | `category` (band/point labels) or `datetime` (labels are dates; laid out on the shared point scale — one slot per record, evenly spaced) |
 | `xAxis.categories` | string[] | index `0..N-1` | x labels (one per record; both base and overlays align to them) |
-| **`xAxis.plotBands`** | object[] | — | **NEW field.** Shaded **vertical** regions spanning a range of x. Each `{from, to, color, label?, opacity?}` (`from`/`to` are category **indices** or datetime strings). Rendered as `<rect class="pk-plotband">` **behind** all marks — frame chrome (§ Marks) |
-| **`xAxis.plotLines`** | object[] | — | **NEW field.** Vertical reference lines at an x. Each `{value, color, width?, dashStyle?, label?}`. Rendered as `<line class="pk-plotline">` behind marks — frame chrome |
+| **`xAxis.plotBands`** | object[] | — | **NEW field.** Shaded **vertical** regions spanning a range of x. Each `{from, to, color, label?, opacity?}` (`from`/`to` are category **indices** or datetime strings). Rendered as `<rect class="sc-plotband">` **behind** all marks — frame chrome (§ Marks) |
+| **`xAxis.plotLines`** | object[] | — | **NEW field.** Vertical reference lines at an x. Each `{value, color, width?, dashStyle?, label?}`. Rendered as `<line class="sc-plotline">` behind marks — frame chrome |
 | `yAxis.title` | string | — | axis label (value / price) |
 | `yAxis.min` / `yAxis.max` | number | auto (nice ticks) | clamp the base-pane value range. **The base value axis is NOT zero-anchored** — it spans the data (base + overlay extents, incl. Bollinger band edges), never forced to include 0 (a $150 price / a 200 ms latency must not anchor at 0). `include_zero=False` |
 | `yAxis.gridLine` | object | `{enabled:true, color:#e8e8ee, dashStyle:solid}` | horizontal gridline styling; `dashStyle` ∈ solid/dashed/dotted |
-| **`yAxis.plotBands`** | object[] | — | **NEW field.** Shaded **horizontal** value regions. Each `{from, to, color, label?, opacity?}`. Rendered as `<rect class="pk-plotband">` behind marks — frame chrome. (In an oscillator pane, `pane: n` scopes the band to that pane's axis — e.g. RSI 30–70.) |
-| **`yAxis.plotLines`** | object[] | — | **NEW field.** Horizontal reference lines at a value (an SLO threshold, VWAP anchor, RSI 30/70). Each `{value, color, width?, dashStyle?, label?, pane?}`. Rendered as `<line class="pk-plotline">` behind marks — frame chrome |
+| **`yAxis.plotBands`** | object[] | — | **NEW field.** Shaded **horizontal** value regions. Each `{from, to, color, label?, opacity?}`. Rendered as `<rect class="sc-plotband">` behind marks — frame chrome. (In an oscillator pane, `pane: n` scopes the band to that pane's axis — e.g. RSI 30–70.) |
+| **`yAxis.plotLines`** | object[] | — | **NEW field.** Horizontal reference lines at a value (an SLO threshold, VWAP anchor, RSI 30/70). Each `{value, color, width?, dashStyle?, label?, pane?}`. Rendered as `<line class="sc-plotline">` behind marks — frame chrome |
 | **`panes`** | object[] | — (single base pane) | **NEW field.** Vertical split of the plot area into stacked panes. `panes[0]` = base pane; `panes[1..]` = oscillator panes. Each `{height?, min?, max?, title?}` (`height` = fraction or px). Absent → a single base pane; an oscillator indicator (`macd`/`rsi`) **auto-creates** `panes[1]` if none is declared. The **frame** owns each pane's value axis (§ Pane layout) |
-| **`flags`** | object[] | — | **NEW field (chart-level).** Event markers anchored along the base plot. Each `{x, title, text?, color?, shape?}` (`x` = category index or datetime string; `shape` ∈ `flag`/`circlepin`/`squarepin`, default `flag`). Rendered as a `.pk-series` group of `.pk-point` flag glyphs (§ Marks) — hoverable |
+| **`flags`** | object[] | — | **NEW field (chart-level).** Event markers anchored along the base plot. Each `{x, title, text?, color?, shape?}` (`x` = category index or datetime string; `shape` ∈ `flag`/`circlepin`/`squarepin`, default `flag`). Rendered as a `.sc-series` group of `.sc-point` flag glyphs (§ Marks) — hoverable |
 | `series[].name` | string | `Series i` | legend + tooltip name (the **base** series name; each derived overlay is named `"<base> <IND>(<period>)"`, e.g. `"Price SMA(20)"`) |
 | **`series[].type`** | string | `line` | **NEW field.** Base mark kind: `"line"` (path + markers) or `"area"` (path + fill down to the pane floor). Reused from the Area/Combo mark vocabulary. Overlays are **always** lines (or a band); this field styles only the base series |
 | `series[].data` | number[] | — | the **base** metric/price values, length `N`. The overlays are derived from these, not supplied |
@@ -196,7 +196,7 @@ a marks callback and re-implements no chrome (§5.2). Note `include_zero=False`
 (the base value axis is not baseline-anchored):
 
 ```python
-# libs/python/peakcharts/charts/technical_indicators.py
+# libs/python/stonecharts/charts/technical_indicators.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -204,7 +204,7 @@ def render_svg(spec) -> str:
                             _ti_marks, include_zero=False)   # base price/metric axis spans the data
 ```
 ```go
-// libs/go/technical_indicators.go — package peakcharts
+// libs/go/technical_indicators.go — package stonecharts
 func renderTechnicalIndicatorsSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Technical indicators", "point", tiMarks, false)
 }
@@ -214,60 +214,60 @@ The callback is a **composition dispatcher** (like Combo). It iterates the
 authored series **by index**, and for each: draws the **base** mark, then runs its
 `indicators` transforms and draws each **derived overlay** — base-pane overlays
 (SMA/EMA/VWAP lines, Bollinger band) and oscillator-pane series (MACD/RSI) — then
-finally the **flag** markers. Each is exactly one `<g class="pk-series"
+finally the **flag** markers. Each is exactly one `<g class="sc-series"
 data-series="{si}">` (indices continue past the authored series):
 
 ```html
 <!-- base metric (series 0) -->
-<g class="pk-series" data-series="0">
-  <path class="pk-series-line" data-series="0" d="M64.0 210.0 L112.0 198.0 …"
+<g class="sc-series" data-series="0">
+  <path class="sc-series-line" data-series="0" d="M64.0 210.0 L112.0 198.0 …"
         fill="none" stroke="#2f7ed8" stroke-width="2"
         stroke-linejoin="round" stroke-linecap="round"/>
-  <circle class="pk-point" data-series="0" data-series-name="Price"
+  <circle class="sc-point" data-series="0" data-series-name="Price"
           data-x="2024-06-03" data-y="153.4" data-color="#2f7ed8"
           data-r="3.5" data-r-hover="6" cx="64.0" cy="210.0" r="3.5" …/>
-  … one .pk-point per record …
+  … one .sc-point per record …
 </g>
 
 <!-- derived SMA(20) overlay (series 1) — starts at the first defined index -->
-<g class="pk-series" data-series="1">
-  <path class="pk-series-line pk-indicator" data-series="1" data-indicator="sma"
+<g class="sc-series" data-series="1">
+  <path class="sc-series-line sc-indicator" data-series="1" data-indicator="sma"
         d="M…" fill="none" stroke="#e0703c" stroke-width="1.5"/>
-  … one .pk-point per DEFINED index (leading gap indices omitted) …
+  … one .sc-point per DEFINED index (leading gap indices omitted) …
 </g>
 
 <!-- derived Bollinger band (upper↔lower) — arearange band-fill reused -->
-<g class="pk-series" data-series="3">
-  <path class="pk-series-range pk-band pk-indicator" data-series="3"
+<g class="sc-series" data-series="3">
+  <path class="sc-series-range sc-band sc-indicator" data-series="3"
         data-indicator="bollinger" d="M…(upper L→R) L…(lower R→L) Z"
         fill="#9b8cf7" fill-opacity="0.15" stroke="none"/>
-  … one .pk-point per index carrying data-low/data-high …
+  … one .sc-point per index carrying data-low/data-high …
 </g>
 
 <!-- oscillator pane: RSI(14) line in panes[1] -->
-<g class="pk-series" data-series="4">
-  <path class="pk-series-line pk-indicator" data-series="4" data-indicator="rsi"
+<g class="sc-series" data-series="4">
+  <path class="sc-series-line sc-indicator" data-series="4" data-indicator="rsi"
         d="M…" fill="none" stroke="#7a58c9" stroke-width="1.5"/>
-  … one .pk-point per defined index, y via the pane-scoped ypix …
+  … one .sc-point per defined index, y via the pane-scoped ypix …
 </g>
 
 <!-- flags / events -->
-<g class="pk-series pk-flags" data-series="5">
-  <g class="pk-flag pk-point" data-series="5" data-series-name="Events"
+<g class="sc-series sc-flags" data-series="5">
+  <g class="sc-flag sc-point" data-series="5" data-series-name="Events"
      data-x="2024-06-06" data-y="Deploy v1.4" data-color="#5b8def"
      data-r="3.5" data-r-hover="6" cx="208.0" cy="72.0">
-    <path class="pk-flag-glyph" d="M208.0 72.0 l0 -14 l28 0 l0 14 l-28 0 z"
+    <path class="sc-flag-glyph" d="M208.0 72.0 l0 -14 l28 0 l0 14 l-28 0 z"
           fill="#5b8def" stroke="#5b8def"/>
-    <text class="pk-flag-label" x="222.0" y="62.0">Deploy v1.4</text>
+    <text class="sc-flag-label" x="222.0" y="62.0">Deploy v1.4</text>
   </g>
-  … one .pk-flag.pk-point per event …
+  … one .sc-flag.sc-point per event …
 </g>
 ```
 
-- **Class:** the base uses `pk-series-line`/`pk-point` (verbatim line); overlays
-  add the cosmetic `pk-indicator` hook (+ `data-indicator="<type>"`); the Bollinger
-  band reuses arearange's `pk-series-range pk-band`; a flag is a `<g class="pk-flag
-  pk-point">`. `pk-point` is the **contract** class the runtime keys on
+- **Class:** the base uses `sc-series-line`/`sc-point` (verbatim line); overlays
+  add the cosmetic `sc-indicator` hook (+ `data-indicator="<type>"`); the Bollinger
+  band reuses arearange's `sc-series-range sc-band`; a flag is a `<g class="sc-flag
+  sc-point">`. `sc-point` is the **contract** class the runtime keys on
   (tooltip/highlight/crosshair/legend-toggle/keyboard) — the extras are pure CSS
   hooks (adding a class the runtime must *know about* is out of scope, NN#2).
 - **Base mark:** verbatim the line renderer — `pts = [(fr.xpix(i), fr.ypix(v)) …]`,
@@ -279,22 +279,22 @@ data-series="{si}">` (indices continue past the authored series):
 - **Bollinger band:** reuse arearange's **band-fill** — one `<path>` = upper
   boundary `L→R` then lower boundary `R→L` then `Z` (both passes reuse `_path_d`/
   `pathD`, so `f1` coords match for free), plus an optional dashed **mid** line
-  (another overlay). `data-low`/`data-high` on each `.pk-point`.
+  (another overlay). `data-low`/`data-high` on each `.sc-point`.
 - **Oscillator series (MACD/RSI):** drawn against a **pane-scoped `ypix`** (the
   oscillator pane's own axis, § Pane layout). MACD's histogram is a baseline-
   anchored `<rect>` per index (column mark reused, anchored at the pane's
   `ypix(0.0)`); MACD/signal/RSI are lines. RSI uses the pane axis fixed 0..100.
-- **Flags:** a `.pk-series` group of `.pk-point` flag glyphs anchored at
+- **Flags:** a `.sc-series` group of `.sc-point` flag glyphs anchored at
   `xpix(flagX)` on the base pane top; each is a small pennant `<path>` + `<text>`
   label. Hoverable (carries `data-x`/`data-y`=title/`data-series-name`).
 - **Plot bands / plot lines are NOT marks — they are frame chrome (head).** The
-  frame emits `<rect class="pk-plotband">` and `<line class="pk-plotline">` from
+  frame emits `<rect class="sc-plotband">` and `<line class="sc-plotline">` from
   `xAxis`/`yAxis` `plotBands`/`plotLines` **behind** every series (right after the
   gridlines, before the marks — the §4.1 head), scoped to the right pane axis.
   This is the one **new frame generalization** this chart forces (analogous to how
   Column forced band-layout); it is a shared-core change with its own parity tests,
   **not** something the marks emit.
-- **`cx` / `cy`:** every `.pk-point` (base, overlay, band, oscillator, flag) MUST
+- **`cx` / `cy`:** every `.sc-point` (base, overlay, band, oscillator, flag) MUST
   carry `cx` (the shared point x) — the crosshair reads it — and by convention `cy`.
 - **Legend swatch:** the shared **tail** emits one legend item per series (base +
   each overlay + each oscillator + flags) with the matching `data-series` index —
@@ -366,7 +366,7 @@ byte-for-byte.
 - **Oscillator pane** — a vertical plot-area split with a pane-scoped value axis
   (generalizes Combo's secondary axis from a right-side dual axis to a stacked
   pane).
-- **Flag / event mark** — a `.pk-point` pennant glyph anchored on the x-axis
+- **Flag / event mark** — a `.sc-point` pennant glyph anchored on the x-axis
   (shared conceptually with Candlestick's flags/events).
 - The new validated fields `series[].type`, `series[].indicators`,
   `series[].volume`, `flags`, `panes`, and axis `plotBands`/`plotLines`
@@ -429,7 +429,7 @@ Go-panics.
 - **VWAP zero-volume guard** — if cumulative `Σvol == 0` at an index, emit a
   **gap** (checked **before** the divide) — do not divide `x/0`.
 - **Gaps are omitted, not zero** — leading indices before a window fills emit **no
-  vertex and no `.pk-point`**; never coerce to `0` (the path starts at the first
+  vertex and no `.sc-point`**; never coerce to `0` (the path starts at the first
   defined index). Both languages skip the same indices.
 - **`include_zero=False` (base pane)** — the base value axis spans base+overlay
   extents (incl. Bollinger band edges), **not** forced to 0. Passing `True`
@@ -468,18 +468,18 @@ The shared runtime (`runtime/chart-interactions.js`) keys **only** on the
 selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes** — for base, overlay, band, oscillator, and flag alike,
-because every one emits `.pk-point`.
+because every one emits `.sc-point`.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series (base **and**
+- **Series group:** `.sc-series[data-series=N]` — one per series (base **and**
   each derived overlay/oscillator/flags group); `N` is the integer series index,
   **consistent** across the group, its points, and the legend item (do not
   renumber; assign in the pinned base→overlays→oscillators→flags order).
-- **Datum mark:** `.pk-point` (a base/overlay `<circle|…>`, a band `<... >`, an
+- **Datum mark:** `.sc-point` (a base/overlay `<circle|…>`, a band `<... >`, an
   oscillator mark, or a flag `<g>`) carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`
   — mandatory even for non-circular marks. Bollinger points add
   `data-low`/`data-high`; overlays add `data-indicator="<type>"`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (the shared point x) and
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (the shared point x) and
   by convention `cy`.
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(value))` (the raw transform
@@ -489,7 +489,7 @@ because every one emits `.pk-point`.
   a separate **visually-hidden data table** in the HTML with **one column per
   series** — base + each derived overlay/oscillator — the table generalizing
   additively off `number[]` in lockstep in both languages (§5.4b-DT), with gap
-  cells rendered blank (not `0`); keyboard nav walks every `.pk-point`.
+  cells rendered blank (not `0`); keyboard nav walks every `.sc-point`.
   `a11y:false` restores the pre-a11y bytes.
 - **Static-first:** the chart is fully readable with JS disabled — the base line/
   area, every overlay, the band fill, oscillator panes, plot bands/lines, and
@@ -552,7 +552,7 @@ XSS tests run against the technical-indicators marks (§5.5d).
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/technical-indicators/examples/basic.json")))
 save_html(spec, "out.html")
@@ -560,7 +560,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="technical-indicators",
     title="API p95 Latency with Moving Averages",
@@ -576,9 +576,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity
@@ -605,7 +605,7 @@ A self-contained interactive HTML file: inline SVG + CSS + the shared runtime.
   the transform layer computes the overlay y-values. Overlay colors come from
   `indicators[].color`, else the next palette slot.
 - Plot bands/lines are **axis chrome** drawn behind the marks; flags are hoverable
-  `.pk-point` markers; oscillators live in a stacked pane. The chart is a
+  `.sc-point` markers; oscillators live in a stacked pane. The chart is a
   **composition** over the Line, Combo, and Arearange renderers — it forks none;
   the shared substrate is reused, never duplicated.
 

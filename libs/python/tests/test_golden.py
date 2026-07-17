@@ -13,9 +13,9 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from peakcharts import ChartSpec, THEMES  # noqa: E402
-from peakcharts.render import render_svg  # noqa: E402
-from peakcharts.validate import SpecError, validate  # noqa: E402
+from stonecharts import ChartSpec, THEMES  # noqa: E402
+from stonecharts.render import render_svg  # noqa: E402
+from stonecharts.validate import SpecError, validate  # noqa: E402
 
 LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
@@ -93,7 +93,7 @@ def test_xss_escaping():
                     "pattern": {"type": "hatch", "color": x, "background": x},
                     "fillOpacity": 0.3}],
     })
-    from peakcharts.render import render_html
+    from stonecharts.render import render_html
     assert "<script>alert(1)</script>" not in render_svg(spec)
     assert "<script>alert(1)</script>" not in render_html(spec)
 

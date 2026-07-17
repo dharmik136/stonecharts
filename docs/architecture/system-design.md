@@ -1,6 +1,6 @@
 ---
-id: PC-ARCH-001
-title: PeakCharts System Design
+id: SC-ARCH-001
+title: StoneCharts System Design
 status: proposed
 classification: normative
 owner: maintainer
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Context
 
-PeakCharts receives a versioned chart specification from an application, validates it,
+StoneCharts receives a versioned chart specification from an application, validates it,
 resolves defaults and capabilities, and produces canonical SVG. An optional shared
 browser runtime enhances the static SVG inside self-contained HTML. Export tools may
 convert the SVG to raster or document formats under separately declared profiles.
@@ -32,7 +32,7 @@ technology users, package registries, and downstream export engines.
 | Container | Responsibility | Authoritative source |
 |---|---|---|
 | Specification | Language-neutral fields, types, defaults, and structural rules | `spec/chart-spec.schema.json` |
-| Python library | Python model, validation, SVG serialization, HTML assembly | `libs/python/peakcharts` |
+| Python library | Python model, validation, SVG serialization, HTML assembly | `libs/python/stonecharts` |
 | Go library | Go model, validation, SVG serialization, HTML assembly | `libs/go` |
 | Shared runtime | Adaptive tooltip, navigation, crosshair, and legend behavior | `runtime/chart-interactions.js` |
 | Contract corpus | Released designs, invalid fixtures, examples, and goldens | `charts/line-basic`, `charts/column`, `spec` |

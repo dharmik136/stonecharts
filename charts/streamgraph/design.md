@@ -1,7 +1,7 @@
 # Chart: Streamgraph (`streamgraph`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which itself
 > copies [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the
@@ -17,7 +17,7 @@
   the area renderer once extraction/stacking land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2 Family A,
   §3.3 Rank 5, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/streamgraph.py` · `libs/go/streamgraph.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/streamgraph.py` · `libs/go/streamgraph.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -33,7 +33,7 @@ x encodes its value; the *stack total* is the outer envelope. It is the
 theme-river view of **event / log / request volume over time**.
 
 Streamgraph is a **variant of Area** — it reuses the **entire** area renderer
-(the stacked `pk-series-area` path builder, gradients/patterns, defs pre-pass,
+(the stacked `sc-series-area` path builder, gradients/patterns, defs pre-pass,
 markers) and adds exactly one thing: a **baseline-offset transform** that replaces
 the zero baseline (`fr.ypix(0.0)`) — and the plain cumulative baseline of a
 stacked area — with a per-category **wiggle** or **silhouette** offset. The
@@ -75,7 +75,7 @@ thickness — see roadmap). See [`CHARTS.md`](../../CHARTS.md).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"streamgraph"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -95,7 +95,7 @@ thickness — see roadmap). See [`CHARTS.md`](../../CHARTS.md).
 | `series[].pattern` | object | — | hatch fill for the ribbon: `{type:hatch, color, background, size, angle, strokeWidth}` (resolves to `url(#pat)`) |
 | `series[].fillOpacity` | number | 1 (ribbon is the mark) | ribbon fill opacity. Unlike line/area (default 0 = no fill), a streamgraph ribbon is **always** filled — it *is* the mark; `fillOpacity` only tunes translucency |
 | `series[].curve` | string | — | `monotone` = smooth (Fritsch-Carlson) ribbon boundaries via the reused spline builder; default = polygonal (straight) ribbons |
-| `series[].marker` | object | `{enabled:true, symbol:circle, radius:3.5}` | per-vertex point markers on the ribbon's top edge; often set `{enabled:false}` for a clean stream (the `.pk-point` element is still emitted for the DOM contract) |
+| `series[].marker` | object | `{enabled:true, symbol:circle, radius:3.5}` | per-vertex point markers on the ribbon's top edge; often set `{enabled:false}` for a clean stream (the `.sc-point` element is still emitted for the DOM contract) |
 
 Fields carried over from the line spec but **inert** for streamgraph (there is no
 boundary stroke on a classic ribbon): `lineWidth`, `dashStyle`, `step` are
@@ -187,7 +187,7 @@ a marks callback and re-implements no chrome (§5.2). It uses the **point** x-sc
 band scale, which is column/bar) and `include_zero=False` (floating baseline):
 
 ```python
-# libs/python/peakcharts/charts/streamgraph.py
+# libs/python/stonecharts/charts/streamgraph.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -195,31 +195,31 @@ def render_svg(spec) -> str:
                             include_zero=False)   # frame reads spec.offset → floating y-domain
 ```
 ```go
-// libs/go/streamgraph.go — package peakcharts
+// libs/go/streamgraph.go — package stonecharts
 func renderStreamgraphSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Streamgraph", "point", streamgraphMarks, false)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
-per series, and inside it **one filled ribbon `<path>`** plus **one `.pk-point`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
+per series, and inside it **one filled ribbon `<path>`** plus **one `.sc-point`
 per category** (on the ribbon's cumulative-top edge — reused verbatim from the
 area/line marker loop):
 
 ```html
-<g class="pk-series" data-series="0">
-  <path class="pk-series-area" data-series="0"
+<g class="sc-series" data-series="0">
+  <path class="sc-series-area" data-series="0"
         d="M64.0 210.3 L216.0 188.7 L368.0 96.4 … L368.0 150.9 L216.0 244.1 L64.0 261.0 Z"
         fill="#2f7ed8"/>
-  <circle class="pk-point" data-series="0"
+  <circle class="sc-point" data-series="0"
           data-series-name="api" data-x="00:00" data-y="340"
           data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
           cx="64.0" cy="210.3" r="3.5" fill="#2f7ed8"/>
-  … one .pk-point per category …
+  … one .sc-point per category …
 </g>
 ```
 
-- **Ribbon path (`pk-series-area`).** Build the band exactly like stacked-area's
+- **Ribbon path (`sc-series-area`).** Build the band exactly like stacked-area's
   band-fill-between-cumulative-baselines (§3.3 Rank 5), but with the floating
   baseline: **top edge** left→right over `ypix(b[i] + cumTop[k][i])`, then **bottom
   edge** right→left over `ypix(b[i] + cumBottom[k][i])`, then `Z`. Reuse `_path_d`
@@ -232,12 +232,12 @@ area/line marker loop):
   is unset — a streamgraph must fill anyway). Add `fill-opacity` only when
   `series[].fillOpacity` is set (`fr.styles[si].area_op`); the default is full
   opacity (stacked ribbons don't overlap).
-- **`.pk-point` per category.** Reuse the area/line marker loop verbatim, anchored
+- **`.sc-point` per category.** Reuse the area/line marker loop verbatim, anchored
   to the **cumulative-top edge** vertex: `cx = fr.xpix(i)`, `cy = fr.ypix(b[i] +
-  cumTop[k][i])`. `marker.enabled:false` hides the visual dot, but the `.pk-point`
+  cumTop[k][i])`. `marker.enabled:false` hides the visual dot, but the `.sc-point`
   element (with all `data-*` + `cx`/`cy`) is **always** emitted — the runtime keys
   the tooltip / crosshair / keyboard nav on it.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (the crosshair reads it) and
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (the crosshair reads it) and
   by convention `cy` (the vertex). Without `cx` the crosshair breaks.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
   index — do not renumber and do not emit a legend from the marks.
@@ -316,13 +316,13 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the
   legend item (do not renumber).
-- **Datum mark:** `.pk-point` carries **all** of `data-series`, `data-series-name`,
+- **Datum mark:** `.sc-point` carries **all** of `data-series`, `data-series-name`,
   `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover` — mandatory even when
   the marker dot is hidden (`marker.enabled:false`).
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (vertex x) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (vertex x) and by
   convention `cy` (top-edge y).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(value))` — the **raw** per-series
@@ -380,7 +380,7 @@ raw `<` fails a test.
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/streamgraph/examples/basic.json")))
 save_html(spec, "out.html")
@@ -388,7 +388,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="streamgraph",
     title="Log Volume by Source",
@@ -406,9 +406,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

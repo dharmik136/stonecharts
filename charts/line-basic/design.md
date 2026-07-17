@@ -1,6 +1,6 @@
 ---
-id: PC-ARCH-004
-title: PeakCharts Basic Line Design
+id: SC-ARCH-004
+title: StoneCharts Basic Line Design
 status: proposed
 classification: normative
 owner: maintainer
@@ -18,13 +18,13 @@ superseded_by: null
 # Chart: Basic Line (`line-basic`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type.
 
 - **Chart id:** `line-basic`
 - **Spec `type`:** `"line"`
 - **Status:** Python ✅ · Go ✅ (byte-identical, golden-tested)
-- **Renderers:** `libs/python/peakcharts/charts/line.py` · `libs/go/line.go`
+- **Renderers:** `libs/python/stonecharts/charts/line.py` · `libs/go/line.go`
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md)
 
 ## What it is
@@ -54,7 +54,7 @@ or x/y correlation with no shared x ordering (use scatter). See
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"line"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default, byte-identical to the classic look) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -102,7 +102,7 @@ See [`examples/basic.json`](examples/basic.json):
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/line-basic/examples/basic.json")))
 save_html(spec, "out.html")
@@ -110,7 +110,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     title="Monthly Average Temperature",
     x_axis=Axis(title="Month", categories=["Jan", "Feb", "Mar"]),
@@ -121,9 +121,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

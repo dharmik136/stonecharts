@@ -1,6 +1,6 @@
 ---
-id: PC-REL-002
-title: PeakCharts 0.0.1 Alpha 1 Qualification Checklist
+id: SC-REL-002
+title: StoneCharts 0.0.1 Alpha 1 Qualification Checklist
 status: proposed
 classification: normative
 owner: maintainer

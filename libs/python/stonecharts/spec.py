@@ -170,7 +170,7 @@ def resolve_theme(value) -> Theme:
 class ChartSpec:
     series: List[Series]
     type: str = "line"
-    id: str = "pk"
+    id: str = "sc"
     theme: Theme = field(default_factory=lambda: THEMES["light"])
     title: Optional[str] = None
     subtitle: Optional[str] = None
@@ -266,7 +266,7 @@ class ChartSpec:
         return ChartSpec(
             series=series,
             type=d.get("type") or "line",
-            id=d.get("id") or "pk",
+            id=d.get("id") or "sc",
             theme=resolve_theme(d.get("theme")),
             title=d.get("title"),
             subtitle=d.get("subtitle"),

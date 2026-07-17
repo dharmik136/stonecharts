@@ -1,4 +1,4 @@
-package peakcharts
+package stonecharts
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// niceNum / niceTicks mirror libs/python/peakcharts/util.py exactly (Heckbert
+// niceNum / niceTicks mirror libs/python/stonecharts/util.py exactly (Heckbert
 // "nice numbers") so both languages land on identical axis ticks.
 func niceNum(x float64, round bool) float64 {
 	if x == 0 {

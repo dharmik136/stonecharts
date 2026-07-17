@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peakcharts.dev/schemas/document-metadata.schema.json",
-  "title": "PeakCharts controlled document metadata",
+  "$id": "https://stonecharts.dev/schemas/document-metadata.schema.json",
+  "title": "StoneCharts controlled document metadata",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -23,7 +23,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^PC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$"
+      "pattern": "^SC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$"
     },
     "title": { "type": "string", "minLength": 3 },
     "status": {
@@ -49,13 +49,13 @@
     "supersedes": {
       "oneOf": [
         { "type": "null" },
-        { "type": "string", "pattern": "^PC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$" }
+        { "type": "string", "pattern": "^SC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$" }
       ]
     },
     "superseded_by": {
       "oneOf": [
         { "type": "null" },
-        { "type": "string", "pattern": "^PC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$" }
+        { "type": "string", "pattern": "^SC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$" }
       ]
     }
   }

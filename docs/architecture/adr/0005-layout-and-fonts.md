@@ -1,5 +1,5 @@
 ---
-id: PC-ARCH-ADR-0005
+id: SC-ARCH-ADR-0005
 title: Use Manual Alpha Layout and Tiered Font Profiles
 status: proposed
 classification: normative

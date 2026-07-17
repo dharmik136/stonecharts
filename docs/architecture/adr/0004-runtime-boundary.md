@@ -1,5 +1,5 @@
 ---
-id: PC-ARCH-ADR-0004
+id: SC-ARCH-ADR-0004
 title: Separate Runtime Semantics from Adaptive Placement
 status: proposed
 classification: normative
@@ -30,7 +30,7 @@ legend state, focus behavior, and DOM/ARIA state updates. It defines adaptive
 placement constraints and a preferred fallback order, not universal absolute screen
 coordinates.
 
-PeakCharts guarantees authored DOM and ARIA semantics, not identical platform
+StoneCharts guarantees authored DOM and ARIA semantics, not identical platform
 accessibility trees across browsers, operating systems, and assistive technologies.
 Embedding modes are qualified separately because inline SVG, standalone SVG, and SVG
 used as an image do not expose the same interaction model.
@@ -39,7 +39,7 @@ used as an image do not expose the same interaction model.
 
 One runtime can remain responsive while semantic tests stay deterministic. Browser and
 assistive-technology matrices become release evidence. Event propagation is specified
-only where PeakCharts intentionally handles or cancels an event.
+only where StoneCharts intentionally handles or cancels an event.
 
 ## Rejected alternatives
 

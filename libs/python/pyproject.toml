@@ -3,9 +3,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "peakcharts"
+name = "stonecharts"
 version = "0.1.0"
-description = "PeakCharts — original, proprietary interactive charting library (Python edition)"
+description = "StoneCharts — original, proprietary interactive charting library (Python edition)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Proprietary — All Rights Reserved" }
@@ -23,8 +23,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dharmik136/peakcharts"
+Homepage = "https://github.com/dharmik136/stonecharts"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["peakcharts*"]
+include = ["stonecharts*"]

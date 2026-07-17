@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peakcharts.dev/schemas/roles.schema.json",
-  "title": "PeakCharts controlled roles",
+  "$id": "https://stonecharts.dev/schemas/roles.schema.json",
+  "title": "StoneCharts controlled roles",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "title", "status", "updated", "roles"],
   "properties": {
-    "id": { "const": "PC-GOV-004" },
+    "id": { "const": "SC-GOV-004" },
     "title": { "type": "string", "minLength": 3 },
     "status": { "enum": ["draft", "proposed", "approved", "archived"] },
     "updated": { "type": "string", "format": "date" },

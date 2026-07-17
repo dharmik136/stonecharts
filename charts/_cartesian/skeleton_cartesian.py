@@ -5,11 +5,11 @@
 # CartesianFrame dataclass, build_frame, and render_cartesian ONLY as signatures +
 # docstrings that pin the parity rules verbatim. It lives here (charts/_cartesian/,
 # OUTSIDE libs/) as a design reference and is deliberately NOT wired into the build:
-# the real, compiled module is `libs/python/peakcharts/charts/_cartesian.py`, created
+# the real, compiled module is `libs/python/stonecharts/charts/_cartesian.py`, created
 # with Rank 1 / Column when the shared chrome is extracted out of line.py.
 #
 # Do NOT import this, register it in render.py, or point a golden at it. The line
-# reference renderer (libs/python/peakcharts/charts/line.py) is the source of the
+# reference renderer (libs/python/stonecharts/charts/line.py) is the source of the
 # verbatim chrome bodies; this file only fixes the shapes and the pinned math so the
 # eventual extraction reproduces line's bytes exactly (§4.6 byte-identity gate).
 """Shared Cartesian chrome (SKELETON).
@@ -17,7 +17,7 @@
 A chart renderer supplies ONLY a marks function; the frame owns everything else —
 margins, scales, ticks, gridlines, axis lines/titles, legend, crosshair, background,
 <defs>, theme resolution, the a11y summary, and the <svg> open/close. Per §5's golden
-rule the marks callback draws ONLY the inner content of <g class="pk-series">…</g>;
+rule the marks callback draws ONLY the inner content of <g class="sc-series">…</g>;
 it MUST NEVER re-implement any chrome and MUST NEVER compute a scale of its own — the
 frame owns the value-axis domain, including the stacking-aware y-max.
 
@@ -213,7 +213,7 @@ def render_cartesian(
     fr = build_frame(spec, chart_noun, x_scale, include_zero)
     p: List[str] = []
     _chrome_head(fr, p)
-    marks(fr, p)          # chart appends its <g class="pk-series">…</g> blocks here
+    marks(fr, p)          # chart appends its <g class="sc-series">…</g> blocks here
     _chrome_tail(fr, p)
     return "".join(p)     # single "".join, NO trailing newline
 

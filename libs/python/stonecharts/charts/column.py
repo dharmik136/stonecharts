@@ -37,7 +37,7 @@ def _column_marks(fr: CartesianFrame, p: list) -> None:
     cumulative = [0.0] * fr.n
     for si, s in enumerate(fr.spec.series):
         st = fr.styles[si]
-        p.append(f'<g class="pk-series" data-series="{si}">')
+        p.append(f'<g class="sc-series" data-series="{si}">')
         for i, raw in enumerate(s.data):
             if i >= fr.n:
                 break
@@ -64,7 +64,7 @@ def _column_marks(fr: CartesianFrame, p: list) -> None:
             xlabel = fr.cats[i] if i < len(fr.cats) else str(i)
             cx = left + bar_w / 2
             common = (
-                f'class="pk-bar pk-point" data-series="{si}" data-series-name="{esc(s.name)}" '
+                f'class="sc-bar sc-point" data-series="{si}" data-series-name="{esc(s.name)}" '
                 f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(raw))}" '
                 f'data-color="{st.solid}" data-r="3.5" data-r-hover="6"'
             )

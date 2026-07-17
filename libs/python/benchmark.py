@@ -1,4 +1,4 @@
-"""Python benchmarking script for PeakCharts rendering.
+"""Python benchmarking script for StoneCharts rendering.
 
 Measures rendering time, throughput, memory footprint, and file sizes across
 different data scopes (3, 10, 100, 1000 points) comparing basic, styled, markers, spline, and gradient layouts.
@@ -16,8 +16,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from peakcharts.spec import Axis, ChartSpec, GridLine, Series, Marker, Gradient, GradientStop, Pattern
-from peakcharts.render import render_html, render_svg
+from stonecharts.spec import Axis, ChartSpec, GridLine, Series, Marker, Gradient, GradientStop, Pattern
+from stonecharts.render import render_html, render_svg
 
 
 def generate_spec(n_points: int, layout_type: str = "basic") -> ChartSpec:

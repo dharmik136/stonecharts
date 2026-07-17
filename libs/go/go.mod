@@ -1,3 +1,3 @@
-module peakcharts
+module stonecharts
 
 go 1.26

@@ -1,6 +1,6 @@
 # Code of Conduct
 
-PeakCharts collaborators must communicate professionally, review technical claims on
+StoneCharts collaborators must communicate professionally, review technical claims on
 evidence, protect confidential information, and separate criticism of work from
 criticism of people.
 

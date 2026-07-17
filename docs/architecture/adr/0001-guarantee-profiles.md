@@ -1,5 +1,5 @@
 ---
-id: PC-ARCH-ADR-0001
+id: SC-ARCH-ADR-0001
 title: Separate Product Guarantee Profiles
 status: proposed
 classification: normative
@@ -25,7 +25,7 @@ would make the product either misleading or impractical.
 
 ## Decision
 
-PeakCharts defines four independent technical profiles:
+StoneCharts defines four independent technical profiles:
 
 1. Canonical output: identical validated SVG serialization under a named release.
 2. Behavioral parity: equivalent DOM inputs and observable interaction semantics.

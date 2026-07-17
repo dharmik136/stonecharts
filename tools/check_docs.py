@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate PeakCharts controlled documents and traceability registries."""
+"""Validate StoneCharts controlled documents and traceability registries."""
 
 from __future__ import annotations
 
@@ -233,7 +233,7 @@ def main() -> int:
         except Exception as exc:
             errors.append(f"{rel(path)}: {exc}")
 
-    artifact_ids = set(documents) | {"PC-GOV-003", "PC-GOV-004"}
+    artifact_ids = set(documents) | {"SC-GOV-003", "SC-GOV-004"}
 
     for doc_id, (path, metadata) in documents.items():
         for role_field in ("owner", "approver"):

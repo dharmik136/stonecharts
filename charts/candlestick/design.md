@@ -1,7 +1,7 @@
 # Chart: Financial — Candlestick / OHLC (`candlestick`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file copies the
 > [`column`](../column/design.md) exemplar (itself modeled on
 > [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the sibling
@@ -15,7 +15,7 @@
   `line` has a live renderer today; candlestick rides the shared cartesian frame
   once the `(o,h,l,c)` point model lands — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 8, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/candlestick.py` · `libs/go/candlestick.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/candlestick.py` · `libs/go/candlestick.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -67,7 +67,7 @@ quartiles + whiskers (use `boxplot`). See [`CHARTS.md`](../../CHARTS.md).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"candlestick"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -130,7 +130,7 @@ a marks callback and re-implements no chrome (§5.2). Note `include_zero=False` 
 price axis is not baseline-anchored):
 
 ```python
-# libs/python/peakcharts/charts/candlestick.py
+# libs/python/stonecharts/charts/candlestick.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -138,36 +138,36 @@ def render_svg(spec) -> str:
                             include_zero=False)   # floating bodies — price axis spans low..high
 ```
 ```go
-// libs/go/candlestick.go — package peakcharts
+// libs/go/candlestick.go — package stonecharts
 func renderCandlestickSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Candlestick", "band", candlestickMarks, false)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
-per series, and inside it **one `.pk-point` group per window** wrapping the wick
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
+per series, and inside it **one `.sc-point` group per window** wrapping the wick
 and the body:
 
 ```html
-<g class="pk-series" data-series="0">
-  <g class="pk-candle pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <g class="sc-candle sc-point" data-series="0"
      data-series-name="ACME" data-x="Jan 2" data-y="153.4"
      data-open="150" data-high="154.2" data-low="149.1" data-close="153.4"
      data-color="#3f9b6a" data-r="3.5" data-r-hover="6"
      cx="128.4" cy="96.0">
-    <line class="pk-wick" x1="128.4" y1="40.0" x2="128.4" y2="120.0"
+    <line class="sc-wick" x1="128.4" y1="40.0" x2="128.4" y2="120.0"
           stroke="#3f9b6a" stroke-width="1"/>
-    <rect class="pk-body" x="112.0" y="72.0" width="32.8" height="24.0"
+    <rect class="sc-body" x="112.0" y="72.0" width="32.8" height="24.0"
           fill="#3f9b6a" stroke="#3f9b6a"/>
   </g>
-  … one .pk-candle.pk-point per window …
+  … one .sc-candle.sc-point per window …
 </g>
 ```
 
-- **Class:** `pk-candle pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-candle` is a
-  purely-cosmetic CSS hook. The `.pk-point` here is a **`<g>`** because a datum
-  needs two primitives (wick + body); the runtime's `querySelectorAll('.pk-point')`,
+- **Class:** `sc-candle sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-candle` is a
+  purely-cosmetic CSS hook. The `.sc-point` here is a **`<g>`** because a datum
+  needs two primitives (wick + body); the runtime's `querySelectorAll('.sc-point')`,
   `getAttribute('cx')`, and hover `setAttribute('r', …)` all operate harmlessly on a
   group. The candle **is** the hoverable point; there are no separate markers.
 - **Candlestick geometry (default subtype):**
@@ -189,7 +189,7 @@ and the body:
   fill+stroke. `hollow` fills up-candles with `none` (outline only), keeping the
   stroke. Never leave a candle uncolored (a colorless financial glyph is a broken
   static chart — NN#2).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (candle center `xc`) — the
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (candle center `xc`) — the
   crosshair reads it — and by convention `cy = ypix(close)`.
 - **Legend swatch:** the shared **tail** emits the **up/down two-swatch** key with
   `data-series` indices — do not emit a legend from the marks.
@@ -284,13 +284,13 @@ The shared runtime (`runtime/chart-interactions.js`) keys **only** on the select
 highlight, crosshair, legend-toggle, and keyboard nav all work with **zero JS
 changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the integer
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the integer
   series index, **consistent** across the group, its points, and the legend item.
-- **Datum mark:** `.pk-candle.pk-point` (a `<g>`) carries **all** of `data-series`,
+- **Datum mark:** `.sc-candle.sc-point` (a `<g>`) carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`
   (mandatory even though a `<g>`/`<rect>` ignores the hover `r`), **plus** the
   financial extension `data-open`, `data-high`, `data-low`, `data-close`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (candle center) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (candle center) and by
   convention `cy = ypix(close)`.
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(close))`;
@@ -360,7 +360,7 @@ candlestick marks (§5.5d). `CANDLESTICK_CASES = ["basic","ohlc","heikin-ashi","
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/candlestick/examples/basic.json")))
 save_html(spec, "out.html")
@@ -368,7 +368,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="candlestick",
     title="ACME Corp — Daily Price",
@@ -384,9 +384,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

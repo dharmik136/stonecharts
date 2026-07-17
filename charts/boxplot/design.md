@@ -1,7 +1,7 @@
 # Chart: Boxplot (`boxplot`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this recipe is modeled on the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which itself
 > copies [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the
@@ -20,7 +20,7 @@
   extraction + the point model land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2
   (Family A row), §3.3 Rank 3/8/9/11, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/boxplot.py` · `libs/go/boxplot.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/boxplot.py` · `libs/go/boxplot.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -81,7 +81,7 @@ Statistical-family density upgrade). See [`CHARTS.md`](../../CHARTS.md).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"boxplot"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -90,7 +90,7 @@ Statistical-family density upgrade). See [`CHARTS.md`](../../CHARTS.md).
 | `a11y` | bool | true | accessibility (on by default): SVG gets `role="img"` + a summary `aria-label` + `<desc>`; HTML adds a visually-hidden data table (the **5-number summary + outliers** per category — see §5.4b-DT). `false` restores the pre-a11y bytes |
 | `responsive` | bool | false | scale to container (viewBox + `width:100%`) instead of fixed px |
 | **`orientation`** | string | `vertical` | **NEW field.** `vertical` = boxes rise on the value-y axis over categorical x (default); `horizontal` = the coordinate transpose (bands on y, value on x). The transpose is a coordinate remap only (Bar-vs-Column, blueprint §3.3 Rank 2) — legend/tooltip/a11y unchanged. Graduates via the §5.4b five-place lockstep (schema + both validators + both spec models + invalid fixtures) |
-| **`scatterOverlay`** | bool | false | **NEW field.** When `true` and `samples` are present, jittered raw sample points are drawn over each box as an overlay (`.pk-sample` circles). Purely additive marks — the box stays the `.pk-point` |
+| **`scatterOverlay`** | bool | false | **NEW field.** When `true` and `samples` are present, jittered raw sample points are drawn over each box as an overlay (`.sc-sample` circles). Purely additive marks — the box stays the `.sc-point` |
 | `xAxis.title` | string | — | axis label |
 | `xAxis.categories` | string[] | index `0..N-1` | x labels (the band categories) |
 | `yAxis.title` | string | — | axis label (the value/distribution axis) |
@@ -154,44 +154,44 @@ a marks callback and re-implements no chrome (§5.2). It passes the bare noun
 byte-for-byte) and **`include_zero=False`**:
 
 ```python
-# libs/python/peakcharts/charts/boxplot.py
+# libs/python/stonecharts/charts/boxplot.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Boxplot", "band", _boxplot_marks, include_zero=False)
 ```
 ```go
-// libs/go/boxplot.go — package peakcharts
+// libs/go/boxplot.go — package stonecharts
 func renderBoxplotSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Boxplot", "band", boxplotMarks, false)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it **one box glyph per (category, series)** — a floating box
-`<rect>` (the `.pk-point`), a median `<line>`, upper + lower whisker stem/cap
+`<rect>` (the `.sc-point`), a median `<line>`, upper + lower whisker stem/cap
 `<line>`s, and one `<circle>` per outlier:
 
 ```html
-<g class="pk-series" data-series="0">
-  <rect class="pk-box pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <rect class="sc-box sc-point" data-series="0"
         data-series-name="Response time (ms)" data-x="/search" data-y="88"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="240.5" cy="168.0" x="210.0" y="150.0" width="61.0" height="70.0"
         fill="#2f7ed8" fill-opacity="0.5" stroke="#2f7ed8"/>
-  <line class="pk-median"      x1="210.0" y1="168.0" x2="271.0" y2="168.0" stroke="#2f7ed8"/>
-  <line class="pk-whisker"     x1="240.5" y1="150.0" x2="240.5" y2="96.0"  stroke="#2f7ed8"/>
-  <line class="pk-whisker-cap" x1="225.3" y1="96.0"  x2="255.8" y2="96.0"  stroke="#2f7ed8"/>
-  <line class="pk-whisker"     x1="240.5" y1="220.0" x2="240.5" y2="260.0" stroke="#2f7ed8"/>
-  <line class="pk-whisker-cap" x1="225.3" y1="260.0" x2="255.8" y2="260.0" stroke="#2f7ed8"/>
-  <circle class="pk-outlier"   cx="240.5" cy="70.0" r="2.5" fill="#2f7ed8"/>
+  <line class="sc-median"      x1="210.0" y1="168.0" x2="271.0" y2="168.0" stroke="#2f7ed8"/>
+  <line class="sc-whisker"     x1="240.5" y1="150.0" x2="240.5" y2="96.0"  stroke="#2f7ed8"/>
+  <line class="sc-whisker-cap" x1="225.3" y1="96.0"  x2="255.8" y2="96.0"  stroke="#2f7ed8"/>
+  <line class="sc-whisker"     x1="240.5" y1="220.0" x2="240.5" y2="260.0" stroke="#2f7ed8"/>
+  <line class="sc-whisker-cap" x1="225.3" y1="260.0" x2="255.8" y2="260.0" stroke="#2f7ed8"/>
+  <circle class="sc-outlier"   cx="240.5" cy="70.0" r="2.5" fill="#2f7ed8"/>
   … one box glyph per category …
 </g>
 ```
 
-- **Class:** the box rect is `pk-box pk-point`. `pk-point` is the **contract**
+- **Class:** the box rect is `sc-box sc-point`. `sc-point` is the **contract**
   class the runtime keys on (tooltip / highlight / crosshair / legend-toggle);
-  `pk-box`, `pk-median`, `pk-whisker`, `pk-whisker-cap`, `pk-outlier`, `pk-sample`
+  `sc-box`, `sc-median`, `sc-whisker`, `sc-whisker-cap`, `sc-outlier`, `sc-sample`
   are purely-cosmetic CSS hooks (adding a class the runtime must *know about* is
   out of scope — NN#2). The box **is** the hoverable point; median/whiskers/
   outliers are decoration within the same series group.
@@ -206,20 +206,20 @@ per series, and inside it **one box glyph per (category, series)** — a floatin
   `cx = left(i,k) + barW/2` — upper from `ypix(q3)` to `ypix(high)`, lower from
   `ypix(q1)` to `ypix(low)` — each capped by a short horizontal `<line>` of
   half-width `capHalf` (below). Same stem+cap primitive Error bar draws.
-- **Outliers:** one `<circle class="pk-outlier">` per outlier at `(cx, ypix(o))`,
+- **Outliers:** one `<circle class="sc-outlier">` per outlier at `(cx, ypix(o))`,
   radius `outlierR`, in the datum's ascending outlier order.
 - **Fill:** read `fr.styles[si].fill` — the resolved box paint. Resolve as
   **pattern → `url(#pat)`; gradient → `url(#grad)`; else the solid hex.** The box
   carries a `fill-opacity` (default `0.5`) so the median line reads through; the
   stroke + median + whiskers + outliers use `fr.styles[si].solid`. Never read
   `area_fill` (that is line's under-fill), and never leave the glyph invisible.
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (box center x) — the crosshair
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (box center x) — the crosshair
   reads it — and by convention `cy = ypix(median)` (the summary's center).
 - **Scatter overlay (`scatterOverlay:true`, samples mode):** additionally emit one
-  `<circle class="pk-sample">` per raw sample at `(jitter(cx), ypix(v))`, drawn
+  `<circle class="sc-sample">` per raw sample at `(jitter(cx), ypix(v))`, drawn
   after the box glyph. The jitter offset is a **pinned deterministic** function of
   `(i, k, sampleIndex)` (never a PRNG — parity requires identical bytes), spanning
-  `±barW·0.3`. Purely additive; the box stays the `.pk-point`.
+  `±barW·0.3`. Purely additive; the box stays the `.sc-point`.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
   index — do not renumber and do not emit a legend from the marks.
 
@@ -300,7 +300,7 @@ The chart delegates with `x_scale="band"` and `include_zero=False`.
 - **Zero-height box (`q1 == q3`)** — apply the shared min-1px rule identically
   (Candlestick doji, §3.3 Rank 8); never emit a `height="0.0"` box that vanishes,
   and never a negative `height`.
-- **Glyph emission ORDER** — box rect (the `.pk-point`) first, then median, then
+- **Glyph emission ORDER** — box rect (the `.sc-point`) first, then median, then
   upper stem, upper cap, lower stem, lower cap, then outliers in ascending order,
   then (if enabled) samples in index order — pinned identically so bytes match.
 - **`data-y`** — carries the **median** (`fmt_num(boxData[i].median)`), the datum's
@@ -326,14 +326,14 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its boxes, and the legend
   item (do not renumber).
-- **Datum mark:** the box `.pk-point` (here also `.pk-box`) carries **all** of
+- **Datum mark:** the box `.sc-point` (here also `.sc-box`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`,
   `data-r-hover` — mandatory even though a `<rect>` ignores the hover `r`. Median,
   whisker, cap, outlier, and sample marks carry **no** `data-*` (cosmetic).
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (box center x) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (box center x) and by
   convention `cy` (= `ypix(median)`).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(boxData[i].median))`;
@@ -402,7 +402,7 @@ boxplot marks (§5.5d). `BOXPLOT_CASES = ["basic","outliers","grouped","dark","a
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/boxplot/examples/basic.json")))
 save_html(spec, "out.html")
@@ -410,7 +410,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="boxplot",
     title="API Latency Distribution by Endpoint",
@@ -422,9 +422,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

@@ -1,6 +1,6 @@
 ---
-id: PC-SEC-002
-title: PeakCharts Supply-Chain Policy
+id: SC-SEC-002
+title: StoneCharts Supply-Chain Policy
 status: proposed
 classification: normative
 owner: security-contact

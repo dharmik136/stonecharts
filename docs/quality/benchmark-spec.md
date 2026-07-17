@@ -1,6 +1,6 @@
 ---
-id: PC-QUAL-002
-title: PeakCharts Benchmark Specification
+id: SC-QUAL-002
+title: StoneCharts Benchmark Specification
 status: proposed
 classification: normative
 owner: maintainer
@@ -20,7 +20,7 @@ superseded_by: null
 ## Purpose
 
 The benchmark establishes reproducible performance and resource baselines. It does not
-rank PeakCharts against unrelated libraries until equivalent workloads, output, and
+rank StoneCharts against unrelated libraries until equivalent workloads, output, and
 environments can be defended.
 
 ## Workloads

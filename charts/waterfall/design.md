@@ -1,7 +1,7 @@
 # Chart: Waterfall (`waterfall`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** [`charts/column/design.md`](../column/design.md) (which itself
 > copies [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the
@@ -16,7 +16,7 @@
   once its rank lands — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3
   Rank 12, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/waterfall.py` · `libs/go/waterfall.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/waterfall.py` · `libs/go/waterfall.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5 (Rank 12)
@@ -82,7 +82,7 @@ distribution of raw samples (use `histogram`). See [`CHARTS.md`](../../CHARTS.md
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"waterfall"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -169,41 +169,41 @@ The renderer is a **one-line delegation** to the shared frame; it supplies **onl
 a marks callback and re-implements no chrome (§5.2):
 
 ```python
-# libs/python/peakcharts/charts/waterfall.py
+# libs/python/stonecharts/charts/waterfall.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Waterfall", "band", _waterfall_marks)   # include_zero defaults True
 ```
 ```go
-// libs/go/waterfall.go — package peakcharts
+// libs/go/waterfall.go — package stonecharts
 func renderWaterfallSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Waterfall", "band", waterfallMarks, true)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, containing the **dashed connector `<line>`s** (decorative) followed by
-**one floating `<rect>` per stage** (the hoverable `.pk-point`):
+**one floating `<rect>` per stage** (the hoverable `.sc-point`):
 
 ```html
-<g class="pk-series" data-series="0">
-  <line class="pk-connector" x1="144.8" y1="150.0" x2="223.2" y2="150.0"
+<g class="sc-series" data-series="0">
+  <line class="sc-connector" x1="144.8" y1="150.0" x2="223.2" y2="150.0"
         stroke="#c9ccd6" stroke-width="1" stroke-dasharray="4 3"/>
   … one connector between each pair of consecutive bars …
-  <rect class="pk-bar pk-point" data-series="0"
+  <rect class="sc-bar sc-point" data-series="0"
         data-series-name="Budget" data-x="Headcount" data-y="260"
         data-kind="increase" data-total="1060"
         data-color="#2e9e5b" data-r="3.5" data-r-hover="6"
         cx="184.0" cy="96.0" x="167.6" y="96.0" width="32.8" height="54.0"
         fill="#2e9e5b"/>
-  … one .pk-bar.pk-point per stage …
+  … one .sc-bar.sc-point per stage …
 </g>
 ```
 
-- **Class:** `pk-bar pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-bar` is a
-  purely-cosmetic CSS hook, and `pk-connector` a cosmetic class on the connector
+- **Class:** `sc-bar sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-bar` is a
+  purely-cosmetic CSS hook, and `sc-connector` a cosmetic class on the connector
   lines (adding a class the runtime must *know about* is out of scope — NN#2). The
   bar **is** the hoverable point; there are no separate markers.
 - **Bar geometry (the floating-bar primitive):** from the running-total transform,
@@ -229,7 +229,7 @@ per series, containing the **dashed connector `<line>`s** (decorative) followed 
   `url(#pat)`; gradient → `url(#grad)`; else the solid hex.** Never read
   `area_fill` (that is line's under-fill), and never leave a bar unfilled (an
   unfilled bar is a broken static chart — NN#2).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (bar center x) — the crosshair
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (bar center x) — the crosshair
   reads it — and by convention `cy` (bar top = `min(ypix(start), ypix(end))`).
   Without `cx` the crosshair breaks.
 - **Legend:** waterfall's legend is the **increase / decrease / total** direction
@@ -336,15 +336,15 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, its
   connectors, and the legend item (do not renumber). The connector lines sit
   inside the group so they hide with the series on legend-toggle.
-- **Datum mark:** `.pk-point` (here also `.pk-bar`) carries **all** of
+- **Datum mark:** `.sc-point` (here also `.sc-bar`) carries **all** of
   `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`,
   `data-r-hover` — mandatory even though a `<rect>` ignores the hover `r`. Waterfall
   adds informational `data-kind` and `data-total`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (bar center x) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (bar center x) and by
   convention `cy` (bar top).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(stage label)`; `data-y = esc(fmt_num(displayValue))` — the **raw
@@ -408,7 +408,7 @@ the waterfall marks (§5.5d). `WATERFALL_CASES = ["basic","intermediate-sums","p
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/waterfall/examples/intermediate-sums.json")))
 save_html(spec, "out.html")
@@ -416,7 +416,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="waterfall",
     title="Monthly Cash Flow",
@@ -428,9 +428,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

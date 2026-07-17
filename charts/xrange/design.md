@@ -1,7 +1,7 @@
 # Chart: X-Range / Gantt (`xrange`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this recipe copies the
 > Cartesian **exemplar** [`charts/column/design.md`](../column/design.md) (itself
 > modeled on [`charts/line-basic/design.md`](../line-basic/design.md)) and swaps
@@ -21,7 +21,7 @@
   the floating-bar primitive + numeric/datetime x-axis + orientation land — see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §2 Family A
   (X-range/Gantt row), §3.2, §3.3 Ranks 1/2/3/8, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/xrange.py` · `libs/go/xrange.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/xrange.py` · `libs/go/xrange.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -95,7 +95,7 @@ See [`CHARTS.md`](../../CHARTS.md).
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"xrange"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -164,7 +164,7 @@ and **`orientation="horizontal"`** (the band axis is the y lane axis, the value
 axis is the x time axis — the Rank-2 transpose):
 
 ```python
-# libs/python/peakcharts/charts/xrange.py
+# libs/python/stonecharts/charts/xrange.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
@@ -173,7 +173,7 @@ def render_svg(spec) -> str:
                             include_zero=False, orientation="horizontal")
 ```
 ```go
-// libs/go/xrange.go — package peakcharts
+// libs/go/xrange.go — package stonecharts
 func renderXRangeSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "X-range", "band", xrangeMarks, false, "horizontal")
 }
@@ -187,24 +187,24 @@ func renderXRangeSVG(spec *ChartSpec) string {
 > sources the band labels from the **y** lane axis and drives `fr.xpix_val` for the
 > time axis. `n = L` (lane count).
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it **one floating span `<rect>` per span** spanning
 `xpix_val(start)` (left) to `xpix_val(end)` (right) inside its lane band:
 
 ```html
-<g class="pk-series" data-series="0">
-  <rect class="pk-span pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <rect class="sc-span sc-point" data-series="0"
         data-series-name="checkout-trace" data-x="payment" data-y="1200"
         data-start="1200" data-end="1850" data-lane="payment" data-duration="650"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="512.0" cy="180.0" x="410.0" y="164.0" width="204.0" height="32.0"
         fill="#2f7ed8"/>
-  … one .pk-span.pk-point per span …
+  … one .sc-span.sc-point per span …
 </g>
 ```
 
-- **Class:** `pk-span pk-point`. `pk-point` is the **contract** class the runtime
-  keys on (tooltip / highlight / crosshair / legend-toggle); `pk-span` is a
+- **Class:** `sc-span sc-point`. `sc-point` is the **contract** class the runtime
+  keys on (tooltip / highlight / crosshair / legend-toggle); `sc-span` is a
   purely-cosmetic CSS hook (adding a class the runtime must *know about* is out of
   scope — NN#2). The span bar **is** the hoverable point; there are no separate
   markers.
@@ -224,24 +224,24 @@ per series, and inside it **one floating span `<rect>` per span** spanning
   doji rule candlestick pins for `open == close`): `width = max(1.0, |xval(end) -
   xval(start)|)`, evaluated **identically** in both languages so a flat span stays a
   visible hairline. If `spans[i].milestone == true`, draw a **diamond** instead: a
-  `<polygon class="pk-milestone pk-point">` centered at `(xval(start),
+  `<polygon class="sc-milestone sc-point">` centered at `(xval(start),
   ypix_band(j))` with half-extent `barThickness/2` — vertices at
   `(cx, cy-h)`,`(cx+h, cy)`,`(cx, cy+h)`,`(cx-h, cy)`. The milestone carries the
   **same** `data-*` as a span (`data-start == data-end`, `data-duration = 0`).
 - **Dependency connectors (Gantt).** For each span carrying `dependency:[predId,…]`,
   draw a finish-to-start connector from **each predecessor's right edge**
   `(xval(pred.end), ypix_band(pred.y))` to **this span's left edge**
-  `(xval(start), ypix_band(this.y))` as a `<path class="pk-dependency">` (an
+  `(xval(start), ypix_band(this.y))` as a `<path class="sc-dependency">` (an
   orthogonal elbow ending in a small arrowhead). The renderer builds a
   **span-id → (endX, laneY)** index in a pre-pass so a dependency can resolve a
   predecessor in **any** series. The connector is drawn **inside the dependent
   span's series group** (so it hides with that series on legend-toggle) but is
-  **not** a `.pk-point` — it is decorative (no runtime behavior, no new JS; NN#2).
+  **not** a `.sc-point` — it is decorative (no runtime behavior, no new JS; NN#2).
 - **Fill:** read `fr.styles[si].fill` — the resolved span paint. Resolve as
   **pattern → `url(#pat)`; gradient → `url(#grad)`; else the solid hex.** Never
   read `area_fill` (that is line's under-fill), and never leave a span unfilled (an
   unfilled span bar is a broken static chart — NN#2).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (span center x = `xval((start
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (span center x = `xval((start
   + end)/2)`) — the crosshair reads it — and by convention `cy` (lane band center =
   `ypix_band(j)`). Without `cx` the crosshair breaks.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
@@ -368,16 +368,16 @@ The shared runtime (`runtime/chart-interactions.js`) keys **only** on the select
 highlight, crosshair, legend-toggle, and keyboard nav all work with **zero JS
 changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the integer
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the integer
   series index, **consistent** across the group, its spans, and the legend item (do
   not renumber). A series' dependency connectors live inside its group so they hide
   with it.
-- **Datum mark:** `.pk-span.pk-point` (a `<rect>`; a milestone is
-  `.pk-milestone.pk-point`, a `<polygon>`) carries **all** of `data-series`,
+- **Datum mark:** `.sc-span.sc-point` (a `<rect>`; a milestone is
+  `.sc-milestone.sc-point`, a `<polygon>`) carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`
   (mandatory even though a `<rect>`/`<polygon>` ignores the hover `r`), **plus** the
   span extension `data-start`, `data-end`, `data-lane`, `data-duration`.
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (span center x =
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (span center x =
   `xval((start+end)/2)`) and by convention `cy` (lane band center = `ypix_band(j)`).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(lane label)`; `data-y = esc(fmt_num(start))`;
@@ -445,7 +445,7 @@ against the xrange marks (§5.5d).
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/xrange/examples/trace-waterfall.json")))
 save_html(spec, "out.html")
@@ -453,7 +453,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="xrange",
     title="Checkout Request — Distributed Trace",
@@ -469,9 +469,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

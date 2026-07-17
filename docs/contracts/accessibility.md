@@ -1,5 +1,5 @@
 ---
-id: PC-CON-007
+id: SC-CON-007
 title: Accessibility Contract
 status: proposed
 classification: normative
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Scope
 
-PeakCharts qualifies the generated chart component, not the complete host page. A host
+StoneCharts qualifies the generated chart component, not the complete host page. A host
 application can break accessibility through surrounding labels, CSS, focus management,
 contrast changes, hidden containers, or incompatible embedding.
 
@@ -50,7 +50,7 @@ claim full conformance until automated and manual qualification is complete.
 
 ## Assistive-technology boundary
 
-PeakCharts authors SVG/HTML/ARIA inputs and tests them in a declared matrix. Browsers,
+StoneCharts authors SVG/HTML/ARIA inputs and tests them in a declared matrix. Browsers,
 operating systems, and assistive technologies generate accessibility trees and speech
 output; those products may differ. The guarantee is equivalent authored semantics and
 qualified task outcomes, not byte-identical accessibility trees.

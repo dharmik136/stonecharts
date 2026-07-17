@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"peakcharts"
+	"stonecharts"
 )
 
 // generateSpec creates a baseline, styled, markers, spline, or gradient ChartSpec for benchmarking,
 // then round-trips it through FromJSON to ensure all defaults are fully populated.
-func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
+func generateSpec(nPoints int, layoutType string) *stonecharts.ChartSpec {
 	data1 := make([]float64, nPoints)
 	data2 := make([]float64, nPoints)
 	categories := make([]string, nPoints)
@@ -23,12 +23,12 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 		categories[i] = fmt.Sprintf("P%d", i)
 	}
 
-	series := []peakcharts.Series{
+	series := []stonecharts.Series{
 		{Name: "Series 1", Data: data1},
 		{Name: "Series 2", Data: data2},
 	}
 
-	spec := &peakcharts.ChartSpec{
+	spec := &stonecharts.ChartSpec{
 		Type:   "line",
 		Series: series,
 	}
@@ -37,11 +37,11 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 		spec.ID = "demo"
 		spec.Title = "Benchmark Gradient"
 		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid + Gradients/Patterns (%d pts)", nPoints)
-		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
+		spec.XAxis = stonecharts.Axis{Title: "X Axis", Categories: categories}
 		enabled := true
-		spec.YAxis = peakcharts.Axis{
+		spec.YAxis = stonecharts.Axis{
 			Title: "Y Axis",
-			GridLine: &peakcharts.GridLine{
+			GridLine: &stonecharts.GridLine{
 				Enabled:   &enabled,
 				Color:     "#d5d5e0",
 				DashStyle: "dashed",
@@ -60,18 +60,18 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 		spec.Series[0].Curve = "monotone"
 
 		spec.Series[1].Color = json.RawMessage(`"#f45b5b"`)
-		spec.Series[1].Pattern = &peakcharts.Pattern{
+		spec.Series[1].Pattern = &stonecharts.Pattern{
 			Type: "hatch",
 			Color: "#f45b5b",
 		}
 	} else if layoutType == "spline" {
 		spec.Title = "Benchmark Spline"
 		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid + Spline (%d pts)", nPoints)
-		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
+		spec.XAxis = stonecharts.Axis{Title: "X Axis", Categories: categories}
 		enabled := true
-		spec.YAxis = peakcharts.Axis{
+		spec.YAxis = stonecharts.Axis{
 			Title: "Y Axis",
-			GridLine: &peakcharts.GridLine{
+			GridLine: &stonecharts.GridLine{
 				Enabled:   &enabled,
 				Color:     "#d5d5e0",
 				DashStyle: "dashed",
@@ -83,11 +83,11 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 	} else if layoutType == "markers" {
 		spec.Title = "Benchmark Markers"
 		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid + Markers (%d pts)", nPoints)
-		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
+		spec.XAxis = stonecharts.Axis{Title: "X Axis", Categories: categories}
 		enabled := true
-		spec.YAxis = peakcharts.Axis{
+		spec.YAxis = stonecharts.Axis{
 			Title: "Y Axis",
-			GridLine: &peakcharts.GridLine{
+			GridLine: &stonecharts.GridLine{
 				Enabled:   &enabled,
 				Color:     "#d5d5e0",
 				DashStyle: "dashed",
@@ -98,7 +98,7 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 		spec.Series[0].LineWidth = 3.0
 		spec.Series[0].DashStyle = "dashed"
 		spec.Series[0].Step = "center"
-		spec.Series[0].Marker = &peakcharts.Marker{
+		spec.Series[0].Marker = &stonecharts.Marker{
 			Enabled: &enabled,
 			Symbol:  "triangle",
 			Radius:  4.0,
@@ -107,7 +107,7 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 		spec.Series[1].LineWidth = 2.0
 		spec.Series[1].DashStyle = "dotted"
 		spec.Series[1].Step = "after"
-		spec.Series[1].Marker = &peakcharts.Marker{
+		spec.Series[1].Marker = &stonecharts.Marker{
 			Enabled: &enabled,
 			Symbol:  "square",
 			Radius:  4.0,
@@ -115,11 +115,11 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 	} else if layoutType == "styled" {
 		spec.Title = "Benchmark Styled"
 		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid (%d pts)", nPoints)
-		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
+		spec.XAxis = stonecharts.Axis{Title: "X Axis", Categories: categories}
 		enabled := true
-		spec.YAxis = peakcharts.Axis{
+		spec.YAxis = stonecharts.Axis{
 			Title: "Y Axis",
-			GridLine: &peakcharts.GridLine{
+			GridLine: &stonecharts.GridLine{
 				Enabled:   &enabled,
 				Color:     "#d5d5e0",
 				DashStyle: "dashed",
@@ -129,8 +129,8 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 	} else {
 		spec.Title = "Benchmark Basic"
 		spec.Subtitle = fmt.Sprintf("Fixed + Default Grid (%d pts)", nPoints)
-		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
-		spec.YAxis = peakcharts.Axis{Title: "Y Axis"}
+		spec.XAxis = stonecharts.Axis{Title: "X Axis", Categories: categories}
+		spec.YAxis = stonecharts.Axis{Title: "Y Axis"}
 		spec.Responsive = false
 	}
 
@@ -139,7 +139,7 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 	if err != nil {
 		panic(err)
 	}
-	finalSpec, err := peakcharts.FromJSON(b)
+	finalSpec, err := stonecharts.FromJSON(b)
 	if err != nil {
 		panic(err)
 	}
@@ -158,12 +158,12 @@ type BenchResult struct {
 }
 
 func main() {
-	// Set PEAKCHARTS_RUNTIME env var if not set so RenderHTML can find the JS file
-	if os.Getenv("PEAKCHARTS_RUNTIME") == "" {
+	// Set STONECHARTS_RUNTIME env var if not set so RenderHTML can find the JS file
+	if os.Getenv("STONECHARTS_RUNTIME") == "" {
 		// Look for runtime/chart-interactions.js up in the repo root
 		path, _ := filepath.Abs("../../runtime/chart-interactions.js")
 		if _, err := os.Stat(path); err == nil {
-			os.Setenv("PEAKCHARTS_RUNTIME", path)
+			os.Setenv("STONECHARTS_RUNTIME", path)
 		}
 	}
 
@@ -190,10 +190,10 @@ func main() {
 			resSVG := testing.Benchmark(func(b *testing.B) {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
-					_ = peakcharts.RenderSVG(specSVG)
+					_ = stonecharts.RenderSVG(specSVG)
 				}
 			})
-			svgContent := peakcharts.RenderSVG(specSVG)
+			svgContent := stonecharts.RenderSVG(specSVG)
 
 			results = append(results, BenchResult{
 				Points:      size,
@@ -211,10 +211,10 @@ func main() {
 			resHTML := testing.Benchmark(func(b *testing.B) {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
-					_ = peakcharts.RenderHTML(specHTML, "")
+					_ = stonecharts.RenderHTML(specHTML, "")
 				}
 			})
-			htmlContent := peakcharts.RenderHTML(specHTML, "")
+			htmlContent := stonecharts.RenderHTML(specHTML, "")
 
 			results = append(results, BenchResult{
 				Points:      size,

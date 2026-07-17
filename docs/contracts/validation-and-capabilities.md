@@ -1,5 +1,5 @@
 ---
-id: PC-CON-002
+id: SC-CON-002
 title: Specification Validation and Renderer Capabilities
 status: proposed
 classification: normative

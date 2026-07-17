@@ -1,6 +1,6 @@
 ---
-id: PC-SEC-001
-title: PeakCharts Threat Model
+id: SC-SEC-001
+title: StoneCharts Threat Model
 status: proposed
 classification: normative
 owner: security-contact
@@ -21,7 +21,7 @@ superseded_by: null
 
 Protected assets are host application integrity, generated SVG/HTML integrity, chart
 data confidentiality, renderer availability, release artifacts, package consumers, and
-the credibility of PeakCharts conformance claims.
+the credibility of StoneCharts conformance claims.
 
 Chart specs are untrusted even when constructed through typed APIs. Output may be
 opened as a document, embedded inline, served by an application, converted by another
@@ -64,7 +64,7 @@ tool, or included in reports.
 
 ## Out of scope for Alpha core
 
-PeakCharts is not yet a hosted multi-tenant service. Authentication, authorization,
+StoneCharts is not yet a hosted multi-tenant service. Authentication, authorization,
 tenant isolation, network controls, billing, account recovery, production monitoring,
 and service incident response require a separate service threat model before an app is
 deployed.

@@ -1,5 +1,5 @@
 ---
-id: PC-QUAL-003
+id: SC-QUAL-003
 title: Legacy Robustness and Known Limitations Report
 status: superseded
 classification: informative
@@ -12,13 +12,13 @@ evidence: [TEST-VALIDATION-PARITY, TEST-XSS-ESCAPING]
 last_reviewed: "2026-07-18"
 review_due: "2026-10-18"
 supersedes: null
-superseded_by: PC-GOV-003
+superseded_by: SC-GOV-003
 ---
 
 # Robustness & Known Limitations
 
 > Superseded as the active risk source by
-> [`PC-GOV-003`](governance/risk-register.yaml). Retained as the historical report
+> [`SC-GOV-003`](governance/risk-register.yaml). Retained as the historical report
 > for the adversarial pass that produced these fixes and observations.
 
 Results of an adversarial stress-test pass against the three load-bearing walls
@@ -29,7 +29,7 @@ unless noted.
 
 | # | Risk | Status |
 |---|------|--------|
-| 1 | **Multi-chart `<defs>` id collision** — two charts with the default `id` both emit `pk-grad-0`; a second chart's `url(#…)` fill resolved to the first's gradient. | **Fixed.** The runtime uniquifies each chart's `<defs>` ids on load (`pkc0-…`, `pkc1-…`) and rewrites that chart's own refs. Static SVG bytes unchanged. For pure-static multi-embed (no runtime), set a unique `id` per chart. |
+| 1 | **Multi-chart `<defs>` id collision** — two charts with the default `id` both emit `sc-grad-0`; a second chart's `url(#…)` fill resolved to the first's gradient. | **Fixed.** The runtime uniquifies each chart's `<defs>` ids on load (`scc0-…`, `scc1-…`) and rewrites that chart's own refs. Static SVG bytes unchanged. For pure-static multi-embed (no runtime), set a unique `id` per chart. |
 | 2 | **Float parity** — `data-y` diverged on floats needing >6 sig figs (Py `%g` vs Go shortest); `int(v)` could overflow Go's int64. | **Fixed.** Both `fmt_num`/`fmtNum` use `%g`/6-sig, guard `NaN`/`Inf` → `"0"`, and bound the integer path to `|v| < 1e18`. Golden: `adversarial.svg`. |
 | 3 | **XSS** — color and `id` fields were injected raw into SVG attributes. | **Fixed.** Every color sink (series color, gradient stops, pattern color/bg, custom theme colors + palette) and the chart `id` are escaped. Test: `test_xss_escaping` / `TestXSSEscaping`. |
 | 4 | **Malformed specs** — `data:null`, `data:[1,null,3]`, `width:"auto"` crashed Python; and Python-vs-Go handling of malformed numeric fields diverged. | **Fixed — strict, both languages.** A shared validator (`validate.py` / `validate.go`, identical rules + error text) runs before parsing and **rejects** malformed input with structured errors (`$.series[0].marker.radius: expected number, received string`). Defaults apply only when a field is absent — never as a cover for a wrong-typed value. Tests: `test_invalid_fixtures_parity` / `TestInvalidFixturesParity` assert both renderers reject the **same** shared fixtures with the **same** errors. |

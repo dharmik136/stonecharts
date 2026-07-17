@@ -1,7 +1,7 @@
 # Chart: Error bar (`error-bar`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file copies the
 > [`charts/line-basic/design.md`](../line-basic/design.md) template and follows
 > the sibling exemplar [`charts/column/design.md`](../column/design.md), adding the
@@ -14,7 +14,7 @@
 - **Status:** design-complete + examples validated · renderers deferred (only
   `line` has a live renderer today; error-bar rides the shared cartesian frame once
   the point-model extraction lands — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 9, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/error_bar.py` · `libs/go/errorbar.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/error_bar.py` · `libs/go/errorbar.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -69,7 +69,7 @@ interval (use `column`), or a **full distribution** with quartiles + outliers
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"error-bar"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -130,43 +130,43 @@ The renderer is a **one-line delegation** to the shared frame; it supplies
 **only** a marks callback and re-implements no chrome (§5.2):
 
 ```python
-# libs/python/peakcharts/charts/error_bar.py
+# libs/python/stonecharts/charts/error_bar.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Error bar", "band", _error_bar_marks)   # include_zero defaults True
 ```
 ```go
-// libs/go/errorbar.go — package peakcharts
+// libs/go/errorbar.go — package stonecharts
 func renderErrorBarSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Error bar", "band", errorBarMarks, true)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it, **per (category, series)**: three whisker `<line>`s
-(stem + low cap + high cap) followed by **one center `.pk-point`** marker:
+(stem + low cap + high cap) followed by **one center `.sc-point`** marker:
 
 ```html
-<g class="pk-series" data-series="0">
-  <line class="pk-whisker pk-whisker-stem" data-series="0"
+<g class="sc-series" data-series="0">
+  <line class="sc-whisker sc-whisker-stem" data-series="0"
         x1="128.4" y1="300.0" x2="128.4" y2="96.0" stroke="#2f7ed8" stroke-width="1.5"/>
-  <line class="pk-whisker pk-whisker-cap" data-series="0"
+  <line class="sc-whisker sc-whisker-cap" data-series="0"
         x1="122.4" y1="96.0"  x2="134.4" y2="96.0"  stroke="#2f7ed8" stroke-width="1.5"/>
-  <line class="pk-whisker pk-whisker-cap" data-series="0"
+  <line class="sc-whisker sc-whisker-cap" data-series="0"
         x1="122.4" y1="300.0" x2="134.4" y2="300.0" stroke="#2f7ed8" stroke-width="1.5"/>
-  <circle class="pk-point" data-series="0"
+  <circle class="sc-point" data-series="0"
           data-series-name="p50 latency" data-x="/login" data-y="182"
           data-low="168" data-high="201"
           data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
           cx="128.4" cy="198.0" r="3.5" fill="#2f7ed8"/>
-  … one whisker triplet + one .pk-point per category …
+  … one whisker triplet + one .sc-point per category …
 </g>
 ```
 
-- **Class:** the center marker is `pk-point` — the **contract** class the runtime
+- **Class:** the center marker is `sc-point` — the **contract** class the runtime
   keys on (tooltip / highlight / crosshair / legend-toggle / keyboard nav). The
-  stem and caps are `pk-whisker` (+ `pk-whisker-stem` / `pk-whisker-cap`) — purely
+  stem and caps are `sc-whisker` (+ `sc-whisker-stem` / `sc-whisker-cap`) — purely
   cosmetic CSS hooks (adding a class the runtime must *know about* is out of scope
   — NN#2). The whisker is the visual; the center point is the hoverable datum.
 - **Whisker geometry:** `cx` is the point's center x from the band layout below;
@@ -183,7 +183,7 @@ per series, and inside it, **per (category, series)**: three whisker `<line>`s
   **stop-0 solid** (the defs pre-pass still populates `.solid`). Error-bar never
   reads `fr.styles[si].fill` (that is the column bar-paint) and never reads
   `area_fill` (line's under-fill).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (the whisker center x) — the
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (the whisker center x) — the
   crosshair reads it — and by convention `cy = ypix(y)` (the center-value pixel).
   Without `cx` the crosshair breaks.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
@@ -293,16 +293,16 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its whiskers/points, and
   the legend item (do not renumber). The legend toggle flips `display` on every
   `[data-series="N"]`; the whisker lines and the center point inherit from the
   group.
-- **Datum mark:** the center `.pk-point` carries **all** of `data-series`,
+- **Datum mark:** the center `.sc-point` carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`
   — mandatory even though the whisker lines are cosmetic. `data-low`/`data-high`
   are added as forward-compatible attributes (surfaced in the data table).
-- **Crosshair anchor:** every `.pk-point` carries a `cx` (whisker center x) and by
+- **Crosshair anchor:** every `.sc-point` carries a `cx` (whisker center x) and by
   convention `cy = ypix(y)` (center value).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   `data-x = esc(category)`; `data-y = esc(fmt_num(y))`;
@@ -365,7 +365,7 @@ error-bar marks (§5.5d). `ERROR_BAR_CASES = ["basic","overlay-grouped","asymmet
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/error-bar/examples/basic.json")))
 save_html(spec, "out.html")
@@ -373,7 +373,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="error-bar",
     title="Mean Request Latency with 95% CI",
@@ -388,9 +388,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

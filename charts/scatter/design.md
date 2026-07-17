@@ -1,7 +1,7 @@
 # Chart: Scatter (`scatter`)
 
 > A single-file, self-describing spec for this chart. Read this and you can
-> produce the chart in any PeakCharts language library without looking anywhere
+> produce the chart in any StoneCharts language library without looking anywhere
 > else. Format is identical for every chart type — this file follows the
 > **exemplar** ([`charts/column/design.md`](../column/design.md), which copies
 > [`charts/line-basic/design.md`](../line-basic/design.md)) and adds the sibling
@@ -14,7 +14,7 @@
 - **Status:** design-complete + examples validated · renderers deferred (only
   `line` has a live renderer today; scatter rides the shared cartesian frame once
   the point model lands — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 3, §3.2, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/scatter.py` · `libs/go/scatter.go`
+- **Renderers (planned):** `libs/python/stonecharts/charts/scatter.py` · `libs/go/scatter.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -26,7 +26,7 @@ A scatter plot: one or more series drawn as **unconnected point marks** at
 is an independent `(x, y)` observation — there is no series line joining them.
 Overlap density is conveyed by a marker **fill-opacity** so dense clouds read as
 shaded regions. Points are the hoverable, interactive elements (the same
-`.pk-point` marks line draws on top of its line, here standing alone).
+`.sc-point` marks line draws on top of its line, here standing alone).
 
 Scatter is **build rank 3** — the first sibling on a **free numeric x-axis**. It
 is the trigger for two of the family's headline generalizations:
@@ -102,7 +102,7 @@ would be wrongly anchored at 0. The marks never recompute a scale — they call
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `type` | string | — | must be `"scatter"` |
-| `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `id` | string | `sc` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
 | `theme` | string \| object | `light` | color theme: `light` (default) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
@@ -122,7 +122,7 @@ would be wrongly anchored at 0. The marks never recompute a scale — they call
 | `series[].color` | string \| gradient | palette by index | the **point fill**: hex `#2f7ed8`, or a `{type:linearGradient, x1,y1,x2,y2, stops:[…]}` object (legend swatch uses stop 0) |
 | `series[].marker` | object | `{enabled:true, symbol:circle, radius:4}` | the point mark (now the **primary** mark, not a decoration on a line): `symbol` ∈ circle/square/triangle/diamond; `radius` px |
 | `series[].fillOpacity` | number | 1 | **point** fill-opacity — set `< 1` (e.g. `0.6`) so overlapping points shade denser regions (overlap density). For scatter this styles the marker fill, **not** an under-line area |
-| `series[].regression` | bool | false | **planned field.** `true` → draw an ordinary-least-squares **trend line** for that series as an extra `<path class="pk-series-line pk-trend">` on top of the points. Adds via the §5.4b five-place lockstep (schema + both validators + both spec models + invalid fixtures) when the renderer lands |
+| `series[].regression` | bool | false | **planned field.** `true` → draw an ordinary-least-squares **trend line** for that series as an extra `<path class="sc-series-line sc-trend">` on top of the points. Adds via the §5.4b five-place lockstep (schema + both validators + both spec models + invalid fixtures) when the renderer lands |
 
 Fields carried over from the line/column spec but **inert** for scatter (no line,
 no bands): `lineWidth`, `dashStyle`, `step`, `curve`, `pattern`, `stacking`,
@@ -140,36 +140,36 @@ numeric x-scale and `include_zero=False` so **both** the x- and y-domains are
 free:
 
 ```python
-# libs/python/peakcharts/charts/scatter.py
+# libs/python/stonecharts/charts/scatter.py
 from ._cartesian import CartesianFrame, render_cartesian
 
 def render_svg(spec) -> str:
     return render_cartesian(spec, "Scatter", "linear", _scatter_marks, include_zero=False)
 ```
 ```go
-// libs/go/scatter.go — package peakcharts
+// libs/go/scatter.go — package stonecharts
 func renderScatterSVG(spec *ChartSpec) string {
     return renderCartesian(spec, "Scatter", "linear", scatterMarks, false)
 }
 ```
 
-The marks callback emits **exactly one** `<g class="pk-series" data-series="{si}">`
+The marks callback emits **exactly one** `<g class="sc-series" data-series="{si}">`
 per series, and inside it **one point mark per datum** — the reused marker symbol
-(`circle`/`square`/`triangle`/`diamond`), carrying the full `.pk-point` contract.
-**No `pk-series-line` path is emitted** (the points are unconnected):
+(`circle`/`square`/`triangle`/`diamond`), carrying the full `.sc-point` contract.
+**No `sc-series-line` path is emitted** (the points are unconnected):
 
 ```html
-<g class="pk-series" data-series="0">
-  <circle class="pk-point" data-series="0"
+<g class="sc-series" data-series="0">
+  <circle class="sc-point" data-series="0"
           data-series-name="checkout-api" data-x="128" data-y="47"
           data-color="#2f7ed8" data-r="4" data-r-hover="6.5"
           cx="286.4" cy="181.0" r="4"
           fill="#2f7ed8" fill-opacity="0.6"/>
-  … one .pk-point per datum …
+  … one .sc-point per datum …
 </g>
 ```
 
-- **Class:** `pk-point` — the **contract** class the runtime keys on (tooltip /
+- **Class:** `sc-point` — the **contract** class the runtime keys on (tooltip /
   highlight / crosshair / legend-toggle / keyboard nav). The point **is** the
   hoverable mark; there is no separate line or area.
 - **Geometry:** each point sits at `cx = fr.xpix(datum.x)`, `cy = fr.ypix(datum.y)`.
@@ -183,11 +183,11 @@ per series, and inside it **one point mark per datum** — the reused marker sym
   `url(#pat)`; gradient → `url(#grad)`; else the solid hex). Apply
   `fill-opacity` from `series[].fillOpacity` (default 1). Never leave a point
   unfilled (an unfilled scatter is a broken static chart — NN#2).
-- **`cx` / `cy`:** every `.pk-point` MUST carry `cx` (point x) — the crosshair
+- **`cx` / `cy`:** every `.sc-point` MUST carry `cx` (point x) — the crosshair
   reads it — and `cy` (point y). For circle/square/triangle/diamond the shape is
   centered on `(cx, cy)`.
 - **No connecting line.** Unlike line, scatter emits **no** `<path
-  class="pk-series-line">`. `curve`, `step`, `dashStyle`, `lineWidth` are inert.
+  class="sc-series-line">`. `curve`, `step`, `dashStyle`, `lineWidth` are inert.
 - **Legend swatch:** emitted by the shared **tail** with the same `data-series`
   index — do not renumber and do not emit a legend from the marks.
 
@@ -272,7 +272,7 @@ It passes the bare noun **`"Scatter"`** — the frame expands it to
   sugar over the same datum.
 - **Gap, not zero** — an absent/null `y` **drops** the point; it is never plotted
   at `ypix(0)`.
-- **No connecting line** — emit no `pk-series-line` path; `curve`/`step`/
+- **No connecting line** — emit no `sc-series-line` path; `curve`/`step`/
   `dashStyle`/`lineWidth` are inert (reading them would draw a line scatter must
   not have).
 - **Point fill** — pattern → `url(#pat)`; gradient → `url(#grad)`; else solid
@@ -293,12 +293,12 @@ selectors + `data-*` below (`spec/svg-contract.md`). Emit them correctly and
 tooltip, highlight, crosshair, legend-toggle, and keyboard nav all work with
 **zero JS changes**.
 
-- **Series group:** `.pk-series[data-series=N]` — one per series; `N` is the
+- **Series group:** `.sc-series[data-series=N]` — one per series; `N` is the
   integer series index, **consistent** across the group, its points, and the
   legend item (do not renumber).
-- **Datum mark:** `.pk-point` carries **all** of `data-series`,
+- **Datum mark:** `.sc-point` carries **all** of `data-series`,
   `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`.
-- **Crosshair anchor:** every `.pk-point` carries `cx` (point x) and `cy`
+- **Crosshair anchor:** every `.sc-point` carries `cx` (point x) and `cy`
   (point y).
 - **Escaping/formatting in `data-*`:** `data-series-name = esc(s.name)`;
   **`data-x = esc(fmt_num(x))`** (the numeric x — the key difference from the
@@ -373,7 +373,7 @@ XSS tests run against the scatter marks (§5.5d). `SCATTER_CASES =
 **Python — from a dict/JSON spec:**
 ```python
 import json
-from peakcharts import ChartSpec, save_html
+from stonecharts import ChartSpec, save_html
 
 spec = ChartSpec.from_dict(json.load(open("charts/scatter/examples/correlation.json")))
 save_html(spec, "out.html")
@@ -381,7 +381,7 @@ save_html(spec, "out.html")
 
 **Python — typed:**
 ```python
-from peakcharts import Axis, ChartSpec, Series, save_html
+from stonecharts import Axis, ChartSpec, Series, save_html
 save_html(ChartSpec(
     type="scatter",
     title="Request Latency Samples",
@@ -396,9 +396,9 @@ save_html(ChartSpec(
 
 **Go —** same spec, byte-identical output:
 ```go
-import "peakcharts"
-spec, _ := peakcharts.FromJSON(specJSON)   // specJSON = the bytes above
-peakcharts.SaveHTML(spec, "out.html", "")
+import "stonecharts"
+spec, _ := stonecharts.FromJSON(specJSON)   // specJSON = the bytes above
+stonecharts.SaveHTML(spec, "out.html", "")
 ```
 
 ## Output & interactivity

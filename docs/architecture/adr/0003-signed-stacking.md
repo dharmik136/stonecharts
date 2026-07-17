@@ -1,5 +1,5 @@
 ---
-id: PC-ARCH-ADR-0003
+id: SC-ARCH-ADR-0003
 title: Define Signed and Percent Stacking Semantics
 status: proposed
 classification: normative

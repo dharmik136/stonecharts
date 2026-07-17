@@ -5,7 +5,7 @@
 // cartesianFrame struct, buildFrame, and renderCartesian ONLY as signatures + doc
 // comments that pin the parity rules verbatim. It lives here (charts/_cartesian/,
 // OUTSIDE libs/) as a design reference and is deliberately NOT wired into the build:
-// the real, compiled module is `libs/go/cartesian.go` (flat `package peakcharts`),
+// the real, compiled module is `libs/go/cartesian.go` (flat `package stonecharts`),
 // created with Rank 1 / Column when the shared chrome is extracted out of line.go.
 //
 // This file has NO package clause and imports nothing on purpose — it must never be
@@ -162,7 +162,7 @@ func renderCartesian(spec *ChartSpec, noun, xScale string, marks marksFn, includ
 	f := buildFrame(spec, noun, xScale, includeZero)
 	var p strings.Builder
 	chromeHead(f, &p)
-	marks(f, &p) // chart appends its <g class="pk-series">…</g> blocks here
+	marks(f, &p) // chart appends its <g class="sc-series">…</g> blocks here
 	chromeTail(f, &p)
 	return p.String()
 }

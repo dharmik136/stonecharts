@@ -1,6 +1,6 @@
-# Contributing to PeakCharts
+# Contributing to StoneCharts
 
-PeakCharts is proprietary software. Access to the repository does not grant a right to
+StoneCharts is proprietary software. Access to the repository does not grant a right to
 use, copy, modify, distribute, or contribute code. Contributions are accepted only
 from authorized collaborators under written terms covering confidentiality and
 intellectual property.

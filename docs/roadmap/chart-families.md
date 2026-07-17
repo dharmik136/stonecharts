@@ -1,6 +1,6 @@
 ---
-id: PC-ARCH-006
-title: PeakCharts Chart Families Roadmap
+id: SC-ARCH-006
+title: StoneCharts Chart Families Roadmap
 status: proposed
 classification: informative
 owner: product-owner
@@ -15,7 +15,7 @@ supersedes: null
 superseded_by: null
 ---
 
-# PeakCharts — Chart Families Blueprint & Cartesian Build Roadmap
+# StoneCharts — Chart Families Blueprint & Cartesian Build Roadmap
 
 > **Status:** Long-range engineering roadmap. Approved requirements, contracts, and
 > ADRs take precedence. Chart and language expansion is paused for Phase 0 and Alpha 1.
@@ -26,7 +26,7 @@ superseded_by: null
 
 > **Governance migration:** historical uses of "binding", "locked", and uppercase
 > requirement language in this file describe the previous planning regime. This file
-> is informative under `PC-GOV-001`; those words become normative only when adopted by
+> is informative under `SC-GOV-001`; those words become normative only when adopted by
 > an approved requirement, contract, or ADR.
 
 ## Historical planning decisions
@@ -42,7 +42,7 @@ Two planning calls are settled and frozen. Everything below is downstream of the
 
 ### 1.1 Why this document exists
 
-PeakCharts renders charts as **static-first, byte-identical SVG from two independent implementations** (Python and Go), verified by a shared golden corpus. Adding chart types naively — one renderer at a time, each re-deriving axes/scales/legend/theme/a11y — would (a) duplicate the ~95%-shared "chrome" that already exists twice in `line.py`/`line.go`, and (b) let the two languages drift apart byte-for-byte. This document prevents both by organizing the entire catalog around **shared substrates** and defining the exact contract for riding each substrate without duplication or drift.
+StoneCharts renders charts as **static-first, byte-identical SVG from two independent implementations** (Python and Go), verified by a shared golden corpus. Adding chart types naively — one renderer at a time, each re-deriving axes/scales/legend/theme/a11y — would (a) duplicate the ~95%-shared "chrome" that already exists twice in `line.py`/`line.go`, and (b) let the two languages drift apart byte-for-byte. This document prevents both by organizing the entire catalog around **shared substrates** and defining the exact contract for riding each substrate without duplication or drift.
 
 ### 1.2 The organizing principle: group by SUBSTRATE
 
@@ -267,10 +267,10 @@ Ordered so each sibling forces the fewest **new** generalizations and unlocks th
 
 **Rank 1 — Column (vertical bars).** *THE trigger for the shared-chrome extraction (§4).*
 - **Data model:** value payload reuses `data:number[]` — one y per category, identical shape to line. Grouped/stacked/percent are transforms over these y-values, **selected by a new `stacking` (+ grouping) spec field** (§5.4b five-place lockstep — you physically cannot render a `stacked` golden differently from `grouped`/`basic` without a mode selector, and an unvalidated `stacking` key would break NN#3).
-- **Marks:** one baseline-anchored `<rect class="pk-bar pk-point">` per (category,series): x/width from the band slot; `y = ypix(value)`; `height = ypix(0) - ypix(value)`. Bars replace circle markers as the hoverable element. Legend swatch is the existing `<rect>`. Bar fill reads `fr.styles[si].fill` (the resolved bar paint — solid/gradient/pattern — see §5.3 / §4.3), **not** `area_fill`.
+- **Marks:** one baseline-anchored `<rect class="sc-bar sc-point">` per (category,series): x/width from the band slot; `y = ypix(value)`; `height = ypix(0) - ypix(value)`. Bars replace circle markers as the hoverable element. Legend swatch is the existing `<rect>`. Bar fill reads `fr.styles[si].fill` (the resolved bar paint — solid/gradient/pattern — see §5.3 / §4.3), **not** `area_fill`.
 - **Reuses:** plot-area+margins, y-scale (`nice_ticks`/`ypix`), y-gridlines+labels, axis lines, categorical x-axis, titles+subtitle, axis titles, legend, crosshair, a11y, defs pre-pass (gradient/pattern fill on bars), theme+palette, responsive svg, svg-contract, `fmt_num`/`f1`/`esc` parity.
 - **Net-new:** the **chrome extraction** into `charts/_cartesian.*` (Call #1 trigger, §4); **band-layout**; **stacking-transform** + the new `stacking`/`grouping` spec field (§5.4b); **frame-owned stacking-aware y-domain** (§4/§5.2); **rect-mark primitive**; **`fill` field on SeriesStyle** for bar paint (§4.3/§5.3).
-- **Parity trap:** fix band arithmetic ORDER so `f1` rounding matches ULP-for-ULP. Pinned scheme (identical in both languages, evaluated in this order): `bandWidth = plot_w/n`; band center `xpix(i) = plot_x + bandWidth*i + bandWidth/2`; group-padding constant `PAD = 0.2`; `groupW = bandWidth*(1-PAD)`; `K = len(series)`; `barW = groupW/K`; `left = xpix(i) - groupW/2 + barW*k`. Stacking cumulative sums must accumulate in the same series order in both languages, and the **frame's** stacked y-max uses that same order. Bars carry the same `data-series`/`data-x`/`data-y`/`data-color` (+ `cx`) as `.pk-point`, so the runtime enhances with **zero JS change**.
+- **Parity trap:** fix band arithmetic ORDER so `f1` rounding matches ULP-for-ULP. Pinned scheme (identical in both languages, evaluated in this order): `bandWidth = plot_w/n`; band center `xpix(i) = plot_x + bandWidth*i + bandWidth/2`; group-padding constant `PAD = 0.2`; `groupW = bandWidth*(1-PAD)`; `K = len(series)`; `barW = groupW/K`; `left = xpix(i) - groupW/2 + barW*k`. Stacking cumulative sums must accumulate in the same series order in both languages, and the **frame's** stacked y-max uses that same order. Bars carry the same `data-series`/`data-x`/`data-y`/`data-color` (+ `cx`) as `.sc-point`, so the runtime enhances with **zero JS change**.
 
 **Rank 2 — Bar (horizontal columns).** Forces the **orientation** generalization.
 - **Data model:** `number[]` value payload + the shared `stacking`/`grouping` field (same as column); only axis roles swap.
@@ -281,7 +281,7 @@ Ordered so each sibling forces the fewest **new** generalizations and unlocks th
 
 **Rank 3 — Scatter (XY points).** Forces **numeric-x-axis** + **point-model**.
 - **Data model:** **richer** — `{x,y}` numeric pairs (positional `[x,y]` sugar). The bare-number fast path stays valid for line/column (x=index) and is **pinned in both languages** (Python: numeric element → `Datum(x=index, y=float(v))`; Go: custom `UnmarshalJSON` keeping `[]float64`-equivalent decoding for numeric arrays), so old goldens don't move.
-- **Marks:** unconnected `<circle|rect|polygon class="pk-point">` at `(xpix(x), ypix(y))` — reuse the four existing marker symbols; no series line. Fill-opacity for overlap density.
+- **Marks:** unconnected `<circle|rect|polygon class="sc-point">` at `(xpix(x), ypix(y))` — reuse the four existing marker symbols; no series line. Fill-opacity for overlap density.
 - **Reuses:** plot-area, y-scale, gridlines, axis lines, chrome, marker symbols, defs pre-pass, theme, parity paths.
 - **Net-new:** **numeric-x-axis** (with include-zero **OFF** for the free x-domain — §3.2 caveat, §4.2); **point-model normalization** (x,y datum) — which also moves `_line_marks`, `_column_marks`, and `build_frame`'s y-range extractor from a float element to `datum.y` in lockstep; optional vertical x-gridlines.
 - **Parity:** the x-scale reuses the already-parity-locked `nice_ticks`+`fmt_num` verbatim → x ticks byte-identical for free. `data-x` becomes numeric via `fmt_num`. Crosshair may become two-axis; tooltip shows (x,y).
@@ -289,14 +289,14 @@ Ordered so each sibling forces the fewest **new** generalizations and unlocks th
 
 **Rank 4 — Bubble (XY + size).** Forces the **size-scale**. *(A `sibling`, not a variant — it introduces a new scale and a new `{x,y,z}` point model; see §1.3 and the §2 Family A row.)*
 - **Data model:** richer — `{x,y,z}`; z drives marker size.
-- **Marks:** `<circle class="pk-point">` at `(xpix(x),ypix(y))`, r from a size-scale of z; fill-opacity for overlap; add `data-z`.
+- **Marks:** `<circle class="sc-point">` at `(xpix(x),ypix(y))`, r from a size-scale of z; fill-opacity for overlap; add `data-z`.
 - **Reuses:** scatter's numeric-x-axis + point-model; y-scale; chrome; parity.
 - **Net-new:** **size-scale** (`r = rmin + (rmax-rmin)*sqrt(clamp01((z-zmin)/(zmax-zmin)))`); optional size legend (z buckets).
 - **Parity:** pin the radius formula + `rmin`/`rmax` constants. **Handle the degenerate domain identically in BOTH languages, before any division:** if `zmax <= zmin` use a fixed radius `(rmin+rmax)/2`; otherwise `clamp01` the ratio to `[0,1]` before `sqrt`. Never perform a raw float divide Python would reject (`0/0` → `ZeroDivisionError`) or feed a negative into `sqrt`. Radius via `fmt_num`; `sqrt` is IEEE754-identical only once the domain is guaranteed ≥ 0. Add a bubble edge-case parity test (all-equal z e.g. `z=[5,5,5]`, single point, z at/below/above domain) analogous to `test_spline_edge_cases`, asserting finite output and Py==Go.
 
 **Rank 5 — Area (stacked + percent).** The cheapest sibling once column exists — effectively a **variant** riding column's stacking.
 - **Data model:** `number[]` value payload + the shared `stacking`/`grouping` field — stacked/percent are cumulative-offset transforms.
-- **Marks:** filled `<path class="pk-series-area">` (already exists via fillOpacity) but the baseline becomes the **previous series' cumulative top** instead of zero; percent mode normalizes each x-column to 100%. Series line drawn on the cumulative top edge.
+- **Marks:** filled `<path class="sc-series-area">` (already exists via fillOpacity) but the baseline becomes the **previous series' cumulative top** instead of zero; percent mode normalizes each x-column to 100%. Series line drawn on the cumulative top edge.
 - **Reuses:** the **entire line renderer** (path builder, area fill, gradients/patterns, markers); column's stacking-transform + frame-owned stacked y-domain; y-scale; chrome; parity.
 - **Net-new:** **band-fill-between-cumulative-baselines** (area top of series k = cumulative through k; bottom = cumulative through k−1) — a thin wrapper over the existing path builder.
 - **Parity:** pin the column-total summation ORDER and the division so `%g` output matches; reuse `_path_d` so `f1` coords match for free. Percent mode: y-axis becomes `nice_ticks(0,100)`; each value divided by its column total.
@@ -360,7 +360,7 @@ Ordered so each sibling forces the fewest **new** generalizations and unlocks th
 
 ## 4. The Cartesian EXTRACTION CONTRACT  *(one-time, gated — performed with Rank 1 / Column)*
 
-**Grounding.** `libs/python/peakcharts/charts/line.py` (`render_svg`, lines 158–386) and `libs/go/line.go` (`renderLineSVG`, lines 189–492) are today ~95% the same program written twice. This contract separates that program into **shared cartesian chrome** (a new `_cartesian.py` / `cartesian.go`) and **line-specific marks** (what stays in `line.py`/`line.go`), and defines the byte-identity gate that proves the extraction changed nothing. Per Call #1, building Column **triggers** this extraction in **both** languages first (commit it on its own so the byte-preserving refactor is auditable). If `_cartesian.py`/`cartesian.go` already exist (a prior sibling created them), you **reuse and extend** them — never fork.
+**Grounding.** `libs/python/stonecharts/charts/line.py` (`render_svg`, lines 158–386) and `libs/go/line.go` (`renderLineSVG`, lines 189–492) are today ~95% the same program written twice. This contract separates that program into **shared cartesian chrome** (a new `_cartesian.py` / `cartesian.go`) and **line-specific marks** (what stays in `line.py`/`line.go`), and defines the byte-identity gate that proves the extraction changed nothing. Per Call #1, building Column **triggers** this extraction in **both** languages first (commit it on its own so the byte-preserving refactor is auditable). If `_cartesian.py`/`cartesian.go` already exist (a prior sibling created them), you **reuse and extend** them — never fork.
 
 ### 4.1 The single hard constraint that dictates the design: emission order
 
@@ -370,15 +370,15 @@ Ordered so each sibling forces the fewest **new** generalizations and unlocks th
 <svg …>                     ┐
   <desc>                    │
   <defs>…</defs>            │  CHROME — "head"
-  <rect pk-bg>              │  (line.py 230–325 / line.go 312–407)
-  <text pk-title/subtitle>  │
-  <g pk-axis-y> gridlines+labels
-  <line pk-axis-line>       │
-  <g pk-axis-x> x labels    │
+  <rect sc-bg>              │  (line.py 230–325 / line.go 312–407)
+  <text sc-title/subtitle>  │
+  <g sc-axis-y> gridlines+labels
+  <line sc-axis-line>       │
+  <g sc-axis-x> x labels    │
   axis titles (x, rot-y)    │
-  <line pk-crosshair>       ┘
-  <g pk-series>…</g> × N    ← MARKS (line.py 327–362 / line.go 410–456)
-  <g pk-legend>…</g>        ┐  CHROME — "tail"
+  <line sc-crosshair>       ┘
+  <g sc-series>…</g> × N    ← MARKS (line.py 327–362 / line.go 410–456)
+  <g sc-legend>…</g>        ┐  CHROME — "tail"
 </svg>                      ┘  (line.py 364–385 / line.go 458–491)
 ```
 
@@ -419,7 +419,7 @@ Chrome is **not** one contiguous block — the series marks are sandwiched betwe
 | Linear + step path builder | `_path_d` 30–53 | `pathD` 24–54 |
 | Monotone spline (Fritsch–Carlson) | `_spline_d` 56–94 | `splineD` 58–109 |
 | Point-marker shapes (circle/square/triangle/diamond) | `_marker` 97–113 | `markerSVG` 113–128 |
-| Series loop body: build `pts`, choose spline vs step/linear `d`, area-fill path, `pk-series-line` path, `pk-point` markers w/ `data-*` | 327–362 | 410–456 |
+| Series loop body: build `pts`, choose spline vs step/linear `d`, area-fill path, `sc-series-line` path, `sc-point` markers w/ `data-*` | 327–362 | 410–456 |
 
 `esc` / `fmt_num`/`fmtNum` / `nice_ticks`/`niceTicks` stay in `util.py`/`util.go` unchanged (already shared). Note `PALETTE` (line.py 17–20) is **dead** — the renderer uses `theme.palette` (line 160), never the module constant; **delete it** (it does not affect output). **Warning — delete ONLY line.py's module-level `PALETTE`.** The identical 8-hex literal in `spec.py` `Theme.palette` (and Go `lightTheme()`) is the **LIVE canonical default** every default-palette chart resolves through — do **NOT** delete or "consolidate" that copy, or every default-palette chart changes.
 
@@ -433,7 +433,7 @@ The **one generalization allowed during extraction** is a first-class **x-scale 
 
 The shared x-label loop calls `frame.xpix(i)`, so labels land under points (line) or band centers (column) with no per-chart label code. Line passes `x_scale="point"` (the default) and is byte-identical to today; **line keeps `x_scale="point"` unchanged** — only column/bar pass `"band"`.
 
-**Python — `libs/python/peakcharts/charts/_cartesian.py`**
+**Python — `libs/python/stonecharts/charts/_cartesian.py`**
 
 ```python
 from dataclasses import dataclass
@@ -484,7 +484,7 @@ def render_cartesian(spec: ChartSpec, chart_noun: str, x_scale: str, marks: Mark
     fr = build_frame(spec, chart_noun, x_scale, include_zero)
     p: List[str] = []
     _chrome_head(fr, p)
-    marks(fr, p)          # chart appends its <g class="pk-series">…</g> blocks here
+    marks(fr, p)          # chart appends its <g class="sc-series">…</g> blocks here
     _chrome_tail(fr, p)
     return "".join(p)     # single "".join, NO trailing newline
 
@@ -498,7 +498,7 @@ def dash_array(style: str) -> str: return _DASH.get(style, "")   # was _dash_arr
 
 `a11y_summary` generalizes line.py 151 `f"Line chart with …"` to `f"{chart_noun} chart with …"`. **The noun is the bare word** — `"Line"`, `"Column"` — **not** `"Line chart"`. Called with `"Line"` it reproduces `"Line chart with N series…"` byte-for-byte.
 
-**Go — `libs/go/cartesian.go` (same flat `package peakcharts`)**
+**Go — `libs/go/cartesian.go` (same flat `package stonecharts`)**
 
 ```go
 type seriesStyle struct { stroke, solid, areaFill, areaOp, fill string }  // moved from line.go 161–167; +fill = resolved bar paint
@@ -550,7 +550,7 @@ func renderCartesian(spec *ChartSpec, noun, xScale string, marks marksFn, includ
 The series-loop body is **moved verbatim** — the only edits are rebindings: `sstyle[si]`→`fr.styles[si]`, bare `xpix`/`ypix`→`fr.xpix`/`fr.ypix`, `cats`→`fr.cats`, `theme`→`fr.theme`. Verbatim move is precisely what guarantees identical bytes. **When Rank 3 lands the point model** (the `data` element becomes a datum), the `for i, v in enumerate(s.data)` here changes to read `datum.y` (bare-number fast path → `y = float(v)`), in lockstep with `_column_marks` and `build_frame`'s y-range extractor, under the Rank 3 byte-identity gate — but at extraction time (Rank 1) `data` is still `number[]` and the loop is verbatim.
 
 ```python
-# libs/python/peakcharts/charts/line.py
+# libs/python/stonecharts/charts/line.py
 from ._cartesian import CartesianFrame, dash_array, render_cartesian
 from ..spec import Marker
 from ..util import fmt_num
@@ -568,13 +568,13 @@ def _line_marks(fr: CartesianFrame, p: list) -> None:
         lw = s.line_width if s.line_width is not None else 2
         line_dash = dash_array(s.dash_style)
         line_dash_attr = f' stroke-dasharray="{line_dash}"' if line_dash else ""
-        p.append(f'<g class="pk-series" data-series="{si}">')
+        p.append(f'<g class="sc-series" data-series="{si}">')
         if st.area_fill is not None and pts:
             base = fr.ypix(0.0)                       # NOT recomputed — call fr.ypix(0.0)
             area_d = f"{d} L{pts[-1][0]:.1f} {base:.1f} L{pts[0][0]:.1f} {base:.1f} Z"
-            p.append(f'<path class="pk-series-area" data-series="{si}" d="{area_d}" '
+            p.append(f'<path class="sc-series-area" data-series="{si}" d="{area_d}" '
                      f'fill="{st.area_fill}"{st.area_op} stroke="none"/>')
-        p.append(f'<path class="pk-series-line" data-series="{si}" d="{d}" fill="none" '
+        p.append(f'<path class="sc-series-line" data-series="{si}" d="{d}" fill="none" '
                  f'stroke="{st.stroke}" stroke-width="{fmt_num(lw)}" stroke-linejoin="round" '
                  f'stroke-linecap="round"{line_dash_attr}/>')
         mk = s.marker or Marker()
@@ -666,18 +666,18 @@ is then linked from the governing requirement and verified through release evide
 5. **Themes** resolved server-side into concrete SVG attributes (`spec/themes/*.json`, baked + JSON-parity-tested).
 6. All user strings via `esc`; all numbers via `fmt_num`/`fmtNum` (data values) or `:.1f`/`f1` (pixel coordinates).
 
-**Golden rule of this contract:** the chart renderer draws **only the series marks** (the inner content of `<g class="pk-series">…</g>`). Every piece of chrome — margins, scales, ticks, gridlines, axis lines, axis titles, legend, crosshair, background, `<defs>`, theme resolution, a11y summary, `<svg>` open/close — is obtained from the **shared cartesian module** (§4). You may **never** re-implement any of it in a chart renderer. (The frame also owns the value-axis domain, including the stacking-aware y-max — the marks never compute a scale.)
+**Golden rule of this contract:** the chart renderer draws **only the series marks** (the inner content of `<g class="sc-series">…</g>`). Every piece of chrome — margins, scales, ticks, gridlines, axis lines, axis titles, legend, crosshair, background, `<defs>`, theme resolution, a11y summary, `<svg>` open/close — is obtained from the **shared cartesian module** (§4). You may **never** re-implement any of it in a chart renderer. (The frame also owns the value-axis domain, including the stacking-aware y-max — the marks never compute a scale.)
 
 ### 5.0 Vocabulary & source-of-truth map
 
 | Concern | Python | Go |
 |---|---|---|
-| Per-chart renderer | `libs/python/peakcharts/charts/<id>.py` → `render_svg(spec)` | `libs/go/<id>.go` (`package peakcharts`) → `render<Id>SVG(spec)` |
+| Per-chart renderer | `libs/python/stonecharts/charts/<id>.py` → `render_svg(spec)` | `libs/go/<id>.go` (`package stonecharts`) → `render<Id>SVG(spec)` |
 | Dispatch registry | `render.py` `_RENDERERS: Dict[str, Callable]` | `render.go` `RenderSVG` `switch spec.Type` |
-| Shared spec model | `peakcharts/spec.py` (dataclasses + `ChartSpec.from_dict`) | `libs/go/spec.go` (structs + `FromJSON` + `applyDefaults`) |
-| Strict validator | `peakcharts/validate.py` `validate(d) -> List[str]` | `libs/go/validate.go` `validate(raw) -> []string` |
-| Shared utils | `peakcharts/util.py` `esc`, `fmt_num`, `nice_ticks` | `libs/go/util.go` `esc`, `fmtNum`, `f1`, `niceTicks` |
-| Shared cartesian module (§4) | `peakcharts/charts/_cartesian.py` | `libs/go/cartesian.go` |
+| Shared spec model | `stonecharts/spec.py` (dataclasses + `ChartSpec.from_dict`) | `libs/go/spec.go` (structs + `FromJSON` + `applyDefaults`) |
+| Strict validator | `stonecharts/validate.py` `validate(d) -> List[str]` | `libs/go/validate.go` `validate(raw) -> []string` |
+| Shared utils | `stonecharts/util.py` `esc`, `fmt_num`, `nice_ticks` | `libs/go/util.go` `esc`, `fmtNum`, `f1`, `niceTicks` |
+| Shared cartesian module (§4) | `stonecharts/charts/_cartesian.py` | `libs/go/cartesian.go` |
 | Schema (doc SoT) | `spec/chart-spec.schema.json` | same file |
 | Themes (canonical) | `spec/themes/{light,dark}.json` | same files (baked + parity-tested) |
 | DOM contract | `spec/svg-contract.md` | same file |
@@ -698,20 +698,20 @@ charts/<id>/design.md                     # self-contained recipe (copy line-bas
 charts/<id>/examples/<case>.json          # one spec per golden case
 charts/<id>/golden/<case>.svg             # byte-reference SVG per case (UTF-8, no trailing newline)
 charts/<id>/invalid-fixtures.json         # ONLY if the chart adds any new validated spec field (§5.5b)
-libs/python/peakcharts/charts/<id>.py     # renderer: render_svg(spec)
-libs/go/<id>.go                           # renderer: render<Id>SVG(spec) (package peakcharts)
+libs/python/stonecharts/charts/<id>.py     # renderer: render_svg(spec)
+libs/go/<id>.go                           # renderer: render<Id>SVG(spec) (package stonecharts)
 ```
 
 **Create once, on the FIRST sibling (the §4 extraction):**
 ```
-libs/python/peakcharts/charts/_cartesian.py
+libs/python/stonecharts/charts/_cartesian.py
 libs/go/cartesian.go
 ```
 If these exist (a prior sibling created them), **reuse and extend** — do not fork.
 
 **Modify (registration + wiring):**
 ```
-libs/python/peakcharts/render.py          # _RENDERERS["<id>"] = _<id>.render_svg  (+ import)
+libs/python/stonecharts/render.py          # _RENDERERS["<id>"] = _<id>.render_svg  (+ import)
 libs/go/render.go                         # add `case "<id>": return render<Id>SVG(spec)` to RenderSVG
 spec/chart-spec.schema.json               # add "<id>" to properties.type.enum (+ any new field defs)
 libs/python/tests/test_golden.py          # add the new chart's cases + invalid-fixtures wiring (§5.6)
@@ -736,7 +736,7 @@ def render_svg(spec: ChartSpec) -> str:
 
 def _column_marks(fr: CartesianFrame, p: list) -> None:
     for si, s in enumerate(fr.spec.series):
-        # emit exactly ONE <g class="pk-series" data-series="{si}">…</g> per series into p
+        # emit exactly ONE <g class="sc-series" data-series="{si}">…</g> per series into p
         ...
 ```
 
@@ -747,7 +747,7 @@ func renderColumnSVG(spec *ChartSpec) string {
 }
 func columnMarks(f *cartesianFrame, p *strings.Builder) {
     for si := range f.spec.Series {
-        // emit exactly ONE <g class="pk-series" data-series="si">…</g> per series into p
+        // emit exactly ONE <g class="sc-series" data-series="si">…</g> per series into p
         ...
     }
 }
@@ -758,33 +758,33 @@ func columnMarks(f *cartesianFrame, p *strings.Builder) {
 - Go `render.go`: add `case "column": return renderColumnSVG(spec)` to the `RenderSVG` switch (before `default`).
 
 **Hard rules for the marks function:**
-- Emits exactly one `<g class="pk-series" data-series="{si}">…</g>` per series, nothing outside it.
+- Emits exactly one `<g class="sc-series" data-series="{si}">…</g>` per series, nothing outside it.
 - Uses `fr.xpix`/`fr.ypix`/`fr.band_width` for **all** geometry — computes **no** scale of its own (the frame owns the value-axis domain, incl. the stacking-aware y-max).
 - Baseline for bars/area is `fr.ypix(0.0)` — the shared value-axis (with `include_zero=True`) already forces 0 into the domain; do **not** special-case it.
 - Every number it prints is formatted per §5.3 — never raw `str(float)` / `strconv.FormatFloat` with other precision.
 
 ### 5.3 DOM-contract compliance (`spec/svg-contract.md`) — emit these so the runtime enhances with ZERO JS changes
 
-The runtime keys **only** on the selectors + `data-*` below. Emit them correctly and tooltip, highlight, crosshair, legend-toggle, keyboard nav, and `<defs>` id-scoping all work with no runtime edit. The shared head/tail already emit `svg.pk-chart`, `.pk-crosshair`, `.pk-legend`/`.pk-legend-item`, and `<defs>`. **Your marks emit the series group and the points.**
+The runtime keys **only** on the selectors + `data-*` below. Emit them correctly and tooltip, highlight, crosshair, legend-toggle, keyboard nav, and `<defs>` id-scoping all work with no runtime edit. The shared head/tail already emit `svg.sc-chart`, `.sc-crosshair`, `.sc-legend`/`.sc-legend-item`, and `<defs>`. **Your marks emit the series group and the points.**
 
 **Required structure your marks produce:**
 ```html
-<g class="pk-series" data-series="0">
+<g class="sc-series" data-series="0">
   <!-- optional visible mark(s): bar rect / area path / connecting line -->
-  <rect class="pk-point" data-series="0"
+  <rect class="sc-point" data-series="0"
         data-series-name="Tokyo" data-x="Jan" data-y="7"
         data-color="#2f7ed8" data-r="3.5" data-r-hover="6"
         cx="123.4" cy="88.0"  x="…" y="…" width="…" height="…" fill="#2f7ed8"/>
-  … one .pk-point per datum …
+  … one .sc-point per datum …
 </g>
 ```
 
 **The non-negotiable emission rules:**
-1. **The whole series group is `.pk-series[data-series=N]`.** The legend toggle does `querySelectorAll('[data-series="N"]')` and flips `display` on every match except the legend item. Anything that must hide with the series carries `data-series="N"` — the group already does, so nested marks inherit. Keep `N` an integer string equal to the series index, **consistent** across the group, its points, and the legend item (emitted by the shared tail with the same index — do not renumber).
-2. **The datum mark is `.pk-point`** and MUST carry all of: `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`. Mandatory even for non-circular marks (a bar `<rect>`): the runtime calls `pt.setAttribute("r", …)` on hover — a `<rect>` ignores `r` (harmless), but the attributes must be present for contract conformance and the tooltip body.
-3. **Every `.pk-point` MUST carry a `cx`** (and by convention `cy`). The crosshair reads `pt.getAttribute("cx")` to position the vertical guide. For a bar, `cx` = bar center x; `cy` = bar top (or center). Without `cx` the crosshair breaks.
+1. **The whole series group is `.sc-series[data-series=N]`.** The legend toggle does `querySelectorAll('[data-series="N"]')` and flips `display` on every match except the legend item. Anything that must hide with the series carries `data-series="N"` — the group already does, so nested marks inherit. Keep `N` an integer string equal to the series index, **consistent** across the group, its points, and the legend item (emitted by the shared tail with the same index — do not renumber).
+2. **The datum mark is `.sc-point`** and MUST carry all of: `data-series`, `data-series-name`, `data-x`, `data-y`, `data-color`, `data-r`, `data-r-hover`. Mandatory even for non-circular marks (a bar `<rect>`): the runtime calls `pt.setAttribute("r", …)` on hover — a `<rect>` ignores `r` (harmless), but the attributes must be present for contract conformance and the tooltip body.
+3. **Every `.sc-point` MUST carry a `cx`** (and by convention `cy`). The crosshair reads `pt.getAttribute("cx")` to position the vertical guide. For a bar, `cx` = bar center x; `cy` = bar top (or center). Without `cx` the crosshair breaks.
 4. **Escaping / formatting inside `data-*`:** `data-series-name` = `esc(s.name)`; `data-x` = `esc(<category label>)` (or a numeric value via `fmt_num` on a numeric-x chart); `data-y` = `esc(fmt_num(value))`; `data-color` = the resolved solid (`fr.styles[si].solid`, already escaped); `data-r`/`data-r-hover` = `fmt_num(...)`. Pixel attributes (`cx,cy,x,y,width,height`) use `:.1f`/`f1`. **Under stacking:** for stacked / percent bars the geometry uses cumulative baselines, but `data-y` MUST carry the **raw per-series segment value** (the datum's own value), **not** the running cumulative total — the tooltip shows the value the user supplied, not the stack sum.
-5. **Do not invent new classes the runtime must know about.** You may add purely-cosmetic classes (e.g. `pk-bar`) for CSS, but runtime behaviors are driven only by the contract selectors above. Adding a behavior that needs new JS is **out of scope** for a chart add (it breaks non-negotiable #2's "zero JS changes").
+5. **Do not invent new classes the runtime must know about.** You may add purely-cosmetic classes (e.g. `sc-bar`) for CSS, but runtime behaviors are driven only by the contract selectors above. Adding a behavior that needs new JS is **out of scope** for a chart add (it breaks non-negotiable #2's "zero JS changes").
 6. **Static correctness:** the chart must be fully readable with JS disabled. The crosshair ships `style="display:none"` (from the shared head); the tooltip is JS-only. Everything else is server-rendered.
 
 **Bar-fill resolution (a real byte-parity + NN#2 trap).** A bar has ONE fill that may be solid / gradient / pattern — the line-shaped `SeriesStyle` (`stroke, solid, area_fill, area_op`) does not carry it directly (`area_fill` is `None` unless `fillOpacity>0`/pattern, and line relies on `stroke==fill_color`). The extraction therefore adds a **`fill` field to `SeriesStyle`** (populated by the defs pre-pass, §4.3; unread by line so line bytes do not move). Your bar mark reads `fr.styles[si].fill`, resolved as: **pattern → the pattern `url(#pat)` ref; gradient → the gradient `url(#grad)` ref; else the solid hex.** Never leave a basic column unfilled (an unfilled bar is a broken static chart — NN#2), and never silently drop gradient/pattern by reading `solid`.
@@ -872,8 +872,8 @@ func TestGolden(t *testing.T) {
 2. Generate the reference SVG with the **Python** renderer (canonical), writing **UTF-8, no BOM, no trailing newline**:
    ```python
    import json, pathlib
-   from peakcharts import ChartSpec
-   from peakcharts.render import render_svg
+   from stonecharts import ChartSpec
+   from stonecharts.render import render_svg
    for case in COLUMN_CASES:
        spec = ChartSpec.from_dict(json.load(open(f"charts/column/examples/{case}.json", encoding="utf-8")))
        pathlib.Path(f"charts/column/golden/{case}.svg").write_text(render_svg(spec), encoding="utf-8")
@@ -905,7 +905,7 @@ func TestGolden(t *testing.T) {
 4. **Write** `charts/<id>/design.md` (copy `line-basic/design.md` structure: id, spec `type`, renderer paths, contract link, data shape, spec-field table, example spec, generate snippets, rendering notes, roadmap). It must be self-contained.
 5. **If new spec fields:** add them in all five places + invalid fixtures (§5.4b). Confirm `validate()` parity mentally against the error-text format. **If the `data` element type changes**, also generalize the accessible data table in lockstep (§5.4b-DT) and plan for Gate A′.
 6. **Implement the Python renderer** `charts/<id>.py`: `render_svg` = one-line `render_cartesian(spec, noun, x_scale, _marks)` (pass `include_zero=False` for a free numeric x/y chart); `_marks` emits the §5.3 DOM contract exactly. Use `esc` + `fmt_num`/`:.1f`.
-7. **Implement the Go renderer** `<id>.go` (`package peakcharts`): `render<Id>SVG` mirroring the Python composition line-for-line. Use `esc` + `fmtNum`/`f1`. Distinguish absent vs zero with pointers/accessors.
+7. **Implement the Go renderer** `<id>.go` (`package stonecharts`): `render<Id>SVG` mirroring the Python composition line-for-line. Use `esc` + `fmtNum`/`f1`. Distinguish absent vs zero with pointers/accessors.
 8. **Register** in `render.py` `_RENDERERS` and `render.go` `RenderSVG` switch; add `<id>` to the schema `type` enum.
 9. **Author** `charts/<id>/examples/*.json` (cover: basic, a styled/grouped/stacked variant, `dark` theme, an `adversarial`/XSS spec with hostile strings in **every** marks-emitted field per §5.5d, and any edge case the chart's math needs). Confirm each passes `validate()==[]`.
 10. **Generate** goldens from the Python renderer (UTF-8, no BOM, no trailing newline) per §5.5e.
@@ -921,7 +921,7 @@ A Cartesian chart type is **done** only when ALL hold:
 - [ ] `charts/<id>/design.md`, `examples/*.json`, and `golden/*.svg` exist; design.md is self-contained (an agent can build the chart from it alone).
 - [ ] The renderer exists in **both** languages, is a one-line delegation to `render_cartesian`/`renderCartesian` supplying only a marks callback, and re-implements **no** chrome/scale/legend/theme/a11y/defs — all obtained from the shared cartesian module (incl. the value-axis domain and any stacking-aware y-max, which the **frame** owns).
 - [ ] The renderer is registered in `render.py` `_RENDERERS` and `render.go` `RenderSVG`; `spec.type` enum updated in the schema.
-- [ ] Marks emit the `spec/svg-contract.md` structure exactly: `.pk-series[data-series=N]` groups, `.pk-point` with all required `data-*` **and** a `cx`, bar fill resolved from `SeriesStyle.fill` (never unfilled), legend/crosshair inherited from the shared tail. The shared runtime enhances with **zero JS changes** (tooltip, highlight, crosshair, legend toggle, keyboard nav, defs-scoping — all verified live).
+- [ ] Marks emit the `spec/svg-contract.md` structure exactly: `.sc-series[data-series=N]` groups, `.sc-point` with all required `data-*` **and** a `cx`, bar fill resolved from `SeriesStyle.fill` (never unfilled), legend/crosshair inherited from the shared tail. The shared runtime enhances with **zero JS changes** (tooltip, highlight, crosshair, legend toggle, keyboard nav, defs-scoping — all verified live).
 - [ ] Every new spec field (if any — incl. Column's `stacking`/`grouping`) is present and consistent across schema + `validate.py` + `validate.go` + `spec.py` + `spec.go`, defaults applied **only on absence**; both validators reject the shared `invalid-fixtures.json` with **identical** `$.path: expected X, received Y` text.
 - [ ] If the `data` element type changed, the accessible data table is generalized in lockstep in both languages (§5.4b-DT) with a Py==Go test, and **Gate A′** passes (all existing goldens byte-unchanged).
 - [ ] All user strings via `esc`; all numbers via `fmt_num`/`fmtNum` (values) or `:.1f`/`f1` (coordinates). XSS tests pass **against this chart's marks** (adversarial example carries hostile strings in every emitted field; §5.5d) and a11y-toggle tests pass. Any new numeric transform (stacking, size-scale) has a finite-output edge-case test.
@@ -958,7 +958,7 @@ These families are **out of scope until the Cartesian family is exhausted** (§1
 
 - **3D / isometric charts** (3D column/scatter/cylinder/area, funnel3d/pyramid3d, 3D pie). They require a depth-sorting + projection layer that **conflicts with static-first byte-parity** and adds a genuine new foundation. Deferred indefinitely.
 - **Tiled raster web maps** (OSM/XYZ basemaps). They require **external tile fetch**, which breaks the static-first, self-contained-SVG guarantee. Out of scope while static-first holds.
-- **Any behavior that needs new runtime JS.** Adding a chart may **never** edit `runtime/chart-interactions.js`. A datum interaction the shared runtime does not already support (via the `.pk-series`/`.pk-point`/`data-*` contract) is out of scope for a chart add.
+- **Any behavior that needs new runtime JS.** Adding a chart may **never** edit `runtime/chart-interactions.js`. A datum interaction the shared runtime does not already support (via the `.sc-series`/`.sc-point`/`data-*` contract) is out of scope for a chart add.
 - **Hand-editing generated goldens to make a test pass.** A Go/Python divergence is a **code** bug to fix, never a golden to regenerate. Goldens are regenerated only on an intentional spec-fixture change, or via the separate lockstep "regenerate all" policy in `docs/customization/plan.md`.
 - **Per-chart re-implementation of chrome.** Axes, scales (including the value-axis domain / stacked y-max), legend, crosshair, theme, a11y, `<defs>` are owned exclusively by the shared cartesian module (§4/§5). A renderer that re-derives any of them is a defect even if byte-correct.
 - **Coercing malformed input.** Defaults apply **only on absence**; a present-but-malformed value is a validation error, never a silently-corrected default.

@@ -1,5 +1,5 @@
 ---
-id: PC-ARCH-ADR-0002
+id: SC-ARCH-ADR-0002
 title: Separate Schema Validity and Renderer Capability
 status: proposed
 classification: normative
