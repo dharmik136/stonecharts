@@ -296,6 +296,18 @@ func vseries(v interface{}, path string, errs *[]string) {
 	}
 }
 
+// knownTypes — discovered from all on-disk example specs at
+// charts/*/examples/*.json. Mirrors _KNOWN_TYPES in validate.py.
+var knownTypes = map[string]bool{
+	"area": true, "arearange": true, "bar": true, "boxplot": true,
+	"bubble": true, "candlestick": true, "column": true, "columnrange": true,
+	"combo": true, "dumbbell": true, "errorbar": true, "error-bar": true,
+	"funnel": true, "histogram": true, "line": true, "lollipop": true,
+	"scatter": true, "streamgraph": true, "technical-indicators": true,
+	"timeline": true, "variwide": true, "vector-plot": true,
+	"waterfall": true, "windbarb": true, "xrange": true,
+}
+
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
 func validate(v interface{}) []string {
 	errs := []string{}
@@ -308,6 +320,11 @@ func validate(v interface{}) []string {
 			vstr(x, "$."+k, &errs)
 		}
 	}
+	if x, ok := has(d, "type"); ok {
+		if s, ok := x.(string); ok && !knownTypes[s] {
+			errs = append(errs, `$.type: unknown chart type "`+s+`"`)
+		}
+	}
 	for _, k := range []string{"width", "height"} {
 		if x, ok := has(d, k); ok {
 			vintnum(x, "$."+k, &errs)
@@ -317,6 +334,15 @@ func validate(v interface{}) []string {
 		if x, ok := has(d, k); ok {
 			vbool(x, "$."+k, &errs)
 		}
+	}
+	if x, ok := has(d, "stacking"); ok {
+		vstr(x, "$.stacking", &errs)
+		if s, ok := x.(string); ok && s != "normal" && s != "percent" {
+			errs = append(errs, `$.stacking: expected one of "normal", "percent", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(d, "grouping"); ok {
+		vbool(x, "$.grouping", &errs)
 	}
 	if x, ok := has(d, "theme"); ok {
 		vtheme(x, "$.theme", &errs)

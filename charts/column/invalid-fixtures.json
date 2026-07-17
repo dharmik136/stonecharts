@@ -1,0 +1,14 @@
+[
+  {
+    "spec": {"type": "column", "stacking": 123, "series": [{"name": "s", "data": [1]}]},
+    "errors": ["$.stacking: expected string, received number"]
+  },
+  {
+    "spec": {"type": "column", "grouping": "yes", "series": [{"name": "s", "data": [1]}]},
+    "errors": ["$.grouping: expected boolean, received string"]
+  },
+  {
+    "spec": {"type": "bogus", "series": [{"name": "s", "data": [1]}]},
+    "errors": ["$.type: unknown chart type \"bogus\""]
+  }
+]

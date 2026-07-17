@@ -17,48 +17,69 @@ from peakcharts import ChartSpec, THEMES  # noqa: E402
 from peakcharts.render import render_svg  # noqa: E402
 from peakcharts.validate import SpecError, validate  # noqa: E402
 
-CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
+LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
+COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
 
 
-def _check(name: str):
-    spec_path = ROOT / "charts" / "line-basic" / "examples" / f"{name}.json"
-    golden_path = ROOT / "charts" / "line-basic" / "golden" / f"{name}.svg"
+def _check(chart_dir: str, name: str):
+    spec_path = ROOT / "charts" / chart_dir / "examples" / f"{name}.json"
+    golden_path = ROOT / "charts" / chart_dir / "golden" / f"{name}.svg"
     spec = ChartSpec.from_dict(json.loads(spec_path.read_text(encoding="utf-8")))
     got = render_svg(spec)
     want = golden_path.read_text(encoding="utf-8")
-    assert got == want, f"{name}: SVG != golden ({len(got)} vs {len(want)} bytes)"
+    assert got == want, f"{chart_dir}/{name}: SVG != golden ({len(got)} vs {len(want)} bytes)"
 
 
 def test_line_basic_golden():
-    _check("basic")
+    _check("line-basic", "basic")
 
 
 def test_line_styled_golden():
-    _check("styled")
+    _check("line-basic", "styled")
 
 
 def test_line_markers_golden():
-    _check("markers")
+    _check("line-basic", "markers")
 
 
 def test_line_spline_golden():
-    _check("spline")
+    _check("line-basic", "spline")
 
 
 def test_line_gradient_golden():
-    _check("gradient")
+    _check("line-basic", "gradient")
 
 
 def test_line_dark_golden():
-    _check("dark")
+    _check("line-basic", "dark")
 
 
 def test_line_adversarial_golden():
-    _check("adversarial")
+    _check("line-basic", "adversarial")
 
 
 def test_line_gradient_partial_golden():
-    _check("gradient-partial")
+    _check("line-basic", "gradient-partial")
+
+
+def test_column_goldens():
+    for name in COLUMN_CASES:
+        _check("column", name)
+
+
+def test_column_edge_cases():
+    for spec in [
+        {"type": "column", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
+         "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
+        {"type": "column", "xAxis": {"categories": ["neg", "pos"]},
+         "series": [{"name": "a", "data": [-5, 10]}]},
+        {"type": "column", "grouping": False,
+         "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
+        {"type": "column", "series": [{"name": str(i), "data": [1, 2, 3]} for i in range(10)]},
+        {"type": "column", "series": [{"name": "a", "data": [42]}]},
+    ]:
+        low = render_svg(ChartSpec.from_dict(spec)).lower()
+        assert "nan" not in low and "inf" not in low, spec
 
 
 def test_xss_escaping():
@@ -92,9 +113,9 @@ def test_valid_edges_render():
 def test_invalid_fixtures_parity():
     """Every shared invalid fixture is rejected with the exact expected errors — the
     SAME file the Go suite checks, so both renderers reject identically."""
-    cases = json.loads(
-        (ROOT / "charts" / "line-basic" / "invalid-fixtures.json").read_text(encoding="utf-8")
-    )
+    cases = []
+    for path in sorted((ROOT / "charts").glob("*/invalid-fixtures.json")):
+        cases.extend(json.loads(path.read_text(encoding="utf-8")))
     assert cases, "no invalid fixtures"
     for c in cases:
         assert validate(c["spec"]) == c["errors"], c["spec"]
@@ -103,6 +124,14 @@ def test_invalid_fixtures_parity():
             raise AssertionError(f"not rejected: {c['spec']}")
         except SpecError:
             pass
+
+
+def test_all_example_specs_validate():
+    paths = sorted((ROOT / "charts").glob("*/examples/*.json"))
+    assert paths, "no example specs"
+    for path in paths:
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        assert validate(spec) == [], str(path)
 
 
 def test_a11y_toggle():
@@ -151,8 +180,11 @@ def test_spline_edge_cases():
 
 
 if __name__ == "__main__":
-    for _n in CASES:
-        _check(_n)
+    for _n in LINE_CASES:
+        _check("line-basic", _n)
         print(f"PASS: python line-{_n} golden")
+    for _n in COLUMN_CASES:
+        _check("column", _n)
+        print(f"PASS: python column-{_n} golden")
     test_spline_edge_cases()
     print("PASS: python spline edge cases")

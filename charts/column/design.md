@@ -11,10 +11,10 @@
 - **Chart id:** `column`
 - **Spec `type`:** `"column"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 1** · **Src:** HC
-- **Status:** design-complete + examples validated · renderers deferred (only
-  `line` has a live renderer today; column rides the shared cartesian frame once
-  extraction lands — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 1, §4, §5)
-- **Renderers (planned):** `libs/python/peakcharts/charts/column.py` · `libs/go/column.go`
+- **Status:** design-complete + examples validated · live Python/Go renderers
+  (`column.py` / `column.go`) ride the shared Cartesian frame extracted for
+  Rank 1 — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 1, §4, §5
+- **Renderers:** `libs/python/peakcharts/charts/column.py` · `libs/go/column.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -360,8 +360,6 @@ A self-contained interactive HTML file: inline SVG + CSS + the shared runtime.
 
 ## Not yet supported (roadmap)
 
-- Live renderers (`column.py` / `column.go`) — deferred; design + examples +
-  validation are complete. Only `line` renders today.
 - **Bar** (horizontal columns) — the orientation transpose (rank 2).
 - **Column range** (floating `(low,high)` bars) and **waterfall** (running-total
   columns) — later ranks reusing the band layout + floating-bar primitive.

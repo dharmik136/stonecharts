@@ -3,6 +3,7 @@ package peakcharts
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -12,22 +13,48 @@ import (
 // (charts/line-basic/golden/*.svg), which the Python renderer also matches.
 // If this and the Python test both pass, the two libraries are provably in sync.
 func TestGolden(t *testing.T) {
-	for _, name := range []string{"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"} {
-		specBytes, err := os.ReadFile("../../charts/line-basic/examples/" + name + ".json")
+	cases := map[string][]string{
+		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
+		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+	}
+	for chartDir, names := range cases {
+		for _, name := range names {
+			specBytes, err := os.ReadFile("../../charts/" + chartDir + "/examples/" + name + ".json")
+			if err != nil {
+				t.Fatal(err)
+			}
+			spec, err := FromJSON(specBytes)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := RenderSVG(spec)
+			want, err := os.ReadFile("../../charts/" + chartDir + "/golden/" + name + ".svg")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got != string(want) {
+				t.Errorf("%s/%s: SVG != golden (got %d bytes, want %d bytes)", chartDir, name, len(got), len(want))
+			}
+		}
+	}
+}
+
+func TestColumnEdgeCases(t *testing.T) {
+	cases := []string{
+		`{"type":"column","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
+		`{"type":"column","xAxis":{"categories":["neg","pos"]},"series":[{"name":"a","data":[-5,10]}]}`,
+		`{"type":"column","grouping":false,"series":[{"name":"a","data":[1,2]},{"name":"b","data":[2,1]}]}`,
+		`{"type":"column","series":[{"name":"0","data":[1,2,3]},{"name":"1","data":[1,2,3]},{"name":"2","data":[1,2,3]},{"name":"3","data":[1,2,3]},{"name":"4","data":[1,2,3]},{"name":"5","data":[1,2,3]},{"name":"6","data":[1,2,3]},{"name":"7","data":[1,2,3]},{"name":"8","data":[1,2,3]},{"name":"9","data":[1,2,3]}]}`,
+		`{"type":"column","series":[{"name":"a","data":[42]}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
 		if err != nil {
 			t.Fatal(err)
 		}
-		spec, err := FromJSON(specBytes)
-		if err != nil {
-			t.Fatal(err)
-		}
-		got := RenderSVG(spec)
-		want, err := os.ReadFile("../../charts/line-basic/golden/" + name + ".svg")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if got != string(want) {
-			t.Errorf("%s: SVG != golden (got %d bytes, want %d bytes)", name, len(got), len(want))
+		low := strings.ToLower(RenderSVG(spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in column render for %s", specJSON)
 		}
 	}
 }
@@ -106,7 +133,7 @@ func TestA11yToggle(t *testing.T) {
 // the exact expected errors — the SAME file the Python suite checks, so both
 // renderers reject identically.
 func TestInvalidFixturesParity(t *testing.T) {
-	b, err := os.ReadFile("../../charts/line-basic/invalid-fixtures.json")
+	paths, err := filepath.Glob("../../charts/*/invalid-fixtures.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,8 +141,19 @@ func TestInvalidFixturesParity(t *testing.T) {
 		Spec   interface{} `json:"spec"`
 		Errors []string    `json:"errors"`
 	}
-	if err := json.Unmarshal(b, &cases); err != nil {
-		t.Fatal(err)
+	for _, path := range paths {
+		b, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var fileCases []struct {
+			Spec   interface{} `json:"spec"`
+			Errors []string    `json:"errors"`
+		}
+		if err := json.Unmarshal(b, &fileCases); err != nil {
+			t.Fatal(err)
+		}
+		cases = append(cases, fileCases...)
 	}
 	if len(cases) == 0 {
 		t.Fatal("no invalid fixtures")
@@ -124,6 +162,29 @@ func TestInvalidFixturesParity(t *testing.T) {
 		got := validate(c.Spec)
 		if !reflect.DeepEqual(got, c.Errors) {
 			t.Errorf("spec %v:\n got  %v\n want %v", c.Spec, got, c.Errors)
+		}
+	}
+}
+
+func TestAllExampleSpecsValidate(t *testing.T) {
+	paths, err := filepath.Glob("../../charts/*/examples/*.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(paths) == 0 {
+		t.Fatal("no example specs")
+	}
+	for _, path := range paths {
+		b, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var raw interface{}
+		if err := json.Unmarshal(b, &raw); err != nil {
+			t.Fatal(err)
+		}
+		if errs := validate(raw); len(errs) > 0 {
+			t.Errorf("%s: %v", path, errs)
 		}
 	}
 }

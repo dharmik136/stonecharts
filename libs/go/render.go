@@ -66,6 +66,8 @@ func dataTable(spec *ChartSpec) string {
 // RenderSVG renders a spec to an SVG string, dispatched by chart type.
 func RenderSVG(spec *ChartSpec) string {
 	switch spec.Type {
+	case "column":
+		return renderColumnSVG(spec)
 	case "line", "":
 		return renderLineSVG(spec)
 	default:

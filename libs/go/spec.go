@@ -281,6 +281,8 @@ type ChartSpec struct {
 	Legend     *bool    `json:"legend,omitempty"`
 	A11y       *bool    `json:"a11y,omitempty"` // nil -> true
 	Responsive bool     `json:"responsive,omitempty"`
+	Stacking   string   `json:"stacking,omitempty"` // "" | "normal" | "percent"
+	Grouping   *bool    `json:"grouping,omitempty"` // nil -> true
 	XAxis      Axis     `json:"xAxis"`
 	YAxis      Axis     `json:"yAxis"`
 	Series     []Series `json:"series"`
@@ -313,8 +315,9 @@ func (c *ChartSpec) applyDefaults() {
 	}
 }
 
-func (c *ChartSpec) legendOn() bool { return c.Legend == nil || *c.Legend }
-func (c *ChartSpec) a11yOn() bool   { return c.A11y == nil || *c.A11y }
+func (c *ChartSpec) legendOn() bool   { return c.Legend == nil || *c.Legend }
+func (c *ChartSpec) a11yOn() bool     { return c.A11y == nil || *c.A11y }
+func (c *ChartSpec) groupingOn() bool { return c.Grouping == nil || *c.Grouping }
 
 // gridEnabled / gridColor / gridDashStyle resolve yAxis gridline defaults.
 func (a *Axis) gridEnabled() bool {

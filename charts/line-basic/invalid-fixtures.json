@@ -260,5 +260,72 @@
       "$.series[0].name: expected string, received number",
       "$.series[0].data[0]: expected number, received string"
     ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "stacking": 5,
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.stacking: expected string, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "stacking": "sideways",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.stacking: expected one of \"normal\", \"percent\", received \"sideways\""
+    ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "grouping": "yes",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.grouping: expected boolean, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "unknown-chart",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.type: unknown chart type \"unknown-chart\""
+    ]
   }
 ]

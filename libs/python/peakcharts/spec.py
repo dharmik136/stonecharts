@@ -181,6 +181,8 @@ class ChartSpec:
     legend: bool = True
     responsive: bool = False
     a11y: bool = True
+    stacking: Optional[str] = None     # None | "normal" | "percent"
+    grouping: bool = True              # True = grouped side-by-side; False = overlaid
 
     @staticmethod
     def from_dict(d: dict) -> "ChartSpec":
@@ -285,4 +287,6 @@ class ChartSpec:
             legend=bool(d.get("legend", True)),
             responsive=bool(d.get("responsive", False)),
             a11y=bool(d.get("a11y", True)),
+            stacking=d.get("stacking"),
+            grouping=bool(d.get("grouping", True)),
         )

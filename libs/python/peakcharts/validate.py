@@ -213,6 +213,18 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
         _marker(v["marker"], f"{path}.marker", errs)
 
 
+# Known chart types — discovered from all on-disk example specs at
+# charts/*/examples/*.json.  Keep sorted for readability; the set comparison
+# is order-independent.
+_KNOWN_TYPES = {
+    "area", "arearange", "bar", "boxplot", "bubble", "candlestick",
+    "column", "columnrange", "combo", "dumbbell", "errorbar",
+    "error-bar", "funnel", "histogram", "line", "lollipop", "scatter",
+    "streamgraph", "technical-indicators", "timeline", "variwide",
+    "vector-plot", "waterfall", "windbarb", "xrange",
+}
+
+
 def validate(d: Any) -> List[str]:
     """Return a list of validation errors ([] = valid)."""
     errs: List[str] = []
@@ -221,12 +233,21 @@ def validate(d: Any) -> List[str]:
     for k in ("type", "id", "title", "subtitle"):
         if k in d:
             _str(d[k], f"$.{k}", errs)
+    if "type" in d:
+        if isinstance(d["type"], str) and d["type"] not in _KNOWN_TYPES:
+            errs.append(f'$.type: unknown chart type "{d["type"]}"')
     for k in ("width", "height"):
         if k in d:
             _intnum(d[k], f"$.{k}", errs)
     for k in ("responsive", "legend", "a11y"):
         if k in d:
             _bool(d[k], f"$.{k}", errs)
+    if "stacking" in d:
+        _str(d["stacking"], "$.stacking", errs)
+        if isinstance(d["stacking"], str) and d["stacking"] not in ("normal", "percent"):
+            errs.append(f'$.stacking: expected one of "normal", "percent", received "{d["stacking"]}"')
+    if "grouping" in d:
+        _bool(d["grouping"], "$.grouping", errs)
     if "theme" in d:
         _theme(d["theme"], "$.theme", errs)
     if "xAxis" in d:

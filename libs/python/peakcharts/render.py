@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable, Dict
 
+from .charts import column as _column
 from .charts import line as _line
 from .spec import ChartSpec
 from .util import esc, fmt_num
@@ -20,6 +21,7 @@ _RUNTIME_PATH = Path(__file__).resolve().parents[3] / "runtime" / "chart-interac
 
 # chart type -> SVG renderer. New chart types register here.
 _RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
+    "column": _column.render_svg,
     "line": _line.render_svg,
 }
 

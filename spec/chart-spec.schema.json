@@ -8,7 +8,33 @@
   "properties": {
     "type": {
       "type": "string",
-      "enum": ["line"],
+      "enum": [
+        "area",
+        "arearange",
+        "bar",
+        "boxplot",
+        "bubble",
+        "candlestick",
+        "column",
+        "columnrange",
+        "combo",
+        "dumbbell",
+        "errorbar",
+        "error-bar",
+        "funnel",
+        "histogram",
+        "line",
+        "lollipop",
+        "scatter",
+        "streamgraph",
+        "technical-indicators",
+        "timeline",
+        "variwide",
+        "vector-plot",
+        "waterfall",
+        "windbarb",
+        "xrange"
+      ],
       "description": "Chart type id; maps to charts/<id>/design.md. Grows as chart types are added."
     },
     "id": {
@@ -38,6 +64,16 @@
       "type": "boolean",
       "default": true,
       "description": "Accessibility (on by default): SVG gets role=\"img\" + a summary aria-label + <desc>; the HTML output adds a visually-hidden data table. Set false to restore the pre-a11y byte output."
+    },
+    "stacking": {
+      "type": "string",
+      "enum": ["normal", "percent"],
+      "description": "Stack series values per category. 'normal' = absolute stacked, 'percent' = 100% stacked. Absent = no stacking."
+    },
+    "grouping": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true (default) multi-series bars/columns sit side-by-side; when false they overlay."
     },
     "xAxis": { "$ref": "#/definitions/axis" },
     "yAxis": { "$ref": "#/definitions/yAxis" },
