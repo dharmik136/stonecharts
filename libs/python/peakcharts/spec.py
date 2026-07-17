@@ -28,6 +28,24 @@ def _int(v, default: int) -> int:
         return default
 
 
+def _float(v, default: float) -> float:
+    """Coerce to float; fallback to default on error."""
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
+
+def _float_or_none(v) -> Optional[float]:
+    """Coerce to float or return None on error/null."""
+    if v is None:
+        return None
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 @dataclass
 class Marker:
     enabled: bool = True
@@ -195,26 +213,28 @@ class ChartSpec:
             m = s.get("marker")
             marker = None
             if m is not None:
+                r = _float(m.get("radius"), 3.5)
                 marker = Marker(
                     enabled=m.get("enabled", True),
-                    symbol=m.get("symbol", "circle"),
-                    radius=float(m.get("radius", 3.5)),
+                    symbol=m.get("symbol") or "circle",
+                    radius=r if r != 0.0 else 3.5,
                 )
             c = s.get("color")
             if isinstance(c, dict):
                 color: Optional[Union[str, Gradient]] = Gradient(
                     stops=[
                         GradientStop(
-                            offset=float(st["offset"]),
-                            color=st["color"],
-                            opacity=st.get("opacity"),
+                            offset=_float(st.get("offset"), 0.0),
+                            color=st.get("color", ""),
+                            opacity=_float_or_none(st.get("opacity")),
                         )
                         for st in c.get("stops", [])
+                        if "offset" in st and "color" in st
                     ],
-                    x1=float(c.get("x1", 0.0)),
-                    y1=float(c.get("y1", 0.0)),
-                    x2=float(c.get("x2", 0.0)),
-                    y2=float(c.get("y2", 1.0)),
+                    x1=_float(c.get("x1"), 0.0),
+                    y1=_float(c.get("y1"), 0.0),
+                    x2=_float(c.get("x2"), 0.0),
+                    y2=_float(c.get("y2"), 1.0),
                 )
             else:
                 color = c
@@ -222,22 +242,22 @@ class ChartSpec:
             pattern = None
             if p is not None:
                 pattern = Pattern(
-                    type=p.get("type", "hatch"),
-                    color=p.get("color", "#333333"),
+                    type=p.get("type") or "hatch",
+                    color=p.get("color") or "#333333",
                     background=p.get("background"),
-                    size=float(p.get("size", 8.0)),
-                    angle=float(p.get("angle", 45.0)),
-                    stroke_width=float(p.get("strokeWidth", 1.5)),
+                    size=_float(p.get("size"), 8.0),
+                    angle=_float(p.get("angle"), 45.0),
+                    stroke_width=_float(p.get("strokeWidth"), 1.5),
                 )
             series.append(
                 Series(
-                    name=s.get("name", f"Series {i + 1}"),
+                    name=s.get("name") or f"Series {i + 1}",
                     data=[_num(v) for v in (s.get("data") or [])],
                     color=color,
-                    fill_opacity=float(s.get("fillOpacity", 0.0)),
+                    fill_opacity=_float(s.get("fillOpacity"), 0.0),
                     pattern=pattern,
-                    line_width=s.get("lineWidth"),
-                    dash_style=s.get("dashStyle", "solid"),
+                    line_width=_float_or_none(s.get("lineWidth")),
+                    dash_style=s.get("dashStyle") or "solid",
                     step=s.get("step"),
                     curve=s.get("curve"),
                     marker=marker,
@@ -257,21 +277,21 @@ class ChartSpec:
 
         return ChartSpec(
             series=series,
-            type=d.get("type", "line"),
-            id=d.get("id", "pk"),
+            type=d.get("type") or "line",
+            id=d.get("id") or "pk",
             theme=resolve_theme(d.get("theme")),
             title=d.get("title"),
             subtitle=d.get("subtitle"),
             x_axis=Axis(
                 title=xa.get("title"),
                 categories=xa.get("categories"),
-                min=xa.get("min"),
-                max=xa.get("max"),
+                min=_float_or_none(xa.get("min")),
+                max=_float_or_none(xa.get("max")),
             ),
             y_axis=Axis(
                 title=ya.get("title"),
-                min=ya.get("min"),
-                max=ya.get("max"),
+                min=_float_or_none(ya.get("min")),
+                max=_float_or_none(ya.get("max")),
                 grid_line=grid,
             ),
             width=_int(d.get("width", 820), 820),
