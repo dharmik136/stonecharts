@@ -36,6 +36,8 @@ level from planned controls.
 
 - Runtime dependencies remain minimal and are declared in ecosystem manifests.
 - Development and release dependencies are version-constrained and recorded.
+- Third-party GitHub Actions are pinned to immutable commit SHAs with readable
+  release-tag comments and receive automated update pull requests.
 - New dependencies receive license, maintenance, vulnerability, size, and determinism
   review.
 - Font files and export engines are dependencies and follow the same review.
@@ -62,4 +64,3 @@ The evidence manifest is validated before tag publication. Consumers receive com
 for checksum and provenance verification. A release with missing provenance may be
 published only if it explicitly reports that status and Alpha policy permits it; it
 must not present planned provenance as completed.
-
