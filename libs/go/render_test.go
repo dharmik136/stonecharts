@@ -2,6 +2,7 @@ package peakcharts
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -25,6 +26,25 @@ func TestGolden(t *testing.T) {
 		}
 		if got != string(want) {
 			t.Errorf("%s: SVG != golden (got %d bytes, want %d bytes)", name, len(got), len(want))
+		}
+	}
+}
+
+// TestSplineEdgeCases locks in the Phase-3 QA edge-case coverage: the monotone
+// spline must stay finite (no NaN/Inf) on flat data, extrema, single/dual points,
+// steep jumps, negatives, and mixed extrema.
+func TestSplineEdgeCases(t *testing.T) {
+	cases := [][]float64{
+		{10}, {10, 20}, {10, 10, 10, 10}, {10, 30, 10},
+		{30, 10, 30}, {10, 10, 100, 100}, {-10, -20, -10},
+		{0, 20, -10, 30, 5, 0, -5, 15},
+	}
+	for _, data := range cases {
+		spec := &ChartSpec{Type: "line", Series: []Series{{Name: "s", Data: data, Curve: "monotone"}}}
+		spec.applyDefaults()
+		low := strings.ToLower(RenderSVG(spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in spline for %v", data)
 		}
 	}
 }

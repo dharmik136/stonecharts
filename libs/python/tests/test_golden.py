@@ -44,7 +44,27 @@ def test_line_spline_golden():
     _check("spline")
 
 
+# Edge-case vectors from the Phase-3 QA report: flat data, extrema, single/dual
+# points, steep jumps, negatives, mixed extrema. The spline must stay finite.
+SPLINE_EDGE_CASES = [
+    [10.0], [10.0, 20.0], [10.0, 10.0, 10.0, 10.0], [10.0, 30.0, 10.0],
+    [30.0, 10.0, 30.0], [10.0, 10.0, 100.0, 100.0], [-10.0, -20.0, -10.0],
+    [0.0, 20.0, -10.0, 30.0, 5.0, 0.0, -5.0, 15.0],
+]
+
+
+def test_spline_edge_cases():
+    for data in SPLINE_EDGE_CASES:
+        spec = ChartSpec.from_dict(
+            {"type": "line", "series": [{"name": "s", "data": data, "curve": "monotone"}]}
+        )
+        low = render_svg(spec).lower()
+        assert "nan" not in low and "inf" not in low, f"NaN/Inf in spline for {data}"
+
+
 if __name__ == "__main__":
     for _n in CASES:
         _check(_n)
         print(f"PASS: python line-{_n} golden")
+    test_spline_edge_cases()
+    print("PASS: python spline edge cases")

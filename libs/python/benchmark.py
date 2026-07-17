@@ -1,7 +1,7 @@
 """Python benchmarking script for PeakCharts rendering.
 
 Measures rendering time, throughput, memory footprint, and file sizes across
-different data scopes (3, 10, 100, 1000 points) comparing basic, styled, and markers layouts.
+different data scopes (3, 10, 100, 1000 points) comparing basic, styled, markers, and spline layouts.
 """
 from __future__ import annotations
 
@@ -25,8 +25,23 @@ def generate_spec(n_points: int, layout_type: str = "basic") -> ChartSpec:
     data = [round(50.0 + 50.0 * math.sin(i / 10.0), 2) for i in range(n_points)]
     categories = [f"P{i}" for i in range(n_points)]
 
-    if layout_type == "markers":
-        # New Phase 2 markers layout: dashed line, lineWidth 3, stepped path (center), and triangle markers (radius 4)
+    if layout_type == "spline":
+        # New Phase 3 spline layout: responsive=true, gridLine=dashed, monotone curve
+        series = [Series(name="Series 1", data=data, curve="monotone")]
+        return ChartSpec(
+            type="line",
+            title="Benchmark Spline",
+            subtitle=f"Responsive + Custom Grid + Spline ({n_points} pts)",
+            x_axis=Axis(title="X Axis", categories=categories),
+            y_axis=Axis(
+                title="Y Axis",
+                grid_line=GridLine(enabled=True, color="#d5d5e0", dash_style="dashed")
+            ),
+            series=series,
+            responsive=True,
+        )
+    elif layout_type == "markers":
+        # Phase 2 markers layout: dashed line, lineWidth 3, stepped path (center), and triangle markers (radius 4)
         series = [
             Series(
                 name="Series 1",
@@ -129,13 +144,13 @@ def main():
         else:
             runs = 50
 
-        for layout_type in ["basic", "styled", "markers"]:
+        for layout_type in ["basic", "styled", "markers", "spline"]:
             for mode in ["svg", "html"]:
                 res = run_benchmark(size, layout_type, mode, runs)
                 results.append(res)
 
     # Output Markdown Tables
-    print("\n# Python Benchmark Results (Phase 2)\n")
+    print("\n# Python Benchmark Results (Phase 3)\n")
     
     # SVG Table
     print("## SVG Rendering Performance")

@@ -11,7 +11,7 @@ import (
 	"peakcharts"
 )
 
-// generateSpec creates a baseline, styled, or markers ChartSpec for benchmarking,
+// generateSpec creates a baseline, styled, markers, or spline ChartSpec for benchmarking,
 // then round-trips it through FromJSON to ensure all defaults are fully populated.
 func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 	data := make([]float64, nPoints)
@@ -30,7 +30,22 @@ func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 		Series: series,
 	}
 
-	if layoutType == "markers" {
+	if layoutType == "spline" {
+		spec.Title = "Benchmark Spline"
+		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid + Spline (%d pts)", nPoints)
+		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
+		enabled := true
+		spec.YAxis = peakcharts.Axis{
+			Title: "Y Axis",
+			GridLine: &peakcharts.GridLine{
+				Enabled:   &enabled,
+				Color:     "#d5d5e0",
+				DashStyle: "dashed",
+			},
+		}
+		spec.Responsive = true
+		spec.Series[0].Curve = "monotone"
+	} else if layoutType == "markers" {
 		spec.Title = "Benchmark Markers"
 		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid + Markers (%d pts)", nPoints)
 		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
@@ -113,12 +128,14 @@ func main() {
 	fmt.Println("Running Go benchmarks (please wait)...")
 
 	for _, size := range sizes {
-		for _, layoutType := range []string{"basic", "styled", "markers"} {
+		for _, layoutType := range []string{"basic", "styled", "markers", "spline"} {
 			layoutName := "Basic"
 			if layoutType == "styled" {
 				layoutName = "Styled"
 			} else if layoutType == "markers" {
 				layoutName = "Markers"
+			} else if layoutType == "spline" {
+				layoutName = "Spline"
 			}
 
 			// 1. Benchmark SVG Rendering
@@ -166,7 +183,7 @@ func main() {
 	}
 
 	// Output Markdown Tables
-	fmt.Println("\n# Go Benchmark Results (Phase 2)")
+	fmt.Println("\n# Go Benchmark Results (Phase 3)")
 
 	fmt.Println("## SVG Rendering Performance")
 	fmt.Println("| Points | Layout | Time (ms) | Throughput (ops/s) | Alloc Mem (B/op) | Alloc Count | Size (B) |")
