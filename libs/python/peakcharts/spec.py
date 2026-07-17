@@ -179,8 +179,9 @@ def resolve_theme(value) -> Theme:
         for k, attr in _THEME_KEYS.items():
             if k in value:
                 v = value[k]
-                if attr == "palette" and isinstance(v, list):
-                    setattr(t, attr, [esc(c) for c in v])
+                if attr == "palette":
+                    if isinstance(v, list) and len(v) > 0:
+                        setattr(t, attr, [esc(c) for c in v])
                 elif v is None:
                     setattr(t, attr, None)
                 else:
