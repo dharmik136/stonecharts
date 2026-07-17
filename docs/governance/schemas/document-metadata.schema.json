@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peakcharts.dev/schemas/document-metadata.schema.json",
+  "title": "PeakCharts controlled document metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "status",
+    "classification",
+    "owner",
+    "approver",
+    "review_mode",
+    "applies_to",
+    "requirements",
+    "evidence",
+    "last_reviewed",
+    "review_due",
+    "supersedes",
+    "superseded_by"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^PC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$"
+    },
+    "title": { "type": "string", "minLength": 3 },
+    "status": {
+      "enum": ["draft", "proposed", "approved", "deprecated", "superseded", "archived"]
+    },
+    "classification": { "enum": ["normative", "informative"] },
+    "owner": { "type": "string", "minLength": 1 },
+    "approver": { "type": "string", "minLength": 1 },
+    "review_mode": { "enum": ["self", "independent"] },
+    "applies_to": { "type": "string", "minLength": 1 },
+    "requirements": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^REQ-[A-Z][A-Z0-9]*-\\d{3}$" },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^(TEST|BENCH|REVIEW)-[A-Z0-9-]+$" },
+      "uniqueItems": true
+    },
+    "last_reviewed": { "type": "string", "format": "date" },
+    "review_due": { "type": "string", "format": "date" },
+    "supersedes": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^PC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$" }
+      ]
+    },
+    "superseded_by": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^PC-(GOV|PROD|REQ|ARCH|CON|QUAL|SEC|REL|USER|OPS)-(\\d{3}|ADR-\\d{4})$" }
+      ]
+    }
+  }
+}

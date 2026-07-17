@@ -1,4 +1,25 @@
+---
+id: PC-CON-008
+title: Legacy Customization Plan of Record
+status: superseded
+classification: informative
+owner: product-owner
+approver: maintainer
+review_mode: self
+applies_to: historical implementation through 7ccfe63
+requirements: [REQ-CUST-001]
+evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
+last_reviewed: "2026-07-18"
+review_due: "2026-10-18"
+supersedes: null
+superseded_by: PC-CON-005
+---
+
 # Customization Layer — Plan of Record
+
+> Superseded as a product contract by
+> [`PC-CON-005`](../contracts/customization-boundary.md). Retained as implementation
+> history for customization phases already completed.
 
 Approved plan for the styling/theming layer, with the guardrails that protect our
 two non-negotiables. Source research: `docs/research/design-customization-brief.md`.

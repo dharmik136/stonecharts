@@ -1,0 +1,290 @@
+id: PC-REQ-REGISTRY
+version: 1
+updated: "2026-07-18"
+requirements:
+  - id: REQ-PROD-001
+    title: One language-neutral chart specification
+    statement: PeakCharts MUST represent supported charts with one versioned language-neutral specification consumable by every certified renderer.
+    rationale: A shared specification is the product boundary that makes cross-language behavior testable and portable.
+    kind: functional
+    priority: must
+    status: proposed
+    owner: product-owner
+    target: 0.0.1-alpha.1
+    source: PC-PROD-001
+    acceptance:
+      - One canonical schema is published for the release.
+      - Python and Go consume equivalent fields and defaults.
+    decisions: [PC-ARCH-ADR-0002]
+    contracts: [PC-CON-001, PC-CON-002]
+    verification: [TEST-VALIDATION-PARITY]
+    implementation: [spec/chart-spec.schema.json, libs/python/peakcharts/spec.py, libs/go/spec.go]
+
+  - id: REQ-SCOPE-001
+    title: Alpha 1 supports only line and column
+    statement: The Alpha 1 active schema MUST expose only line and column chart types; design-only chart types MUST remain non-normative.
+    rationale: Passing validation for an unrenderable chart breaks the public contract and creates runtime failures.
+    kind: constraint
+    priority: must
+    status: proposed
+    owner: product-owner
+    target: 0.0.1-alpha.1
+    source: PC-PROD-002
+    acceptance:
+      - The active type enum contains line and column only.
+      - Every other type is rejected before rendering with a canonical error.
+    decisions: [PC-ARCH-ADR-0002]
+    contracts: [PC-CON-002]
+    verification: [TEST-CAPABILITY-MATRIX]
+    implementation: [spec/chart-spec.schema.json, libs/python/peakcharts/validate.py, libs/go/validate.go]
+
+  - id: REQ-DET-001
+    title: Canonical SVG byte parity
+    statement: Certified renderers MUST produce identical canonical SVG bytes for every specification in the release conformance corpus.
+    rationale: Byte identity is the internal oracle for detecting cross-language serialization and geometry drift.
+    kind: quality
+    priority: must
+    status: implemented
+    owner: maintainer
+    target: 0.0.1-alpha.1
+    source: PC-CON-001
+    acceptance:
+      - Python output equals every approved golden byte for byte.
+      - Go output equals the same approved goldens byte for byte.
+      - A direct Python-to-Go cross-render sweep reports no differences.
+    decisions: [PC-ARCH-ADR-0001]
+    contracts: [PC-CON-001, PC-CON-003]
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
+    implementation: [libs/python/peakcharts, libs/go, charts/line-basic/golden, charts/column/golden]
+
+  - id: REQ-VAL-001
+    title: Cross-language validation parity
+    statement: The schema, Python validator, and Go validator MUST implement one ratified acceptance domain and canonical error semantics.
+    rationale: Identical rendering is irrelevant when language entry points disagree about which input is legal.
+    kind: quality
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: 0.0.1-alpha.1
+    source: PC-CON-002
+    acceptance:
+      - Shared valid fixtures are accepted by the schema and both validators.
+      - Shared invalid fixtures are rejected with equivalent error codes and paths.
+      - Empty series, dimensions, category lengths, and unknown fields have explicit rules.
+    decisions: [PC-ARCH-ADR-0002]
+    contracts: [PC-CON-002]
+    verification: [TEST-VALIDATION-PARITY]
+    implementation: [spec/chart-spec.schema.json, libs/python/peakcharts/validate.py, libs/go/validate.go]
+
+  - id: REQ-CAP-001
+    title: Capability failures are typed and non-fatal
+    statement: Renderer entry points MUST return a canonical typed error for unsupported capabilities and MUST NOT panic, crash, or emit partial output for user-controlled input.
+    rationale: Capability negotiation is distinct from schema validity and must be safe across renderer versions.
+    kind: functional
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: 0.0.1-alpha.1
+    source: PC-CON-002
+    acceptance:
+      - A machine-readable capability manifest exists for Python and Go.
+      - Unsupported type and feature fixtures return canonical errors.
+      - Fuzzed invalid input causes no unhandled exception or panic.
+    decisions: [PC-ARCH-ADR-0002]
+    contracts: [PC-CON-002]
+    verification: [TEST-CAPABILITY-MATRIX]
+    implementation: [libs/python/peakcharts/render.py, libs/go/render.go]
+
+  - id: REQ-STACK-001
+    title: Diverging normal stacks
+    statement: Normal stacking MUST accumulate positive and negative values independently from the zero baseline in both domain and mark calculations.
+    rationale: A shared accumulator produces invalid geometry when signs differ within a category.
+    kind: functional
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: 0.0.1-alpha.1
+    source: PC-ARCH-ADR-0003
+    acceptance:
+      - Positive segments stack upward from zero.
+      - Negative segments stack downward from zero.
+      - Every emitted rectangle stays within the computed plot domain unless explicitly clipped by an axis override.
+    decisions: [PC-ARCH-ADR-0003]
+    contracts: [PC-CON-002]
+    verification: [TEST-STACK-SIGNED]
+    implementation: [libs/python/peakcharts/charts/_cartesian.py, libs/python/peakcharts/charts/column.py, libs/go/cartesian.go, libs/go/column.go]
+
+  - id: REQ-STACK-002
+    title: Unambiguous percent stacking
+    statement: Alpha 1 percent stacking MUST accept only finite non-negative values and MUST render an all-zero category as zero-height zero-percent segments.
+    rationale: Net-sum and absolute-sum conventions assign different meanings to signed data; Alpha 1 must not choose silently.
+    kind: constraint
+    priority: must
+    status: proposed
+    owner: product-owner
+    target: 0.0.1-alpha.1
+    source: PC-ARCH-ADR-0003
+    acceptance:
+      - Any negative value in a percent stack is rejected consistently.
+      - An all-zero category emits no NaN or infinity and represents every share as zero.
+      - Positive categories normalize to one hundred percent within the defined numeric tolerance.
+    decisions: [PC-ARCH-ADR-0003]
+    contracts: [PC-CON-002]
+    verification: [TEST-PERCENT-DOMAIN]
+    implementation: [libs/python/peakcharts/validate.py, libs/go/validate.go, libs/python/peakcharts/charts/column.py, libs/go/column.go]
+
+  - id: REQ-LAYOUT-001
+    title: Deterministic manual layout controls
+    statement: Alpha 1 MUST provide deterministic validated manual margins and MUST NOT claim automatic text fitting.
+    rationale: Host text measurement is not stable enough for the canonical byte profile, while fixed margins can clip real data.
+    kind: functional
+    priority: must
+    status: proposed
+    owner: product-owner
+    target: 0.0.1-alpha.1
+    source: PC-ARCH-ADR-0005
+    acceptance:
+      - Margin values are finite and non-negative.
+      - Invalid remaining plot dimensions are rejected.
+      - Defaults preserve approved line and column output.
+      - Overflow and no-auto-fit limitations are published.
+    decisions: [PC-ARCH-ADR-0005]
+    contracts: [PC-CON-005, PC-CON-006]
+    verification: [TEST-LAYOUT-MARGINS]
+    implementation: [spec/chart-spec.schema.json, libs/python/peakcharts/charts/_cartesian.py, libs/go/cartesian.go]
+
+  - id: REQ-RUNTIME-001
+    title: Invariant interaction semantics
+    statement: Interactive output MUST preserve canonical tooltip content, navigation state transitions, legend state, and ARIA DOM updates while allowing viewport-dependent placement.
+    rationale: Browser presentation must adapt without changing the meaning or observable state of an interaction.
+    kind: functional
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: 0.0.1-alpha.1
+    source: PC-CON-004
+    acceptance:
+      - Keyboard navigation and escape behavior match the runtime state table.
+      - Legend operation is available to pointer and keyboard users.
+      - Tooltip content derives only from canonical data attributes.
+      - Placement stays within the declared container without fixed cross-viewport coordinates.
+    decisions: [PC-ARCH-ADR-0004]
+    contracts: [PC-CON-003, PC-CON-004]
+    verification: [TEST-RUNTIME-BROWSER]
+    implementation: [runtime/chart-interactions.js, spec/svg-contract.md]
+
+  - id: REQ-A11Y-001
+    title: Accessible chart alternatives and operation
+    statement: Interactive HTML MUST provide a concise chart description, a complete semantic data alternative, and keyboard-operable interactive controls for the declared accessibility profile.
+    rationale: SVG text and visual marks alone do not expose sufficient chart meaning or operation to assistive technology.
+    kind: quality
+    priority: must
+    status: proposed
+    owner: product-owner
+    target: 0.0.1-alpha.1
+    source: PC-CON-007
+    acceptance:
+      - SVG has a tested accessible name and description.
+      - The data table represents every rendered series/category value safely.
+      - Keyboard focus is visible, ordered, and not trapped.
+      - Component claims are scoped rather than asserting whole-page WCAG conformance.
+    decisions: [PC-ARCH-ADR-0004]
+    contracts: [PC-CON-003, PC-CON-004, PC-CON-007]
+    verification: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
+    implementation: [runtime/chart-interactions.js, libs/python/peakcharts/render.py, libs/go/render.go]
+
+  - id: REQ-VIS-001
+    title: Explicit visual reproducibility profiles
+    statement: PeakCharts MUST distinguish canonical SVG identity, embedded-font consistency, and certified pixel export in all product claims.
+    rationale: Identical SVG bytes do not guarantee identical rasterized pixels across fonts, browsers, operating systems, and converters.
+    kind: quality
+    priority: must
+    status: proposed
+    owner: product-owner
+    target: 0.0.1-alpha.1
+    source: PC-CON-006
+    acceptance:
+      - Default host-font limitations are documented.
+      - Any embedded font is one prebuilt licensed artifact with a recorded hash.
+      - Pixel claims name the exact certified environment and tolerance.
+    decisions: [PC-ARCH-ADR-0001, PC-ARCH-ADR-0005]
+    contracts: [PC-CON-001, PC-CON-006]
+    verification: [REVIEW-VISUAL-PROFILE]
+    implementation: [docs/contracts/typography-and-export-profiles.md]
+
+  - id: REQ-CUST-001
+    title: Deterministic customization boundary
+    statement: Features inside a certified guarantee profile MUST be expressible as structured validated data and MUST render without arbitrary executable code or raw DOM mutation.
+    rationale: Personalization is central to the product, but unbounded injection defeats portability, security, and parity.
+    kind: constraint
+    priority: must
+    status: proposed
+    owner: product-owner
+    target: 0.0.1-alpha.1
+    source: PC-CON-005
+    acceptance:
+      - Supported themes and style primitives are represented in the schema.
+      - Unknown or unsafe customization has a documented error or downgrade behavior.
+      - Future escape hatches are explicitly outside certified guarantees.
+    decisions: [PC-ARCH-ADR-0001]
+    contracts: [PC-CON-001, PC-CON-005]
+    verification: [TEST-VALIDATION-PARITY, TEST-XSS-ESCAPING]
+    implementation: [spec/chart-spec.schema.json, spec/themes]
+
+  - id: REQ-SEC-001
+    title: Untrusted specification safety
+    statement: Renderers and the shared runtime MUST treat every specification string and style value as untrusted input and prevent markup, script, URL, and style injection.
+    rationale: Self-contained HTML and SVG place user-controlled values near executable and styling contexts.
+    kind: security
+    priority: must
+    status: implemented
+    owner: security-contact
+    target: 0.0.1-alpha.1
+    source: PC-SEC-001
+    acceptance:
+      - Hostile text cannot create executable markup in SVG or HTML.
+      - Style-bearing fields have explicit validation or safe encoding rules.
+      - Security regressions block release.
+    decisions: []
+    contracts: [PC-CON-005]
+    verification: [TEST-XSS-ESCAPING]
+    implementation: [libs/python/peakcharts/util.py, libs/go/util.go, runtime/chart-interactions.js]
+
+  - id: REQ-REL-001
+    title: Immutable release qualification evidence
+    statement: Every distributed release MUST include or reference an immutable manifest containing source revision, versions, toolchains, artifact hashes, test results, known limits, SBOM, and provenance status.
+    rationale: Claims must be auditable against the exact artifacts delivered to users.
+    kind: delivery
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: 0.0.1-alpha.1
+    source: PC-REL-001
+    acceptance:
+      - Product, Python, and Go versions follow their ecosystem formats and map to one release.
+      - Every package and evidence artifact has a SHA-256 hash.
+      - Failed, skipped, and unavailable evidence is visible in the manifest.
+    decisions: []
+    contracts: [PC-CON-001]
+    verification: [TEST-RELEASE-EVIDENCE]
+    implementation: [docs/releases/0.0.1-alpha.1/evidence/manifest.schema.json]
+
+  - id: REQ-PERF-001
+    title: Reproducible performance qualification
+    statement: Release performance claims MUST be produced by the approved benchmark protocol with recorded workload, environment, samples, variance, and artifact revision.
+    rationale: Uncontrolled benchmark numbers are not comparable and create misleading promises.
+    kind: quality
+    priority: should
+    status: proposed
+    owner: maintainer
+    target: 0.0.1-alpha.1
+    source: PC-QUAL-002
+    acceptance:
+      - Small, business, and stress workloads are defined and versioned.
+      - Render time, memory, and output size are recorded for Python and Go.
+      - Absolute budgets are approved only after a stable baseline exists.
+    decisions: []
+    contracts: []
+    verification: [BENCH-RENDER-BASELINE]
+    implementation: [libs/python/benchmark.py, libs/go/cmd/benchmark/main.go]
+

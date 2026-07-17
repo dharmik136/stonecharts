@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peakcharts.dev/schemas/risk-register.schema.json",
+  "title": "PeakCharts risk register",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "status", "owner", "updated", "risks"],
+  "properties": {
+    "id": { "const": "PC-GOV-003" },
+    "title": { "type": "string" },
+    "status": { "enum": ["draft", "proposed", "approved", "archived"] },
+    "owner": { "type": "string" },
+    "updated": { "type": "string", "format": "date" },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "description", "likelihood", "impact", "status", "owner", "mitigation", "requirements"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^RISK-\\d{3}$" },
+          "title": { "type": "string", "minLength": 3 },
+          "description": { "type": "string", "minLength": 10 },
+          "likelihood": { "enum": ["low", "medium", "high"] },
+          "impact": { "enum": ["low", "medium", "high", "critical"] },
+          "status": { "enum": ["open", "mitigating", "accepted", "closed"] },
+          "owner": { "type": "string" },
+          "mitigation": { "type": "string", "minLength": 10 },
+          "requirements": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^REQ-[A-Z][A-Z0-9]*-\\d{3}$" },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}

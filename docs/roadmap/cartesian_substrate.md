@@ -1,7 +1,25 @@
-# Cartesian Substrate & Layout Contract
+---
+id: PC-ARCH-007
+title: Cartesian Substrate and Layout Roadmap
+status: proposed
+classification: informative
+owner: maintainer
+approver: product-owner
+review_mode: self
+applies_to: roadmap
+requirements: [REQ-LAYOUT-001]
+evidence: []
+last_reviewed: "2026-07-18"
+review_due: "2026-10-18"
+supersedes: null
+superseded_by: null
+---
+
+# Cartesian Substrate & Layout Reference
 
 > **Location:** `docs/roadmap/cartesian_substrate.md`
-> **Status:** Reference Specification
+> **Status:** Roadmap reference. Approved requirements, contracts, and ADRs take
+> precedence over this document.
 
 This document defines the coordinate space, grid layouts, scale projections, and accumulator pipelines shared by all Cartesian/XY chart types in PeakCharts (Line, Area, Column, Bar, Scatter, etc.).
 

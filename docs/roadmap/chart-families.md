@@ -1,10 +1,35 @@
-# PeakCharts — Chart Families Blueprint & Cartesian Build Contract
+---
+id: PC-ARCH-006
+title: PeakCharts Chart Families Roadmap
+status: proposed
+classification: informative
+owner: product-owner
+approver: maintainer
+review_mode: self
+applies_to: roadmap
+requirements: [REQ-PROD-001]
+evidence: []
+last_reviewed: "2026-07-18"
+review_due: "2026-10-18"
+supersedes: null
+superseded_by: null
+---
 
-> **Status:** Canonical roadmap + binding build contract for the PeakCharts dual-language (Python + Go) static SVG charting library.
+# PeakCharts — Chart Families Blueprint & Cartesian Build Roadmap
+
+> **Status:** Long-range engineering roadmap. Approved requirements, contracts, and
+> ADRs take precedence. Chart and language expansion is paused for Phase 0 and Alpha 1.
 > **Location:** `docs/roadmap/chart-families.md`
-> **Audience:** Any agent extending the chart catalog. Sections 4–5 are a **strict, binding contract** — the next sibling (Column, then Bar) MUST be built against them verbatim. Deviating is a defect even if the output "looks right."
+> **Audience:** Anyone planning chart-catalog expansion. Sections 4–5 preserve the
+> detailed implementation procedure that produced Column. Future work must first
+> reconcile it with approved requirements, contracts, ADRs, and the active release.
 
-## Locked decisions (do not relitigate)
+> **Governance migration:** historical uses of "binding", "locked", and uppercase
+> requirement language in this file describe the previous planning regime. This file
+> is informative under `PC-GOV-001`; those words become normative only when adopted by
+> an approved requirement, contract, or ADR.
+
+## Historical planning decisions
 
 Two planning calls are settled and frozen. Everything below is downstream of them.
 
@@ -626,9 +651,12 @@ This contract lets Column be added as a second marks callback + `render_cartesia
 
 ---
 
-## 5. The per-chart-type COORDINATION CONTRACT  *(binding procedure for every cartesian sibling)*
+## 5. The per-chart-type coordination procedure
 
-**Authority.** This section is the binding procedure an implementing agent MUST follow to add a Cartesian/XY chart type (column, bar, scatter, combo, area-variant, financial, …). Following it verbatim is what keeps the six library non-negotiables intact. Deviating is a defect even if the output "looks right."
+**Authority.** This section is a detailed engineering procedure, not current release
+authority. Before adding a Cartesian/XY type, the procedure must be reviewed against
+the active requirements, contracts, ADRs, and renderer constitution. Any adopted step
+is then linked from the governing requirement and verified through release evidence.
 
 **The six non-negotiables you are protecting (do not break any):**
 1. Python and Go emit **byte-identical SVG** for the same spec (golden-tested).
@@ -941,4 +969,4 @@ These families are **out of scope until the Cartesian family is exhausted** (§1
 1. **Extraction first (Call #1).** With Column (Rank 1), extract the shared chrome into `_cartesian.py` + `cartesian.go` (widening the corpus with the category-edge fixtures first, §4.6); pass **Gate A**; commit the extraction on its own.
 2. **Exhaust the Cartesian family (Call #1)** in the §3.3 build order: Column → Bar → Scatter → Bubble → Area → Combo → Histogram → Candlestick → Error bar → Area range → Column range → Waterfall → Bullet. Each rides §5's coordination contract and must satisfy Gates B and C (and Gate A′ for any rank that changes the `data` element type, e.g. Scatter) before landing. Order is fixed so each sibling forces the fewest **new** generalizations (§3.2) and unlocks the most reuse for the next.
 3. **Only after the Cartesian family is exhausted** (§1.4), open the deferred families in the §6 D1→D6 order — Polar → Matrix → Hierarchy → Flow → Statistical → Geo — each paying its foundation tax once and reusing prior foundations per the cross-family reuse chain. KPI types fold in opportunistically as their underlying substrates land (no dedicated foundation).
-4. **Throughout, both locked decisions hold:** every type targets the **Highcharts baseline** floor plus the **profiling superset** (Call #2), and every non-line addition rides the extracted shared substrate rather than duplicating it (Call #1). Byte-identical Python==Go output, verified against a shared golden corpus, is the invariant that gates every landing.
+4. **Throughout, the roadmap assumptions remain:** every type targets the **Highcharts baseline** floor plus the **profiling superset** (Call #2), and every non-line addition rides the extracted shared substrate rather than duplicating it (Call #1). Approved release scope and contracts can supersede these assumptions. Byte-identical Python==Go output, verified against a shared golden corpus, remains the intended gate for certified renderers.

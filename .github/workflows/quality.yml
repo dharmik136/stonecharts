@@ -1,0 +1,50 @@
+name: quality
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install "jsonschema>=4.23,<5" "markdown-it-py>=3,<5" "PyYAML>=6,<7"
+      - run: python tools/check_docs.py
+
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: python -m pip install "pytest>=8,<10"
+      - run: python -m pytest libs/python/tests
+
+  go:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: libs/go
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: libs/go/go.mod
+          cache-dependency-path: libs/go/go.mod
+      - run: go test ./...
+

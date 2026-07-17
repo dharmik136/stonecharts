@@ -14,6 +14,14 @@ keywords = ["charts", "svg", "visualization", "plotting"]
 classifiers = ["License :: Other/Proprietary License", "Private :: Do Not Upload"]
 dependencies = []
 
+[project.optional-dependencies]
+dev = [
+  "jsonschema>=4.23,<5",
+  "markdown-it-py>=3,<5",
+  "PyYAML>=6,<7",
+  "pytest>=8,<10",
+]
+
 [project.urls]
 Homepage = "https://github.com/dharmik136/peakcharts"
 

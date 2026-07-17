@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peakcharts.dev/schemas/evidence-registry.schema.json",
+  "title": "PeakCharts evidence registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "version", "updated", "evidence"],
+  "properties": {
+    "id": { "const": "PC-QUAL-EVIDENCE" },
+    "version": { "type": "integer", "minimum": 1 },
+    "updated": { "type": "string", "format": "date" },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "status", "description", "command", "location", "requirements"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^(TEST|BENCH|REVIEW)-[A-Z0-9-]+$" },
+          "kind": { "enum": ["test", "benchmark", "manual-review", "audit"] },
+          "status": { "enum": ["implemented", "partial", "planned", "retired"] },
+          "description": { "type": "string", "minLength": 10 },
+          "command": { "type": ["string", "null"] },
+          "location": { "type": ["string", "null"] },
+          "requirements": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^REQ-[A-Z][A-Z0-9]*-\\d{3}$" },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,6 +4,10 @@ An original, proprietary charting library. One shared chart-spec model, a
 standalone renderer per language, and a shared interaction runtime — so the same
 chart "recipe" produces the same interactive chart in Python, Go, and beyond.
 
+PeakCharts is currently entering a governed Alpha qualification phase. Product scope,
+guarantees, requirements, architecture decisions, risks, evidence, and release gates
+are indexed in [`docs/README.md`](docs/README.md).
+
 **Not** a fork or copy of any commercial charting library. The chart-type catalog
 is inspired by common visualization types (line, bar, pie, scatter, heatmap, …);
 every renderer here is written from scratch. All rights reserved.
@@ -38,9 +42,9 @@ renderer in each `libs/<lang>`. See any chart's `design.md` to generate it.
 
 PeakCharts generates deterministic static SVG without a browser runtime for
 supported chart specifications. Go and Python outputs are byte-identical for
-covered fixtures. It includes optional client-side interactivity and
-accessibility primitives; downstream PDF, PNG, and email workflows may require
-SVG conversion or rasterization.
+covered fixtures. Canonical output, browser behavior, visual export, and
+customization have separate applicability boundaries in the governed
+[`guarantees and limits`](docs/contracts/guarantees-and-limits.md).
 
 - **Deterministic & runtime-free rendering.** The SVG is fully drawn server-side —
   no browser or JS needed to produce it; the runtime only *enhances* an
@@ -91,12 +95,14 @@ peakcharts.SaveHTML(spec, "chart.html", "")
 | Chart | Spec | Python | Go | Interactivity |
 |-------|------|--------|----|----|
 | Basic line (`line-basic`) | ✅ | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Column (`column`) | qualification pending | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
 tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
-Roadmap: replicate the common chart-type catalog one type at a time (bar/column,
-area, pie, scatter, bubble, heatmap, gauge, …), each with its own `design.md`.
+The active Alpha scope is line and column. Other chart designs remain roadmap
+material until the schema, capability, conformance, packaging, and release gates
+for each type are complete.
 
 ## License
 

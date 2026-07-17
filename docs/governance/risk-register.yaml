@@ -1,0 +1,115 @@
+id: PC-GOV-003
+title: PeakCharts product and engineering risk register
+status: proposed
+owner: maintainer
+updated: "2026-07-18"
+risks:
+  - id: RISK-001
+    title: Released schema overstates renderer support
+    description: The active schema and handwritten validators accept chart types that Python and Go cannot render.
+    likelihood: high
+    impact: critical
+    status: open
+    owner: maintainer
+    mitigation: Restrict the active schema to released types and add explicit renderer capability validation.
+    requirements: [REQ-SCOPE-001, REQ-CAP-001]
+  - id: RISK-002
+    title: Schema and handwritten validators disagree
+    description: Minimum dimensions and non-empty series requirements currently differ between the JSON Schema and both runtime validators.
+    likelihood: high
+    impact: high
+    status: open
+    owner: maintainer
+    mitigation: Ratify one rule set, encode it in all three validators, and add shared accept-and-reject fixtures.
+    requirements: [REQ-VAL-001]
+  - id: RISK-003
+    title: Accepted input can panic or throw during dispatch
+    description: Unsupported chart types may pass validation and then cause a Go panic or Python exception during rendering.
+    likelihood: high
+    impact: critical
+    status: open
+    owner: maintainer
+    mitigation: Make render entry points return canonical typed errors for every user-controlled failure.
+    requirements: [REQ-CAP-001]
+  - id: RISK-004
+    title: Mixed-sign normal stacking has an invalid domain
+    description: Positive and negative values share one accumulator, which can place bars far outside the plotting area.
+    likelihood: high
+    impact: critical
+    status: open
+    owner: maintainer
+    mitigation: Use separate positive and negative accumulators in both the domain and mark transforms.
+    requirements: [REQ-STACK-001]
+  - id: RISK-005
+    title: Percent stacking has ambiguous signed semantics
+    description: Net-total normalization can divide by zero or erase non-zero values when positive and negative values cancel.
+    likelihood: high
+    impact: high
+    status: open
+    owner: product-owner
+    mitigation: Restrict Alpha 1 percent stacking to finite non-negative values and define all-zero categories explicitly.
+    requirements: [REQ-STACK-002]
+  - id: RISK-006
+    title: Unicode legend geometry differs by language
+    description: Python code-point length and Go byte length produce different legend estimates for non-ASCII names.
+    likelihood: high
+    impact: high
+    status: open
+    owner: maintainer
+    mitigation: Define one Unicode length model and lock it with cross-language fixtures.
+    requirements: [REQ-DET-001, REQ-LAYOUT-001]
+  - id: RISK-007
+    title: Fixed margins can clip real-world labels
+    description: Current deterministic fixed margins do not auto-fit long axis and category labels.
+    likelihood: high
+    impact: medium
+    status: open
+    owner: product-owner
+    mitigation: Add validated manual margins and publish the no-auto-fit Alpha 1 limitation.
+    requirements: [REQ-LAYOUT-001]
+  - id: RISK-008
+    title: Runtime interaction and accessibility gaps
+    description: Rect highlight behavior, tooltip persistence, legend keyboard operation, and accessibility semantics are not fully verified in a browser matrix.
+    likelihood: high
+    impact: high
+    status: open
+    owner: maintainer
+    mitigation: Ratify runtime semantics and add automated browser plus manual accessibility qualification.
+    requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
+  - id: RISK-009
+    title: Package version conflicts with planned release
+    description: Python package metadata and __version__ currently report 0.1.0 while the planned product release is 0.0.1-alpha.1.
+    likelihood: high
+    impact: high
+    status: open
+    owner: maintainer
+    mitigation: Adopt ecosystem-specific version mappings and verify every emitted package before tagging.
+    requirements: [REQ-REL-001]
+  - id: RISK-010
+    title: Short category arrays can break generated HTML
+    description: The accessible data-table path can index beyond an explicitly supplied category array shorter than the longest series.
+    likelihood: medium
+    impact: critical
+    status: open
+    owner: maintainer
+    mitigation: Define category-length semantics, validate or pad deterministically, and add shared HTML tests.
+    requirements: [REQ-VAL-001, REQ-A11Y-001]
+  - id: RISK-011
+    title: Byte identity may be misrepresented as pixel identity
+    description: Host fonts and viewer rasterizers can produce different pixels from identical SVG bytes.
+    likelihood: high
+    impact: high
+    status: mitigating
+    owner: product-owner
+    mitigation: Publish separate canonical, embedded-font, and certified-export guarantee profiles.
+    requirements: [REQ-VIS-001]
+  - id: RISK-012
+    title: Release provenance is not yet reproducible
+    description: The repository has no automated immutable release manifest, SBOM, package hashes, or build provenance.
+    likelihood: high
+    impact: high
+    status: open
+    owner: maintainer
+    mitigation: Build the Alpha 1 evidence pack and supply-chain workflow before public distribution.
+    requirements: [REQ-REL-001, REQ-SEC-001]
+

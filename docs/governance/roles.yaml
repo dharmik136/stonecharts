@@ -1,0 +1,18 @@
+id: PC-GOV-004
+title: PeakCharts controlled roles
+status: proposed
+updated: "2026-07-18"
+roles:
+  product-owner:
+    holder: Dharmik Shingala
+    responsibilities:
+      - Product scope, promises, priorities, and release approval.
+  maintainer:
+    holder: Dharmik Shingala
+    responsibilities:
+      - Architecture, implementation, conformance, packaging, and technical approval.
+  security-contact:
+    holder: Dharmik Shingala
+    responsibilities:
+      - Vulnerability intake, risk decisions, remediation, and disclosure coordination.
+

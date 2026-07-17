@@ -1,4 +1,25 @@
+---
+id: PC-QUAL-003
+title: Legacy Robustness and Known Limitations Report
+status: superseded
+classification: informative
+owner: maintainer
+approver: product-owner
+review_mode: self
+applies_to: historical implementation through 7ccfe63
+requirements: [REQ-DET-001, REQ-VAL-001, REQ-SEC-001]
+evidence: [TEST-VALIDATION-PARITY, TEST-XSS-ESCAPING]
+last_reviewed: "2026-07-18"
+review_due: "2026-10-18"
+supersedes: null
+superseded_by: PC-GOV-003
+---
+
 # Robustness & Known Limitations
+
+> Superseded as the active risk source by
+> [`PC-GOV-003`](governance/risk-register.yaml). Retained as the historical report
+> for the adversarial pass that produced these fixes and observations.
 
 Results of an adversarial stress-test pass against the three load-bearing walls
 (byte parity, the DOM contract, the spec schema). Each item has a regression test

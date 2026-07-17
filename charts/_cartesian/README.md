@@ -1,3 +1,20 @@
+---
+id: PC-ARCH-003
+title: PeakCharts Cartesian Substrate
+status: proposed
+classification: normative
+owner: maintainer
+approver: product-owner
+review_mode: self
+applies_to: 0.0.1-alpha.1
+requirements: [REQ-DET-001, REQ-STACK-001, REQ-STACK-002, REQ-LAYOUT-001]
+evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN]
+last_reviewed: "2026-07-18"
+review_due: "2026-09-18"
+supersedes: null
+superseded_by: null
+---
+
 # The Cartesian Substrate (`_cartesian`)
 
 > The shared substrate every Cartesian/XY chart rides. Read this **before** building
@@ -7,14 +24,15 @@
 > function you supply (the marks callback), and the parity / a11y / validation
 > obligations you inherit and must not break.
 >
-> **This README is orientation, not authority.** The binding contract is
+> **Authority note:** approved requirements, contracts, and ADRs take precedence.
+> Within that boundary, the detailed implementation roadmap is
 > [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) **§3–§5**
 > (§3 the scoped plan + generalizations, §4 the extraction contract, §5 the
 > per-chart coordination contract). The DOM contract is
 > [`spec/svg-contract.md`](../../spec/svg-contract.md). The recipe template every
 > chart's `design.md` copies is [`charts/line-basic/design.md`](../line-basic/design.md).
-> **Where this file and chart-families.md ever disagree, chart-families.md wins —
-> fix this file.**
+> If this file and the roadmap disagree, approved requirements, contracts, and ADRs
+> decide the behavior; reconcile both engineering documents before implementation.
 
 - **Module (Python):** `libs/python/peakcharts/charts/_cartesian.py`
 - **Module (Go):** `libs/go/cartesian.go` (flat `package peakcharts`)

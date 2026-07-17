@@ -1,3 +1,20 @@
+---
+id: PC-ARCH-004
+title: PeakCharts Basic Line Design
+status: proposed
+classification: normative
+owner: maintainer
+approver: product-owner
+review_mode: self
+applies_to: 0.0.1-alpha.1
+requirements: [REQ-SCOPE-001, REQ-DET-001, REQ-RUNTIME-001, REQ-A11Y-001]
+evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-RUNTIME-BROWSER]
+last_reviewed: "2026-07-18"
+review_due: "2026-09-18"
+supersedes: null
+superseded_by: null
+---
+
 # Chart: Basic Line (`line-basic`)
 
 > A single-file, self-describing spec for this chart. Read this and you can

@@ -1,4 +1,25 @@
+---
+id: PC-ARCH-005
+title: PeakCharts Column Design
+status: proposed
+classification: normative
+owner: maintainer
+approver: product-owner
+review_mode: self
+applies_to: 0.0.1-alpha.1
+requirements: [REQ-SCOPE-001, REQ-DET-001, REQ-STACK-001, REQ-STACK-002, REQ-RUNTIME-001, REQ-A11Y-001]
+evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN, TEST-RUNTIME-BROWSER]
+last_reviewed: "2026-07-18"
+review_due: "2026-09-18"
+supersedes: null
+superseded_by: null
+---
+
 # Chart: Column (`column`)
+
+> **Phase 0 authority note:** this design predates the signed-stacking decision.
+> [`ADR 0003`](../../docs/architecture/adr/0003-signed-stacking.md) overrides any
+> single-accumulator or signed-percent language below until this design is reconciled.
 
 > A single-file, self-describing spec for this chart. Read this and you can
 > produce the chart in any PeakCharts language library without looking anywhere
@@ -16,7 +37,7 @@
   Rank 1 — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 1, §4, §5
 - **Renderers:** `libs/python/peakcharts/charts/column.py` · `libs/go/column.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
-- **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
+- **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · implementation roadmap
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
 
 ## What it is
