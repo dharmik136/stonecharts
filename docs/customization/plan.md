@@ -51,17 +51,30 @@ two non-negotiables. Source research: `docs/research/design-customization-brief.
      renderers and locked to the JSON by a parity test. Threads bg + all text/grid/
      axis/marker-halo colors + palette. New fixture `dark.svg`; light default keeps
      every existing golden byte-identical.
-   - **5b a11y ✅ done (default-on).** SVG gets `role="img"` + a summary `aria-label`
-     + `<desc>`; the HTML output adds a visually-hidden, keyboard-navigable data
-     table (caption + column/row headers + every value). `spec.a11y` (default true);
-     `a11y:false` restores the pre-a11y bytes. Accessibility is baseline, so this
-     DELIBERATELY regenerated all 6 goldens — the diff is purely the a11y markup
-     (verified line-by-line), and Python==Go parity was re-proven.
+   - **5b a11y ✅ done (default-on).** SVG gets `role="img"` + a **concise** summary
+     `aria-label` + a matching `<desc>` (chart type + series names + category range).
+     Accessibility rules of record:
+     - **Do NOT `aria-describedby` the data table.** Pointing the SVG's description
+       at a `<table>` makes screen readers read the whole table as one flattened
+       string on focus — overwhelming and unusable. The summary stays short.
+     - **The data table is a SEPARATE semantic element** in the HTML (its own
+       `<caption>` + column/row headers + every value), visually hidden with the
+       `!important` sr-only pattern. A screen-reader user navigates it with standard
+       table commands at their own pace — it is not tied to the SVG's description.
+     `spec.a11y` (default true); `a11y:false` restores the pre-a11y bytes. Making a11y
+     baseline DELIBERATELY regenerated all goldens (diff = purely the a11y markup;
+     Python==Go re-proven).
    - **Keyboard navigation ✅ done (runtime).** The chart is a single focus stop
      (tabindex set by the runtime, so the static SVG is unchanged); arrow keys walk
-     the points (Left/Right within a series, Up/Down across series, Home/End, Esc),
-     reusing the live tooltip + crosshair + highlight. Sighted keyboard users get
-     the visual experience; screen-reader users use the data table.
+     the points (Left/Right within a series, Up/Down across series, Home/End),
+     reusing the live tooltip + crosshair + highlight.
+     - **No focus trap.** Tab focuses the chart and the next Tab passes focus on to
+       the next element normally; arrows are the only intercepted keys.
+     - **Esc collapses the active state without stealing focus** — it clears the
+       highlight/tooltip but leaves focus on the SVG root, and bubbles when nothing
+       is active (so a parent modal's Esc still works).
+     Sighted keyboard users get the visual experience; screen-reader users use the
+     separate data table.
 
 ## Nits to fix as we touch them
 - `legend` will become `oneOf [boolean, object]` when legend layout lands (Phase 5);

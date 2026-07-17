@@ -16,8 +16,9 @@ every renderer here is written from scratch. All rights reserved.
    [`spec/svg-contract.md`](spec/svg-contract.md).
 3. The shared **interaction runtime**
    ([`runtime/chart-interactions.js`](runtime/chart-interactions.js)) enhances that
-   SVG (tooltip, point highlight, legend toggle, crosshair). Output is a single,
-   self-contained interactive HTML file.
+   SVG (tooltip, point highlight, legend toggle, crosshair, keyboard navigation)
+   and layers on accessibility (a concise screen-reader summary plus a
+   navigable data table). Output is a single, self-contained interactive HTML file.
 
 ## Repo layout
 
@@ -26,12 +27,31 @@ spec/          shared spec schema + the SVG DOM contract
 runtime/       the shared vanilla-JS interaction runtime (written once)
 charts/<id>/   per-chart docs: design.md, examples/, golden/
 libs/python/   Python renderer (peakcharts package)
-libs/go/       Go renderer (next)
+libs/go/       Go renderer
 CHARTS.md      the "smart" router: data + intent -> which chart + its design.md
 ```
 
 Every new chart type = one `charts/<id>/` folder (with its `design.md`) plus a
 renderer in each `libs/<lang>`. See any chart's `design.md` to generate it.
+
+## Guarantees & limitations
+
+PeakCharts generates deterministic static SVG without a browser runtime for
+supported chart specifications. Go and Python outputs are byte-identical for
+covered fixtures. It includes optional client-side interactivity and
+accessibility primitives; downstream PDF, PNG, and email workflows may require
+SVG conversion or rasterization.
+
+- **Deterministic & runtime-free rendering.** The SVG is fully drawn server-side —
+  no browser or JS needed to produce it; the runtime only *enhances* an
+  already-complete chart.
+- **Cross-language byte parity** is verified per fixture by the golden tests in
+  both languages; it is a guarantee for *covered* specs, not an untested claim for
+  every possible input (see [`docs/robustness.md`](docs/robustness.md)).
+- **Interactivity & accessibility are optional layers.** Disable the a11y layer
+  with `a11y: false`; the interactive HTML is one self-contained file.
+- **Export is out of scope of the core.** PDF/PNG/email delivery is a downstream
+  concern — convert or rasterize the SVG with the tool of your choice.
 
 ## Quickstart (Python)
 

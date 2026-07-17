@@ -1,0 +1,14 @@
+{
+  "type": "line",
+  "title": "Partial gradient stops",
+  "subtitle": "a stop missing offset must be kept (offset -> 0), not dropped",
+  "xAxis": { "categories": ["a", "b", "c", "d", "e"] },
+  "series": [
+    {
+      "name": "s",
+      "data": [3, 6, 4, 8, 5],
+      "color": { "stops": [ { "offset": 0, "color": "#2f7ed8" }, { "color": "#1aadce" } ] },
+      "fillOpacity": 0.4
+    }
+  ]
+}

@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / "libs" / "python"))
 from peakcharts import ChartSpec, THEMES  # noqa: E402
 from peakcharts.render import render_svg  # noqa: E402
 
-CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial"]
+CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 
 
 def _check(name: str):

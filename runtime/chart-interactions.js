@@ -167,8 +167,12 @@
       else if (k === "ArrowUp") go(Math.max(si - 1, 0), pi);
       else if (k === "Home") go(si, 0);
       else if (k === "End") go(si, series[si].length - 1);
-      else if (k === "Escape") { clear(); svg.blur(); }
-      else return;
+      else if (k === "Escape") {
+        // Collapse the chart's active state but KEEP focus on the SVG (Tab still
+        // moves on). If nothing is active, let Esc bubble (e.g. to close a modal).
+        if (!active) return;
+        clear();
+      } else return;
       e.preventDefault();
     });
   }

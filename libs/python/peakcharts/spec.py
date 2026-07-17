@@ -223,6 +223,8 @@ class ChartSpec:
             c = s.get("color")
             if isinstance(c, dict):
                 color: Optional[Union[str, Gradient]] = Gradient(
+                    # Keep every stop (missing offset -> 0.0, color -> "") so this
+                    # matches Go's decoder byte-for-byte; do NOT drop partial stops.
                     stops=[
                         GradientStop(
                             offset=_float(st.get("offset"), 0.0),
@@ -230,7 +232,6 @@ class ChartSpec:
                             opacity=_float_or_none(st.get("opacity")),
                         )
                         for st in c.get("stops", [])
-                        if "offset" in st and "color" in st
                     ],
                     x1=_float(c.get("x1"), 0.0),
                     y1=_float(c.get("y1"), 0.0),
