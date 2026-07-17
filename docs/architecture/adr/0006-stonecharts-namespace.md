@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1 and later
+applies_to: 0.0.0.1 and later
 requirements: [REQ-DET-001, REQ-RUNTIME-001]
 evidence: [TEST-DOCS-CONTROL, TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
 last_reviewed: "2026-07-18"
@@ -37,7 +37,7 @@ StoneCharts is the sole canonical product and technical namespace:
 - Controlled-document prefix: `SC-`.
 
 No compatibility package, browser alias, or dual DOM selector is carried into
-Alpha 1. Canonical SVG goldens are requalified under the `sc-` namespace, and both
+0.0.0.1. Canonical SVG goldens are requalified under the `sc-` namespace, and both
 certified renderers must continue to match the same files byte for byte.
 
 ## Consequences

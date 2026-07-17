@@ -6,7 +6,7 @@ classification: normative
 owner: security-contact
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-SEC-001, REQ-CUST-001, REQ-CAP-001]
 evidence: [TEST-XSS-ESCAPING, TEST-CAPABILITY-MATRIX, TEST-RUNTIME-BROWSER]
 last_reviewed: "2026-07-18"

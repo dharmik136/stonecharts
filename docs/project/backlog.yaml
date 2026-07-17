@@ -1,0 +1,728 @@
+id: SC-OPS-BACKLOG
+version: 1
+updated: "2026-07-18"
+project:
+  owner: dharmik136
+  number: 2
+  repository: dharmik136/stonecharts
+  milestone: 0.0.0.1
+  views:
+    - name: 0.0.0.1 Board
+      layout: BOARD_LAYOUT
+      filter: ""
+      fields: [Title, Status, Tracking ID, Item Type, Priority, Workstream, Stage, Target]
+      group_by: []
+    - name: Release Gates
+      layout: TABLE_LAYOUT
+      filter: 'item-type:"Release Gate"'
+      fields: [Title, Status, Tracking ID, Priority, Workstream, Stage, Target, Risks, Evidence, Dependencies]
+      group_by: []
+    - name: Stage 0
+      layout: TABLE_LAYOUT
+      filter: 'stage:"S0 Foundation"'
+      fields: [Title, Status, Tracking ID, Item Type, Priority, Workstream, Target, Risks, Evidence, Dependencies]
+      group_by: []
+    - name: Decisions
+      layout: TABLE_LAYOUT
+      filter: item-type:Decision
+      fields: [Title, Status, Tracking ID, Priority, Workstream, Stage, Target, Traceability, Risks, Evidence, Dependencies]
+      group_by: []
+    - name: Workstreams
+      layout: TABLE_LAYOUT
+      filter: ""
+      fields: [Title, Status, Tracking ID, Item Type, Priority, Stage, Target, Risks, Evidence, Dependencies]
+      group_by: [Workstream]
+    - name: Risks & Evidence
+      layout: TABLE_LAYOUT
+      filter: RISK-
+      fields: [Title, Status, Tracking ID, Priority, Workstream, Stage, Risks, Evidence, Dependencies]
+      group_by: []
+workflow:
+  statuses: [Inbox, Triage, Ready, In Progress, In Review, Qualification, Blocked, Done]
+  priorities: [P0, P1, P2, P3]
+  workstreams:
+    - WS-01 Governance
+    - WS-02 Renderer
+    - WS-03 Conformance
+    - WS-04 Runtime & A11y
+    - WS-05 Customization
+    - WS-06 Release
+    - WS-07 Docs & DX
+    - WS-08 Expansion
+  stages:
+    - S0 Foundation
+    - S1 Contract Closure
+    - S2 Qualification
+    - S3 Release Candidate
+    - S4 Release
+    - S5 Expansion
+  targets: [0.0.0.1, Post-0.0.0.1, Unscheduled]
+  item_types: [Decision, Requirement, Work Package, Defect, Release Gate]
+
+items:
+  - id: DEC-001
+    title: Adopt 0.0.0.1 as the canonical first release identifier
+    item_type: Decision
+    status: Done
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: Every governed product surface names the first StoneCharts release as 0.0.0.1.
+    traceability: [SC-ARCH-ADR-0007, REQ-REL-001]
+    risks: [RISK-009]
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: []
+    compatibility: Changes planning and future package metadata; no public release exists to migrate.
+    areas: [docs, release]
+    acceptance:
+      - The canonical identifier is exactly 0.0.0.1 in governance, release, milestone, and Project records.
+      - The identifier is not represented as Semantic Versioning.
+      - Ecosystem-specific publication constraints remain explicit release gates.
+    verification: [python tools/check_docs.py, GitHub Project conformance check]
+
+  - id: DEC-002
+    title: Ratify line and column as the only active 0.0.0.1 chart types
+    item_type: Decision
+    status: Ready
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: The first release has one unambiguous chart capability boundary.
+    traceability: [REQ-SCOPE-001, REQ-CAP-001, SC-ARCH-ADR-0002, SC-CON-002]
+    risks: [RISK-001, RISK-003]
+    evidence: [TEST-CAPABILITY-MATRIX]
+    dependencies: []
+    compatibility: Narrows the active schema; unreleased design recipes remain informative.
+    areas: [spec, python, go]
+    acceptance:
+      - Product owner records whether only line and column are actively supported.
+      - Unsupported designs have an explicit non-normative status.
+      - The decision names the required validator and capability behavior.
+    verification: [Approved decision record and capability-matrix test plan]
+
+  - id: DEC-003
+    title: Decide when additional language renderers may enter development
+    item_type: Decision
+    status: Triage
+    priority: P1
+    workstream: WS-08 Expansion
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: Language expansion cannot bypass the conformance and release gates.
+    traceability: [SC-ARCH-002, SC-OPS-003]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-002]
+    compatibility: Controls future implementation sequencing without changing current APIs.
+    areas: [docs, release]
+    acceptance:
+      - The decision states whether implementation begins before or after 0.0.0.1 qualification.
+      - Admission requirements for every new renderer are named.
+      - The initial candidate-language order is either approved or explicitly deferred.
+    verification: [Approved decision and updated renderer constitution]
+
+  - id: DEC-004
+    title: Ratify the structured customization surface for 0.0.0.1
+    item_type: Decision
+    status: Triage
+    priority: P0
+    workstream: WS-05 Customization
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: Users receive meaningful visual freedom without invalidating certified guarantees.
+    traceability: [REQ-CUST-001, REQ-LAYOUT-001, SC-CON-005, SC-ARCH-ADR-0005]
+    risks: [RISK-007, RISK-011]
+    evidence: [TEST-VALIDATION-PARITY, TEST-XSS-ESCAPING, TEST-LAYOUT-MARGINS]
+    dependencies: [DEC-002]
+    compatibility: Defines the first public customization contract and rejected escape hatches.
+    areas: [spec, python, go, security]
+    acceptance:
+      - Every guaranteed customization primitive is enumerated.
+      - Arbitrary CSS, callbacks, raw SVG, and DOM mutation are classified explicitly.
+      - Validation, parity, security, and downgrade behavior are specified.
+    verification: [Approved customization contract and mapped tests]
+
+  - id: DEC-005
+    title: Define the compatibility policy beginning with 0.0.0.1
+    item_type: Decision
+    status: Triage
+    priority: P1
+    workstream: WS-01 Governance
+    stage: S3 Release Candidate
+    target: 0.0.0.1
+    outcome: Consumers can distinguish pre-release change freedom from promised migration behavior.
+    traceability: [SC-CON-001, SC-REL-001]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [GATE-S2]
+    compatibility: Establishes policy for schema, API, DOM, bytes, packages, and migrations.
+    areas: [docs, release]
+    acceptance:
+      - Covered public surfaces are listed.
+      - Breaking-change, deprecation, and migration-note rules are stated.
+      - The policy says when stronger compatibility begins.
+    verification: [Approved compatibility policy and release-checklist mapping]
+
+  - id: DEC-006
+    title: Decide the default branch and authoritative merge strategy
+    item_type: Decision
+    status: Ready
+    priority: P1
+    workstream: WS-01 Governance
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: Repository contribution flow has one explicit default branch and merge policy.
+    traceability: [SC-OPS-001, SC-SEC-002]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: []
+    compatibility: May rename master to main; branch protection is plan-limited while the repository is private.
+    areas: [docs, release, security]
+    acceptance:
+      - Default-branch naming is decided.
+      - Merge, history, review, and source-branch deletion rules are recorded.
+      - The GitHub plan limitation on branch protection has an explicit treatment.
+    verification: [Repository settings audit and approved operating policy]
+
+  - id: DEC-007
+    title: Adopt the governed GitHub Project field and workflow model
+    item_type: Decision
+    status: Done
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: The execution board mirrors a validated backlog and uses controlled workflow fields.
+    traceability: [SC-OPS-001, SC-OPS-005]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: []
+    compatibility: Adds planning controls only; it does not alter product behavior.
+    areas: [docs, release]
+    acceptance:
+      - Required Project fields and status transitions are defined.
+      - Every governed backlog item has a stable tracking ID and acceptance contract.
+      - Local and remote conformance checks detect drift.
+    verification: [python tools/check_docs.py, python tools/check_github_project.py]
+
+  - id: DEC-008
+    title: Approve the supported runtime and platform matrix
+    item_type: Decision
+    status: Triage
+    priority: P1
+    workstream: WS-03 Conformance
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Support claims name only environments backed by qualification evidence.
+    traceability: [REQ-REL-001, REQ-RUNTIME-001, SC-QUAL-001]
+    risks: [RISK-008]
+    evidence: [TEST-RUNTIME-BROWSER, TEST-RELEASE-EVIDENCE]
+    dependencies: [GATE-S1]
+    compatibility: Defines supported Python, Go, browser, operating-system, and exporter profiles.
+    areas: [python, go, runtime, release]
+    acceptance:
+      - Supported, experimental, and untested environments are separated.
+      - Toolchain versions and qualification evidence are named.
+      - Unsupported environments are not implied by generic claims.
+    verification: [Recorded compatibility matrix and passing profile evidence]
+
+  - id: DEC-009
+    title: Approve performance and artifact-size release budgets
+    item_type: Decision
+    status: Triage
+    priority: P1
+    workstream: WS-03 Conformance
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Performance claims and regression gates are grounded in repeatable measurements.
+    traceability: [REQ-PERF-001, SC-QUAL-002]
+    risks: []
+    evidence: [BENCH-RENDER-BASELINE]
+    dependencies: [GATE-S1]
+    compatibility: Sets non-functional budgets without changing rendered semantics.
+    areas: [python, go, runtime, release]
+    acceptance:
+      - Baseline workloads and environment are approved.
+      - Budgets follow measured variance rather than arbitrary targets.
+      - Accepted-regression rules are documented.
+    verification: [Benchmark report review and approved budgets]
+
+  - id: DEC-010
+    title: Approve the certified visual profile for 0.0.0.1
+    item_type: Decision
+    status: Triage
+    priority: P1
+    workstream: WS-05 Customization
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Byte identity, font consistency, and pixel export are never conflated.
+    traceability: [REQ-VIS-001, SC-CON-006, SC-ARCH-ADR-0005]
+    risks: [RISK-011]
+    evidence: [REVIEW-VISUAL-PROFILE]
+    dependencies: [GATE-S1]
+    compatibility: Defines visual claims and certified exporter boundaries.
+    areas: [runtime, docs, release]
+    acceptance:
+      - The default host-font profile is explicit.
+      - Any certified pixel profile names its font, exporter, environment, and tolerance.
+      - Accessibility and artifact-size tradeoffs are recorded.
+    verification: [Visual-profile review record]
+
+  - id: DEC-011
+    title: Decide package and source publication channels
+    item_type: Decision
+    status: Triage
+    priority: P1
+    workstream: WS-06 Release
+    stage: S3 Release Candidate
+    target: 0.0.0.1
+    outcome: Source and packages are published only through approved, supportable channels.
+    traceability: [REQ-REL-001, SC-SEC-002, SC-ARCH-ADR-0007]
+    risks: [RISK-009, RISK-012]
+    evidence: [TEST-RELEASE-EVIDENCE]
+    dependencies: [GATE-S2]
+    compatibility: Must resolve valid ecosystem version mapping, especially for Go modules.
+    areas: [python, go, release, security]
+    acceptance:
+      - Repository and registry visibility are approved.
+      - Python, Go, source, and evidence publication paths are defined.
+      - Support and rollback responsibilities exist for every channel.
+    verification: [Distribution plan review and package dry run]
+
+  - id: DEC-012
+    title: Complete StoneCharts name-clearance decision
+    item_type: Decision
+    status: Triage
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S3 Release Candidate
+    target: 0.0.0.1
+    outcome: Public commercial branding proceeds only after documented name due diligence.
+    traceability: [SC-PROD-001, SC-ARCH-ADR-0006]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [GATE-S2]
+    compatibility: May require a pre-publication rename if clearance fails.
+    areas: [docs, release]
+    acceptance:
+      - Repository, package-index, domain, company-name, and trademark searches are recorded.
+      - Jurisdictions and professional legal-review boundaries are explicit.
+      - The product owner records proceed, constrain, or rename.
+    verification: [Dated name-clearance record]
+
+  - id: DEC-013
+    title: Decide commercial license, contribution, support, and access model
+    item_type: Decision
+    status: Triage
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S3 Release Candidate
+    target: 0.0.0.1
+    outcome: External access cannot imply rights or support commitments that were never approved.
+    traceability: [SC-PROD-002, SC-SEC-002]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [GATE-S2]
+    compatibility: Controls licensing, contributions, distribution, support, and commercial use.
+    areas: [docs, release, security]
+    acceptance:
+      - License and source-access terms are explicit.
+      - Contribution and intellectual-property terms are explicit.
+      - Support, vulnerability response, and commercial channels are explicit.
+    verification: [Approved legal and operating policy set]
+
+  - id: WORK-S0-001
+    title: Review and approve the Stage 0 controlled foundation baseline
+    item_type: Work Package
+    status: Triage
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: The product, architecture, contract, quality, security, and release baseline becomes authoritative before hardening work starts.
+    traceability: [SC-GOV-001, SC-PROD-001, SC-PROD-002, SC-ARCH-001, SC-ARCH-002, SC-CON-001, SC-REL-001]
+    risks: [RISK-001, RISK-002, RISK-003, RISK-004, RISK-005, RISK-007, RISK-008, RISK-009, RISK-010, RISK-011, RISK-012]
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-001, DEC-002, DEC-003, DEC-004, DEC-006, DEC-007, REQ-PROD-001]
+    compatibility: Approves contracts but does not change renderer output or public packages.
+    areas: [docs, spec, release, security]
+    acceptance:
+      - Every applicable normative document is reviewed and has a truthful lifecycle status.
+      - Requirements, ADRs, contracts, risks, evidence, and release gates have no unresolved references.
+      - Current implementation gaps are represented in this backlog with ownership and acceptance criteria.
+      - No chart or language expansion work is active.
+    verification: [python tools/check_docs.py, controlled baseline review]
+
+  - id: REQ-PROD-001
+    title: Qualify one language-neutral chart specification
+    item_type: Requirement
+    status: Ready
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: Approve and prove the registered REQ-PROD-001 acceptance contract.
+    traceability: [REQ-PROD-001, SC-PROD-001, SC-CON-001, SC-CON-002]
+    risks: [RISK-002]
+    evidence: [TEST-VALIDATION-PARITY]
+    dependencies: [DEC-001]
+    compatibility: Establishes the released specification boundary across Python and Go.
+    areas: [spec, python, go, docs]
+
+  - id: REQ-SCOPE-001
+    title: Restrict active chart scope to line and column
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-02 Renderer
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-SCOPE-001 acceptance contract.
+    traceability: [REQ-SCOPE-001, SC-ARCH-ADR-0002, SC-CON-002]
+    risks: [RISK-001]
+    evidence: [TEST-CAPABILITY-MATRIX]
+    dependencies: [DEC-002, GATE-S0]
+    compatibility: Narrows validation for unreleased chart designs.
+    areas: [spec, python, go]
+
+  - id: REQ-VAL-001
+    title: Reconcile schema, Python, and Go validation semantics
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-VAL-001 acceptance contract.
+    traceability: [REQ-VAL-001, SC-CON-002]
+    risks: [RISK-002, RISK-010]
+    evidence: [TEST-VALIDATION-PARITY]
+    dependencies: [REQ-SCOPE-001, GATE-S0]
+    compatibility: May reject inputs previously accepted inconsistently by unreleased validators.
+    areas: [spec, python, go]
+
+  - id: REQ-CAP-001
+    title: Add typed non-fatal renderer capability failures
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-02 Renderer
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-CAP-001 acceptance contract.
+    traceability: [REQ-CAP-001, SC-CON-002]
+    risks: [RISK-001, RISK-003]
+    evidence: [TEST-CAPABILITY-MATRIX]
+    dependencies: [REQ-VAL-001, GATE-S0]
+    compatibility: Replaces panic or exception boundaries with canonical typed errors.
+    areas: [python, go, spec]
+
+  - id: REQ-STACK-001
+    title: Correct mixed-sign normal stacking geometry
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-02 Renderer
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-STACK-001 acceptance contract.
+    traceability: [REQ-STACK-001, SC-ARCH-ADR-0003]
+    risks: [RISK-004]
+    evidence: [TEST-STACK-SIGNED]
+    dependencies: [GATE-S0]
+    compatibility: Intentionally changes incorrect mixed-sign column geometry and affected goldens.
+    areas: [python, go, spec]
+
+  - id: REQ-STACK-002
+    title: Define and enforce safe percent stacking
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-02 Renderer
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-STACK-002 acceptance contract.
+    traceability: [REQ-STACK-002, SC-ARCH-ADR-0003]
+    risks: [RISK-005]
+    evidence: [TEST-PERCENT-DOMAIN]
+    dependencies: [GATE-S0]
+    compatibility: Rejects ambiguous signed percent stacks and defines all-zero output.
+    areas: [spec, python, go]
+
+  - id: REQ-LAYOUT-001
+    title: Add deterministic validated manual margins
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-05 Customization
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-LAYOUT-001 acceptance contract.
+    traceability: [REQ-LAYOUT-001, SC-ARCH-ADR-0005, SC-CON-005, SC-CON-006]
+    risks: [RISK-006, RISK-007]
+    evidence: [TEST-LAYOUT-MARGINS]
+    dependencies: [DEC-004, GATE-S0]
+    compatibility: Adds structured layout fields while preserving default canonical output.
+    areas: [spec, python, go]
+
+  - id: REQ-RUNTIME-001
+    title: Correct and qualify invariant browser interaction semantics
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-04 Runtime & A11y
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-RUNTIME-001 acceptance contract.
+    traceability: [REQ-RUNTIME-001, SC-ARCH-ADR-0004, SC-CON-003, SC-CON-004]
+    risks: [RISK-008]
+    evidence: [TEST-RUNTIME-BROWSER]
+    dependencies: [GATE-S0]
+    compatibility: May change tooltip, focus, legend, and keyboard state transitions to match the contract.
+    areas: [runtime, python, go]
+
+  - id: REQ-CUST-001
+    title: Implement the deterministic customization boundary
+    item_type: Requirement
+    status: Triage
+    priority: P0
+    workstream: WS-05 Customization
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-CUST-001 acceptance contract.
+    traceability: [REQ-CUST-001, SC-CON-005, SC-ARCH-ADR-0001]
+    risks: [RISK-007, RISK-011]
+    evidence: [TEST-VALIDATION-PARITY, TEST-XSS-ESCAPING]
+    dependencies: [DEC-004, GATE-S0]
+    compatibility: Freezes guaranteed structured styles and explicitly excludes unsafe escape hatches.
+    areas: [spec, python, go, security]
+
+  - id: GATE-S0
+    title: Pass Stage 0 product-foundation gate
+    item_type: Release Gate
+    status: Triage
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S0 Foundation
+    target: 0.0.0.1
+    outcome: No implementation-hardening item becomes Ready until the governed foundation is approved and internally consistent.
+    traceability: [SC-OPS-005, SC-REL-001]
+    risks: [RISK-001, RISK-002, RISK-003, RISK-009]
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-001, DEC-002, DEC-003, DEC-004, DEC-006, DEC-007, WORK-S0-001, REQ-PROD-001]
+    compatibility: Governance gate only; no renderer behavior changes.
+    areas: [docs, release]
+    acceptance:
+      - Canonical release identity and active scope are approved.
+      - Guarantee, customization, versioning, and project-operation decisions are recorded.
+      - Controlled documents and registries validate with no unresolved reference.
+      - Stage 1 work remains blocked until this gate is closed.
+    verification: [python tools/check_docs.py, python tools/check_github_project.py]
+
+  - id: GATE-S1
+    title: Pass Stage 1 contract-closure gate
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-02 Renderer
+    stage: S1 Contract Closure
+    target: 0.0.0.1
+    outcome: Active line and column behavior is mathematically safe, validated, bounded, and frozen for qualification.
+    traceability: [SC-REL-001, SC-CON-002, SC-CON-005]
+    risks: [RISK-001, RISK-002, RISK-003, RISK-004, RISK-005, RISK-007, RISK-008, RISK-010]
+    evidence: [TEST-VALIDATION-PARITY, TEST-CAPABILITY-MATRIX, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN, TEST-LAYOUT-MARGINS, TEST-RUNTIME-BROWSER]
+    dependencies: [GATE-S0, REQ-SCOPE-001, REQ-VAL-001, REQ-CAP-001, REQ-STACK-001, REQ-STACK-002, REQ-LAYOUT-001, REQ-RUNTIME-001, REQ-CUST-001]
+    compatibility: Freezes the 0.0.0.1 behavior and canonical fixture domain.
+    areas: [spec, python, go, runtime]
+    acceptance:
+      - Every Stage 1 requirement is implemented and reviewed.
+      - Shared valid and invalid fixtures pass in schema, Python, and Go.
+      - Canonical changes have approved semantic justification and reviewed byte diffs.
+      - No known P0 correctness or runtime defect remains.
+    verification: [All Stage 1 evidence IDs pass and direct cross-render has zero diff]
+
+  - id: REQ-DET-001
+    title: Qualify canonical SVG byte parity
+    item_type: Requirement
+    status: Inbox
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Requalify and prove the registered REQ-DET-001 acceptance contract on the frozen release corpus.
+    traceability: [REQ-DET-001, SC-CON-001, SC-CON-003]
+    risks: [RISK-006]
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
+    dependencies: [GATE-S1]
+    compatibility: Certifies canonical output; unapproved byte changes fail qualification.
+    areas: [python, go, spec]
+
+  - id: REQ-A11Y-001
+    title: Qualify accessible chart alternatives and operation
+    item_type: Requirement
+    status: Inbox
+    priority: P0
+    workstream: WS-04 Runtime & A11y
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-A11Y-001 acceptance contract.
+    traceability: [REQ-A11Y-001, SC-CON-003, SC-CON-004, SC-CON-007]
+    risks: [RISK-008, RISK-010]
+    evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
+    dependencies: [REQ-RUNTIME-001, GATE-S1]
+    compatibility: Defines the supported component accessibility profile without whole-page claims.
+    areas: [runtime, python, go, docs]
+
+  - id: REQ-VIS-001
+    title: Qualify explicit visual reproducibility profiles
+    item_type: Requirement
+    status: Inbox
+    priority: P1
+    workstream: WS-05 Customization
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-VIS-001 acceptance contract.
+    traceability: [REQ-VIS-001, SC-CON-001, SC-CON-006]
+    risks: [RISK-011]
+    evidence: [REVIEW-VISUAL-PROFILE]
+    dependencies: [DEC-010, GATE-S1]
+    compatibility: Constrains visual claims rather than changing canonical SVG semantics.
+    areas: [runtime, docs, release]
+
+  - id: REQ-SEC-001
+    title: Requalify untrusted specification safety
+    item_type: Requirement
+    status: Inbox
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Requalify and prove the registered REQ-SEC-001 acceptance contract across all released sinks.
+    traceability: [REQ-SEC-001, SC-SEC-001, SC-CON-005]
+    risks: [RISK-003, RISK-012]
+    evidence: [TEST-XSS-ESCAPING]
+    dependencies: [REQ-CUST-001, GATE-S1]
+    compatibility: Unsafe values may become newly rejected; no executable escape hatch is promised.
+    areas: [security, spec, python, go, runtime]
+
+  - id: REQ-PERF-001
+    title: Establish reproducible performance qualification
+    item_type: Requirement
+    status: Inbox
+    priority: P1
+    workstream: WS-03 Conformance
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-PERF-001 acceptance contract.
+    traceability: [REQ-PERF-001, SC-QUAL-002]
+    risks: []
+    evidence: [BENCH-RENDER-BASELINE]
+    dependencies: [DEC-009, GATE-S1]
+    compatibility: Establishes baselines and budgets without weakening correctness gates.
+    areas: [python, go, runtime, release]
+
+  - id: GATE-S2
+    title: Pass Stage 2 qualification gate
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S2 Qualification
+    target: 0.0.0.1
+    outcome: Every product claim is backed by repeatable correctness, browser, accessibility, security, visual, and performance evidence.
+    traceability: [SC-QUAL-001, SC-QUAL-002, SC-REL-001]
+    risks: [RISK-006, RISK-008, RISK-010, RISK-011, RISK-012]
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-VALIDATION-PARITY, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL, REVIEW-VISUAL-PROFILE, BENCH-RENDER-BASELINE]
+    dependencies: [GATE-S1, DEC-008, DEC-009, DEC-010, REQ-DET-001, REQ-A11Y-001, REQ-VIS-001, REQ-SEC-001, REQ-PERF-001]
+    compatibility: Qualification gate only; evidence must describe any intended behavior change.
+    areas: [python, go, runtime, security, release]
+    acceptance:
+      - Cross-language, golden, invalid, fuzz, and stress qualification passes.
+      - Browser and manual accessibility profiles pass or carry approved non-critical limits.
+      - Security review reports no unresolved critical or high release defect.
+      - Runtime matrix, visual profile, and benchmark baseline are approved.
+    verification: [Immutable Stage 2 qualification results]
+
+  - id: REQ-REL-001
+    title: Build immutable release qualification evidence
+    item_type: Requirement
+    status: Inbox
+    priority: P0
+    workstream: WS-06 Release
+    stage: S3 Release Candidate
+    target: 0.0.0.1
+    outcome: Implement and prove the registered REQ-REL-001 acceptance contract.
+    traceability: [REQ-REL-001, SC-REL-001, SC-REL-002, SC-SEC-002, SC-ARCH-ADR-0007]
+    risks: [RISK-009, RISK-012]
+    evidence: [TEST-RELEASE-EVIDENCE]
+    dependencies: [GATE-S2, DEC-005, DEC-011, DEC-012, DEC-013]
+    compatibility: Aligns package metadata and publication artifacts with canonical release 0.0.0.1.
+    areas: [python, go, docs, release, security]
+
+  - id: GATE-S3
+    title: Pass Stage 3 release-candidate gate
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-06 Release
+    stage: S3 Release Candidate
+    target: 0.0.0.1
+    outcome: One immutable commit can reproducibly produce installable artifacts, documentation, and a complete evidence pack.
+    traceability: [SC-REL-001, SC-REL-002, SC-SEC-002]
+    risks: [RISK-009, RISK-012]
+    evidence: [TEST-RELEASE-EVIDENCE]
+    dependencies: [GATE-S2, DEC-005, DEC-011, DEC-012, DEC-013, REQ-REL-001]
+    compatibility: Freezes candidate source, versions, artifacts, known limits, and publication decisions.
+    areas: [python, go, docs, release, security]
+    acceptance:
+      - Product and package version records match the approved mapping.
+      - Built artifacts install and execute in every supported profile.
+      - SBOM, provenance, hashes, changelog, known limits, and support matrix are complete.
+      - Evidence manifest validates and references immutable results.
+    verification: [python tools/check_docs.py, release evidence validator, package installation matrix]
+
+  - id: GATE-S4
+    title: Authorize and publish release 0.0.0.1
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-06 Release
+    stage: S4 Release
+    target: 0.0.0.1
+    outcome: The first StoneCharts release is published only after explicit product and technical authorization.
+    traceability: [SC-REL-001, SC-REL-002]
+    risks: [RISK-009, RISK-012]
+    evidence: [TEST-RELEASE-EVIDENCE]
+    dependencies: [GATE-S3]
+    compatibility: Creates the first governed external release baseline.
+    areas: [release, docs, security]
+    acceptance:
+      - Product owner and maintainer sign-off are recorded.
+      - Release tag and artifacts are published from the qualified commit only.
+      - Evidence manifest and hashes are archived immutably.
+      - Support, vulnerability, and feedback channels are operational.
+    verification: [Published-artifact hash recomputation and release-record audit]
+
+  - id: GATE-S5
+    title: Admit post-0.0.0.1 chart and language expansion
+    item_type: Release Gate
+    status: Inbox
+    priority: P1
+    workstream: WS-08 Expansion
+    stage: S5 Expansion
+    target: Post-0.0.0.1
+    outcome: New charts and language renderers enter only through an approved conformance admission protocol.
+    traceability: [SC-ARCH-002, SC-OPS-003]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-003, GATE-S4]
+    compatibility: Expands capability without weakening the 0.0.0.1 guarantees.
+    areas: [spec, python, go, docs, release]
+    acceptance:
+      - Release findings are reviewed and incorporated.
+      - Renderer conformance kit and chart admission checklist are approved.
+      - Expansion order and next release target are approved.
+      - No new implementation starts before this gate is Ready and authorized.
+    verification: [Approved expansion plan and conformance admission review]

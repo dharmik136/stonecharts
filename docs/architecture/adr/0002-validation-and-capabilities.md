@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1 and later
+applies_to: 0.0.0.1 and later
 requirements: [REQ-PROD-001, REQ-SCOPE-001, REQ-VAL-001, REQ-CAP-001]
 evidence: [TEST-VALIDATION-PARITY, TEST-CAPABILITY-MATRIX]
 last_reviewed: "2026-07-18"
@@ -31,7 +31,7 @@ Validation has two explicit phases:
 2. Validate the requested features against a machine-readable renderer capability
    manifest before rendering.
 
-The Alpha 1 active schema contains only line and column. Unreleased designs remain
+The 0.0.0.1 active schema contains only line and column. Unreleased designs remain
 non-normative. A future spec valid under a newer schema may receive an unsupported
 capability error from an older renderer. All user-input failures are typed and
 non-fatal.

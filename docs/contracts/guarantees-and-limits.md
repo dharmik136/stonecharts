@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-DET-001, REQ-VIS-001, REQ-CUST-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, REVIEW-VISUAL-PROFILE]
 last_reviewed: "2026-07-18"
@@ -50,7 +50,7 @@ engine and version, operating system or container digest, viewport, device scale
 locale, timezone, color configuration, flags, and comparison tolerance. Identical SVG
 outside that profile is not a pixel guarantee.
 
-Alpha 1 has no certified pixel profile until its exporter evaluation and visual
+0.0.0.1 has no certified pixel profile until its exporter evaluation and visual
 evidence are approved.
 
 ## G4: Customization boundary
@@ -61,7 +61,7 @@ mutation, and third-party plugins are outside certified guarantees. A future esc
 hatch may be useful, but it must be labeled unverified and isolated from the certified
 path.
 
-## Alpha 1 known limits
+## 0.0.0.1 known limits
 
 - Only line and column are released chart types.
 - Layout uses deterministic defaults and manual margins; there is no automatic text

@@ -10,7 +10,7 @@ requirements:
     priority: must
     status: proposed
     owner: product-owner
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-PROD-001
     acceptance:
       - One canonical schema is published for the release.
@@ -21,14 +21,14 @@ requirements:
     implementation: [spec/chart-spec.schema.json, libs/python/stonecharts/spec.py, libs/go/spec.go]
 
   - id: REQ-SCOPE-001
-    title: Alpha 1 supports only line and column
-    statement: The Alpha 1 active schema MUST expose only line and column chart types; design-only chart types MUST remain non-normative.
+    title: 0.0.0.1 supports only line and column
+    statement: The 0.0.0.1 active schema MUST expose only line and column chart types; design-only chart types MUST remain non-normative.
     rationale: Passing validation for an unrenderable chart breaks the public contract and creates runtime failures.
     kind: constraint
     priority: must
     status: proposed
     owner: product-owner
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-PROD-002
     acceptance:
       - The active type enum contains line and column only.
@@ -46,7 +46,7 @@ requirements:
     priority: must
     status: implemented
     owner: maintainer
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-CON-001
     acceptance:
       - Python output equals every approved golden byte for byte.
@@ -65,7 +65,7 @@ requirements:
     priority: must
     status: proposed
     owner: maintainer
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-CON-002
     acceptance:
       - Shared valid fixtures are accepted by the schema and both validators.
@@ -84,7 +84,7 @@ requirements:
     priority: must
     status: proposed
     owner: maintainer
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-CON-002
     acceptance:
       - A machine-readable capability manifest exists for Python and Go.
@@ -103,7 +103,7 @@ requirements:
     priority: must
     status: proposed
     owner: maintainer
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-ARCH-ADR-0003
     acceptance:
       - Positive segments stack upward from zero.
@@ -116,13 +116,13 @@ requirements:
 
   - id: REQ-STACK-002
     title: Unambiguous percent stacking
-    statement: Alpha 1 percent stacking MUST accept only finite non-negative values and MUST render an all-zero category as zero-height zero-percent segments.
-    rationale: Net-sum and absolute-sum conventions assign different meanings to signed data; Alpha 1 must not choose silently.
+    statement: 0.0.0.1 percent stacking MUST accept only finite non-negative values and MUST render an all-zero category as zero-height zero-percent segments.
+    rationale: Net-sum and absolute-sum conventions assign different meanings to signed data; 0.0.0.1 must not choose silently.
     kind: constraint
     priority: must
     status: proposed
     owner: product-owner
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-ARCH-ADR-0003
     acceptance:
       - Any negative value in a percent stack is rejected consistently.
@@ -135,13 +135,13 @@ requirements:
 
   - id: REQ-LAYOUT-001
     title: Deterministic manual layout controls
-    statement: Alpha 1 MUST provide deterministic validated manual margins and MUST NOT claim automatic text fitting.
+    statement: 0.0.0.1 MUST provide deterministic validated manual margins and MUST NOT claim automatic text fitting.
     rationale: Host text measurement is not stable enough for the canonical byte profile, while fixed margins can clip real data.
     kind: functional
     priority: must
     status: proposed
     owner: product-owner
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-ARCH-ADR-0005
     acceptance:
       - Margin values are finite and non-negative.
@@ -161,7 +161,7 @@ requirements:
     priority: must
     status: proposed
     owner: maintainer
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-CON-004
     acceptance:
       - Keyboard navigation and escape behavior match the runtime state table.
@@ -181,7 +181,7 @@ requirements:
     priority: must
     status: proposed
     owner: product-owner
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-CON-007
     acceptance:
       - SVG has a tested accessible name and description.
@@ -201,7 +201,7 @@ requirements:
     priority: must
     status: proposed
     owner: product-owner
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-CON-006
     acceptance:
       - Default host-font limitations are documented.
@@ -220,7 +220,7 @@ requirements:
     priority: must
     status: proposed
     owner: product-owner
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-CON-005
     acceptance:
       - Supported themes and style primitives are represented in the schema.
@@ -239,7 +239,7 @@ requirements:
     priority: must
     status: implemented
     owner: security-contact
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-SEC-001
     acceptance:
       - Hostile text cannot create executable markup in SVG or HTML.
@@ -258,7 +258,7 @@ requirements:
     priority: must
     status: proposed
     owner: maintainer
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-REL-001
     acceptance:
       - Product, Python, and Go versions follow their ecosystem formats and map to one release.
@@ -267,7 +267,7 @@ requirements:
     decisions: []
     contracts: [SC-CON-001]
     verification: [TEST-RELEASE-EVIDENCE]
-    implementation: [docs/releases/0.0.1-alpha.1/evidence/manifest.schema.json]
+    implementation: [docs/releases/0.0.0.1/evidence/manifest.schema.json]
 
   - id: REQ-PERF-001
     title: Reproducible performance qualification
@@ -277,7 +277,7 @@ requirements:
     priority: should
     status: proposed
     owner: maintainer
-    target: 0.0.1-alpha.1
+    target: 0.0.0.1
     source: SC-QUAL-002
     acceptance:
       - Small, business, and stress workloads are defined and versioned.

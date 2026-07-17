@@ -6,7 +6,7 @@ classification: normative
 owner: security-contact
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-SEC-001, REQ-REL-001]
 evidence: [TEST-RELEASE-EVIDENCE]
 last_reviewed: "2026-07-18"
@@ -20,7 +20,7 @@ superseded_by: null
 ## Objectives
 
 Consumers must be able to identify what source, inputs, toolchains, and process produced
-each distributed artifact. Alpha 1 targets an SPDX SBOM and SLSA-compatible build
+each distributed artifact. 0.0.0.1 targets an SPDX SBOM and SLSA-compatible build
 provenance statement; it MUST report the achieved level accurately rather than claim a
 level from planned controls.
 

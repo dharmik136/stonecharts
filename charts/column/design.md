@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-SCOPE-001, REQ-DET-001, REQ-STACK-001, REQ-STACK-002, REQ-RUNTIME-001, REQ-A11Y-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN, TEST-RUNTIME-BROWSER]
 last_reviewed: "2026-07-18"
@@ -17,7 +17,7 @@ superseded_by: null
 
 # Chart: Column (`column`)
 
-> **Phase 0 authority note:** this design predates the signed-stacking decision.
+> **Stage 0 authority note:** this design predates the signed-stacking decision.
 > [`ADR 0003`](../../docs/architecture/adr/0003-signed-stacking.md) overrides any
 > single-accumulator or signed-percent language below until this design is reconciled.
 

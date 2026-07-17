@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
 evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
 last_reviewed: "2026-07-18"
@@ -35,7 +35,7 @@ This document defines observable state and the adaptive boundary of the shared r
 ## Adaptive presentation
 
 Tooltip placement is a function of container bounds, viewport, input location, and
-tooltip dimensions. Alpha 1 guarantees containment and a preferred placement order,
+tooltip dimensions. 0.0.0.1 guarantees containment and a preferred placement order,
 not one screen coordinate across environments. The runtime may use DOM measurement for
 this adaptive overlay; it MUST NOT recompute chart data geometry or change canonical
 SVG coordinates.
@@ -61,7 +61,7 @@ appearance, and hidden-series navigation are known implementation gaps until
 
 - **Inline interactive HTML:** full runtime and authored accessibility contract.
 - **Standalone interactive SVG:** only features present in that document and allowed by
-  the viewer; Alpha 1 HTML runtime is not automatically embedded in raw SVG.
+  the viewer; 0.0.0.1 HTML runtime is not automatically embedded in raw SVG.
 - **SVG image (`img`, CSS image, email):** static presentation; internal script and
   interaction are not part of the profile.
 - **Converted export:** behavior is static and governed by the selected export profile.

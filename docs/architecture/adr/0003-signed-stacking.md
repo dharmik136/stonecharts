@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-STACK-001, REQ-STACK-002]
 evidence: [TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN]
 last_reviewed: "2026-07-18"
@@ -35,7 +35,7 @@ value < 0  -> segment spans negative_total to negative_total + value
 The frame domain includes the extrema of both accumulators. Series order remains the
 pinned accumulation order within each sign.
 
-Alpha 1 percent stacks accept finite non-negative values only. Positive categories
+0.0.0.1 percent stacks accept finite non-negative values only. Positive categories
 normalize by their category total. An all-zero category produces zero-height segments
 and zero-percent semantics. Negative values receive a canonical validation error.
 

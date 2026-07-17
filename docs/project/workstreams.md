@@ -6,7 +6,7 @@ classification: informative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1 and later
+applies_to: 0.0.0.1 and later
 requirements: []
 evidence: [TEST-DOCS-CONTROL]
 last_reviewed: "2026-07-18"
@@ -20,7 +20,7 @@ superseded_by: null
 Workstreams are stable reporting lanes, not substitute departments. A work item has
 one primary workstream even when it changes several repositories or languages.
 
-| ID | Workstream | Durable outcome | Alpha 1 focus |
+| ID | Workstream | Durable outcome | 0.0.0.1 focus |
 |---|---|---|---|
 | WS-01 | Product contract and governance | Claims, scope, ownership, risks, and decisions remain explicit and traceable | Approve the release contract and resolve blockers without fictional approvals |
 | WS-02 | Renderer correctness and active scope | Every accepted specification renders safely and mathematically correctly | Restrict active capability to line and column; close signed stacking, percent, layout, and edge-case gaps |
@@ -33,11 +33,12 @@ one primary workstream even when it changes several repositories or languages.
 
 ## Current sequence
 
-1. Close Alpha 1 contract and correctness gaps in WS-01 and WS-02.
-2. Qualify exact output and browser behavior through WS-03 and WS-04.
-3. Lock the minimum customization and layout surface in WS-05.
-4. Produce releasable artifacts and evidence through WS-06 and WS-07.
-5. Admit WS-08 implementation only under the expansion decision and renderer
+1. Close Stage 0 governance and product decisions in WS-01.
+2. Close 0.0.0.1 contract and correctness gaps in WS-02.
+3. Qualify exact output and browser behavior through WS-03 and WS-04.
+4. Lock the minimum customization and layout surface in WS-05.
+5. Produce releasable artifacts and evidence through WS-06 and WS-07.
+6. Admit WS-08 implementation only under the expansion decision and renderer
    constitution.
 
 Security, privacy, performance, and accessibility are acceptance dimensions across

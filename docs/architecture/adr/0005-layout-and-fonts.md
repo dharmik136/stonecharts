@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1 and later
+applies_to: 0.0.0.1 and later
 requirements: [REQ-LAYOUT-001, REQ-VIS-001]
 evidence: [TEST-LAYOUT-MARGINS, REVIEW-VISUAL-PROFILE]
 last_reviewed: "2026-07-18"
@@ -19,12 +19,12 @@ superseded_by: null
 
 ## Context
 
-Host text metrics, shaping, and rasterization vary. Alpha 1 needs usable label space
+Host text metrics, shaping, and rasterization vary. 0.0.0.1 needs usable label space
 without adding a heavy shaping dependency or weakening canonical output.
 
 ## Decision
 
-Alpha 1 uses fixed deterministic defaults plus validated manual margins. It performs
+0.0.0.1 uses fixed deterministic defaults plus validated manual margins. It performs
 no automatic text fitting, wrapping, ellipsis, or margin expansion. Overflow behavior
 and the minimum remaining plot area are explicit contract rules.
 
@@ -44,6 +44,6 @@ semantic alternative when required.
 ## Rejected alternatives
 
 - Host measurement in each language: not parity-safe.
-- HarfBuzz in Alpha 1: valuable later, disproportionate now.
+- HarfBuzz in 0.0.0.1: valuable later, disproportionate now.
 - Universal text outlines: weakens selection, search, and intrinsic text semantics.
 

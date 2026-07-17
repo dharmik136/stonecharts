@@ -1,12 +1,12 @@
 ---
 id: SC-REL-003
-title: StoneCharts Alpha 1 Evidence Pack Format
+title: StoneCharts 0.0.0.1 Evidence Pack Format
 status: proposed
 classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-REL-001]
 evidence: [TEST-RELEASE-EVIDENCE]
 last_reviewed: "2026-07-18"
@@ -15,7 +15,7 @@ supersedes: null
 superseded_by: null
 ---
 
-# Alpha 1 Evidence Pack
+# 0.0.0.1 Evidence Pack
 
 This directory defines the release evidence format. Actual candidate evidence is
 generated under a candidate-specific directory and is immutable after sign-off.

@@ -18,7 +18,7 @@ superseded_by: null
 # StoneCharts — Chart Families Blueprint & Cartesian Build Roadmap
 
 > **Status:** Long-range engineering roadmap. Approved requirements, contracts, and
-> ADRs take precedence. Chart and language expansion is paused for Phase 0 and Alpha 1.
+> ADRs take precedence. Chart and language expansion is paused for Stage 0 and 0.0.0.1.
 > **Location:** `docs/roadmap/chart-families.md`
 > **Audience:** Anyone planning chart-catalog expansion. Sections 4–5 preserve the
 > detailed implementation procedure that produced Column. Future work must first

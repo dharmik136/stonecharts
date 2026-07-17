@@ -1,12 +1,12 @@
 ---
 id: SC-REL-001
-title: StoneCharts 0.0.1 Alpha 1 Release Plan
+title: StoneCharts 0.0.0.1 Release Plan
 status: proposed
 classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-SCOPE-001, REQ-DET-001, REQ-VAL-001, REQ-CAP-001, REQ-STACK-001, REQ-STACK-002, REQ-LAYOUT-001, REQ-RUNTIME-001, REQ-A11Y-001, REQ-VIS-001, REQ-CUST-001, REQ-SEC-001, REQ-REL-001, REQ-PERF-001]
 evidence: [TEST-DOCS-CONTROL, TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-VALIDATION-PARITY, TEST-CAPABILITY-MATRIX, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN, TEST-LAYOUT-MARGINS, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL, REVIEW-VISUAL-PROFILE, BENCH-RENDER-BASELINE, TEST-RELEASE-EVIDENCE]
 last_reviewed: "2026-07-18"
@@ -15,7 +15,7 @@ supersedes: null
 superseded_by: null
 ---
 
-# 0.0.1 Alpha 1 Release Plan
+# 0.0.0.1 Release Plan
 
 ## Objective
 
@@ -31,19 +31,22 @@ hosted service, universal browser support, or universal pixel identity.
 
 | Surface | Version |
 |---|---|
-| Product and documentation | `0.0.1-alpha.1` |
-| Python package (PEP 440) | `0.0.1a1` |
-| Go module tag | `v0.0.1-alpha.1` |
+| Product and documentation | `0.0.0.1` |
+| Python package (PEP 440) | `0.0.0.1` |
+| Source release tag | `0.0.0.1` |
+| Go module tag | Not yet approved; any published mapping must be valid Go semantic versioning |
 
 Current Python metadata reports `0.1.0`; aligning package and runtime version metadata
-is a release blocker. No release tag is created until all surfaces match this mapping.
+is a release blocker. A `v0.0.0.1` Go tag is forbidden because it is not valid semantic
+versioning. No release tag is created until distribution mappings and all release
+surfaces satisfy [ADR 0007](../../architecture/adr/0007-release-identifier.md).
 
-## Phase 0 exit gate
+## Stage 0 exit gate
 
 Implementation hardening begins after:
 
 - Controlled documentation validates with no unresolved metadata or trace links.
-- Product thesis, scope, guarantees, requirements, five initial ADRs, risks, test
+- Product thesis, scope, guarantees, requirements, applicable ADRs, risks, test
   strategy, security controls, and this plan are approved.
 - Every `must` requirement has acceptance criteria and a verification ID.
 - Current implementation gaps are present in the risk register and work backlog.
@@ -82,7 +85,7 @@ Each stage has semantic tests before implementation and a separate reviewable co
 
 ## Planning envelope
 
-With one focused senior maintainer, Phase 0 is planned for two to four weeks and Alpha
+With one focused senior maintainer, Stage 0 is planned for two to four weeks and release
 hardening for three to six additional weeks. This is an estimate, not a commitment.
 Gate completion controls the release date; scope is reduced before quality gates are.
 
@@ -91,4 +94,3 @@ Gate completion controls the release date; scope is reduced before quality gates
 The product owner approves scope and product claims. The maintainer approves technical
 qualification. While both roles are held by one person, the release manifest records
 `review_mode: self`; it does not represent the release as independently audited.
-

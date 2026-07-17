@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1 and later
+applies_to: 0.0.0.1 and later
 requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
 evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
 last_reviewed: "2026-07-18"

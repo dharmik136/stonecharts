@@ -52,14 +52,16 @@ REQUIREMENTS_SCHEMA = SCHEMA_DIR / "requirements-registry.schema.json"
 EVIDENCE_SCHEMA = SCHEMA_DIR / "evidence-registry.schema.json"
 RISK_SCHEMA = SCHEMA_DIR / "risk-register.schema.json"
 ROLES_SCHEMA = SCHEMA_DIR / "roles.schema.json"
+PROJECT_BACKLOG_SCHEMA = SCHEMA_DIR / "project-backlog.schema.json"
 RELEASE_MANIFEST_SCHEMA = (
-    DOCS / "releases" / "0.0.1-alpha.1" / "evidence" / "manifest.schema.json"
+    DOCS / "releases" / "0.0.0.1" / "evidence" / "manifest.schema.json"
 )
 
 REQUIREMENTS_FILE = DOCS / "requirements" / "registry.yaml"
 EVIDENCE_FILE = DOCS / "quality" / "evidence-registry.yaml"
 RISK_FILE = DOCS / "governance" / "risk-register.yaml"
 ROLES_FILE = DOCS / "governance" / "roles.yaml"
+PROJECT_BACKLOG_FILE = DOCS / "project" / "backlog.yaml"
 
 
 def rel(path: Path) -> str:
@@ -156,6 +158,28 @@ def check_path_reference(value: Any, source: str, errors: List[str]) -> None:
         errors.append(f"{source}: referenced path does not exist: {value}")
 
 
+def check_dependency_cycles(items: List[Dict[str, Any]], errors: List[str]) -> None:
+    dependencies = {item["id"]: item.get("dependencies", []) for item in items}
+    visiting: Set[str] = set()
+    visited: Set[str] = set()
+
+    def visit(item_id: str, path: List[str]) -> None:
+        if item_id in visited:
+            return
+        if item_id in visiting:
+            start = path.index(item_id)
+            errors.append("project backlog dependency cycle: " + " -> ".join(path[start:] + [item_id]))
+            return
+        visiting.add(item_id)
+        for dependency in dependencies.get(item_id, []):
+            visit(dependency, path + [item_id])
+        visiting.remove(item_id)
+        visited.add(item_id)
+
+    for item_id in dependencies:
+        visit(item_id, [])
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -172,6 +196,7 @@ def main() -> int:
         EVIDENCE_SCHEMA,
         RISK_SCHEMA,
         ROLES_SCHEMA,
+        PROJECT_BACKLOG_SCHEMA,
         RELEASE_MANIFEST_SCHEMA,
     ]
     for schema_path in schemas:
@@ -211,12 +236,29 @@ def main() -> int:
         errors.append(f"{rel(ROLES_FILE)}: {exc}")
         roles = set()
 
+    try:
+        project_backlog = load_yaml(PROJECT_BACKLOG_FILE)
+        validate_value(project_backlog, PROJECT_BACKLOG_SCHEMA, PROJECT_BACKLOG_FILE, errors)
+    except Exception as exc:
+        errors.append(f"{rel(PROJECT_BACKLOG_FILE)}: {exc}")
+        project_backlog = {"items": [], "workflow": {}}
+
     requirement_rows = requirements.get("requirements", [])
     evidence_rows = evidence.get("evidence", [])
     risk_rows = risks.get("risks", [])
     requirement_ids = duplicate_ids(requirement_rows, "requirement", errors)
     evidence_ids = duplicate_ids(evidence_rows, "evidence", errors)
-    duplicate_ids(risk_rows, "risk", errors)
+    risk_ids = duplicate_ids(risk_rows, "risk", errors)
+    backlog_rows = project_backlog.get("items", [])
+    backlog_ids = duplicate_ids(backlog_rows, "project backlog", errors)
+    project_views = project_backlog.get("project", {}).get("views", [])
+    view_names = [view.get("name") for view in project_views if isinstance(view.get("name"), str)]
+    duplicate_view_names = sorted({name for name in view_names if view_names.count(name) > 1})
+    if duplicate_view_names:
+        errors.append(
+            f"{rel(PROJECT_BACKLOG_FILE)}: duplicate Project view names: "
+            + ", ".join(duplicate_view_names)
+        )
 
     documents: Dict[str, Tuple[Path, Dict[str, Any]]] = {}
     for path in controlled_markdown():
@@ -292,6 +334,78 @@ def main() -> int:
             if requirement_id not in requirement_ids:
                 errors.append(f"{rel(RISK_FILE)}:{risk_id}: unknown requirement `{requirement_id}`")
 
+    expected_workflow = {
+        "statuses": ["Inbox", "Triage", "Ready", "In Progress", "In Review", "Qualification", "Blocked", "Done"],
+        "priorities": ["P0", "P1", "P2", "P3"],
+        "workstreams": [
+            "WS-01 Governance", "WS-02 Renderer", "WS-03 Conformance",
+            "WS-04 Runtime & A11y", "WS-05 Customization", "WS-06 Release",
+            "WS-07 Docs & DX", "WS-08 Expansion",
+        ],
+        "stages": [
+            "S0 Foundation", "S1 Contract Closure", "S2 Qualification",
+            "S3 Release Candidate", "S4 Release", "S5 Expansion",
+        ],
+        "targets": ["0.0.0.1", "Post-0.0.0.1", "Unscheduled"],
+        "item_types": ["Decision", "Requirement", "Work Package", "Defect", "Release Gate"],
+    }
+    for field, expected in expected_workflow.items():
+        if project_backlog.get("workflow", {}).get(field) != expected:
+            errors.append(f"{rel(PROJECT_BACKLOG_FILE)}: workflow.{field} must match the governed order")
+
+    requirement_item_ids: Set[str] = set()
+    for row in backlog_rows:
+        item_id = row.get("id", "<unknown>")
+        traceability = row.get("traceability", [])
+        for reference in traceability:
+            if reference not in requirement_ids and reference not in artifact_ids:
+                errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: unknown traceability reference `{reference}`")
+        for risk_id in row.get("risks", []):
+            if risk_id not in risk_ids:
+                errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: unknown risk `{risk_id}`")
+        for evidence_id in row.get("evidence", []):
+            if evidence_id not in evidence_ids:
+                errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: unknown evidence `{evidence_id}`")
+        for dependency in row.get("dependencies", []):
+            if dependency not in backlog_ids:
+                errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: unknown dependency `{dependency}`")
+        if row.get("item_type") == "Requirement":
+            requirement_item_ids.add(item_id)
+            if item_id not in requirement_ids:
+                errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: no matching requirement registry entry")
+            if item_id not in traceability:
+                errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: requirement item must trace to itself")
+        elif not row.get("acceptance") or not row.get("verification"):
+            errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: non-requirement item needs acceptance and verification")
+
+    missing_requirement_items = requirement_ids - requirement_item_ids
+    extra_requirement_items = requirement_item_ids - requirement_ids
+    if missing_requirement_items:
+        errors.append(
+            f"{rel(PROJECT_BACKLOG_FILE)}: requirements missing Project items: "
+            + ", ".join(sorted(missing_requirement_items))
+        )
+    if extra_requirement_items:
+        errors.append(
+            f"{rel(PROJECT_BACKLOG_FILE)}: Project requirement items missing registry entries: "
+            + ", ".join(sorted(extra_requirement_items))
+        )
+
+    backlog_by_id = {row["id"]: row for row in backlog_rows if isinstance(row.get("id"), str)}
+    for row in backlog_rows:
+        if row.get("status") in {"Ready", "In Progress", "In Review", "Qualification", "Done"}:
+            unfinished = [
+                dependency
+                for dependency in row.get("dependencies", [])
+                if backlog_by_id.get(dependency, {}).get("status") != "Done"
+            ]
+            if unfinished:
+                errors.append(
+                    f"{rel(PROJECT_BACKLOG_FILE)}:{row.get('id')}: active status has unfinished dependencies: "
+                    + ", ".join(unfinished)
+                )
+    check_dependency_cycles(backlog_rows, errors)
+
     # The active chart schema is itself a controlled machine-readable contract.
     try:
         chart_schema = load_json(ROOT / "spec" / "chart-spec.schema.json")
@@ -340,6 +454,22 @@ def main() -> int:
                 }
                 for row in requirement_rows
             ],
+            "projectBacklog": [
+                {
+                    "id": row["id"],
+                    "type": row["item_type"],
+                    "status": row["status"],
+                    "priority": row["priority"],
+                    "workstream": row["workstream"],
+                    "stage": row["stage"],
+                    "target": row["target"],
+                    "traceability": row["traceability"],
+                    "risks": row["risks"],
+                    "evidence": row["evidence"],
+                    "dependencies": row["dependencies"],
+                }
+                for row in backlog_rows
+            ],
         }
         output_path = args.traceability_json
         if not output_path.is_absolute():
@@ -351,7 +481,8 @@ def main() -> int:
     print(
         "documentation control PASS: "
         f"{len(documents)} documents, {len(requirement_ids)} requirements, "
-        f"{len(evidence_ids)} evidence definitions, {len(risk_rows)} risks"
+        f"{len(evidence_ids)} evidence definitions, {len(risk_rows)} risks, "
+        f"{len(backlog_ids)} project items"
     )
     return 0
 

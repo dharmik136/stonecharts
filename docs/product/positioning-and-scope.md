@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-SCOPE-001]
 evidence: [TEST-CAPABILITY-MATRIX]
 last_reviewed: "2026-07-18"
@@ -29,9 +29,9 @@ StoneCharts initially serves workflows where native server rendering, canonical 
 auditability, self-contained artifacts, and cross-language equivalence matter more
 than browser-only breadth.
 
-## Alpha 1 user outcomes
+## 0.0.0.1 user outcomes
 
-An authorized Alpha 1 user can:
+An authorized 0.0.0.1 user can:
 
 - Describe a supported line or column chart in one JSON-compatible specification.
 - Validate and render it natively in Python or Go.
@@ -60,7 +60,7 @@ An authorized Alpha 1 user can:
 - A universal pixel guarantee outside a named certified visual profile.
 - Hosted chart rendering, accounts, billing, collaboration, telemetry, or an uptime
   commitment.
-- A stable public API or backward-compatibility promise beyond the specific Alpha 1
+- A stable public API or backward-compatibility promise beyond the specific 0.0.0.1
   release manifest.
 
 ## Commercial and legal boundary

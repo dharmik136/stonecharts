@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-PROD-001, REQ-SCOPE-001, REQ-VAL-001, REQ-CAP-001, REQ-STACK-001, REQ-STACK-002]
 evidence: [TEST-VALIDATION-PARITY, TEST-CAPABILITY-MATRIX, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN]
 last_reviewed: "2026-07-18"
@@ -32,13 +32,13 @@ An error in one phase prevents later phases and produces no output artifact.
 ## Active Alpha schema
 
 The active type set is `line` and `column`. Other chart design directories are roadmap
-inputs and MUST NOT be accepted by the Alpha 1 schema. Python and Go capability
+inputs and MUST NOT be accepted by the 0.0.0.1 schema. Python and Go capability
 manifests MUST additionally declare:
 
 ```json
 {
-  "specVersion": "0.0.1-alpha.1",
-  "svgContractVersion": "0.0.1-alpha.1",
+  "specVersion": "0.0.0.1",
+  "svgContractVersion": "0.0.0.1",
   "chartTypes": ["column", "line"],
   "column": {
     "grouping": ["grouped", "overlay"],
@@ -53,7 +53,7 @@ before approval.
 ## Semantic rules requiring ratification in code
 
 - `series` is required. Whether an empty list and empty series data are valid must be
-  identical in schema and both validators; Alpha 1 currently treats the mismatch as a
+  identical in schema and both validators; 0.0.0.1 currently treats the mismatch as a
   release blocker rather than silently choosing.
 - Width and height minimums must be identical in every validation path.
 - An explicit category array shorter than rendered data must either fail or be padded

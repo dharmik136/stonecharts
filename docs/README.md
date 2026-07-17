@@ -25,7 +25,7 @@ Document status and classification are authoritative in each file's metadata.
 - [Documentation control policy](governance/documentation-policy.md)
 - [Controlled glossary](governance/glossary.md)
 - [Product thesis](product/thesis.md)
-- [Positioning and Alpha scope](product/positioning-and-scope.md)
+- [Positioning and first-release scope](product/positioning-and-scope.md)
 - [Requirements registry](requirements/registry.yaml)
 - [Requirements and traceability guide](requirements/README.md)
 - [Risk register](governance/risk-register.yaml)
@@ -34,6 +34,8 @@ Document status and classification are authoritative in each file's metadata.
 
 - [StoneCharts GitHub Project](https://github.com/users/dharmik136/projects/2)
 - [Project operating model](project/README.md)
+- [Stage 0 foundation gate](project/stage-0.md)
+- [Governed execution backlog](project/backlog.yaml)
 - [Workstreams](project/workstreams.md)
 - [Milestone map](project/milestones.md)
 - [Open decision backlog](project/decisions.md)
@@ -57,8 +59,8 @@ Document status and classification are authoritative in each file's metadata.
 - [Evidence registry](quality/evidence-registry.yaml)
 - [Threat model](security/threat-model.md)
 - [Supply-chain policy](security/supply-chain.md)
-- [Alpha 1 release plan](releases/0.0.1-alpha.1/plan.md)
-- [Alpha 1 qualification checklist](releases/0.0.1-alpha.1/checklist.md)
+- [0.0.0.1 release plan](releases/0.0.0.1/plan.md)
+- [0.0.0.1 qualification checklist](releases/0.0.0.1/checklist.md)
 
 Research and long-range roadmaps remain under `docs/research` and `docs/roadmap`.
 They inform decisions but do not override approved requirements, ADRs, or contracts.

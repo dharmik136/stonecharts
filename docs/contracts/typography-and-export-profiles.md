@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1 and later
+applies_to: 0.0.0.1 and later
 requirements: [REQ-LAYOUT-001, REQ-VIS-001]
 evidence: [TEST-LAYOUT-MARGINS, REVIEW-VISUAL-PROFILE]
 last_reviewed: "2026-07-18"
@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Alpha default profile
 
-Alpha 1 emits semantic SVG `<text>` with a declared host font stack. Text positions and
+0.0.0.1 emits semantic SVG `<text>` with a declared host font stack. Text positions and
 chart geometry are canonical, but glyph selection, shaping, hinting, antialiasing, and
 raster pixels are host responsibilities. The profile does not guarantee automatic fit
 or pixel identity.
@@ -40,7 +40,7 @@ embedded profile MUST:
 - Define fallback and unsupported-codepoint behavior.
 - Test all supported embedding and export environments.
 
-No embedded font is selected for Alpha 1 until licensing, size, coverage, and exporter
+No embedded font is selected for 0.0.0.1 until licensing, size, coverage, and exporter
 compatibility are reviewed.
 
 ## Certified export profile

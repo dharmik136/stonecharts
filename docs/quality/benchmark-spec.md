@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-PERF-001]
 evidence: [BENCH-RENDER-BASELINE]
 last_reviewed: "2026-07-18"
@@ -61,7 +61,7 @@ JSON and a generated human summary.
 ## Gates
 
 Correctness gates remain absolute: benchmark output must validate and byte-match its
-corpus. Alpha 1 first establishes a baseline. Absolute latency and memory budgets are
+corpus. 0.0.0.1 first establishes a baseline. Absolute latency and memory budgets are
 approved only after stable repeated measurements. Subsequent releases use a documented
 regression budget derived from observed variance; a convenient percentage is not
 invented in advance.

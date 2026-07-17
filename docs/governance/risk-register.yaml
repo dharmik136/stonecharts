@@ -47,7 +47,7 @@ risks:
     impact: high
     status: open
     owner: product-owner
-    mitigation: Restrict Alpha 1 percent stacking to finite non-negative values and define all-zero categories explicitly.
+    mitigation: Restrict 0.0.0.1 percent stacking to finite non-negative values and define all-zero categories explicitly.
     requirements: [REQ-STACK-002]
   - id: RISK-006
     title: Unicode legend geometry differs by language
@@ -65,7 +65,7 @@ risks:
     impact: medium
     status: open
     owner: product-owner
-    mitigation: Add validated manual margins and publish the no-auto-fit Alpha 1 limitation.
+    mitigation: Add validated manual margins and publish the no-auto-fit 0.0.0.1 limitation.
     requirements: [REQ-LAYOUT-001]
   - id: RISK-008
     title: Runtime interaction and accessibility gaps
@@ -78,7 +78,7 @@ risks:
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
   - id: RISK-009
     title: Package version conflicts with planned release
-    description: Python package metadata and __version__ currently report 0.1.0 while the planned product release is 0.0.1-alpha.1.
+    description: Python package metadata and __version__ currently report 0.1.0 while the planned product release is 0.0.0.1.
     likelihood: high
     impact: high
     status: open
@@ -110,6 +110,6 @@ risks:
     impact: high
     status: open
     owner: maintainer
-    mitigation: Build the Alpha 1 evidence pack and supply-chain workflow before public distribution.
+    mitigation: Build the 0.0.0.1 evidence pack and supply-chain workflow before public distribution.
     requirements: [REQ-REL-001, REQ-SEC-001]
 

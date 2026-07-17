@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-DET-001, REQ-VAL-001, REQ-CAP-001, REQ-STACK-001, REQ-STACK-002, REQ-RUNTIME-001, REQ-A11Y-001, REQ-SEC-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-VALIDATION-PARITY, TEST-CAPABILITY-MATRIX, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER]
 last_reviewed: "2026-07-18"
@@ -63,7 +63,7 @@ them, review every golden diff, record hashes, and capture approval in release e
 
 ## Browser matrix
 
-Alpha 1 certifies Chromium on one pinned desktop environment after automated testing.
+0.0.0.1 certifies Chromium on one pinned desktop environment after automated testing.
 Firefox, WebKit, mobile viewports, and assistive-technology combinations are recorded
 as tested, experimental, or untested; they are not implied by generic "browser"
 language. Tests run through a local HTTP server, not `file://`, so the environment

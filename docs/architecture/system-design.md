@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-PROD-001, REQ-DET-001, REQ-VAL-001, REQ-CAP-001, REQ-RUNTIME-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-VALIDATION-PARITY]
 last_reviewed: "2026-07-18"
@@ -84,7 +84,7 @@ artifacts are supply-chain inputs and must be pinned by hash in certified profil
 The release manifest records product release, schema version, SVG contract version,
 runtime version, language package versions, supported runtime/toolchain versions, and
 certified export profiles. These versions need not all increment independently in
-Alpha 1, but their exact revisions must be identifiable.
+0.0.0.1, but their exact revisions must be identifiable.
 
 ## Failure model
 

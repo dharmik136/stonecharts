@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-SCOPE-001, REQ-DET-001, REQ-RUNTIME-001, REQ-A11Y-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-RUNTIME-BROWSER]
 last_reviewed: "2026-07-18"

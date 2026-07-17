@@ -26,6 +26,7 @@ Describe schema, API, DOM, output-byte, runtime, packaging, and migration impact
 ## Verification
 
 - [ ] `python tools/check_docs.py`
+- [ ] `python tools/check_github_project.py` when Project or backlog controls change
 - [ ] `python -m pytest libs/python/tests`
 - [ ] `go test ./...` from `libs/go`
 - [ ] Direct cross-render comparison, when canonical output changes

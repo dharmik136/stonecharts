@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://stonecharts.dev/releases/0.0.1-alpha.1/evidence/manifest.schema.json",
+  "$id": "https://stonecharts.dev/releases/0.0.0.1/evidence/manifest.schema.json",
   "title": "StoneCharts release evidence manifest",
   "type": "object",
   "additionalProperties": false,
@@ -9,15 +9,16 @@
     "evidence", "risks", "knownLimits", "review"
   ],
   "properties": {
-    "release": { "const": "0.0.1-alpha.1" },
+    "release": { "const": "0.0.0.1" },
     "candidate": { "type": "string", "pattern": "^rc\\.[1-9][0-9]*$" },
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "commit", "treeClean"],
+      "required": ["repository", "commit", "tag", "treeClean"],
       "properties": {
         "repository": { "type": "string" },
         "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tag": { "const": "0.0.0.1" },
         "treeClean": { "const": true }
       }
     },
@@ -26,9 +27,18 @@
       "additionalProperties": false,
       "required": ["product", "python", "go", "schema", "svgContract", "runtime"],
       "properties": {
-        "product": { "const": "0.0.1-alpha.1" },
-        "python": { "const": "0.0.1a1" },
-        "go": { "const": "v0.0.1-alpha.1" },
+        "product": { "const": "0.0.0.1" },
+        "python": { "const": "0.0.0.1" },
+        "go": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+              "not": { "const": "v0.0.0.1" }
+            }
+          ]
+        },
         "schema": { "type": "string" },
         "svgContract": { "type": "string" },
         "runtime": { "type": "string" }

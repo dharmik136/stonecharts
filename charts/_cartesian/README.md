@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-DET-001, REQ-STACK-001, REQ-STACK-002, REQ-LAYOUT-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN]
 last_reviewed: "2026-07-18"

@@ -32,9 +32,10 @@ Precedence is explicit:
 
 1. Approved normative documents and release contracts.
 2. Requirements, risks, decisions, and evidence registries.
-3. The GitHub Project for current status, ownership, priority, and dependencies.
-4. GitHub issues for bounded outcomes and pull requests for reviewed changes.
-5. Generated qualification and release evidence for what was actually proved.
+3. The schema-validated [execution backlog](backlog.yaml).
+4. The GitHub Project for current status, ownership, priority, and dependencies.
+5. GitHub issues for bounded outcomes and pull requests for reviewed changes.
+6. Generated qualification and release evidence for what was actually proved.
 
 When these disagree, the higher source controls and the lower source is corrected.
 
@@ -45,7 +46,7 @@ Every item admitted to `Ready` has the following information:
 | Field | Required meaning |
 |---|---|
 | Outcome | One externally verifiable result |
-| Type | Defect, capability, decision, qualification, documentation, or operations |
+| Type | Decision, requirement, work package, defect, or release gate |
 | Workstream | One primary ownership and reporting lane |
 | Target | A release or an explicit unscheduled state |
 | Traceability | Applicable requirement, ADR, contract, risk, or a reason none applies |
@@ -73,29 +74,59 @@ completion.
 - Canonical-output work does not regenerate goldens before the intended semantic
   change is reviewed.
 - Only one high-risk contract change per shared renderer surface is active at once.
-- Decisions blocking Alpha 1 are resolved before expansion work enters `Ready`.
+- Decisions blocking 0.0.0.1 are resolved before expansion work enters `Ready`.
 - Unplanned work enters through triage; urgency does not erase acceptance criteria.
+
+An item may enter `Ready` only when every declared dependency is `Done`. The local
+documentation checker enforces this rule in the backlog registry; the remote Project
+checker enforces it against GitHub field values.
+
+## Governed Project fields
+
+| Field | Values or meaning |
+|---|---|
+| Tracking ID | Stable `DEC-*`, `REQ-*`, `WORK-*`, or `GATE-*` identifier |
+| Item Type | Decision, Requirement, Work Package, Defect, or Release Gate |
+| Status | Controlled workflow state above |
+| Priority | P0 through P3 |
+| Workstream | WS-01 through WS-08 |
+| Stage | S0 Foundation through S5 Expansion |
+| Target | `0.0.0.1`, post-release, or unscheduled |
+| Traceability | Requirement, ADR, contract, or controlled-document IDs |
+| Risks | Risk-register IDs addressed by the item |
+| Evidence | Evidence-registry IDs that prove completion |
+| Dependencies | Stable IDs that must finish first |
+| Assignees | Accountable owner represented by GitHub's native field |
+| Milestone | Repository milestone represented by GitHub's native field |
 
 ## Project views
 
-The recommended GitHub Project starts with five views:
+The governed GitHub Project has six saved views. View names, filters, visible-field
+order, and grouping are controlled by `docs/project/backlog.yaml`.
 
-| View | Purpose |
-|---|---|
-| Alpha 1 Board | Status flow for the active release |
-| Release Gates | Only P0/P1 qualification and release blockers |
-| Workstreams | Grouped ownership and dependency view |
-| Decisions | Open decisions ordered by their blocking deadline |
-| Risks and Evidence | Requirements, risks, and proof expected before release |
+| View | Saved configuration | Purpose |
+|---|---|---|
+| 0.0.0.1 Board | Board layout | Full status flow for all governed work |
+| Release Gates | `item-type:"Release Gate"` | Stage and release authorization evidence |
+| Stage 0 | `stage:"S0 Foundation"` | The nine items that establish the controlled foundation |
+| Decisions | `item-type:Decision` | Decision status, traceability, risks, and dependencies |
+| Workstreams | Grouped by `Workstream` | Ownership, stage, target, risks, evidence, and dependencies |
+| Risks & Evidence | `RISK-` | Work carrying a registered risk and its expected proof |
 
-The exact fields and automation are open decisions in
-[the decision backlog](decisions.md), not silently assumed here.
+Project data is checked against `docs/project/backlog.yaml` with
+`python tools/check_github_project.py`. The checker verifies saved views as well as
+fields, issues, classification, and content. GitHub does not expose Project-view
+creation through the supported API, so view configuration is performed in the UI and
+then held against drift by the checker. The checker does not delete unregistered work;
+it reports drift for review.
 
 ## Related project controls
 
 - [Workstreams](workstreams.md)
-- [Milestone map](milestones.md)
-- [Decision backlog](decisions.md)
-- [Alpha 1 release plan](../releases/0.0.1-alpha.1/plan.md)
+- [Stage and milestone map](milestones.md)
+- [Decision register](decisions.md)
+- [Stage 0 foundation gate](stage-0.md)
+- [Execution backlog](backlog.yaml)
+- [0.0.0.1 release plan](../releases/0.0.0.1/plan.md)
 - [Test strategy](../quality/test-strategy.md)
 - [Risk register](../governance/risk-register.yaml)

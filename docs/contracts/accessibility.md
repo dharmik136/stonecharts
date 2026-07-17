@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.1-alpha.1
+applies_to: 0.0.0.1
 requirements: [REQ-A11Y-001, REQ-RUNTIME-001]
 evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
 last_reviewed: "2026-07-18"
@@ -23,7 +23,7 @@ StoneCharts qualifies the generated chart component, not the complete host page.
 application can break accessibility through surrounding labels, CSS, focus management,
 contrast changes, hidden containers, or incompatible embedding.
 
-Alpha 1 targets applicable WCAG 2.2 Level A and AA component behavior but MUST NOT
+0.0.0.1 targets applicable WCAG 2.2 Level A and AA component behavior but MUST NOT
 claim full conformance until automated and manual qualification is complete.
 
 ## Static requirements

@@ -98,6 +98,6 @@ evidence:
     status: planned
     description: Will validate the immutable release manifest, artifact hashes, SBOM references, and evidence completeness.
     command: null
-    location: docs/releases/0.0.1-alpha.1/evidence/manifest.schema.json
+    location: docs/releases/0.0.0.1/evidence/manifest.schema.json
     requirements: [REQ-REL-001]
 
