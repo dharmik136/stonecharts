@@ -1,7 +1,7 @@
 """Python benchmarking script for PeakCharts rendering.
 
 Measures rendering time, throughput, memory footprint, and file sizes across
-different data scopes (3, 10, 100, 1000 points) comparing basic vs styled.
+different data scopes (3, 10, 100, 1000 points) comparing basic, styled, and markers layouts.
 """
 from __future__ import annotations
 
@@ -16,17 +16,41 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from peakcharts.spec import Axis, ChartSpec, GridLine, Series
+from peakcharts.spec import Axis, ChartSpec, GridLine, Series, Marker
 from peakcharts.render import render_html, render_svg
 
 
-def generate_spec(n_points: int, styled: bool = False) -> ChartSpec:
+def generate_spec(n_points: int, layout_type: str = "basic") -> ChartSpec:
     """Generate a deterministic ChartSpec for benchmarking."""
     data = [round(50.0 + 50.0 * math.sin(i / 10.0), 2) for i in range(n_points)]
     categories = [f"P{i}" for i in range(n_points)]
-    series = [Series(name="Series 1", data=data)]
 
-    if styled:
+    if layout_type == "markers":
+        # New Phase 2 markers layout: dashed line, lineWidth 3, stepped path (center), and triangle markers (radius 4)
+        series = [
+            Series(
+                name="Series 1",
+                data=data,
+                line_width=3.0,
+                dash_style="dashed",
+                step="center",
+                marker=Marker(enabled=True, symbol="triangle", radius=4.0)
+            )
+        ]
+        return ChartSpec(
+            type="line",
+            title="Benchmark Markers",
+            subtitle=f"Responsive + Custom Grid + Markers ({n_points} pts)",
+            x_axis=Axis(title="X Axis", categories=categories),
+            y_axis=Axis(
+                title="Y Axis",
+                grid_line=GridLine(enabled=True, color="#d5d5e0", dash_style="dashed")
+            ),
+            series=series,
+            responsive=True,
+        )
+    elif layout_type == "styled":
+        series = [Series(name="Series 1", data=data)]
         return ChartSpec(
             type="line",
             title="Benchmark Styled",
@@ -40,6 +64,7 @@ def generate_spec(n_points: int, styled: bool = False) -> ChartSpec:
             responsive=True,
         )
     else:
+        series = [Series(name="Series 1", data=data)]
         return ChartSpec(
             type="line",
             title="Benchmark Basic",
@@ -51,8 +76,8 @@ def generate_spec(n_points: int, styled: bool = False) -> ChartSpec:
         )
 
 
-def run_benchmark(n_points: int, styled: bool, mode: str, runs: int = 1000):
-    spec = generate_spec(n_points, styled)
+def run_benchmark(n_points: int, layout_type: str, mode: str, runs: int = 1000):
+    spec = generate_spec(n_points, layout_type)
     func = lambda: render_svg(spec) if mode == "svg" else render_html(spec)
 
     # Warmup
@@ -71,7 +96,6 @@ def run_benchmark(n_points: int, styled: bool, mode: str, runs: int = 1000):
     # Memory measurement
     tracemalloc.start()
     tracemalloc.clear_traces()
-    # Run a few times to get a stable peak
     for _ in range(5):
         func()
     _, peak = tracemalloc.get_traced_memory()
@@ -83,7 +107,7 @@ def run_benchmark(n_points: int, styled: bool, mode: str, runs: int = 1000):
 
     return {
         "points": n_points,
-        "layout": "Styled" if styled else "Basic",
+        "layout": layout_type.capitalize(),
         "mode": mode.upper(),
         "avg_time_ms": avg_time_ms,
         "throughput_ops_sec": throughput,
@@ -98,7 +122,6 @@ def main():
 
     print("Running Python benchmarks (please wait)...")
     for size in sizes:
-        # Determine number of runs based on size to keep execution time reasonable
         if size <= 10:
             runs = 2000
         elif size <= 100:
@@ -106,13 +129,13 @@ def main():
         else:
             runs = 50
 
-        for styled in [False, True]:
+        for layout_type in ["basic", "styled", "markers"]:
             for mode in ["svg", "html"]:
-                res = run_benchmark(size, styled, mode, runs)
+                res = run_benchmark(size, layout_type, mode, runs)
                 results.append(res)
 
     # Output Markdown Tables
-    print("\n# Python Benchmark Results\n")
+    print("\n# Python Benchmark Results (Phase 2)\n")
     
     # SVG Table
     print("## SVG Rendering Performance")

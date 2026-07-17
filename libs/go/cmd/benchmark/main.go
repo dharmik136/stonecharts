@@ -11,9 +11,9 @@ import (
 	"peakcharts"
 )
 
-// generateSpec creates a baseline or styled ChartSpec for benchmarking,
+// generateSpec creates a baseline, styled, or markers ChartSpec for benchmarking,
 // then round-trips it through FromJSON to ensure all defaults are fully populated.
-func generateSpec(nPoints int, styled bool) *peakcharts.ChartSpec {
+func generateSpec(nPoints int, layoutType string) *peakcharts.ChartSpec {
 	data := make([]float64, nPoints)
 	categories := make([]string, nPoints)
 	for i := 0; i < nPoints; i++ {
@@ -30,7 +30,29 @@ func generateSpec(nPoints int, styled bool) *peakcharts.ChartSpec {
 		Series: series,
 	}
 
-	if styled {
+	if layoutType == "markers" {
+		spec.Title = "Benchmark Markers"
+		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid + Markers (%d pts)", nPoints)
+		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
+		enabled := true
+		spec.YAxis = peakcharts.Axis{
+			Title: "Y Axis",
+			GridLine: &peakcharts.GridLine{
+				Enabled:   &enabled,
+				Color:     "#d5d5e0",
+				DashStyle: "dashed",
+			},
+		}
+		spec.Responsive = true
+		spec.Series[0].LineWidth = 3.0
+		spec.Series[0].DashStyle = "dashed"
+		spec.Series[0].Step = "center"
+		spec.Series[0].Marker = &peakcharts.Marker{
+			Enabled: &enabled,
+			Symbol:  "triangle",
+			Radius:  4.0,
+		}
+	} else if layoutType == "styled" {
 		spec.Title = "Benchmark Styled"
 		spec.Subtitle = fmt.Sprintf("Responsive + Custom Grid (%d pts)", nPoints)
 		spec.XAxis = peakcharts.Axis{Title: "X Axis", Categories: categories}
@@ -91,14 +113,16 @@ func main() {
 	fmt.Println("Running Go benchmarks (please wait)...")
 
 	for _, size := range sizes {
-		for _, styled := range []bool{false, true} {
+		for _, layoutType := range []string{"basic", "styled", "markers"} {
 			layoutName := "Basic"
-			if styled {
+			if layoutType == "styled" {
 				layoutName = "Styled"
+			} else if layoutType == "markers" {
+				layoutName = "Markers"
 			}
 
 			// 1. Benchmark SVG Rendering
-			specSVG := generateSpec(size, styled)
+			specSVG := generateSpec(size, layoutType)
 			resSVG := testing.Benchmark(func(b *testing.B) {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
@@ -119,7 +143,7 @@ func main() {
 			})
 
 			// 2. Benchmark HTML Rendering
-			specHTML := generateSpec(size, styled)
+			specHTML := generateSpec(size, layoutType)
 			resHTML := testing.Benchmark(func(b *testing.B) {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
@@ -142,7 +166,7 @@ func main() {
 	}
 
 	// Output Markdown Tables
-	fmt.Println("\n# Go Benchmark Results")
+	fmt.Println("\n# Go Benchmark Results (Phase 2)")
 
 	fmt.Println("## SVG Rendering Performance")
 	fmt.Println("| Points | Layout | Time (ms) | Throughput (ops/s) | Alloc Mem (B/op) | Alloc Count | Size (B) |")
