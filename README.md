@@ -1,12 +1,12 @@
 # PeakCharts
 
-An original, MIT-licensed charting library. One shared chart-spec model, a
+An original, proprietary charting library. One shared chart-spec model, a
 standalone renderer per language, and a shared interaction runtime — so the same
 chart "recipe" produces the same interactive chart in Python, Go, and beyond.
 
 **Not** a fork or copy of any commercial charting library. The chart-type catalog
 is inspired by common visualization types (line, bar, pie, scatter, heatmap, …);
-every renderer here is written from scratch under the MIT license.
+every renderer here is written from scratch. All rights reserved.
 
 ## What a chart is here
 
@@ -62,4 +62,6 @@ area, pie, scatter, bubble, heatmap, gauge, …), each with its own `design.md`.
 
 ## License
 
-MIT © 2026 Dharmik Shingala. See [LICENSE](LICENSE).
+**Proprietary** — Copyright © 2026 Dharmik Shingala. **All rights reserved.**
+No use, copying, modification, or distribution without prior written permission.
+See [LICENSE](LICENSE).

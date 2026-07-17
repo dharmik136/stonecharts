@@ -5,12 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "peakcharts"
 version = "0.1.0"
-description = "PeakCharts — original, MIT-licensed interactive charting library (Python edition)"
+description = "PeakCharts — original, proprietary interactive charting library (Python edition)"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = { text = "Proprietary — All Rights Reserved" }
 authors = [{ name = "Dharmik Shingala" }]
 keywords = ["charts", "svg", "visualization", "plotting"]
+classifiers = ["License :: Other/Proprietary License", "Private :: Do Not Upload"]
 dependencies = []
 
 [project.urls]

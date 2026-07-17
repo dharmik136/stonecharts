@@ -6,7 +6,8 @@
  * without JS; this only *enhances* it (tooltip, point highlight, legend toggle,
  * crosshair). See spec/svg-contract.md for the contract this depends on.
  *
- * License: MIT (c) 2026 Dharmik Shingala
+ * Proprietary. Copyright (c) 2026 Dharmik Shingala. All rights reserved.
+ * No use, copying, or distribution without written permission. See LICENSE.
  */
 (function () {
   "use strict";

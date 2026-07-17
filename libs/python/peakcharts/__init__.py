@@ -1,4 +1,7 @@
-"""PeakCharts — an original, MIT-licensed charting library (Python edition).
+"""PeakCharts — an original, proprietary charting library (Python edition).
+
+Proprietary. Copyright (c) 2026 Dharmik Shingala. All rights reserved.
+
 
 Build a chart spec, render it to a self-contained interactive HTML document.
 
