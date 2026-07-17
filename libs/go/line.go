@@ -166,6 +166,24 @@ type seriesStyle struct {
 	areaOp   string // fill-opacity attribute (with leading space) or ""
 }
 
+// a11ySummary mirrors line.py _a11y_summary: a screen-reader chart summary.
+func a11ySummary(spec *ChartSpec) string {
+	names := make([]string, len(spec.Series))
+	for i, s := range spec.Series {
+		names[i] = s.Name
+	}
+	parts := []string{}
+	if spec.Title != "" {
+		parts = append(parts, spec.Title+".")
+	}
+	parts = append(parts, fmt.Sprintf("Line chart with %d series: %s.", len(spec.Series), strings.Join(names, ", ")))
+	if len(spec.XAxis.Categories) > 0 {
+		c := spec.XAxis.Categories
+		parts = append(parts, fmt.Sprintf("Categories from %s to %s.", c[0], c[len(c)-1]))
+	}
+	return strings.Join(parts, " ")
+}
+
 // renderLineSVG mirrors libs/python/peakcharts/charts/line.py exactly so the two
 // libraries emit byte-identical SVG for the same spec (see charts/line-basic/golden).
 func renderLineSVG(spec *ChartSpec) string {
@@ -176,6 +194,12 @@ func renderLineSVG(spec *ChartSpec) string {
 		theme = &t
 	}
 	palette := theme.Palette
+	a11yAttr, a11yDesc := "", ""
+	if spec.a11yOn() {
+		s := esc(a11ySummary(spec))
+		a11yAttr = ` role="img" aria-label="` + s + `"`
+		a11yDesc = "<desc>" + s + "</desc>"
+	}
 
 	mTop := 20
 	if spec.Title != "" {
@@ -286,12 +310,17 @@ func renderLineSVG(spec *ChartSpec) string {
 	var p strings.Builder
 	if spec.Responsive {
 		p.WriteString(fmt.Sprintf(
-			`<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid meet" width="100%%" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
-			W, H))
+			`<svg class="pk-chart"%s xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid meet" width="100%%" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
+			a11yAttr, W, H))
 	} else {
 		p.WriteString(fmt.Sprintf(
-			`<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
-			W, H, W, H))
+			`<svg class="pk-chart"%s xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
+			a11yAttr, W, H, W, H))
+	}
+
+	// Accessible description (screen readers; role="img" makes the chart one image).
+	if a11yDesc != "" {
+		p.WriteString(a11yDesc)
 	}
 
 	// Gradient / pattern defs (only present when a series needs them).

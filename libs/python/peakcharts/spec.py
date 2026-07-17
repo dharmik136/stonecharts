@@ -159,6 +159,7 @@ class ChartSpec:
     height: int = 460
     legend: bool = True
     responsive: bool = False
+    a11y: bool = True
 
     @staticmethod
     def from_dict(d: dict) -> "ChartSpec":
@@ -251,4 +252,5 @@ class ChartSpec:
             height=int(d.get("height", 460)),
             legend=bool(d.get("legend", True)),
             responsive=bool(d.get("responsive", False)),
+            a11y=bool(d.get("a11y", True)),
         )

@@ -142,10 +142,29 @@ def _pattern_def(pid: str, pat: Pattern) -> str:
     )
 
 
+def _a11y_summary(spec: ChartSpec) -> str:
+    """Screen-reader summary: title (if any), series names, category range."""
+    names = ", ".join(s.name for s in spec.series)
+    parts = []
+    if spec.title:
+        parts.append(f"{spec.title}.")
+    parts.append(f"Line chart with {len(spec.series)} series: {names}.")
+    if spec.x_axis.categories:
+        c = spec.x_axis.categories
+        parts.append(f"Categories from {c[0]} to {c[-1]}.")
+    return " ".join(parts)
+
+
 def render_svg(spec: ChartSpec) -> str:
     W, H = spec.width, spec.height
     theme = spec.theme
     palette = theme.palette
+    a11y_attr = ""
+    a11y_desc = ""
+    if spec.a11y:
+        _sum = esc(_a11y_summary(spec))
+        a11y_attr = f' role="img" aria-label="{_sum}"'
+        a11y_desc = f"<desc>{_sum}</desc>"
 
     # Margins adapt to which chrome is present.
     m_top = 20
@@ -211,15 +230,19 @@ def render_svg(spec: ChartSpec) -> str:
     _font = 'font-family="Segoe UI, Helvetica, Arial, sans-serif"'
     if spec.responsive:
         p.append(
-            f'<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" '
+            f'<svg class="pk-chart"{a11y_attr} xmlns="http://www.w3.org/2000/svg" '
             f'viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid meet" '
             f'width="100%" {_font}>'
         )
     else:
         p.append(
-            f'<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" '
+            f'<svg class="pk-chart"{a11y_attr} xmlns="http://www.w3.org/2000/svg" '
             f'width="{W}" height="{H}" viewBox="0 0 {W} {H}" {_font}>'
         )
+
+    # Accessible description (screen readers; role="img" makes the chart one image).
+    if a11y_desc:
+        p.append(a11y_desc)
 
     # Gradient / pattern defs (only present when a series needs them).
     if defs_parts:

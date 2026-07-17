@@ -34,6 +34,11 @@
       "description": "When true the SVG scales to its container (viewBox + preserveAspectRatio + width:100%) instead of a fixed pixel size. Default false keeps fixed width/height."
     },
     "legend": { "type": "boolean", "default": true },
+    "a11y": {
+      "type": "boolean",
+      "default": true,
+      "description": "Accessibility (on by default): SVG gets role=\"img\" + a summary aria-label + <desc>; the HTML output adds a visually-hidden data table. Set false to restore the pre-a11y byte output."
+    },
     "xAxis": { "$ref": "#/definitions/axis" },
     "yAxis": { "$ref": "#/definitions/yAxis" },
     "series": {

@@ -52,6 +52,15 @@ def test_line_dark_golden():
     _check("dark")
 
 
+def test_a11y_toggle():
+    """a11y is on by default (role/desc); a11y:false restores the pre-a11y bytes."""
+    base = {"type": "line", "title": "T", "series": [{"name": "s", "data": [1, 2, 3]}]}
+    on = render_svg(ChartSpec.from_dict(base))
+    assert 'role="img"' in on and "<desc>" in on
+    off = render_svg(ChartSpec.from_dict({**base, "a11y": False}))
+    assert 'role="img"' not in off and "<desc>" not in off
+
+
 def test_theme_json_parity():
     """The baked THEMES must stay in lockstep with the canonical spec/themes/*.json."""
     key_map = {

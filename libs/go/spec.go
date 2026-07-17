@@ -259,6 +259,7 @@ type ChartSpec struct {
 	Width      int      `json:"width,omitempty"`
 	Height     int      `json:"height,omitempty"`
 	Legend     *bool    `json:"legend,omitempty"`
+	A11y       *bool    `json:"a11y,omitempty"` // nil -> true
 	Responsive bool     `json:"responsive,omitempty"`
 	XAxis      Axis     `json:"xAxis"`
 	YAxis      Axis     `json:"yAxis"`
@@ -293,6 +294,7 @@ func (c *ChartSpec) applyDefaults() {
 }
 
 func (c *ChartSpec) legendOn() bool { return c.Legend == nil || *c.Legend }
+func (c *ChartSpec) a11yOn() bool   { return c.A11y == nil || *c.A11y }
 
 // gridEnabled / gridColor / gridDashStyle resolve yAxis gridline defaults.
 func (a *Axis) gridEnabled() bool {

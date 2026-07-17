@@ -43,6 +43,7 @@ or x/y correlation with no shared x ordering (use scatter). See
 | `subtitle` | string | — | under the title |
 | `width` / `height` | int | 820 / 460 | px |
 | `legend` | bool | true | bottom legend + click-to-toggle |
+| `a11y` | bool | true | accessibility (on by default): SVG gets `role="img"` + a summary `aria-label` + `<desc>`; HTML adds a visually-hidden data table. `false` restores the pre-a11y bytes |
 | `responsive` | bool | false | scale to container (viewBox + `width:100%`) instead of fixed px |
 | `xAxis.title` | string | — | axis label |
 | `xAxis.categories` | string[] | index `0..N-1` | x labels |

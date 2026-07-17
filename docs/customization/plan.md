@@ -21,12 +21,17 @@ two non-negotiables. Source research: `docs/research/design-customization-brief.
   renderer; out of scope here.
 
 ## Golden policy (the mechanical trap)
-- The **default** rendering (light, no gradient, `responsive:false`) must stay
-  **byte-identical to the existing `charts/line-basic/golden/basic.svg`**. Do not
+- The **default** rendering (light theme, no gradient, `responsive:false`) must stay
+  **byte-identical to the current `charts/line-basic/golden/basic.svg`**. Do not
   emit new elements (`<defs>`, background `<rect>`) when they'd be empty/implicit.
 - A **new visual** (responsive, dashed gridlines, a theme, …) gets its **own new
   golden fixture** — never mutate an existing golden by accident. Each phase names
   exactly which goldens it adds.
+- **Deliberate baseline changes are allowed but rare:** Phase 5b intentionally
+  added default-on a11y markup (`role`/`aria-label`/`<desc>`) to *every* golden. That
+  is the one sanctioned way to change existing goldens — regenerate them all in
+  lockstep, verify the diff is exactly the intended change, and re-prove Python==Go.
+  "the default stays byte-identical" now means byte-identical to the a11y baseline.
 
 ## Roadmap (build in this order — cheap + static first)
 1. **Phase 1 — Sizing & gridlines:** `responsive` (viewBox + `preserveAspectRatio`
@@ -46,9 +51,13 @@ two non-negotiables. Source research: `docs/research/design-customization-brief.
      renderers and locked to the JSON by a parity test. Threads bg + all text/grid/
      axis/marker-halo colors + palette. New fixture `dark.svg`; light default keeps
      every existing golden byte-identical.
-   - **5b a11y + deeper interactivity — pending.** `role="img"`/`aria-label`,
-     `<desc>`, hidden data-table, keyboard nav. (Baseline a11y likely default-on →
-     will intentionally regenerate all goldens; parity re-verified.)
+   - **5b a11y ✅ done (default-on).** SVG gets `role="img"` + a summary `aria-label`
+     + `<desc>`; the HTML output adds a visually-hidden, keyboard-navigable data
+     table (caption + column/row headers + every value). `spec.a11y` (default true);
+     `a11y:false` restores the pre-a11y bytes. Accessibility is baseline, so this
+     DELIBERATELY regenerated all 6 goldens — the diff is purely the a11y markup
+     (verified line-by-line), and Python==Go parity was re-proven. Deeper keyboard
+     point-nav (arrow through points with live tooltip) is future work.
 
 ## Nits to fix as we touch them
 - `legend` will become `oneOf [boolean, object]` when legend layout lands (Phase 5);

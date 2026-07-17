@@ -12,7 +12,7 @@ from typing import Callable, Dict
 
 from .charts import line as _line
 from .spec import ChartSpec
-from .util import esc
+from .util import esc, fmt_num
 
 # The canonical shared runtime lives at <repo>/runtime/chart-interactions.js.
 # render.py -> peakcharts -> python -> libs -> <repo>
@@ -34,7 +34,30 @@ _CSS = """
   .pk-tt-title{font-weight:600;margin-bottom:2px}
   .pk-tt-row{display:flex;align-items:center}
   .pk-tt-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+  .pk-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 """.strip()
+
+
+def _data_table(spec: ChartSpec) -> str:
+    """A visually-hidden HTML data table: the accessible, keyboard-navigable
+    alternative to the SVG (which is role="img"). Screen readers read this."""
+    n = max((len(s.data) for s in spec.series), default=0)
+    cats = spec.x_axis.categories or [str(i) for i in range(n)]
+    head = "".join(f'<th scope="col">{esc(cats[i])}</th>' for i in range(n))
+    rows = []
+    for s in spec.series:
+        cells = "".join(
+            f"<td>{esc(fmt_num(s.data[i]))}</td>" if i < len(s.data) else "<td></td>"
+            for i in range(n)
+        )
+        rows.append(f'<tr><th scope="row">{esc(s.name)}</th>{cells}</tr>')
+    caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
+    return (
+        f'<table class="pk-visually-hidden">{caption}'
+        f'<thead><tr><td></td>{head}</tr></thead>'
+        f'<tbody>{"".join(rows)}</tbody></table>'
+    )
 
 
 def render_svg(spec: ChartSpec) -> str:
@@ -63,6 +86,7 @@ def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
         f'aspect-ratio:{spec.width} / {spec.height}"'
         if spec.responsive else ""
     )
+    table = _data_table(spec) if spec.a11y else ""
     return (
         "<!doctype html>\n"
         '<html lang="en"><head><meta charset="utf-8">'
@@ -70,7 +94,8 @@ def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
         f"<title>{esc(title)}</title>\n"
         f"<style>{_CSS}</style></head>\n"
         "<body>\n"
-        f'<div class="pk-chart-wrap"{wrap_style}>{svg}<div class="pk-tooltip" style="display:none"></div></div>\n'
+        f'<div class="pk-chart-wrap"{wrap_style}>{svg}{table}'
+        f'<div class="pk-tooltip" style="display:none"></div></div>\n'
         f"<script>{_runtime_js()}</script>\n"
         "</body></html>\n"
     )

@@ -32,6 +32,28 @@ func TestGolden(t *testing.T) {
 	}
 }
 
+// TestA11yToggle verifies a11y is on by default and a11y:false restores the
+// pre-a11y bytes.
+func TestA11yToggle(t *testing.T) {
+	mk := func() *ChartSpec {
+		return &ChartSpec{Type: "line", Title: "T", Series: []Series{{Name: "s", Data: []float64{1, 2, 3}}}}
+	}
+	on := mk()
+	on.applyDefaults()
+	svgOn := RenderSVG(on)
+	if !strings.Contains(svgOn, `role="img"`) || !strings.Contains(svgOn, "<desc>") {
+		t.Error("a11y default should add role=img + <desc>")
+	}
+	off := mk()
+	no := false
+	off.A11y = &no
+	off.applyDefaults()
+	svgOff := RenderSVG(off)
+	if strings.Contains(svgOff, `role="img"`) || strings.Contains(svgOff, "<desc>") {
+		t.Error("a11y:false should omit role=img + <desc>")
+	}
+}
+
 // TestThemeJSONParity keeps the baked light/dark themes in lockstep with the
 // canonical spec/themes/*.json (the single source of truth). If they drift, the
 // two languages could theme differently.
