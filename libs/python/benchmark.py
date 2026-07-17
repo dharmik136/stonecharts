@@ -1,7 +1,7 @@
 """Python benchmarking script for PeakCharts rendering.
 
 Measures rendering time, throughput, memory footprint, and file sizes across
-different data scopes (3, 10, 100, 1000 points) comparing basic, styled, markers, and spline layouts.
+different data scopes (3, 10, 100, 1000 points) comparing basic, styled, markers, spline, and gradient layouts.
 """
 from __future__ import annotations
 
@@ -16,18 +16,56 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from peakcharts.spec import Axis, ChartSpec, GridLine, Series, Marker
+from peakcharts.spec import Axis, ChartSpec, GridLine, Series, Marker, Gradient, GradientStop, Pattern
 from peakcharts.render import render_html, render_svg
 
 
 def generate_spec(n_points: int, layout_type: str = "basic") -> ChartSpec:
-    """Generate a deterministic ChartSpec for benchmarking."""
-    data = [round(50.0 + 50.0 * math.sin(i / 10.0), 2) for i in range(n_points)]
+    """Generate a deterministic ChartSpec with 2 series for benchmarking."""
+    data1 = [round(50.0 + 50.0 * math.sin(i / 10.0), 2) for i in range(n_points)]
+    data2 = [round(30.0 + 30.0 * math.cos(i / 10.0), 2) for i in range(n_points)]
     categories = [f"P{i}" for i in range(n_points)]
 
-    if layout_type == "spline":
-        # New Phase 3 spline layout: responsive=true, gridLine=dashed, monotone curve
-        series = [Series(name="Series 1", data=data, curve="monotone")]
+    if layout_type == "gradient":
+        # New Phase 4 gradient layout: 2 series with gradient area and hatch pattern fills
+        series = [
+            Series(
+                name="Series 1",
+                data=data1,
+                color=Gradient(
+                    stops=[
+                        GradientStop(offset=0.0, color="#2f7ed8"),
+                        GradientStop(offset=1.0, color="#1aadce")
+                    ]
+                ),
+                fill_opacity=0.25,
+                curve="monotone",
+            ),
+            Series(
+                name="Series 2",
+                data=data2,
+                color="#f45b5b",
+                pattern=Pattern(type="hatch", color="#f45b5b", size=8.0, angle=45.0, stroke_width=1.5)
+            )
+        ]
+        return ChartSpec(
+            type="line",
+            id="demo",
+            title="Benchmark Gradient",
+            subtitle=f"Responsive + Custom Grid + Gradients/Patterns ({n_points} pts)",
+            x_axis=Axis(title="X Axis", categories=categories),
+            y_axis=Axis(
+                title="Y Axis",
+                grid_line=GridLine(enabled=True, color="#d5d5e0", dash_style="dashed")
+            ),
+            series=series,
+            responsive=True,
+        )
+    elif layout_type == "spline":
+        series = [
+            Series(name="Series 1", data=data1, curve="monotone"),
+            Series(name="Series 2", data=data2, curve="monotone")
+        ]
         return ChartSpec(
             type="line",
             title="Benchmark Spline",
@@ -41,15 +79,22 @@ def generate_spec(n_points: int, layout_type: str = "basic") -> ChartSpec:
             responsive=True,
         )
     elif layout_type == "markers":
-        # Phase 2 markers layout: dashed line, lineWidth 3, stepped path (center), and triangle markers (radius 4)
         series = [
             Series(
                 name="Series 1",
-                data=data,
+                data=data1,
                 line_width=3.0,
                 dash_style="dashed",
                 step="center",
                 marker=Marker(enabled=True, symbol="triangle", radius=4.0)
+            ),
+            Series(
+                name="Series 2",
+                data=data2,
+                line_width=2.0,
+                dash_style="dotted",
+                step="after",
+                marker=Marker(enabled=True, symbol="square", radius=4.0)
             )
         ]
         return ChartSpec(
@@ -65,7 +110,10 @@ def generate_spec(n_points: int, layout_type: str = "basic") -> ChartSpec:
             responsive=True,
         )
     elif layout_type == "styled":
-        series = [Series(name="Series 1", data=data)]
+        series = [
+            Series(name="Series 1", data=data1),
+            Series(name="Series 2", data=data2)
+        ]
         return ChartSpec(
             type="line",
             title="Benchmark Styled",
@@ -79,7 +127,10 @@ def generate_spec(n_points: int, layout_type: str = "basic") -> ChartSpec:
             responsive=True,
         )
     else:
-        series = [Series(name="Series 1", data=data)]
+        series = [
+            Series(name="Series 1", data=data1),
+            Series(name="Series 2", data=data2)
+        ]
         return ChartSpec(
             type="line",
             title="Benchmark Basic",
@@ -144,13 +195,13 @@ def main():
         else:
             runs = 50
 
-        for layout_type in ["basic", "styled", "markers", "spline"]:
+        for layout_type in ["basic", "styled", "markers", "spline", "gradient"]:
             for mode in ["svg", "html"]:
                 res = run_benchmark(size, layout_type, mode, runs)
                 results.append(res)
 
     # Output Markdown Tables
-    print("\n# Python Benchmark Results (Phase 3)\n")
+    print("\n# Python Benchmark Results (Phase 4)\n")
     
     # SVG Table
     print("## SVG Rendering Performance")
