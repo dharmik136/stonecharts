@@ -11,6 +11,18 @@ var palette = []string{
 	"#1aadce", "#8e44ad", "#f28f43", "#77a1e5",
 }
 
+// dashArray maps a dashStyle name to an SVG stroke-dasharray value ("" = solid).
+func dashArray(style string) string {
+	switch style {
+	case "dashed":
+		return "5 5"
+	case "dotted":
+		return "2 3"
+	default:
+		return ""
+	}
+}
+
 // renderLineSVG mirrors libs/python/peakcharts/charts/line.py exactly so the two
 // libraries emit byte-identical SVG for the same spec (see charts/line-basic/golden).
 func renderLineSVG(spec *ChartSpec) string {
@@ -87,9 +99,15 @@ func renderLineSVG(spec *ChartSpec) string {
 	}
 
 	var p strings.Builder
-	p.WriteString(fmt.Sprintf(
-		`<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
-		W, H, W, H))
+	if spec.Responsive {
+		p.WriteString(fmt.Sprintf(
+			`<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid meet" width="100%%" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
+			W, H))
+	} else {
+		p.WriteString(fmt.Sprintf(
+			`<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
+			W, H, W, H))
+	}
 
 	ty := 26
 	if spec.Title != "" {
@@ -104,13 +122,21 @@ func renderLineSVG(spec *ChartSpec) string {
 			f1(float64(W)/2), ty, esc(spec.Subtitle)))
 	}
 
-	// Y gridlines + labels.
+	// Y gridlines + labels. Defaults reproduce the built-in look byte-for-byte.
+	gridEnabled := spec.YAxis.gridEnabled()
+	gridColor := spec.YAxis.gridColor()
+	gridDashAttr := ""
+	if da := dashArray(spec.YAxis.gridDashStyle()); da != "" {
+		gridDashAttr = ` stroke-dasharray="` + da + `"`
+	}
 	p.WriteString(`<g class="pk-axis pk-axis-y">`)
 	for _, tv := range yTicks {
 		gy := ypix(tv)
-		p.WriteString(fmt.Sprintf(
-			`<line class="pk-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="#e8e8ee" stroke-width="1"/>`,
-			f1(plotX), f1(gy), f1(plotX+plotW), f1(gy)))
+		if gridEnabled {
+			p.WriteString(fmt.Sprintf(
+				`<line class="pk-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"%s/>`,
+				f1(plotX), f1(gy), f1(plotX+plotW), f1(gy), gridColor, gridDashAttr))
+		}
 		p.WriteString(fmt.Sprintf(
 			`<text x="%s" y="%s" text-anchor="end" font-size="11" fill="#6b6b80">%s</text>`,
 			f1(plotX-8), f1(gy+4), esc(fmtNum(tv))))

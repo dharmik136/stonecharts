@@ -2,23 +2,27 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/dharmik136/peakcharts/blob/master/spec/chart-spec.schema.json",
   "title": "PeakCharts Chart Spec",
-  "description": "Language-agnostic recipe for one chart. Every PeakCharts language library builds this shape and renders it. Keep language spec models (e.g. libs/python/peakcharts/spec.py) in lockstep with this file.",
+  "description": "Language-agnostic recipe for one chart. Unknown keys are ignored (forward-compatible); renderers grow field support phase by phase. Keep language spec models (libs/*/spec) in lockstep with this file.",
   "type": "object",
   "required": ["type", "series"],
-  "additionalProperties": false,
   "properties": {
     "type": {
       "type": "string",
       "enum": ["line"],
-      "description": "Chart type id. The enum grows as chart types are added; each maps to charts/<id>/design.md."
+      "description": "Chart type id; maps to charts/<id>/design.md. Grows as chart types are added."
     },
     "title": { "type": "string" },
     "subtitle": { "type": "string" },
     "width": { "type": "integer", "minimum": 100, "default": 820 },
     "height": { "type": "integer", "minimum": 100, "default": 460 },
+    "responsive": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true the SVG scales to its container (viewBox + preserveAspectRatio + width:100%) instead of a fixed pixel size. Default false keeps fixed width/height."
+    },
     "legend": { "type": "boolean", "default": true },
     "xAxis": { "$ref": "#/definitions/axis" },
-    "yAxis": { "$ref": "#/definitions/axis" },
+    "yAxis": { "$ref": "#/definitions/yAxis" },
     "series": {
       "type": "array",
       "minItems": 1,
@@ -28,22 +32,41 @@
   "definitions": {
     "axis": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "title": { "type": "string" },
         "categories": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "Category labels for the axis. On xAxis, index i of each series maps to categories[i]."
+          "description": "Category labels. On xAxis, index i of each series maps to categories[i]."
         },
         "min": { "type": "number" },
         "max": { "type": "number" }
       }
     },
+    "yAxis": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "gridLine": {
+          "type": "object",
+          "description": "Horizontal gridline styling. Defaults reproduce the built-in look (solid #e8e8ee).",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "color": { "type": "string", "description": "Hex color; default #e8e8ee." },
+            "dashStyle": {
+              "type": "string",
+              "enum": ["solid", "dashed", "dotted"],
+              "default": "solid"
+            }
+          }
+        }
+      }
+    },
     "series": {
       "type": "object",
       "required": ["data"],
-      "additionalProperties": false,
       "properties": {
         "name": { "type": "string" },
         "data": {
@@ -53,7 +76,7 @@
         },
         "color": {
           "type": "string",
-          "description": "Optional hex color (e.g. #2f7ed8). Defaults from the built-in palette by series index."
+          "description": "Optional hex color; defaults from the palette by series index."
         }
       }
     }

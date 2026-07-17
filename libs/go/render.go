@@ -56,13 +56,17 @@ func RenderHTML(spec *ChartSpec, pageTitle string) string {
 	if title == "" {
 		title = "PeakCharts"
 	}
+	wrapStyle := ""
+	if spec.Responsive {
+		wrapStyle = fmt.Sprintf(` style="display:block;width:100%%;max-width:%dpx;aspect-ratio:%d / %d"`, spec.Width, spec.Width, spec.Height)
+	}
 	return "<!doctype html>\n" +
 		`<html lang="en"><head><meta charset="utf-8">` +
 		`<meta name="viewport" content="width=device-width,initial-scale=1">` +
 		"<title>" + esc(title) + "</title>\n" +
 		"<style>" + cssBlock + "</style></head>\n" +
 		"<body>\n" +
-		`<div class="pk-chart-wrap">` + svg + `<div class="pk-tooltip" style="display:none"></div></div>` + "\n" +
+		`<div class="pk-chart-wrap"` + wrapStyle + `>` + svg + `<div class="pk-tooltip" style="display:none"></div></div>` + "\n" +
 		"<script>" + runtimeJS() + "</script>\n" +
 		"</body></html>\n"
 }

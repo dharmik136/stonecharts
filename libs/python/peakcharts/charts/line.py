@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import List
 
-from ..spec import ChartSpec
+from ..spec import ChartSpec, GridLine
 from ..util import esc, fmt_num, nice_ticks
 
 # Default categorical palette (original values; not copied from any library).
@@ -17,6 +17,13 @@ PALETTE: List[str] = [
     "#2f7ed8", "#f45b5b", "#8bbc21", "#e4a812",
     "#1aadce", "#8e44ad", "#f28f43", "#77a1e5",
 ]
+
+# dashStyle name -> SVG stroke-dasharray value ("" = solid, no attribute).
+_DASH = {"dashed": "5 5", "dotted": "2 3"}
+
+
+def _dash_array(style: str) -> str:
+    return _DASH.get(style, "")
 
 
 def render_svg(spec: ChartSpec) -> str:
@@ -54,11 +61,18 @@ def render_svg(spec: ChartSpec) -> str:
         return plot_y + plot_h * (1 - (v - y_min) / (y_max - y_min))
 
     p: List[str] = []
-    p.append(
-        f'<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" '
-        f'width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
-        f'font-family="Segoe UI, Helvetica, Arial, sans-serif">'
-    )
+    _font = 'font-family="Segoe UI, Helvetica, Arial, sans-serif"'
+    if spec.responsive:
+        p.append(
+            f'<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" '
+            f'viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid meet" '
+            f'width="100%" {_font}>'
+        )
+    else:
+        p.append(
+            f'<svg class="pk-chart" xmlns="http://www.w3.org/2000/svg" '
+            f'width="{W}" height="{H}" viewBox="0 0 {W} {H}" {_font}>'
+        )
 
     # Titles.
     ty = 26
@@ -74,14 +88,20 @@ def render_svg(spec: ChartSpec) -> str:
             f'font-size="12" fill="#6b6b80">{esc(spec.subtitle)}</text>'
         )
 
-    # Y gridlines + labels.
+    # Y gridlines + labels. Defaults reproduce the built-in look byte-for-byte.
+    gl = spec.y_axis.grid_line or GridLine()
+    grid_color = gl.color or "#e8e8ee"
+    grid_dash = _dash_array(gl.dash_style)
+    dash_attr = f' stroke-dasharray="{grid_dash}"' if grid_dash else ''
     p.append('<g class="pk-axis pk-axis-y">')
     for tv in y_ticks:
         gy = ypix(tv)
-        p.append(
-            f'<line class="pk-gridline" x1="{plot_x:.1f}" y1="{gy:.1f}" '
-            f'x2="{plot_x+plot_w:.1f}" y2="{gy:.1f}" stroke="#e8e8ee" stroke-width="1"/>'
-        )
+        if gl.enabled:
+            p.append(
+                f'<line class="pk-gridline" x1="{plot_x:.1f}" y1="{gy:.1f}" '
+                f'x2="{plot_x+plot_w:.1f}" y2="{gy:.1f}" stroke="{grid_color}" '
+                f'stroke-width="1"{dash_attr}/>'
+            )
         p.append(
             f'<text x="{plot_x-8:.1f}" y="{gy+4:.1f}" text-anchor="end" '
             f'font-size="11" fill="#6b6b80">{esc(fmt_num(tv))}</text>'

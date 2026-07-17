@@ -58,6 +58,11 @@ def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
     """Return a full, self-contained interactive HTML document for the chart."""
     svg = render_svg(spec)
     title = page_title or spec.title or "PeakCharts"
+    wrap_style = (
+        f' style="display:block;width:100%;max-width:{spec.width}px;'
+        f'aspect-ratio:{spec.width} / {spec.height}"'
+        if spec.responsive else ""
+    )
     return (
         "<!doctype html>\n"
         '<html lang="en"><head><meta charset="utf-8">'
@@ -65,7 +70,7 @@ def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
         f"<title>{esc(title)}</title>\n"
         f"<style>{_CSS}</style></head>\n"
         "<body>\n"
-        f'<div class="pk-chart-wrap">{svg}<div class="pk-tooltip" style="display:none"></div></div>\n'
+        f'<div class="pk-chart-wrap"{wrap_style}>{svg}<div class="pk-tooltip" style="display:none"></div></div>\n'
         f"<script>{_runtime_js()}</script>\n"
         "</body></html>\n"
     )

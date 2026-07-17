@@ -41,10 +41,12 @@ or x/y correlation with no shared x ordering (use scatter). See
 | `subtitle` | string | — | under the title |
 | `width` / `height` | int | 820 / 460 | px |
 | `legend` | bool | true | bottom legend + click-to-toggle |
+| `responsive` | bool | false | scale to container (viewBox + `width:100%`) instead of fixed px |
 | `xAxis.title` | string | — | axis label |
 | `xAxis.categories` | string[] | index `0..N-1` | x labels |
 | `yAxis.title` | string | — | axis label |
 | `yAxis.min` / `yAxis.max` | number | auto (nice ticks, includes 0) | clamp the y range |
+| `yAxis.gridLine` | object | `{enabled:true, color:#e8e8ee, dashStyle:solid}` | horizontal gridline styling; `dashStyle` ∈ solid/dashed/dotted |
 | `series[].name` | string | `Series i` | legend + tooltip name |
 | `series[].data` | number[] | — | y-values, length `N` |
 | `series[].color` | string | palette by index | hex, e.g. `#2f7ed8` |
