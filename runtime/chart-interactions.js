@@ -19,9 +19,39 @@
     for (var i = 0; i < charts.length; i++) setupChart(charts[i]);
   }
 
+  var uidCounter = 0;
+
+  // Uniquify this chart's <defs> ids (gradients/patterns) and rewrite its own
+  // url(#id) references, so multiple charts on one page can't collide on shared
+  // ids like "pk-grad-0". Runs at load, so the static SVG bytes stay unchanged.
+  function scopeDefs(svg) {
+    var defs = svg.querySelector("defs");
+    if (!defs) return;
+    var idNodes = defs.querySelectorAll("[id]");
+    if (!idNodes.length) return;
+    var uid = "pkc" + (uidCounter++), map = {};
+    for (var i = 0; i < idNodes.length; i++) {
+      var oldId = idNodes[i].getAttribute("id");
+      map[oldId] = uid + "-" + oldId;
+      idNodes[i].setAttribute("id", map[oldId]);
+    }
+    var refs = svg.querySelectorAll("[fill],[stroke]");
+    for (var j = 0; j < refs.length; j++) {
+      var attrs = ["fill", "stroke"];
+      for (var a = 0; a < attrs.length; a++) {
+        var v = refs[j].getAttribute(attrs[a]);
+        if (v && v.indexOf("url(#") === 0) {
+          var id = v.slice(5, -1);
+          if (map[id]) refs[j].setAttribute(attrs[a], "url(#" + map[id] + ")");
+        }
+      }
+    }
+  }
+
   function setupChart(svg) {
     if (svg.__pkInit) return;
     svg.__pkInit = true;
+    scopeDefs(svg);
 
     var wrap = svg.closest(".pk-chart-wrap") || svg.parentNode;
     var tip = wrap.querySelector(".pk-tooltip");

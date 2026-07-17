@@ -12,6 +12,22 @@ from typing import List, Optional, Union
 from .util import esc
 
 
+def _num(v) -> float:
+    """Coerce a data value to float; non-numeric/None -> 0.0 (never crash)."""
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _int(v, default: int) -> int:
+    """Coerce to int; non-numeric/None -> default (never crash)."""
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return default
+
+
 @dataclass
 class Marker:
     enabled: bool = True
@@ -216,7 +232,7 @@ class ChartSpec:
             series.append(
                 Series(
                     name=s.get("name", f"Series {i + 1}"),
-                    data=[float(v) for v in s["data"]],
+                    data=[_num(v) for v in (s.get("data") or [])],
                     color=color,
                     fill_opacity=float(s.get("fillOpacity", 0.0)),
                     pattern=pattern,
@@ -258,8 +274,8 @@ class ChartSpec:
                 max=ya.get("max"),
                 grid_line=grid,
             ),
-            width=int(d.get("width", 820)),
-            height=int(d.get("height", 460)),
+            width=_int(d.get("width", 820), 820),
+            height=_int(d.get("height", 460), 460),
             legend=bool(d.get("legend", True)),
             responsive=bool(d.get("responsive", False)),
             a11y=bool(d.get("a11y", True)),

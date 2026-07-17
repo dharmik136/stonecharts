@@ -22,3 +22,4 @@ Thumbs.db
 
 # machine-specific benchmark output
 benchmark_results.json
+.stress/

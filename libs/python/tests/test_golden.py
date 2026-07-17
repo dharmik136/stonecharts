@@ -72,6 +72,20 @@ def test_xss_escaping():
     assert "<script>alert(1)</script>" not in render_html(spec)
 
 
+def test_malformed_no_crash():
+    """Malformed specs must coerce to valid SVG, never raise on render."""
+    bad = [
+        {"type": "line", "series": [{"name": "s", "data": None}]},
+        {"type": "line", "series": [{"name": "s", "data": [1, None, 3]}]},
+        {"type": "line", "width": "auto", "series": [{"name": "s", "data": [1, 2]}]},
+        {"type": "line", "series": []},
+        {"type": "line", "series": [{"name": "s", "data": []}]},
+    ]
+    for spec in bad:
+        svg = render_svg(ChartSpec.from_dict(spec))
+        assert svg.startswith("<svg") and svg.endswith("</svg>")
+
+
 def test_a11y_toggle():
     """a11y is on by default (role/desc); a11y:false restores the pre-a11y bytes."""
     base = {"type": "line", "title": "T", "series": [{"name": "s", "data": [1, 2, 3]}]}

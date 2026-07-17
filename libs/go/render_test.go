@@ -59,6 +59,27 @@ func jsonStr(s string) string {
 	return string(b)
 }
 
+// TestMalformedNoPanic feeds coercible malformed specs and asserts the renderer
+// produces valid SVG (or FromJSON returns a clean error) but never panics.
+func TestMalformedNoPanic(t *testing.T) {
+	specs := []string{
+		`{"type":"line","series":[{"name":"s","data":null}]}`,
+		`{"type":"line","series":[{"name":"s","data":[1,null,3]}]}`,
+		`{"type":"line","width":"auto","series":[{"name":"s","data":[1,2]}]}`,
+		`{"type":"line","series":[]}`,
+		`{"type":"line","series":[{"name":"s","data":[]}]}`,
+	}
+	for _, s := range specs {
+		spec, err := FromJSON([]byte(s))
+		if err != nil {
+			continue // a clean error is acceptable
+		}
+		if svg := RenderSVG(spec); !strings.HasPrefix(svg, "<svg") {
+			t.Errorf("bad SVG for %s", s)
+		}
+	}
+}
+
 // TestA11yToggle verifies a11y is on by default and a11y:false restores the
 // pre-a11y bytes.
 func TestA11yToggle(t *testing.T) {
