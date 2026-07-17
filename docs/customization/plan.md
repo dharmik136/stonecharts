@@ -40,8 +40,15 @@ two non-negotiables. Source research: `docs/research/design-customization-brief.
    `series.color` as a linear gradient (stroke + area), `series.fillOpacity` (area
    under the line → area chart), `series.pattern` (hatch fill), chart `id` namespaces
    `<defs>` ids. Defs emitted only when needed, so `basic.svg` stays byte-identical.
-5. **Phase 5 — Themes, a11y, deeper interactivity:** shared `spec/themes/*.json`
-   (light/dark, colorblind-safe palette), ARIA/`<desc>`/data-table, keyboard nav.
+5. **Phase 5 — Themes, a11y, deeper interactivity:**
+   - **5a Themes ✅ done.** `spec.theme` = `light` (default, byte-identical) / `dark`
+     / custom object. Canonical values in `spec/themes/*.json`, baked into both
+     renderers and locked to the JSON by a parity test. Threads bg + all text/grid/
+     axis/marker-halo colors + palette. New fixture `dark.svg`; light default keeps
+     every existing golden byte-identical.
+   - **5b a11y + deeper interactivity — pending.** `role="img"`/`aria-label`,
+     `<desc>`, hidden data-table, keyboard nav. (Baseline a11y likely default-on →
+     will intentionally regenerate all goldens; parity re-verified.)
 
 ## Nits to fix as we touch them
 - `legend` will become `oneOf [boolean, object]` when legend layout lands (Phase 5);

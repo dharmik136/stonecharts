@@ -1,7 +1,9 @@
 package peakcharts
 
 import (
+	"encoding/json"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -10,7 +12,7 @@ import (
 // (charts/line-basic/golden/*.svg), which the Python renderer also matches.
 // If this and the Python test both pass, the two libraries are provably in sync.
 func TestGolden(t *testing.T) {
-	for _, name := range []string{"basic", "styled", "markers", "spline", "gradient"} {
+	for _, name := range []string{"basic", "styled", "markers", "spline", "gradient", "dark"} {
 		specBytes, err := os.ReadFile("../../charts/line-basic/examples/" + name + ".json")
 		if err != nil {
 			t.Fatal(err)
@@ -26,6 +28,26 @@ func TestGolden(t *testing.T) {
 		}
 		if got != string(want) {
 			t.Errorf("%s: SVG != golden (got %d bytes, want %d bytes)", name, len(got), len(want))
+		}
+	}
+}
+
+// TestThemeJSONParity keeps the baked light/dark themes in lockstep with the
+// canonical spec/themes/*.json (the single source of truth). If they drift, the
+// two languages could theme differently.
+func TestThemeJSONParity(t *testing.T) {
+	for _, name := range []string{"light", "dark"} {
+		b, err := os.ReadFile("../../spec/themes/" + name + ".json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var fromJSON Theme
+		if err := json.Unmarshal(b, &fromJSON); err != nil {
+			t.Fatal(err)
+		}
+		baked, _ := builtinTheme(name)
+		if !reflect.DeepEqual(baked, fromJSON) {
+			t.Errorf("%s theme: baked != spec/themes/%s.json\n baked=%+v\n json =%+v", name, name, baked, fromJSON)
 		}
 	}
 }

@@ -13,10 +13,10 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from peakcharts import ChartSpec  # noqa: E402
+from peakcharts import ChartSpec, THEMES  # noqa: E402
 from peakcharts.render import render_svg  # noqa: E402
 
-CASES = ["basic", "styled", "markers", "spline", "gradient"]
+CASES = ["basic", "styled", "markers", "spline", "gradient", "dark"]
 
 
 def _check(name: str):
@@ -46,6 +46,28 @@ def test_line_spline_golden():
 
 def test_line_gradient_golden():
     _check("gradient")
+
+
+def test_line_dark_golden():
+    _check("dark")
+
+
+def test_theme_json_parity():
+    """The baked THEMES must stay in lockstep with the canonical spec/themes/*.json."""
+    key_map = {
+        "background": "background", "titleColor": "title_color",
+        "subtitleColor": "subtitle_color", "axisLabelColor": "axis_label_color",
+        "axisTitleColor": "axis_title_color", "gridColor": "grid_color",
+        "axisLineColor": "axis_line_color", "crosshairColor": "crosshair_color",
+        "markerHalo": "marker_halo", "legendTextColor": "legend_text_color",
+        "palette": "palette",
+    }
+    for name in ("light", "dark"):
+        j = json.loads((ROOT / "spec" / "themes" / f"{name}.json").read_text(encoding="utf-8"))
+        t = THEMES[name]
+        assert t.name == j["name"], name
+        for jk, attr in key_map.items():
+            assert getattr(t, attr) == j[jk], f"{name}.{jk}"
 
 
 # Edge-case vectors from the Phase-3 QA report: flat data, extrema, single/dual

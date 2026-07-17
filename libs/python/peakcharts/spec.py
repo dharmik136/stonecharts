@@ -6,7 +6,7 @@ with spec/chart-spec.schema.json and libs/go/spec.go.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import List, Optional, Union
 
 
@@ -75,10 +75,82 @@ class Axis:
 
 
 @dataclass
+class Theme:
+    """Concrete color set (canonical values in spec/themes/*.json). Defaults = light,
+    exactly reproducing the classic look so light output is byte-identical."""
+    name: str = "light"
+    background: Optional[str] = None
+    title_color: str = "#1a1a2e"
+    subtitle_color: str = "#6b6b80"
+    axis_label_color: str = "#6b6b80"
+    axis_title_color: str = "#4a4a5a"
+    grid_color: str = "#e8e8ee"
+    axis_line_color: str = "#b6b6c2"
+    crosshair_color: str = "#c0c0cc"
+    marker_halo: str = "#fff"
+    legend_text_color: str = "#33334d"
+    palette: List[str] = field(default_factory=lambda: [
+        "#2f7ed8", "#f45b5b", "#8bbc21", "#e4a812",
+        "#1aadce", "#8e44ad", "#f28f43", "#77a1e5",
+    ])
+
+
+# Built-in themes (baked; kept in lockstep with spec/themes/*.json by a parity test).
+THEMES = {
+    "light": Theme(),
+    "dark": Theme(
+        name="dark",
+        background="#1a1a2e",
+        title_color="#f5f5fa",
+        subtitle_color="#a0a0b8",
+        axis_label_color="#9a9ab0",
+        axis_title_color="#c8c8d8",
+        grid_color="#2e2e44",
+        axis_line_color="#45455a",
+        crosshair_color="#55556a",
+        marker_halo="#1a1a2e",
+        legend_text_color="#d0d0e0",
+        palette=[
+            "#5aa2f0", "#ff7a7a", "#a3d95a", "#f5c542",
+            "#3ec8e0", "#b57ae0", "#ff9d5c", "#93b8ff",
+        ],
+    ),
+}
+
+# camelCase JSON key -> Theme attribute (for custom-object overrides + JSON parity).
+_THEME_KEYS = {
+    "background": "background", "titleColor": "title_color",
+    "subtitleColor": "subtitle_color", "axisLabelColor": "axis_label_color",
+    "axisTitleColor": "axis_title_color", "gridColor": "grid_color",
+    "axisLineColor": "axis_line_color", "crosshairColor": "crosshair_color",
+    "markerHalo": "marker_halo", "legendTextColor": "legend_text_color",
+    "palette": "palette",
+}
+
+
+def resolve_theme(value) -> Theme:
+    """A theme name, a custom object (overriding a named base), or None -> light."""
+    if value is None:
+        return THEMES["light"]
+    if isinstance(value, str):
+        return THEMES.get(value, THEMES["light"])
+    if isinstance(value, dict):
+        base = THEMES.get(value.get("name", "light"), THEMES["light"])
+        t = Theme(**{f.name: getattr(base, f.name) for f in fields(base)})
+        t.name = value.get("name", base.name)
+        for k, attr in _THEME_KEYS.items():
+            if k in value:
+                setattr(t, attr, value[k])
+        return t
+    return THEMES["light"]
+
+
+@dataclass
 class ChartSpec:
     series: List[Series]
     type: str = "line"
     id: str = "pk"
+    theme: Theme = field(default_factory=lambda: THEMES["light"])
     title: Optional[str] = None
     subtitle: Optional[str] = None
     x_axis: Axis = field(default_factory=Axis)
@@ -160,6 +232,7 @@ class ChartSpec:
             series=series,
             type=d.get("type", "line"),
             id=d.get("id", "pk"),
+            theme=resolve_theme(d.get("theme")),
             title=d.get("title"),
             subtitle=d.get("subtitle"),
             x_axis=Axis(

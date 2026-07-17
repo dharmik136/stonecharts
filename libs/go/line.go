@@ -7,11 +7,6 @@ import (
 	"strings"
 )
 
-var palette = []string{
-	"#2f7ed8", "#f45b5b", "#8bbc21", "#e4a812",
-	"#1aadce", "#8e44ad", "#f28f43", "#77a1e5",
-}
-
 // dashArray maps a dashStyle name to an SVG stroke-dasharray value ("" = solid).
 func dashArray(style string) string {
 	switch style {
@@ -115,8 +110,8 @@ func splineD(pts [][2]float64) string {
 
 // markerSVG renders one data-point marker. `common` = shared class + data-* attrs.
 // Non-circle shapes carry cx/cy attrs so the JS runtime (crosshair) still works.
-func markerSVG(symbol string, x, y, r float64, common, color string) string {
-	fs := fmt.Sprintf(`fill="%s" stroke="#fff" stroke-width="1"`, color)
+func markerSVG(symbol string, x, y, r float64, common, color, halo string) string {
+	fs := fmt.Sprintf(`fill="%s" stroke="%s" stroke-width="1"`, color, halo)
 	switch symbol {
 	case "square":
 		return fmt.Sprintf(`<rect %s cx="%s" cy="%s" x="%s" y="%s" width="%s" height="%s" %s/>`,
@@ -175,6 +170,12 @@ type seriesStyle struct {
 // libraries emit byte-identical SVG for the same spec (see charts/line-basic/golden).
 func renderLineSVG(spec *ChartSpec) string {
 	W, H := spec.Width, spec.Height
+	theme := spec.theme
+	if theme == nil {
+		t := lightTheme()
+		theme = &t
+	}
+	palette := theme.Palette
 
 	mTop := 20
 	if spec.Title != "" {
@@ -300,22 +301,29 @@ func renderLineSVG(spec *ChartSpec) string {
 		p.WriteString(`</defs>`)
 	}
 
+	// Background (only when the theme sets one; light theme -> none).
+	if theme.Background != "" {
+		p.WriteString(fmt.Sprintf(
+			`<rect class="pk-bg" x="0" y="0" width="%d" height="%d" fill="%s"/>`,
+			W, H, theme.Background))
+	}
+
 	ty := 26
 	if spec.Title != "" {
 		p.WriteString(fmt.Sprintf(
-			`<text class="pk-title" x="%s" y="%d" text-anchor="middle" font-size="17" font-weight="600" fill="#1a1a2e">%s</text>`,
-			f1(float64(W)/2), ty, esc(spec.Title)))
+			`<text class="pk-title" x="%s" y="%d" text-anchor="middle" font-size="17" font-weight="600" fill="%s">%s</text>`,
+			f1(float64(W)/2), ty, theme.TitleColor, esc(spec.Title)))
 		ty += 20
 	}
 	if spec.Subtitle != "" {
 		p.WriteString(fmt.Sprintf(
-			`<text class="pk-subtitle" x="%s" y="%d" text-anchor="middle" font-size="12" fill="#6b6b80">%s</text>`,
-			f1(float64(W)/2), ty, esc(spec.Subtitle)))
+			`<text class="pk-subtitle" x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
+			f1(float64(W)/2), ty, theme.SubtitleColor, esc(spec.Subtitle)))
 	}
 
 	// Y gridlines + labels. Defaults reproduce the built-in look byte-for-byte.
 	gridEnabled := spec.YAxis.gridEnabled()
-	gridColor := spec.YAxis.gridColor()
+	gridColor := spec.YAxis.gridColorOr(theme.GridColor)
 	gridDashAttr := ""
 	if da := dashArray(spec.YAxis.gridDashStyle()); da != "" {
 		gridDashAttr = ` stroke-dasharray="` + da + `"`
@@ -329,43 +337,43 @@ func renderLineSVG(spec *ChartSpec) string {
 				f1(plotX), f1(gy), f1(plotX+plotW), f1(gy), gridColor, gridDashAttr))
 		}
 		p.WriteString(fmt.Sprintf(
-			`<text x="%s" y="%s" text-anchor="end" font-size="11" fill="#6b6b80">%s</text>`,
-			f1(plotX-8), f1(gy+4), esc(fmtNum(tv))))
+			`<text x="%s" y="%s" text-anchor="end" font-size="11" fill="%s">%s</text>`,
+			f1(plotX-8), f1(gy+4), theme.AxisLabelColor, esc(fmtNum(tv))))
 	}
 	p.WriteString(`</g>`)
 
 	// Axis line.
 	p.WriteString(fmt.Sprintf(
-		`<line class="pk-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="#b6b6c2" stroke-width="1"/>`,
-		f1(plotX), f1(plotY+plotH), f1(plotX+plotW), f1(plotY+plotH)))
+		`<line class="pk-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"/>`,
+		f1(plotX), f1(plotY+plotH), f1(plotX+plotW), f1(plotY+plotH), theme.AxisLineColor))
 
 	// X labels.
 	p.WriteString(`<g class="pk-axis pk-axis-x">`)
 	for i := 0; i < n && i < len(cats); i++ {
 		lx := xpix(i)
 		p.WriteString(fmt.Sprintf(
-			`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="#6b6b80">%s</text>`,
-			f1(lx), f1(plotY+plotH+18), esc(cats[i])))
+			`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
+			f1(lx), f1(plotY+plotH+18), theme.AxisLabelColor, esc(cats[i])))
 	}
 	p.WriteString(`</g>`)
 
 	// Axis titles.
 	if spec.XAxis.Title != "" {
 		p.WriteString(fmt.Sprintf(
-			`<text x="%s" y="%d" text-anchor="middle" font-size="12" fill="#4a4a5a">%s</text>`,
-			f1(plotX+plotW/2), H-6, esc(spec.XAxis.Title)))
+			`<text x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
+			f1(plotX+plotW/2), H-6, theme.AxisTitleColor, esc(spec.XAxis.Title)))
 	}
 	if spec.YAxis.Title != "" {
 		yc := plotY + plotH/2
 		p.WriteString(fmt.Sprintf(
-			`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="#4a4a5a" transform="rotate(-90 14 %s)">%s</text>`,
-			f1(yc), f1(yc), esc(spec.YAxis.Title)))
+			`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(-90 14 %s)">%s</text>`,
+			f1(yc), theme.AxisTitleColor, f1(yc), esc(spec.YAxis.Title)))
 	}
 
 	// Crosshair (JS-driven).
 	p.WriteString(fmt.Sprintf(
-		`<line class="pk-crosshair" x1="0" y1="%s" x2="0" y2="%s" stroke="#c0c0cc" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>`,
-		f1(plotY), f1(plotY+plotH)))
+		`<line class="pk-crosshair" x1="0" y1="%s" x2="0" y2="%s" stroke="%s" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>`,
+		f1(plotY), f1(plotY+plotH), theme.CrosshairColor))
 
 	// Series.
 	for si, s := range spec.Series {
@@ -410,7 +418,7 @@ func renderLineSVG(spec *ChartSpec) string {
 				common := fmt.Sprintf(
 					`class="pk-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="%s" data-r-hover="%s"`,
 					si, esc(s.Name), esc(xlabel), esc(fmtNum(s.Data[i])), color, fmtNum(radius), fmtNum(radiusHover))
-				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, color))
+				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, color, theme.MarkerHalo))
 			}
 		}
 		p.WriteString(`</g>`)
@@ -440,8 +448,8 @@ func renderLineSVG(spec *ChartSpec) string {
 				`<rect x="%s" y="%s" width="14" height="4" rx="2" fill="%s"/>`,
 				f1(lx), f1(ly-9), color))
 			p.WriteString(fmt.Sprintf(
-				`<text x="%s" y="%s" font-size="12" fill="#33334d">%s</text>`,
-				f1(lx+20), f1(ly-2), esc(s.Name)))
+				`<text x="%s" y="%s" font-size="12" fill="%s">%s</text>`,
+				f1(lx+20), f1(ly-2), theme.LegendTextColor, esc(s.Name)))
 			p.WriteString(`</g>`)
 			lx += est[si] + gap
 		}

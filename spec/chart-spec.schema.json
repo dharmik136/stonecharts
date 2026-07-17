@@ -16,6 +16,14 @@
       "default": "pk",
       "description": "Chart instance id, used to namespace <defs> ids (gradients/patterns) so multiple charts on one page don't collide. Set a unique value per chart when embedding several."
     },
+    "theme": {
+      "description": "Color theme. A built-in name ('light' = default, byte-identical to the classic look; 'dark'), or a full theme object. Resolved server-side into concrete SVG attributes (never CSS variables).",
+      "default": "light",
+      "oneOf": [
+        { "type": "string", "enum": ["light", "dark"] },
+        { "$ref": "#/definitions/theme" }
+      ]
+    },
     "title": { "type": "string" },
     "subtitle": { "type": "string" },
     "width": { "type": "integer", "minimum": 100, "default": 820 },
@@ -35,6 +43,24 @@
     }
   },
   "definitions": {
+    "theme": {
+      "type": "object",
+      "description": "Concrete color set. Canonical values live in spec/themes/*.json; a custom object may override any field. Omitted fields fall back to the light theme.",
+      "properties": {
+        "name": { "type": "string" },
+        "background": { "type": ["string", "null"], "description": "Chart background; null/absent = transparent (no <rect>)." },
+        "titleColor": { "type": "string" },
+        "subtitleColor": { "type": "string" },
+        "axisLabelColor": { "type": "string" },
+        "axisTitleColor": { "type": "string" },
+        "gridColor": { "type": "string" },
+        "axisLineColor": { "type": "string" },
+        "crosshairColor": { "type": "string" },
+        "markerHalo": { "type": "string" },
+        "legendTextColor": { "type": "string" },
+        "palette": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "gradient": {
       "type": "object",
       "description": "Linear gradient. Direction is x1,y1 -> x2,y2 in 0..1 objectBoundingBox coords (default 0,0 -> 0,1 = vertical top-to-bottom). No trig, so both renderers format it identically.",

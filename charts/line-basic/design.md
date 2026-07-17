@@ -38,6 +38,7 @@ or x/y correlation with no shared x ordering (use scatter). See
 |-------|------|---------|-------|
 | `type` | string | — | must be `"line"` |
 | `id` | string | `pk` | chart instance id; namespaces `<defs>` ids (gradients/patterns) so multiple charts on one page don't collide — set a unique value per chart when embedding several |
+| `theme` | string \| object | `light` | color theme: `light` (default, byte-identical to the classic look) / `dark`, or a full theme object overriding any field; resolved server-side into concrete SVG colors. Canonical values in `spec/themes/*.json` |
 | `title` | string | — | top title |
 | `subtitle` | string | — | under the title |
 | `width` / `height` | int | 820 / 460 | px |

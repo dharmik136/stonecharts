@@ -136,10 +136,125 @@ type Axis struct {
 	GridLine   *GridLine `json:"gridLine,omitempty"` // yAxis only
 }
 
+// Theme is a concrete color set (canonical values in spec/themes/*.json).
+type Theme struct {
+	Name            string   `json:"name,omitempty"`
+	Background      string   `json:"background,omitempty"` // "" -> transparent (no <rect>)
+	TitleColor      string   `json:"titleColor,omitempty"`
+	SubtitleColor   string   `json:"subtitleColor,omitempty"`
+	AxisLabelColor  string   `json:"axisLabelColor,omitempty"`
+	AxisTitleColor  string   `json:"axisTitleColor,omitempty"`
+	GridColor       string   `json:"gridColor,omitempty"`
+	AxisLineColor   string   `json:"axisLineColor,omitempty"`
+	CrosshairColor  string   `json:"crosshairColor,omitempty"`
+	MarkerHalo      string   `json:"markerHalo,omitempty"`
+	LegendTextColor string   `json:"legendTextColor,omitempty"`
+	Palette         []string `json:"palette,omitempty"`
+}
+
+func lightTheme() Theme {
+	return Theme{
+		Name: "light", Background: "",
+		TitleColor: "#1a1a2e", SubtitleColor: "#6b6b80",
+		AxisLabelColor: "#6b6b80", AxisTitleColor: "#4a4a5a",
+		GridColor: "#e8e8ee", AxisLineColor: "#b6b6c2",
+		CrosshairColor: "#c0c0cc", MarkerHalo: "#fff", LegendTextColor: "#33334d",
+		Palette: []string{"#2f7ed8", "#f45b5b", "#8bbc21", "#e4a812", "#1aadce", "#8e44ad", "#f28f43", "#77a1e5"},
+	}
+}
+
+func darkTheme() Theme {
+	return Theme{
+		Name: "dark", Background: "#1a1a2e",
+		TitleColor: "#f5f5fa", SubtitleColor: "#a0a0b8",
+		AxisLabelColor: "#9a9ab0", AxisTitleColor: "#c8c8d8",
+		GridColor: "#2e2e44", AxisLineColor: "#45455a",
+		CrosshairColor: "#55556a", MarkerHalo: "#1a1a2e", LegendTextColor: "#d0d0e0",
+		Palette: []string{"#5aa2f0", "#ff7a7a", "#a3d95a", "#f5c542", "#3ec8e0", "#b57ae0", "#ff9d5c", "#93b8ff"},
+	}
+}
+
+func builtinTheme(name string) (Theme, bool) {
+	switch name {
+	case "light":
+		return lightTheme(), true
+	case "dark":
+		return darkTheme(), true
+	}
+	return Theme{}, false
+}
+
+// resolveTheme mirrors spec.py resolve_theme: a name, a custom object (overriding
+// a named base), or absent -> light.
+func resolveTheme(raw json.RawMessage) *Theme {
+	b := bytes.TrimSpace([]byte(raw))
+	if len(b) == 0 || string(b) == "null" {
+		t := lightTheme()
+		return &t
+	}
+	if b[0] == '"' {
+		var name string
+		_ = json.Unmarshal(b, &name)
+		if t, ok := builtinTheme(name); ok {
+			return &t
+		}
+		t := lightTheme()
+		return &t
+	}
+	var over Theme
+	if json.Unmarshal(b, &over) != nil {
+		t := lightTheme()
+		return &t
+	}
+	base, ok := builtinTheme(over.Name)
+	if !ok {
+		base = lightTheme()
+	}
+	if over.Name != "" {
+		base.Name = over.Name
+	}
+	if over.Background != "" {
+		base.Background = over.Background
+	}
+	if over.TitleColor != "" {
+		base.TitleColor = over.TitleColor
+	}
+	if over.SubtitleColor != "" {
+		base.SubtitleColor = over.SubtitleColor
+	}
+	if over.AxisLabelColor != "" {
+		base.AxisLabelColor = over.AxisLabelColor
+	}
+	if over.AxisTitleColor != "" {
+		base.AxisTitleColor = over.AxisTitleColor
+	}
+	if over.GridColor != "" {
+		base.GridColor = over.GridColor
+	}
+	if over.AxisLineColor != "" {
+		base.AxisLineColor = over.AxisLineColor
+	}
+	if over.CrosshairColor != "" {
+		base.CrosshairColor = over.CrosshairColor
+	}
+	if over.MarkerHalo != "" {
+		base.MarkerHalo = over.MarkerHalo
+	}
+	if over.LegendTextColor != "" {
+		base.LegendTextColor = over.LegendTextColor
+	}
+	if len(over.Palette) > 0 {
+		base.Palette = over.Palette
+	}
+	return &base
+}
+
 type ChartSpec struct {
-	Type       string   `json:"type"`
-	ID         string   `json:"id,omitempty"`
-	Title      string   `json:"title,omitempty"`
+	Type       string          `json:"type"`
+	ID         string          `json:"id,omitempty"`
+	Theme      json.RawMessage `json:"theme,omitempty"` // name string OR theme object
+	theme      *Theme          // resolved (set in applyDefaults)
+	Title      string          `json:"title,omitempty"`
 	Subtitle   string   `json:"subtitle,omitempty"`
 	Width      int      `json:"width,omitempty"`
 	Height     int      `json:"height,omitempty"`
@@ -159,6 +274,7 @@ func (c *ChartSpec) applyDefaults() {
 	if c.ID == "" {
 		c.ID = "pk"
 	}
+	c.theme = resolveTheme(c.Theme)
 	if c.Width == 0 {
 		c.Width = 820
 	}
@@ -182,11 +298,11 @@ func (c *ChartSpec) legendOn() bool { return c.Legend == nil || *c.Legend }
 func (a *Axis) gridEnabled() bool {
 	return a.GridLine == nil || a.GridLine.Enabled == nil || *a.GridLine.Enabled
 }
-func (a *Axis) gridColor() string {
+func (a *Axis) gridColorOr(def string) string {
 	if a.GridLine != nil && a.GridLine.Color != "" {
 		return a.GridLine.Color
 	}
-	return "#e8e8ee"
+	return def
 }
 func (a *Axis) gridDashStyle() string {
 	if a.GridLine != nil && a.GridLine.DashStyle != "" {

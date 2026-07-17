@@ -1,0 +1,14 @@
+{
+  "name": "dark",
+  "background": "#1a1a2e",
+  "titleColor": "#f5f5fa",
+  "subtitleColor": "#a0a0b8",
+  "axisLabelColor": "#9a9ab0",
+  "axisTitleColor": "#c8c8d8",
+  "gridColor": "#2e2e44",
+  "axisLineColor": "#45455a",
+  "crosshairColor": "#55556a",
+  "markerHalo": "#1a1a2e",
+  "legendTextColor": "#d0d0e0",
+  "palette": ["#5aa2f0", "#ff7a7a", "#a3d95a", "#f5c542", "#3ec8e0", "#b57ae0", "#ff9d5c", "#93b8ff"]
+}

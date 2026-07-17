@@ -94,10 +94,10 @@ def _spline_d(pts) -> str:
     return " ".join(parts)
 
 
-def _marker(symbol, x, y, r, common, color) -> str:
+def _marker(symbol, x, y, r, common, color, halo) -> str:
     """One data-point marker. `common` = the shared class + data-* attributes.
     Non-circle shapes carry cx/cy attrs so the JS runtime (crosshair) still works."""
-    fs = f'fill="{color}" stroke="#fff" stroke-width="1"'
+    fs = f'fill="{color}" stroke="{halo}" stroke-width="1"'
     if symbol == "square":
         return (
             f'<rect {common} cx="{x:.1f}" cy="{y:.1f}" x="{x-r:.1f}" y="{y-r:.1f}" '
@@ -144,6 +144,8 @@ def _pattern_def(pid: str, pat: Pattern) -> str:
 
 def render_svg(spec: ChartSpec) -> str:
     W, H = spec.width, spec.height
+    theme = spec.theme
+    palette = theme.palette
 
     # Margins adapt to which chrome is present.
     m_top = 20
@@ -187,11 +189,11 @@ def render_svg(spec: ChartSpec) -> str:
             ref = f"url(#{gid})"
             stroke = ref
             fill_color = ref
-            solid = s.color.stops[0].color if s.color.stops else PALETTE[si % len(PALETTE)]
+            solid = s.color.stops[0].color if s.color.stops else palette[si % len(palette)]
         elif s.color:
             stroke = fill_color = solid = s.color
         else:
-            stroke = fill_color = solid = PALETTE[si % len(PALETTE)]
+            stroke = fill_color = solid = palette[si % len(palette)]
         if s.pattern is not None:
             pid = f"{spec.id}-pat-{si}"
             defs_parts.append(_pattern_def(pid, s.pattern))
@@ -223,23 +225,29 @@ def render_svg(spec: ChartSpec) -> str:
     if defs_parts:
         p.append("<defs>" + "".join(defs_parts) + "</defs>")
 
+    # Background (only when the theme sets one; light theme -> none).
+    if theme.background:
+        p.append(
+            f'<rect class="pk-bg" x="0" y="0" width="{W}" height="{H}" fill="{theme.background}"/>'
+        )
+
     # Titles.
     ty = 26
     if spec.title:
         p.append(
             f'<text class="pk-title" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
-            f'font-size="17" font-weight="600" fill="#1a1a2e">{esc(spec.title)}</text>'
+            f'font-size="17" font-weight="600" fill="{theme.title_color}">{esc(spec.title)}</text>'
         )
         ty += 20
     if spec.subtitle:
         p.append(
             f'<text class="pk-subtitle" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
-            f'font-size="12" fill="#6b6b80">{esc(spec.subtitle)}</text>'
+            f'font-size="12" fill="{theme.subtitle_color}">{esc(spec.subtitle)}</text>'
         )
 
     # Y gridlines + labels. Defaults reproduce the built-in look byte-for-byte.
     gl = spec.y_axis.grid_line or GridLine()
-    grid_color = gl.color or "#e8e8ee"
+    grid_color = gl.color or theme.grid_color
     grid_dash = _dash_array(gl.dash_style)
     dash_attr = f' stroke-dasharray="{grid_dash}"' if grid_dash else ''
     p.append('<g class="pk-axis pk-axis-y">')
@@ -253,14 +261,14 @@ def render_svg(spec: ChartSpec) -> str:
             )
         p.append(
             f'<text x="{plot_x-8:.1f}" y="{gy+4:.1f}" text-anchor="end" '
-            f'font-size="11" fill="#6b6b80">{esc(fmt_num(tv))}</text>'
+            f'font-size="11" fill="{theme.axis_label_color}">{esc(fmt_num(tv))}</text>'
         )
     p.append("</g>")
 
     # Axis lines.
     p.append(
         f'<line class="pk-axis-line" x1="{plot_x:.1f}" y1="{plot_y+plot_h:.1f}" '
-        f'x2="{plot_x+plot_w:.1f}" y2="{plot_y+plot_h:.1f}" stroke="#b6b6c2" stroke-width="1"/>'
+        f'x2="{plot_x+plot_w:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{theme.axis_line_color}" stroke-width="1"/>'
     )
 
     # X labels.
@@ -269,7 +277,7 @@ def render_svg(spec: ChartSpec) -> str:
         lx = xpix(i)
         p.append(
             f'<text x="{lx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '
-            f'font-size="11" fill="#6b6b80">{esc(label)}</text>'
+            f'font-size="11" fill="{theme.axis_label_color}">{esc(label)}</text>'
         )
     p.append("</g>")
 
@@ -277,19 +285,19 @@ def render_svg(spec: ChartSpec) -> str:
     if spec.x_axis.title:
         p.append(
             f'<text x="{plot_x+plot_w/2:.1f}" y="{H-6}" text-anchor="middle" '
-            f'font-size="12" fill="#4a4a5a">{esc(spec.x_axis.title)}</text>'
+            f'font-size="12" fill="{theme.axis_title_color}">{esc(spec.x_axis.title)}</text>'
         )
     if spec.y_axis.title:
         yc = plot_y + plot_h / 2
         p.append(
             f'<text x="14" y="{yc:.1f}" text-anchor="middle" font-size="12" '
-            f'fill="#4a4a5a" transform="rotate(-90 14 {yc:.1f})">{esc(spec.y_axis.title)}</text>'
+            f'fill="{theme.axis_title_color}" transform="rotate(-90 14 {yc:.1f})">{esc(spec.y_axis.title)}</text>'
         )
 
     # Crosshair (hidden until a point is hovered; driven by the JS runtime).
     p.append(
         f'<line class="pk-crosshair" x1="0" y1="{plot_y:.1f}" x2="0" y2="{plot_y+plot_h:.1f}" '
-        f'stroke="#c0c0cc" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>'
+        f'stroke="{theme.crosshair_color}" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>'
     )
 
     # Series: one group per series (data-series drives legend toggle).
@@ -326,7 +334,7 @@ def render_svg(spec: ChartSpec) -> str:
                     f'data-color="{color}" data-r="{fmt_num(radius)}" '
                     f'data-r-hover="{fmt_num(radius_hover)}"'
                 )
-                p.append(_marker(mk.symbol, x, y, radius, common, color))
+                p.append(_marker(mk.symbol, x, y, radius, common, color, theme.marker_halo))
         p.append("</g>")
 
     # Legend (bottom center).
@@ -344,7 +352,7 @@ def render_svg(spec: ChartSpec) -> str:
                 f'<rect x="{lx:.1f}" y="{ly-9:.1f}" width="14" height="4" rx="2" fill="{color}"/>'
             )
             p.append(
-                f'<text x="{lx+20:.1f}" y="{ly-2:.1f}" font-size="12" fill="#33334d">{esc(s.name)}</text>'
+                f'<text x="{lx+20:.1f}" y="{ly-2:.1f}" font-size="12" fill="{theme.legend_text_color}">{esc(s.name)}</text>'
             )
             p.append("</g>")
             lx += est[si] + gap

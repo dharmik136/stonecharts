@@ -1,0 +1,14 @@
+{
+  "name": "light",
+  "background": null,
+  "titleColor": "#1a1a2e",
+  "subtitleColor": "#6b6b80",
+  "axisLabelColor": "#6b6b80",
+  "axisTitleColor": "#4a4a5a",
+  "gridColor": "#e8e8ee",
+  "axisLineColor": "#b6b6c2",
+  "crosshairColor": "#c0c0cc",
+  "markerHalo": "#fff",
+  "legendTextColor": "#33334d",
+  "palette": ["#2f7ed8", "#f45b5b", "#8bbc21", "#e4a812", "#1aadce", "#8e44ad", "#f28f43", "#77a1e5"]
+}
