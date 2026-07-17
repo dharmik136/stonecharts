@@ -57,6 +57,10 @@ def test_line_adversarial_golden():
     _check("adversarial")
 
 
+def test_line_gradient_partial_golden():
+    _check("gradient-partial")
+
+
 def test_xss_escaping():
     """Hostile strings in every user-facing field must be escaped, never injected."""
     x = '"><script>alert(1)</script>'
