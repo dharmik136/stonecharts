@@ -53,6 +53,7 @@ or x/y correlation with no shared x ordering (use scatter). See
 | `series[].lineWidth` | number | 2 | line thickness (px) |
 | `series[].dashStyle` | string | solid | line dash: solid/dashed/dotted |
 | `series[].step` | string | — | stepped line: before/after/center |
+| `series[].curve` | string | — | `monotone` = smooth Fritsch-Carlson spline (no overshoot); default straight |
 | `series[].marker` | object | `{enabled:true, symbol:circle, radius:3.5}` | point markers; `symbol` ∈ circle/square/triangle/diamond |
 
 Full schema: [`spec/chart-spec.schema.json`](../../spec/chart-spec.schema.json).

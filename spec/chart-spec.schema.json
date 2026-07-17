@@ -89,6 +89,11 @@
           "enum": ["before", "after", "center"],
           "description": "Draw as a stepped line instead of straight segments."
         },
+        "curve": {
+          "type": "string",
+          "enum": ["linear", "monotone"],
+          "description": "Line interpolation. 'monotone' = smooth Fritsch-Carlson spline (no overshoot). Default = straight segments."
+        },
         "marker": {
           "type": "object",
           "description": "Data-point markers. Defaults reproduce the built-in circle (r 3.5).",

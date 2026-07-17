@@ -35,7 +35,7 @@ two non-negotiables. Source research: `docs/research/design-customization-brief.
    `series.marker {symbol, radius}` (circle/square/triangle/diamond), `series.step`
    (before/after/center).  ✅ done
 3. **Phase 3 — Spline:** `series.curve: "monotone"` (Fritsch–Carlson, identical math
-   both languages, golden-tested).
+   both languages, golden-tested).  ✅ done
 4. **Phase 4 — Gradients & patterns:** `<defs>` + gradient/pattern fills.
 5. **Phase 5 — Themes, a11y, deeper interactivity:** shared `spec/themes/*.json`
    (light/dark, colorblind-safe palette), ARIA/`<desc>`/data-table, keyboard nav.

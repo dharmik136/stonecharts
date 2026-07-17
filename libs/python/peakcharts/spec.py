@@ -25,6 +25,7 @@ class Series:
     line_width: Optional[float] = None   # None -> default 2
     dash_style: str = "solid"            # solid | dashed | dotted
     step: Optional[str] = None           # None | before | after | center
+    curve: Optional[str] = None          # None/linear | monotone
     marker: Optional[Marker] = None
 
 
@@ -78,6 +79,7 @@ class ChartSpec:
                     line_width=s.get("lineWidth"),
                     dash_style=s.get("dashStyle", "solid"),
                     step=s.get("step"),
+                    curve=s.get("curve"),
                     marker=marker,
                 )
             )

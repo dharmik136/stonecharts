@@ -24,6 +24,7 @@ type Series struct {
 	LineWidth float64   `json:"lineWidth,omitempty"` // 0 -> default 2
 	DashStyle string    `json:"dashStyle,omitempty"` // "" -> solid
 	Step      string    `json:"step,omitempty"`      // "" | before | after | center
+	Curve     string    `json:"curve,omitempty"`     // "" / linear | monotone
 	Marker    *Marker   `json:"marker,omitempty"`
 }
 

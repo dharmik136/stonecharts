@@ -7,6 +7,7 @@ Python — no third-party charting deps.
 """
 from __future__ import annotations
 
+import math
 from typing import List
 
 from ..spec import ChartSpec, GridLine, Marker
@@ -49,6 +50,47 @@ def _path_d(pts, step) -> str:
         else:  # after
             parts.append(f"L{x:.1f} {py:.1f}")
             parts.append(f"L{x:.1f} {y:.1f}")
+    return " ".join(parts)
+
+
+def _spline_d(pts) -> str:
+    """Monotone cubic spline path (Fritsch-Carlson). Identical math to line.go."""
+    n = len(pts)
+    if n < 3:
+        return _path_d(pts, None)
+    xs = [p[0] for p in pts]
+    ys = [p[1] for p in pts]
+    delta = [(ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]) for i in range(n - 1)]
+    m = [0.0] * n
+    m[0] = delta[0]
+    m[n - 1] = delta[n - 2]
+    for i in range(1, n - 1):
+        if delta[i - 1] * delta[i] <= 0:
+            m[i] = 0.0
+        else:
+            m[i] = (delta[i - 1] + delta[i]) / 2
+    for i in range(n - 1):
+        if delta[i] == 0:
+            m[i] = 0.0
+            m[i + 1] = 0.0
+        else:
+            a = m[i] / delta[i]
+            b = m[i + 1] / delta[i]
+            s = a * a + b * b
+            if s > 9:
+                t = 3.0 / math.sqrt(s)
+                m[i] = t * a * delta[i]
+                m[i + 1] = t * b * delta[i]
+    parts = [f"M{xs[0]:.1f} {ys[0]:.1f}"]
+    for i in range(n - 1):
+        h = xs[i + 1] - xs[i]
+        c1x = xs[i] + h / 3
+        c1y = ys[i] + m[i] * h / 3
+        c2x = xs[i + 1] - h / 3
+        c2y = ys[i + 1] - m[i + 1] * h / 3
+        parts.append(
+            f"C{c1x:.1f} {c1y:.1f} {c2x:.1f} {c2y:.1f} {xs[i + 1]:.1f} {ys[i + 1]:.1f}"
+        )
     return " ".join(parts)
 
 
@@ -192,7 +234,7 @@ def render_svg(spec: ChartSpec) -> str:
     for si, s in enumerate(spec.series):
         color = s.color or PALETTE[si % len(PALETTE)]
         pts = [(xpix(i), ypix(v)) for i, v in enumerate(s.data)]
-        d = _path_d(pts, s.step)
+        d = _spline_d(pts) if s.curve == "monotone" else _path_d(pts, s.step)
         lw = s.line_width if s.line_width is not None else 2
         line_dash = _dash_array(s.dash_style)
         line_dash_attr = f' stroke-dasharray="{line_dash}"' if line_dash else ""

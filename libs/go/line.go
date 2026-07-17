@@ -2,6 +2,7 @@ package peakcharts
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -53,6 +54,61 @@ func pathD(pts [][2]float64, step string) string {
 		default: // after
 			parts = append(parts, "L"+f1(x)+" "+f1(py), "L"+f1(x)+" "+f1(y))
 		}
+	}
+	return strings.Join(parts, " ")
+}
+
+// splineD builds a monotone cubic spline path (Fritsch-Carlson). Identical math
+// to _spline_d in line.py so both languages emit byte-identical curves.
+func splineD(pts [][2]float64) string {
+	n := len(pts)
+	if n < 3 {
+		return pathD(pts, "")
+	}
+	xs := make([]float64, n)
+	ys := make([]float64, n)
+	for i, p := range pts {
+		xs[i], ys[i] = p[0], p[1]
+	}
+	delta := make([]float64, n-1)
+	for i := 0; i < n-1; i++ {
+		delta[i] = (ys[i+1] - ys[i]) / (xs[i+1] - xs[i])
+	}
+	m := make([]float64, n)
+	m[0] = delta[0]
+	m[n-1] = delta[n-2]
+	for i := 1; i < n-1; i++ {
+		if delta[i-1]*delta[i] <= 0 {
+			m[i] = 0
+		} else {
+			m[i] = (delta[i-1] + delta[i]) / 2
+		}
+	}
+	for i := 0; i < n-1; i++ {
+		if delta[i] == 0 {
+			m[i] = 0
+			m[i+1] = 0
+		} else {
+			a := m[i] / delta[i]
+			b := m[i+1] / delta[i]
+			s := a*a + b*b
+			if s > 9 {
+				t := 3.0 / math.Sqrt(s)
+				m[i] = t * a * delta[i]
+				m[i+1] = t * b * delta[i]
+			}
+		}
+	}
+	parts := make([]string, 0, n)
+	parts = append(parts, "M"+f1(xs[0])+" "+f1(ys[0]))
+	for i := 0; i < n-1; i++ {
+		h := xs[i+1] - xs[i]
+		c1x := xs[i] + h/3
+		c1y := ys[i] + m[i]*h/3
+		c2x := xs[i+1] - h/3
+		c2y := ys[i+1] - m[i+1]*h/3
+		parts = append(parts,
+			"C"+f1(c1x)+" "+f1(c1y)+" "+f1(c2x)+" "+f1(c2y)+" "+f1(xs[i+1])+" "+f1(ys[i+1]))
 	}
 	return strings.Join(parts, " ")
 }
@@ -239,7 +295,12 @@ func renderLineSVG(spec *ChartSpec) string {
 		for i, v := range s.Data {
 			pts[i] = [2]float64{xpix(i), ypix(v)}
 		}
-		d := pathD(pts, s.Step)
+		var d string
+		if s.Curve == "monotone" {
+			d = splineD(pts)
+		} else {
+			d = pathD(pts, s.Step)
+		}
 		lineDashAttr := ""
 		if da := dashArray(s.DashStyle); da != "" {
 			lineDashAttr = ` stroke-dasharray="` + da + `"`
