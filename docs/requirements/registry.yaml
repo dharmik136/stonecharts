@@ -170,7 +170,7 @@ requirements:
       - Placement stays within the declared container without fixed cross-viewport coordinates.
     decisions: [SC-ARCH-ADR-0004]
     contracts: [SC-CON-003, SC-CON-004]
-    verification: [TEST-RUNTIME-BROWSER]
+    verification: [TEST-RUNTIME-SMOKE, TEST-RUNTIME-BROWSER]
     implementation: [runtime/chart-interactions.js, spec/svg-contract.md]
 
   - id: REQ-A11Y-001
@@ -190,7 +190,7 @@ requirements:
       - Component claims are scoped rather than asserting whole-page WCAG conformance.
     decisions: [SC-ARCH-ADR-0004]
     contracts: [SC-CON-003, SC-CON-004, SC-CON-007]
-    verification: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
+    verification: [TEST-RUNTIME-SMOKE, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
     implementation: [runtime/chart-interactions.js, libs/python/stonecharts/render.py, libs/go/render.go]
 
   - id: REQ-VIS-001

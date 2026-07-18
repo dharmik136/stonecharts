@@ -50,6 +50,7 @@ release evidence directory for the candidate and completed there.
 
 ## Runtime and accessibility
 
+- [ ] Automated runtime smoke passes for tooltip, legend, focus, keyboard, and ARIA state.
 - [ ] Local HTTP browser suite passes in the pinned Chromium profile.
 - [ ] Tooltip pointer and keyboard semantics pass.
 - [ ] Legend is pointer and keyboard operable with exposed state.

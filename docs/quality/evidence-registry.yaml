@@ -72,6 +72,13 @@ evidence:
     command: null
     location: null
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
+  - id: TEST-RUNTIME-SMOKE
+    kind: test
+    status: implemented
+    description: Exercises the shared interaction runtime and authored accessibility state transitions in the Node DOM harness as the automated precursor to full browser qualification.
+    command: node --test runtime/chart-interactions.test.js
+    location: runtime/chart-interactions.test.js
+    requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
   - id: REVIEW-ACCESSIBILITY-MANUAL
     kind: manual-review
     status: planned

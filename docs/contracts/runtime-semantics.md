@@ -8,7 +8,7 @@ approver: product-owner
 review_mode: self
 applies_to: 0.0.0.1
 requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
-evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
+evidence: [TEST-RUNTIME-SMOKE, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
 last_reviewed: "2026-07-18"
 review_due: "2026-09-18"
 supersedes: null
@@ -55,7 +55,9 @@ SVG coordinates.
 | Legend activation | Toggle series, update control state, and expose the resulting state |
 
 Tooltip hover persistence, bar highlight geometry, focus appearance, and full browser
-qualification remain open until `TEST-RUNTIME-BROWSER` passes.
+qualification remain open until `TEST-RUNTIME-BROWSER` passes. The automated
+runtime smoke test covers the shared JS interaction state machine before that browser
+gate is qualified.
 
 ## Embedding profiles
 
