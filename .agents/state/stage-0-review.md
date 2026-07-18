@@ -1,47 +1,14 @@
 # Stage 0 Baseline Review Package
 
-- Generated at: 2026-07-18 15:15:42 +0530
-- Commit: 30248618708fa4af42381b9811d857804aeb7afa
+- Generated at: 2026-07-18 15:34:01 +0530
+- Commit: ac916bdbc6c8f43bf2147856f7820528b52bf021
 - Branch: main
 - Working tree: dirty
 
 ## Working tree status
 
-M .github/ISSUE_TEMPLATE/config.yml
- M .github/ISSUE_TEMPLATE/decision.yml
- M .github/ISSUE_TEMPLATE/defect.yml
- M .github/ISSUE_TEMPLATE/work-item.yml
- M docs/product/thesis.md
- M docs/project/README.md
- M docs/project/backlog.yaml
- M docs/project/decisions.md
- M docs/project/stage-0.md
- M docs/requirements/registry.yaml
- M spec/chart-spec.schema.json
- M tools/check_github_project.py
-?? .agents/
-?? .github/ISSUE_TEMPLATE/compliance.yml
-?? .github/ISSUE_TEMPLATE/developer.yml
-?? .github/ISSUE_TEMPLATE/planner.yml
-?? .github/ISSUE_TEMPLATE/qa.yml
-?? .github/ISSUE_TEMPLATE/release.yml
-?? .github/ISSUE_TEMPLATE/security.yml
-?? AGENTS.md
-?? docs/project/local-agent-model.md
-?? tools/bootstrap_agents.ps1
-?? tools/build_stage0_review.py
-?? tools/issue_form_to_project.py
-?? tools/launch-agent.ps1
-?? tools/launch-compliance.ps1
-?? tools/launch-coordinator.ps1
-?? tools/launch-developer.ps1
-?? tools/launch-notetaker.ps1
-?? tools/launch-planner.ps1
-?? tools/launch-qa.ps1
-?? tools/launch-release.ps1
-?? tools/launch-security.ps1
-?? tools/launch-stakeholder.ps1
-?? tools/new-agent-worktree.ps1
+M .agents/state/stage-0-review.md
+ M tools/build_stage0_review.py
 
 ## Verification
 
@@ -84,9 +51,9 @@ GitHub Project conformance PASS: 35 governed items, 8 statuses, 11 governed fiel
 
 ## Stage 0 blockers
 
-- WORK-S0-001 (Triage): Review and approve the Stage 0 controlled foundation baseline -> depends on DEC-001, DEC-002, DEC-003, DEC-004, DEC-006, DEC-007, REQ-PROD-001
-- GATE-S0 (Triage): Pass Stage 0 product-foundation gate -> depends on DEC-001, DEC-002, DEC-003, DEC-004, DEC-006, DEC-007, WORK-S0-001, REQ-PROD-001
+- WORK-S0-001 (Done): Review and approve the Stage 0 controlled foundation baseline -> depends on DEC-001, DEC-002, DEC-003, DEC-004, DEC-006, DEC-007, REQ-PROD-001
+- GATE-S0 (Done): Pass Stage 0 product-foundation gate -> depends on DEC-001, DEC-002, DEC-003, DEC-004, DEC-006, DEC-007, WORK-S0-001, REQ-PROD-001
 
 ## Review note
 
-Stage 0 is not yet ready to close because WORK-S0-001 and GATE-S0 remain open.
+Stage 0 is closed; the baseline has been reviewed and the governed gate is complete.

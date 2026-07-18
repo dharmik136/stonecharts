@@ -74,6 +74,12 @@ def extract_blockers() -> list[str]:
     return blockers
 
 
+def stage0_is_closed() -> bool:
+    backlog = yaml.safe_load((ROOT / "docs" / "project" / "backlog.yaml").read_text(encoding="utf-8"))
+    items = {item["id"]: item for item in backlog["items"]}
+    return items["WORK-S0-001"]["status"] == "Done" and items["GATE-S0"]["status"] == "Done"
+
+
 def main() -> int:
     STATE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -83,6 +89,12 @@ def main() -> int:
     status = git("status", "--short")
     docs_code, docs_output = run(["python", "tools/check_docs.py"])
     project_code, project_output = run(["python", "tools/check_github_project.py"])
+
+    review_note = (
+        "Stage 0 is closed; the baseline has been reviewed and the governed gate is complete."
+        if stage0_is_closed()
+        else "Stage 0 is not yet ready to close because WORK-S0-001 and GATE-S0 remain open."
+    )
 
     lines: list[str] = [
         "# Stage 0 Baseline Review Package",
@@ -122,9 +134,9 @@ def main() -> int:
         "",
         *extract_blockers(),
         "",
-        "## Review note",
-        "",
-        "Stage 0 is not yet ready to close because WORK-S0-001 and GATE-S0 remain open.",
+    "## Review note",
+    "",
+    review_note,
     ]
 
     REVIEW_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
