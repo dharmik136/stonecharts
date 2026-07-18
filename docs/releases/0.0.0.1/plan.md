@@ -75,7 +75,8 @@ Each stage has semantic tests before implementation and a separate reviewable co
 - Signed normal-stack geometry and percent-domain rules pass in both languages.
 - All approved canonical fixtures match byte for byte in Python and Go.
 - Direct cross-render of all released examples and stress fixtures has zero diff.
-- Chromium browser qualification passes through local HTTP.
+- Chromium browser qualification passes through local HTTP. This is the next open
+  qualification gate after the automated runtime smoke evidence.
 - Manual keyboard and accessibility tasks pass or have an approved non-critical known
   limit.
 - Benchmark baseline and compatibility matrix are complete.

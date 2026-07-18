@@ -68,7 +68,7 @@ evidence:
   - id: TEST-RUNTIME-BROWSER
     kind: test
     status: planned
-    description: Will exercise tooltip, keyboard, focus, legend, adaptive placement, and DOM state through a local HTTP browser harness.
+    description: Next release gate; will exercise tooltip, keyboard, focus, legend, adaptive placement, and DOM state through a local HTTP browser harness.
     command: null
     location: null
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
