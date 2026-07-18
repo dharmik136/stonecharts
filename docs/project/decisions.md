@@ -28,23 +28,24 @@ receive an ADR; bounded operating decisions name their controlling project docum
 | DEC-002 | Active 0.0.0.1 chart scope | Accept only `line` and `column` in the active release scope; keep the other chart designs informative until each has a renderer and conformance corpus | [Project operating model](README.md), [Stage 0 gate](stage-0.md), [Positioning and alpha scope](../product/positioning-and-scope.md) | 2026-07-17 |
 | DEC-003 | Additional language renderer timing | Design the language conformance kit now, but defer new language implementation until Python and Go have proven the contract end to end through 0.0.0.1 qualification | [Renderer constitution](../architecture/renderer-constitution.md), [Stage 0 gate](stage-0.md) | 2026-07-18 |
 | DEC-004 | Structured customization surface for 0.0.0.1 | Keep customization typed, deterministic, and schema-governed; allow themes, sizing, margins, palettes, series styling, gradients, patterns, and supported mark controls; exclude raw CSS, raw SVG, callbacks, DOM mutation, and other executable escape hatches from certified output | [Customization boundary](../contracts/customization-boundary.md), [ADR 0005](../architecture/adr/0005-layout-and-fonts.md) | 2026-07-18 |
+| DEC-005 | Compatibility policy beginning with 0.0.0.1 | Allow governed pre-release breaks during qualification; after release, require migration notes, deprecation windows where feasible, traceability updates, and checklist evidence for public-surface changes | [Compatibility policy](../contracts/compatibility-policy.md), [Release plan](../releases/0.0.0.1/plan.md) | 2026-07-18 |
 | DEC-006 | Default branch and merge strategy | Use `main` as the default branch and keep the authoritative merge policy recorded in the governed project documents | [Project operating model](README.md), [Stage 0 gate](stage-0.md) | 2026-07-18 |
 | DEC-007 | GitHub Project fields and workflow | Use the schema-validated backlog, controlled status model, stable IDs, traceability fields, and local/remote conformance checks | [Project operating model](README.md), [Stage 0 gate](stage-0.md) | 2026-07-18 |
+| DEC-008 | Supported runtime and platform matrix | Support Python 3.9 and 3.14, Go 1.26, Chromium on the pinned desktop Linux profile through local HTTP, and no certified exporter profile for 0.0.0.1 | [Runtime matrix](../contracts/runtime-matrix.md), [Visual profile](../contracts/visual-profile.md), [Release plan](../releases/0.0.0.1/plan.md) | 2026-07-18 |
+| DEC-010 | Certified visual profile for 0.0.0.1 | Use the host-font semantic SVG profile as the certified visual baseline; reserve embedded-font and pinned-exporter profiles for later decisions | [Visual profile](../contracts/visual-profile.md), [Typography and export profiles](../contracts/typography-and-export-profiles.md) | 2026-07-18 |
+| DEC-009 | Performance and artifact-size release budgets | Use a reproducible baseline across small, business, dense, and stress workloads, with regression budgets derived from observed variance rather than invented thresholds | [Performance budget policy](../contracts/performance-budgets.md), [Benchmark specification](../quality/benchmark-spec.md) | 2026-07-18 |
+| DEC-011 | Package and source publication channels | Keep the repository and registries private until S3 evidence is complete; publish only through supportable channels recorded in the release plan and supply-chain policy | [Publication policy](../contracts/publication-policy.md), [Supply-chain policy](../security/supply-chain.md), [Release plan](../releases/0.0.0.1/plan.md) | 2026-07-18 |
+| DEC-012 | StoneCharts name clearance for public commercial use | Require a dated due-diligence record before any public commercial name claim; technical namespace adoption is not legal clearance | [Name-clearance policy](../contracts/name-clearance-policy.md), [ADR 0006](../architecture/adr/0006-stonecharts-namespace.md) | 2026-07-18 |
+| DEC-013 | Commercial license, contribution, support, and access model | Keep the product proprietary until a written business policy is approved; internal access does not imply external rights | [Commercial terms policy](../contracts/commercial-terms-policy.md), [Product positioning and alpha scope](../product/positioning-and-scope.md) | 2026-07-18 |
 
 ## Open decisions
 
 | Priority | ID | Decision | Current recommendation | Decide before |
 |---:|---|---|---|---|
-| 2 | DEC-005 | What compatibility promise begins at 0.0.0.1? | Permit documented pre-release breaks now; after 0.0.0.1, require migration notes and a deprecation window for public spec/API/DOM changes | S3 release candidate |
-| 3 | DEC-008 | What is the supported runtime and platform matrix? | Pin explicit Python, Go, browser, OS, and exporter profiles from CI evidence rather than broad untested claims | S2 qualification plan |
-| 4 | DEC-009 | What performance and artifact-size budgets block release? | Establish measured budgets for 10, 100, 1,000, and stress-point profiles before optimizing implementation details | S2 benchmark gate |
-| 5 | DEC-010 | What is the certified visual profile for 0.0.0.1? | Guarantee semantic SVG under the host-font profile; treat embedded font plus pinned exporter as a separate certified profile | S2 visual qualification |
-| 6 | DEC-011 | When and where are packages and source made public? | Keep the repository and registries private until S3 evidence is complete; publish only channels with an explicit support policy | S3 distribution plan |
-| 7 | DEC-012 | Is the StoneCharts name cleared for public commercial use? | Complete repository, package-index, domain, and trademark due diligence before public announcement; technical adoption is not legal clearance | Public branding or registration |
-| 8 | DEC-013 | What commercial license, contribution terms, and support model apply? | Keep the current proprietary boundary until a written business model and contributor agreement are approved | External access or contributions |
 
 ## Discussion order
 
-DEC-006 is resolved. DEC-008 through DEC-010 define qualification. DEC-005 and DEC-011 through
-DEC-013 govern release and public exposure and must not be inferred from engineering
-progress.
+DEC-005, DEC-006, DEC-008, DEC-009, DEC-010, DEC-011, DEC-012, and DEC-013 are resolved.
+The commercial boundary is governed by the approved policy document and must not be inferred from engineering progress.
+
+DEC-005 stakeholder brief: [Compatibility decision brief](decision-briefs/dec-005-compatibility.md).

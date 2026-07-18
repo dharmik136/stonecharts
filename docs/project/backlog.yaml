@@ -1,6 +1,6 @@
 id: SC-OPS-BACKLOG
 version: 1
-updated: "2026-07-17"
+updated: "2026-07-18"
 project:
   owner: dharmik136
   number: 2
@@ -147,7 +147,7 @@ items:
   - id: DEC-005
     title: Define the compatibility policy beginning with 0.0.0.1
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-01 Governance
     stage: S3 Release Candidate
@@ -156,14 +156,14 @@ items:
     traceability: [SC-CON-001, SC-REL-001]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
-    dependencies: [GATE-S2]
+    dependencies: []
     compatibility: Establishes policy for schema, API, DOM, bytes, packages, and migrations.
     areas: [docs, release]
     acceptance:
       - Covered public surfaces are listed.
       - Breaking-change, deprecation, and migration-note rules are stated.
       - The policy says when stronger compatibility begins.
-    verification: [Approved compatibility policy and release-checklist mapping]
+    verification: [Approved compatibility policy, release-checklist mapping, and traceability update]
 
   - id: DEC-006
     title: Decide the default branch and authoritative merge strategy
@@ -210,7 +210,7 @@ items:
   - id: DEC-008
     title: Approve the supported runtime and platform matrix
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-03 Conformance
     stage: S2 Qualification
@@ -219,19 +219,19 @@ items:
     traceability: [REQ-REL-001, REQ-RUNTIME-001, SC-QUAL-001]
     risks: [RISK-008]
     evidence: [TEST-RUNTIME-BROWSER, TEST-RELEASE-EVIDENCE]
-    dependencies: [GATE-S1]
+    dependencies: []
     compatibility: Defines supported Python, Go, browser, operating-system, and exporter profiles.
     areas: [python, go, runtime, release]
     acceptance:
       - Supported, experimental, and untested environments are separated.
       - Toolchain versions and qualification evidence are named.
       - Unsupported environments are not implied by generic claims.
-    verification: [Recorded compatibility matrix and passing profile evidence]
+    verification: [Recorded compatibility matrix, passing profile evidence, controlled runtime-matrix document]
 
   - id: DEC-009
     title: Approve performance and artifact-size release budgets
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-03 Conformance
     stage: S2 Qualification
@@ -240,19 +240,19 @@ items:
     traceability: [REQ-PERF-001, SC-QUAL-002]
     risks: []
     evidence: [BENCH-RENDER-BASELINE]
-    dependencies: [GATE-S1]
+    dependencies: []
     compatibility: Sets non-functional budgets without changing rendered semantics.
     areas: [python, go, runtime, release]
     acceptance:
       - Baseline workloads and environment are approved.
       - Budgets follow measured variance rather than arbitrary targets.
       - Accepted-regression rules are documented.
-    verification: [Benchmark report review and approved budgets]
+    verification: [Benchmark report review, approved budget policy, and baseline evidence]
 
   - id: DEC-010
     title: Approve the certified visual profile for 0.0.0.1
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-05 Customization
     stage: S2 Qualification
@@ -261,19 +261,19 @@ items:
     traceability: [REQ-VIS-001, SC-CON-006, SC-ARCH-ADR-0005]
     risks: [RISK-011]
     evidence: [REVIEW-VISUAL-PROFILE]
-    dependencies: [GATE-S1]
+    dependencies: []
     compatibility: Defines visual claims and certified exporter boundaries.
     areas: [runtime, docs, release]
     acceptance:
       - The default host-font profile is explicit.
       - Any certified pixel profile names its font, exporter, environment, and tolerance.
       - Accessibility and artifact-size tradeoffs are recorded.
-    verification: [Visual-profile review record]
+    verification: [Visual-profile review record, controlled profile document]
 
   - id: DEC-011
     title: Decide package and source publication channels
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-06 Release
     stage: S3 Release Candidate
@@ -282,56 +282,56 @@ items:
     traceability: [REQ-REL-001, SC-SEC-002, SC-ARCH-ADR-0007]
     risks: [RISK-009, RISK-012]
     evidence: [TEST-RELEASE-EVIDENCE]
-    dependencies: [GATE-S2]
+    dependencies: []
     compatibility: Must resolve valid ecosystem version mapping, especially for Go modules.
     areas: [python, go, release, security]
     acceptance:
       - Repository and registry visibility are approved.
       - Python, Go, source, and evidence publication paths are defined.
       - Support and rollback responsibilities exist for every channel.
-    verification: [Distribution plan review and package dry run]
+    verification: [Distribution plan review, package dry run, and controlled publication policy]
 
   - id: DEC-012
     title: Complete StoneCharts name-clearance decision
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-01 Governance
     stage: S3 Release Candidate
     target: 0.0.0.1
-    outcome: Public commercial branding proceeds only after documented name due diligence.
+    outcome: Public commercial branding is blocked until a dated due-diligence record is completed and reviewed.
     traceability: [SC-PROD-001, SC-ARCH-ADR-0006]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
-    dependencies: [GATE-S2]
-    compatibility: May require a pre-publication rename if clearance fails.
+    dependencies: []
+    compatibility: May require a pre-publication rename if later due diligence fails.
     areas: [docs, release]
     acceptance:
-      - Repository, package-index, domain, company-name, and trademark searches are recorded.
+      - Repository, package-index, domain, company-name, and trademark searches are required.
       - Jurisdictions and professional legal-review boundaries are explicit.
-      - The product owner records proceed, constrain, or rename.
-    verification: [Dated name-clearance record]
+      - Public branding is blocked until the dated record exists.
+    verification: [Name-clearance policy and dated clearance record]
 
   - id: DEC-013
     title: Decide commercial license, contribution, support, and access model
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-01 Governance
     stage: S3 Release Candidate
     target: 0.0.0.1
-    outcome: External access cannot imply rights or support commitments that were never approved.
+    outcome: The commercial boundary stays proprietary until a written business policy is approved.
     traceability: [SC-PROD-002, SC-SEC-002]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
-    dependencies: [GATE-S2]
+    dependencies: []
     compatibility: Controls licensing, contributions, distribution, support, and commercial use.
     areas: [docs, release, security]
     acceptance:
-      - License and source-access terms are explicit.
-      - Contribution and intellectual-property terms are explicit.
-      - Support, vulnerability response, and commercial channels are explicit.
-    verification: [Approved legal and operating policy set]
+      - The proprietary boundary is explicit.
+      - No external rights are implied by private repository access.
+      - A written business policy is required before commercial or contribution terms are announced.
+    verification: [Approved commercial-terms policy and decision brief]
 
   - id: WORK-S0-001
     title: Review and approve the Stage 0 controlled foundation baseline

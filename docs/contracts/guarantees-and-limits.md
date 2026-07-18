@@ -61,6 +61,13 @@ mutation, and third-party plugins are outside certified guarantees. A future esc
 hatch may be useful, but it must be labeled unverified and isolated from the certified
 path.
 
+## Compatibility policy
+
+StoneCharts uses a separate compatibility policy to govern future public-surface
+changes. `0.0.0.1` may still carry controlled pre-release breaks while the release is
+under qualification, but every post-release public change must follow the approved
+compatibility policy and its evidence requirements.
+
 ## 0.0.0.1 known limits
 
 - Only line and column are released chart types.
@@ -80,4 +87,3 @@ path.
 These are engineering conformance statements. License rights, warranties, liability,
 support response, service levels, and indemnities are governed only by applicable
 legal agreements.
-

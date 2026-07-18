@@ -66,6 +66,8 @@ approved only after stable repeated measurements. Subsequent releases use a docu
 regression budget derived from observed variance; a convenient percentage is not
 invented in advance.
 
+The governing budget policy is recorded in
+[SC-CON-017](../contracts/performance-budgets.md).
+
 Any accepted regression records the affected workload, measured change, reason,
 product benefit, owner, and approval in the release manifest.
-
