@@ -336,7 +336,7 @@ items:
   - id: WORK-S0-001
     title: Review and approve the Stage 0 controlled foundation baseline
     item_type: Work Package
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-01 Governance
     stage: S0 Foundation
@@ -353,7 +353,7 @@ items:
       - Requirements, ADRs, contracts, risks, evidence, and release gates have no unresolved references.
       - Current implementation gaps are represented in this backlog with ownership and acceptance criteria.
       - No chart or language expansion work is active.
-    verification: [python tools/check_docs.py, controlled baseline review]
+    verification: [python tools/check_docs.py, python tools/check_github_project.py, controlled baseline review]
 
   - id: REQ-PROD-001
     title: Qualify one language-neutral chart specification
@@ -507,7 +507,7 @@ items:
   - id: GATE-S0
     title: Pass Stage 0 product-foundation gate
     item_type: Release Gate
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-01 Governance
     stage: S0 Foundation
@@ -524,7 +524,7 @@ items:
       - Guarantee, customization, versioning, and project-operation decisions are recorded.
       - Controlled documents and registries validate with no unresolved reference.
       - Stage 1 work remains blocked until this gate is closed.
-    verification: [python tools/check_docs.py, python tools/check_github_project.py]
+    verification: [python tools/check_docs.py, python tools/check_github_project.py, controlled baseline review package]
 
   - id: GATE-S1
     title: Pass Stage 1 contract-closure gate
