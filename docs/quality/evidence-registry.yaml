@@ -53,10 +53,10 @@ evidence:
     requirements: [REQ-STACK-002]
   - id: TEST-LAYOUT-MARGINS
     kind: test
-    status: planned
-    description: Will verify manual-margin validation, preserved defaults, plot-area constraints, and cross-language output parity.
-    command: null
-    location: null
+    status: implemented
+    description: Verifies manual-margin validation, preserved defaults, plot-area constraints, and cross-language output parity.
+    command: python -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-LAYOUT-001]
   - id: TEST-XSS-ESCAPING
     kind: test

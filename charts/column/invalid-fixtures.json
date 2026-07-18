@@ -8,6 +8,10 @@
     "errors": ["$.grouping: expected boolean, received string"]
   },
   {
+    "spec": {"type": "column", "layout": {"margin": {"left": -1}}, "series": [{"name": "s", "data": [1]}]},
+    "errors": ["$.layout.margin.left: expected non-negative number, received -1"]
+  },
+  {
     "spec": {"type": "bogus", "series": [{"name": "s", "data": [1]}]},
     "errors": ["$.type: unknown chart type \"bogus\""]
   },

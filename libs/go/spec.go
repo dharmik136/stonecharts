@@ -136,6 +136,17 @@ type Axis struct {
 	GridLine   *GridLine `json:"gridLine,omitempty"` // yAxis only
 }
 
+type Margin struct {
+	Top    *float64 `json:"top,omitempty"`
+	Right  *float64 `json:"right,omitempty"`
+	Bottom *float64 `json:"bottom,omitempty"`
+	Left   *float64 `json:"left,omitempty"`
+}
+
+type Layout struct {
+	Margin *Margin `json:"margin,omitempty"`
+}
+
 // Theme is a concrete color set (canonical values in spec/themes/*.json).
 type Theme struct {
 	Name            string   `json:"name,omitempty"`
@@ -281,6 +292,7 @@ type ChartSpec struct {
 	Legend     *bool    `json:"legend,omitempty"`
 	A11y       *bool    `json:"a11y,omitempty"` // nil -> true
 	Responsive bool     `json:"responsive,omitempty"`
+	Layout     *Layout  `json:"layout,omitempty"`
 	Stacking   string   `json:"stacking,omitempty"` // "" | "normal" | "percent"
 	Grouping   *bool    `json:"grouping,omitempty"` // nil -> true
 	XAxis      Axis     `json:"xAxis"`

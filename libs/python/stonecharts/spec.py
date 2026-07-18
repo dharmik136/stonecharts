@@ -87,6 +87,19 @@ class Axis:
 
 
 @dataclass
+class Margin:
+    top: Optional[float] = None
+    right: Optional[float] = None
+    bottom: Optional[float] = None
+    left: Optional[float] = None
+
+
+@dataclass
+class Layout:
+    margin: Optional[Margin] = None
+
+
+@dataclass
 class Theme:
     """Concrete color set (canonical values in spec/themes/*.json). Defaults = light,
     exactly reproducing the classic look so light output is byte-identical."""
@@ -181,6 +194,7 @@ class ChartSpec:
     legend: bool = True
     responsive: bool = False
     a11y: bool = True
+    layout: Optional[Layout] = None
     stacking: Optional[str] = None     # None | "normal" | "percent"
     grouping: bool = True              # True = grouped side-by-side; False = overlaid
 
@@ -263,6 +277,20 @@ class ChartSpec:
                 dash_style=gl.get("dashStyle", "solid"),
             )
 
+        layout = None
+        ly = d.get("layout")
+        if ly is not None:
+            m = ly.get("margin")
+            margin = None
+            if m is not None:
+                margin = Margin(
+                    top=_opt_float(m, "top"),
+                    right=_opt_float(m, "right"),
+                    bottom=_opt_float(m, "bottom"),
+                    left=_opt_float(m, "left"),
+                )
+            layout = Layout(margin=margin)
+
         return ChartSpec(
             series=series,
             type=d.get("type") or "line",
@@ -287,6 +315,7 @@ class ChartSpec:
             legend=bool(d.get("legend", True)),
             responsive=bool(d.get("responsive", False)),
             a11y=bool(d.get("a11y", True)),
+            layout=layout,
             stacking=d.get("stacking"),
             grouping=bool(d.get("grouping", True)),
         )

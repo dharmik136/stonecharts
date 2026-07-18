@@ -180,7 +180,8 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
         a11y_attr = f' role="img" aria-label="{_sum}"'
         a11y_desc = f"<desc>{_sum}</desc>"
 
-    # Margins adapt to which chrome is present.
+    # Margins adapt to which chrome is present unless a validated manual layout
+    # margin overrides the deterministic default for that edge.
     m_top = 20
     if spec.title:
         m_top += 26
@@ -189,6 +190,16 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
     m_left = 62 if spec.y_axis.title else 52
     m_right = 22
     m_bottom = 46 + (18 if spec.legend else 0) + (18 if spec.x_axis.title else 0)
+    if spec.layout and spec.layout.margin:
+        m = spec.layout.margin
+        if m.top is not None:
+            m_top = m.top
+        if m.left is not None:
+            m_left = m.left
+        if m.right is not None:
+            m_right = m.right
+        if m.bottom is not None:
+            m_bottom = m.bottom
 
     plot_x, plot_y = m_left, m_top
     plot_w, plot_h = W - m_left - m_right, H - m_top - m_bottom

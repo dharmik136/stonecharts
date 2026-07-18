@@ -27,9 +27,9 @@ or pixel identity.
 The approved 0.0.0.1 visual profile is recorded in
 [SC-CON-016](visual-profile.md).
 
-Layout uses deterministic defaults plus planned explicit margins. Margin fields are
-finite non-negative pixels. Validation rejects a result that leaves less than the
-contracted minimum plot dimensions. Existing defaults remain byte-identical.
+Layout uses deterministic defaults plus validated explicit margins. Margin fields are
+finite non-negative pixels. Validation rejects a result that leaves a non-positive
+plot rectangle. Existing defaults remain byte-identical.
 
 ## Embedded-font profile
 

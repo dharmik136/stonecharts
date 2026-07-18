@@ -118,6 +118,29 @@ def _axis(v: Any, path: str, errs: List[str]) -> None:
         _gridline(v["gridLine"], f"{path}.gridLine", errs)
 
 
+def _margin(v: Any, path: str, errs: List[str]) -> None:
+    if not isinstance(v, dict):
+        errs.append(f"{path}: expected object, received {_jtype(v)}")
+        return
+    for k in ("top", "right", "bottom", "left"):
+        if k in v:
+            _num(v[k], f"{path}.{k}", errs)
+            if isinstance(v[k], (int, float)) and not isinstance(v[k], bool) and v[k] < 0:
+                errs.append(f"{path}.{k}: expected non-negative number, received {fmt_num(float(v[k]))}")
+
+
+def _layout(v: Any, path: str, errs: List[str]) -> None:
+    if not isinstance(v, dict):
+        errs.append(f"{path}: expected object, received {_jtype(v)}")
+        return
+    if "margin" in v:
+        _margin(v["margin"], f"{path}.margin", errs)
+
+
+def _num_or_default(v: Any, default: float) -> float:
+    return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else default
+
+
 def _marker(v: Any, path: str, errs: List[str]) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
@@ -257,6 +280,8 @@ def validate(d: Any) -> List[str]:
         _bool(d["grouping"], "$.grouping", errs)
     if "theme" in d:
         _theme(d["theme"], "$.theme", errs)
+    if "layout" in d:
+        _layout(d["layout"], "$.layout", errs)
     if "xAxis" in d:
         _axis(d["xAxis"], "$.xAxis", errs)
     if "yAxis" in d:
@@ -277,4 +302,19 @@ def validate(d: Any) -> List[str]:
                 continue
             for j, v in enumerate(data):
                 _nonneg_num(v, f"$.series[{i}].data[{j}]", errs)
+    if isinstance(d.get("layout"), dict) and isinstance(d["layout"].get("margin"), dict):
+        m = d["layout"]["margin"]
+        if isinstance(d.get("width"), (int, float)) and isinstance(d.get("height"), (int, float)):
+            ya = d.get("yAxis") if isinstance(d.get("yAxis"), dict) else {}
+            xa = d.get("xAxis") if isinstance(d.get("xAxis"), dict) else {}
+            left = _num_or_default(m.get("left"), 62 if ya.get("title") else 52)
+            right = _num_or_default(m.get("right"), 22)
+            top = _num_or_default(m.get("top"), 20 + (26 if d.get("title") else 0) + (18 if d.get("subtitle") else 0))
+            bottom = _num_or_default(m.get("bottom"), 46 + (18 if d.get("legend", True) else 0) + (18 if xa.get("title") else 0))
+            plot_w = float(d["width"]) - left - right
+            plot_h = float(d["height"]) - top - bottom
+            if plot_w <= 0:
+                errs.append(f"$.layout.margin: plot width must remain positive, received {fmt_num(plot_w)}")
+            if plot_h <= 0:
+                errs.append(f"$.layout.margin: plot height must remain positive, received {fmt_num(plot_h)}")
     return errs

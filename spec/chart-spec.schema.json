@@ -42,6 +42,21 @@
       "default": true,
       "description": "Accessibility (on by default): SVG gets role=\"img\" + a summary aria-label + <desc>; the HTML output adds a visually-hidden data table. Set false to restore the pre-a11y byte output."
     },
+    "layout": {
+      "type": "object",
+      "description": "Manual chart layout controls. Margin values override the deterministic defaults only when present; they never auto-fit text.",
+      "properties": {
+        "margin": {
+          "type": "object",
+          "properties": {
+            "top": { "type": "number", "minimum": 0 },
+            "right": { "type": "number", "minimum": 0 },
+            "bottom": { "type": "number", "minimum": 0 },
+            "left": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
     "stacking": {
       "type": "string",
       "enum": ["normal", "percent"],

@@ -15,7 +15,7 @@ Build a chart spec, render it to a self-contained interactive HTML document.
     save_html(spec, "chart.html")
 """
 from .spec import (
-    Axis, ChartSpec, Gradient, GradientStop, Marker, Pattern, Series, Theme, THEMES,
+    Axis, ChartSpec, Gradient, GradientStop, Layout, Margin, Marker, Pattern, Series, Theme, THEMES,
 )
 from .capabilities import CapabilityError, capabilities
 from .validate import SpecError, validate
@@ -29,6 +29,8 @@ __all__ = [
     "Marker",
     "Gradient",
     "GradientStop",
+    "Margin",
+    "Layout",
     "Pattern",
     "Theme",
     "THEMES",

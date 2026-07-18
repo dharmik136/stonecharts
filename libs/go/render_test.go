@@ -65,6 +65,7 @@ func mustHTML(t *testing.T, spec *ChartSpec, title string) string {
 func TestColumnEdgeCases(t *testing.T) {
 	cases := []string{
 		`{"type":"column","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`,
+		`{"type":"column","layout":{"margin":{"left":90,"right":40,"top":30,"bottom":50}},"series":[{"name":"s","data":[1,2,3]}]}`,
 		`{"type":"column","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
 		`{"type":"column","xAxis":{"categories":["neg","pos"]},"series":[{"name":"a","data":[-5,10]}]}`,
 		`{"type":"column","grouping":false,"series":[{"name":"a","data":[1,2]},{"name":"b","data":[2,1]}]}`,
@@ -104,6 +105,17 @@ func TestColumnSignedStackGeometry(t *testing.T) {
 	}
 	if !(got["1"] > got["0"]) {
 		t.Fatalf("expected negative stack segment below positive segment, got %+v", got)
+	}
+}
+
+func TestLayoutMargins(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"column","layout":{"margin":{"left":90,"right":40,"top":30,"bottom":50}},"series":[{"name":"s","data":[1,2,3]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	svg := mustSVG(t, spec)
+	if !strings.Contains(svg, `x1="90.0"`) {
+		t.Fatalf("expected manual left margin to shift plot area, got %s", svg)
 	}
 }
 

@@ -459,12 +459,12 @@ items:
   - id: REQ-LAYOUT-001
     title: Add deterministic validated manual margins
     item_type: Requirement
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-05 Customization
     stage: S1 Contract Closure
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-LAYOUT-001 acceptance contract.
+    outcome: The renderer now accepts validated manual margins, preserves default bytes when absent, and proves the registered REQ-LAYOUT-001 acceptance contract.
     traceability: [REQ-LAYOUT-001, SC-ARCH-ADR-0005, SC-CON-005, SC-CON-006]
     risks: [RISK-006, RISK-007]
     evidence: [TEST-LAYOUT-MARGINS]

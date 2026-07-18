@@ -180,30 +180,44 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool) *cartesi
 		a11yDesc = "<desc>" + s + "</desc>"
 	}
 
-	mTop := 20
+	mTop := 20.0
 	if spec.Title != "" {
 		mTop += 26
 	}
 	if spec.Subtitle != "" {
 		mTop += 18
 	}
-	mLeft := 52
+	mLeft := 52.0
 	if spec.YAxis.Title != "" {
 		mLeft = 62
 	}
-	mRight := 22
-	mBottom := 46
+	mRight := 22.0
+	mBottom := 46.0
 	if spec.legendOn() {
 		mBottom += 18
 	}
 	if spec.XAxis.Title != "" {
 		mBottom += 18
 	}
+	if spec.Layout != nil && spec.Layout.Margin != nil {
+		if spec.Layout.Margin.Top != nil {
+			mTop = *spec.Layout.Margin.Top
+		}
+		if spec.Layout.Margin.Left != nil {
+			mLeft = *spec.Layout.Margin.Left
+		}
+		if spec.Layout.Margin.Right != nil {
+			mRight = *spec.Layout.Margin.Right
+		}
+		if spec.Layout.Margin.Bottom != nil {
+			mBottom = *spec.Layout.Margin.Bottom
+		}
+	}
 
-	plotX := float64(mLeft)
-	plotY := float64(mTop)
-	plotW := float64(W - mLeft - mRight)
-	plotH := float64(H - mTop - mBottom)
+	plotX := mLeft
+	plotY := mTop
+	plotW := float64(W) - mLeft - mRight
+	plotH := float64(H) - mTop - mBottom
 
 	n := 0
 	for _, s := range spec.Series {

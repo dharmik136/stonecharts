@@ -1,7 +1,7 @@
 ---
 id: SC-ARCH-ADR-0005
 title: Use Manual Alpha Layout and Tiered Font Profiles
-status: proposed
+status: approved
 classification: normative
 owner: product-owner
 approver: maintainer
@@ -46,4 +46,3 @@ semantic alternative when required.
 - Host measurement in each language: not parity-safe.
 - HarfBuzz in 0.0.0.1: valuable later, disproportionate now.
 - Universal text outlines: weakens selection, search, and intrinsic text semantics.
-

@@ -148,6 +148,33 @@ func vaxis(v interface{}, path string, errs *[]string) {
 	}
 }
 
+func vmargin(v interface{}, path string, errs *[]string) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, path+": expected object, received "+jtype(v))
+		return
+	}
+	for _, k := range []string{"top", "right", "bottom", "left"} {
+		if x, ok := has(m, k); ok {
+			vnum(x, path+"."+k, errs)
+			if f, ok := x.(float64); ok && f < 0 {
+				*errs = append(*errs, path+"."+k+": expected non-negative number, received "+fmtNum(f))
+			}
+		}
+	}
+}
+
+func vlayout(v interface{}, path string, errs *[]string) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, path+": expected object, received "+jtype(v))
+		return
+	}
+	if x, ok := has(m, "margin"); ok {
+		vmargin(x, path+".margin", errs)
+	}
+}
+
 func vmarker(v interface{}, path string, errs *[]string) {
 	m, ok := v.(map[string]interface{})
 	if !ok {
@@ -351,6 +378,9 @@ func validate(v interface{}) []string {
 	if x, ok := has(d, "theme"); ok {
 		vtheme(x, "$.theme", &errs)
 	}
+	if x, ok := has(d, "layout"); ok {
+		vlayout(x, "$.layout", &errs)
+	}
 	if x, ok := has(d, "xAxis"); ok {
 		vaxis(x, "$.xAxis", &errs)
 	}
@@ -380,6 +410,75 @@ func validate(v interface{}) []string {
 								for j, v := range arr {
 									vnonneg(v, "$.series["+itoa(i)+"].data["+itoa(j)+"]", &errs)
 								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if x, ok := has(d, "layout"); ok {
+		if ly, ok := x.(map[string]interface{}); ok {
+			left := 52.0
+			if yAxis, ok := has(d, "yAxis"); ok {
+				if ya, ok := yAxis.(map[string]interface{}); ok {
+					if title, ok := has(ya, "title"); ok && title != "" {
+						left = 62.0
+					}
+				}
+			}
+			right := 22.0
+			top := 20.0
+			if title, ok := has(d, "title"); ok && title != "" {
+				top += 26.0
+			}
+			if subtitle, ok := has(d, "subtitle"); ok && subtitle != "" {
+				top += 18.0
+			}
+			bottom := 46.0
+			if legend, ok := has(d, "legend"); !ok || legend == nil || legend == true {
+				bottom += 18.0
+			}
+			if xAxis, ok := has(d, "xAxis"); ok {
+				if xa, ok := xAxis.(map[string]interface{}); ok {
+					if title, ok := has(xa, "title"); ok && title != "" {
+						bottom += 18.0
+					}
+				}
+			}
+			if margin, ok := has(ly, "margin"); ok {
+				if m, ok := margin.(map[string]interface{}); ok {
+					if v, ok := has(m, "left"); ok {
+						if f, ok := v.(float64); ok {
+							left = f
+						}
+					}
+					if v, ok := has(m, "right"); ok {
+						if f, ok := v.(float64); ok {
+							right = f
+						}
+					}
+					if v, ok := has(m, "top"); ok {
+						if f, ok := v.(float64); ok {
+							top = f
+						}
+					}
+					if v, ok := has(m, "bottom"); ok {
+						if f, ok := v.(float64); ok {
+							bottom = f
+						}
+					}
+				}
+			}
+			if w, ok := has(d, "width"); ok {
+				if h, ok := has(d, "height"); ok {
+					if wf, ok := w.(float64); ok {
+						if hf, ok := h.(float64); ok {
+							if wf-left-right <= 0 {
+								errs = append(errs, "$.layout.margin: plot width must remain positive, received "+fmtNum(wf-left-right))
+							}
+							if hf-top-bottom <= 0 {
+								errs = append(errs, "$.layout.margin: plot height must remain positive, received "+fmtNum(hf-top-bottom))
 							}
 						}
 					}

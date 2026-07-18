@@ -82,6 +82,8 @@ def test_column_edge_cases():
     for spec in [
         {"type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
          "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
+        {"type": "column", "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+         "series": [{"name": "s", "data": [1, 2, 3]}]},
         {"type": "column", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
          "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
         {"type": "column", "xAxis": {"categories": ["neg", "pos"]},
@@ -105,6 +107,17 @@ def test_column_signed_stack_geometry():
         for series, y in re.findall(r'data-series="(\d)"[^>]* y="([^"]+)"', svg)
     }
     assert rects[1] > rects[0], rects
+
+
+def test_layout_margins():
+    spec = ChartSpec.from_dict({
+        "type": "column",
+        "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+        "series": [{"name": "s", "data": [1, 2, 3]}],
+    })
+    svg = render_svg(spec)
+    assert 'x1="90.0"' in svg
+    assert 'y="30"' in svg or 'y="30.0"' in svg
 
 
 def test_xss_escaping():

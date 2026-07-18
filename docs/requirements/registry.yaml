@@ -139,13 +139,13 @@ requirements:
     rationale: Host text measurement is not stable enough for the canonical byte profile, while fixed margins can clip real data.
     kind: functional
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-ARCH-ADR-0005
     acceptance:
       - Margin values are finite and non-negative.
-      - Invalid remaining plot dimensions are rejected.
+      - Invalid remaining plot dimensions are rejected before render.
       - Defaults preserve approved line and column output.
       - Overflow and no-auto-fit limitations are published.
     decisions: [SC-ARCH-ADR-0005]

@@ -91,6 +91,7 @@ samples (use `histogram`). See [`CHARTS.md`](../../CHARTS.md).
 | `legend` | bool | true | bottom legend + click-to-toggle (swatch is the bar `<rect>`) |
 | `a11y` | bool | true | accessibility (on by default): SVG gets `role="img"` + a summary `aria-label` + `<desc>`; HTML adds a visually-hidden data table. `false` restores the pre-a11y bytes |
 | `responsive` | bool | false | scale to container (viewBox + `width:100%`) instead of fixed px |
+| `layout.margin` | object | — | optional manual margins: `{top,right,bottom,left}` in px. Each value must be finite and non-negative; absent edges fall back to the deterministic defaults |
 | **`stacking`** | string | — (grouped) | **NEW field.** `null`/absent = grouped side-by-side; `"normal"` = bars stacked cumulatively with separate positive/negative accumulators; `"percent"` = stacked then normalized so each category totals 100% using non-negative values only. The **frame** owns the resulting stacking-aware y-domain (signed extrema for normal, 0–100 for percent). Added in the §5.4b five-place lockstep (schema + both validators + both spec models + invalid fixtures) |
 | **`grouping`** | bool | true | **NEW field.** Only meaningful when `stacking` is absent: `true` → `K = len(series)` side-by-side sub-bands per category (the pinned band layout); `false` → `K = 1`, all series share one centered slot (overlaid, drawn in series order). When `stacking` is set, grouping is ignored (a stack occupies one slot) |
 | `xAxis.title` | string | — | axis label |
