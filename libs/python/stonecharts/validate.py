@@ -18,6 +18,8 @@ from __future__ import annotations
 import math
 from typing import Any, List
 
+from .util import fmt_num
+
 
 class SpecError(ValueError):
     """Raised when a chart spec fails validation. `.errors` lists every problem."""
@@ -49,6 +51,15 @@ def _num(v: Any, path: str, errs: List[str]) -> None:
     elif isinstance(v, float) and not math.isfinite(v):
         errs.append(f"{path}: expected finite number, received "
                     + ("NaN" if math.isnan(v) else "Infinity"))
+
+
+def _nonneg_num(v: Any, path: str, errs: List[str]) -> None:
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return
+    if isinstance(v, float) and not math.isfinite(v):
+        return
+    if float(v) < 0:
+        errs.append(f"{path}: expected non-negative number, received {fmt_num(float(v))}")
 
 
 def _intnum(v: Any, path: str, errs: List[str]) -> None:
@@ -257,4 +268,13 @@ def validate(d: Any) -> List[str]:
     else:
         for i, s in enumerate(d["series"]):
             _series(s, f"$.series[{i}]", errs)
+    if d.get("stacking") == "percent" and isinstance(d.get("series"), list):
+        for i, s in enumerate(d["series"]):
+            if not isinstance(s, dict):
+                continue
+            data = s.get("data")
+            if not isinstance(data, list):
+                continue
+            for j, v in enumerate(data):
+                _nonneg_num(v, f"$.series[{i}].data[{j}]", errs)
     return errs

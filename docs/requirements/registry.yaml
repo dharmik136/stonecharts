@@ -101,7 +101,7 @@ requirements:
     rationale: A shared accumulator produces invalid geometry when signs differ within a category.
     kind: functional
     priority: must
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-ARCH-ADR-0003
@@ -120,7 +120,7 @@ requirements:
     rationale: Net-sum and absolute-sum conventions assign different meanings to signed data; 0.0.0.1 must not choose silently.
     kind: constraint
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-ARCH-ADR-0003

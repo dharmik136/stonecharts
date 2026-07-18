@@ -200,17 +200,20 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
     # Value-axis domain — owned by the frame, never by the marks.
     stacking = spec.stacking
     if stacking in ("normal", "percent"):
-        # Per-category totals, accumulated in series index order (pinned).
-        totals = [0.0] * n
-        for s in spec.series:
-            for i, v in enumerate(s.data):
-                totals[i] += v
         if stacking == "percent":
             lo = spec.y_axis.min if spec.y_axis.min is not None else 0.0
             hi = spec.y_axis.max if spec.y_axis.max is not None else 100.0
         else:
-            lo = spec.y_axis.min if spec.y_axis.min is not None else min(totals + [0.0])
-            hi = spec.y_axis.max if spec.y_axis.max is not None else max(totals + [0.0])
+            pos_totals = [0.0] * n
+            neg_totals = [0.0] * n
+            for s in spec.series:
+                for i, v in enumerate(s.data):
+                    if v >= 0:
+                        pos_totals[i] += v
+                    else:
+                        neg_totals[i] += v
+            lo = spec.y_axis.min if spec.y_axis.min is not None else min(neg_totals + [0.0])
+            hi = spec.y_axis.max if spec.y_axis.max is not None else max(pos_totals + [0.0])
     else:
         # Y range across all series; include_zero=True anchors the 0 baseline.
         values = [v for s in spec.series for v in s.data]

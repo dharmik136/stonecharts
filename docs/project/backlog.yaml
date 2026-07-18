@@ -427,12 +427,12 @@ items:
   - id: REQ-STACK-001
     title: Correct mixed-sign normal stacking geometry
     item_type: Requirement
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-02 Renderer
     stage: S1 Contract Closure
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-STACK-001 acceptance contract.
+    outcome: The active renderer now accumulates positive and negative stacks separately and proves the registered REQ-STACK-001 acceptance contract.
     traceability: [REQ-STACK-001, SC-ARCH-ADR-0003]
     risks: [RISK-004]
     evidence: [TEST-STACK-SIGNED]
@@ -443,12 +443,12 @@ items:
   - id: REQ-STACK-002
     title: Define and enforce safe percent stacking
     item_type: Requirement
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-02 Renderer
     stage: S1 Contract Closure
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-STACK-002 acceptance contract.
+    outcome: Percent stacking now rejects negative values and proves the registered REQ-STACK-002 acceptance contract.
     traceability: [REQ-STACK-002, SC-ARCH-ADR-0003]
     risks: [RISK-005]
     evidence: [TEST-PERCENT-DOMAIN]

@@ -9,6 +9,7 @@ Or with pytest:  pytest libs/python/tests/
 import json
 import pathlib
 import sys
+import re
 
 import jsonschema
 
@@ -79,6 +80,8 @@ def test_column_goldens():
 
 def test_column_edge_cases():
     for spec in [
+        {"type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
+         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
         {"type": "column", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
          "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
         {"type": "column", "xAxis": {"categories": ["neg", "pos"]},
@@ -90,6 +93,18 @@ def test_column_edge_cases():
     ]:
         low = render_svg(ChartSpec.from_dict(spec)).lower()
         assert "nan" not in low and "inf" not in low, spec
+
+
+def test_column_signed_stack_geometry():
+    svg = render_svg(ChartSpec.from_dict({
+        "type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
+        "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}],
+    }))
+    rects = {
+        int(series): float(y)
+        for series, y in re.findall(r'data-series="(\d)"[^>]* y="([^"]+)"', svg)
+    }
+    assert rects[1] > rects[0], rects
 
 
 def test_xss_escaping():

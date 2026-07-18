@@ -39,17 +39,17 @@ evidence:
     requirements: [REQ-SCOPE-001, REQ-CAP-001]
   - id: TEST-STACK-SIGNED
     kind: test
-    status: planned
-    description: Will verify separate positive and negative normal-stack domains and geometry in both languages.
-    command: null
-    location: null
+    status: implemented
+    description: Verifies separate positive and negative normal-stack domains and geometry in both languages.
+    command: python -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-STACK-001]
   - id: TEST-PERCENT-DOMAIN
     kind: test
-    status: planned
-    description: Will reject negative percent-stack values and verify deterministic all-zero category behavior.
-    command: null
-    location: null
+    status: implemented
+    description: Rejects negative percent-stack values and verifies deterministic all-zero category behavior.
+    command: python -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-STACK-002]
   - id: TEST-LAYOUT-MARGINS
     kind: test

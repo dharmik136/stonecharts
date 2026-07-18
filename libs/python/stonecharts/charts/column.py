@@ -34,7 +34,8 @@ def _column_marks(fr: CartesianFrame, p: list) -> None:
                 if i < fr.n:
                     totals[i] += v
 
-    cumulative = [0.0] * fr.n
+    positive = [0.0] * fr.n
+    negative = [0.0] * fr.n
     for si, s in enumerate(fr.spec.series):
         st = fr.styles[si]
         p.append(f'<g class="sc-series" data-series="{si}">')
@@ -49,9 +50,14 @@ def _column_marks(fr: CartesianFrame, p: list) -> None:
                     value = 0.0 if total == 0.0 else raw / total * 100.0
                 else:
                     value = raw
-                bottom_v = cumulative[i]
-                top_v = bottom_v + value
-                cumulative[i] = top_v
+                if value >= 0:
+                    bottom_v = positive[i]
+                    top_v = bottom_v + value
+                    positive[i] = top_v
+                else:
+                    bottom_v = negative[i]
+                    top_v = bottom_v + value
+                    negative[i] = top_v
                 y0 = fr.ypix(bottom_v)
                 y1 = fr.ypix(top_v)
                 y = min(y0, y1)

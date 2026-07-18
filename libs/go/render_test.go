@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -62,6 +64,7 @@ func mustHTML(t *testing.T, spec *ChartSpec, title string) string {
 
 func TestColumnEdgeCases(t *testing.T) {
 	cases := []string{
+		`{"type":"column","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`,
 		`{"type":"column","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
 		`{"type":"column","xAxis":{"categories":["neg","pos"]},"series":[{"name":"a","data":[-5,10]}]}`,
 		`{"type":"column","grouping":false,"series":[{"name":"a","data":[1,2]},{"name":"b","data":[2,1]}]}`,
@@ -77,6 +80,30 @@ func TestColumnEdgeCases(t *testing.T) {
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in column render for %s", specJSON)
 		}
+	}
+}
+
+func TestColumnSignedStackGeometry(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"column","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	svg := mustSVG(t, spec)
+	re := regexp.MustCompile(`data-series="(\d)"[^>]* y="([^"]+)"`)
+	matches := re.FindAllStringSubmatch(svg, -1)
+	got := map[string]float64{}
+	for _, m := range matches {
+		if len(m) != 3 {
+			continue
+		}
+		f, err := strconv.ParseFloat(m[2], 64)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got[m[1]] = f
+	}
+	if !(got["1"] > got["0"]) {
+		t.Fatalf("expected negative stack segment below positive segment, got %+v", got)
 	}
 }
 

@@ -1,7 +1,7 @@
 ---
 id: SC-ARCH-ADR-0003
 title: Define Signed and Percent Stacking Semantics
-status: proposed
+status: approved
 classification: normative
 owner: product-owner
 approver: maintainer
@@ -51,4 +51,3 @@ schema value, labels, examples, and conformance corpus.
 - Absolute-total normalization: valid but changes the meaning of "100%" and is not
   appropriate as an undocumented default.
 - Silently discard negative values: data corruption.
-

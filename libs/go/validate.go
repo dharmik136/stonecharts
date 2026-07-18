@@ -296,6 +296,16 @@ func vseries(v interface{}, path string, errs *[]string) {
 	}
 }
 
+func vnonneg(v interface{}, path string, errs *[]string) {
+	f, ok := v.(float64)
+	if !ok {
+		return
+	}
+	if f < 0 {
+		*errs = append(*errs, path+": expected non-negative number, received "+fmtNum(f))
+	}
+}
+
 // knownTypes — active 0.0.0.1 release scope. Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"column": true,
@@ -354,6 +364,27 @@ func validate(v interface{}) []string {
 	} else {
 		for i, s := range arr {
 			vseries(s, "$.series["+itoa(i)+"]", &errs)
+		}
+	}
+	if x, ok := has(d, "stacking"); ok {
+		if s, ok := x.(string); ok && s == "percent" {
+			if arr, ok := has(d, "series"); ok {
+				if series, ok := arr.([]interface{}); ok {
+					for i, s := range series {
+						m, ok := s.(map[string]interface{})
+						if !ok {
+							continue
+						}
+						if data, ok := has(m, "data"); ok {
+							if arr, ok := data.([]interface{}); ok {
+								for j, v := range arr {
+									vnonneg(v, "$.series["+itoa(i)+"].data["+itoa(j)+"]", &errs)
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	return errs

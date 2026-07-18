@@ -12,6 +12,10 @@
     "errors": ["$.type: unknown chart type \"bogus\""]
   },
   {
+    "spec": {"type": "column", "stacking": "percent", "series": [{"name": "s", "data": [1, -2]}]},
+    "errors": ["$.series[0].data[1]: expected non-negative number, received -2"]
+  },
+  {
     "spec": {"type": "area", "series": [{"name": "s", "data": [1]}]},
     "errors": ["$.type: unknown chart type \"area\""]
   }

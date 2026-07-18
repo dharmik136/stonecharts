@@ -222,24 +222,32 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool) *cartesi
 	// Value-axis range. Stacking changes the domain to per-category totals.
 	lo, hi := 0.0, 0.0
 	if spec.Stacking == "normal" || spec.Stacking == "percent" {
-		totals := make([]float64, n)
-		for _, s := range spec.Series {
-			for i, v := range s.Data {
-				if i < n {
-					totals[i] += v
-				}
-			}
-		}
 		if spec.Stacking == "percent" {
 			lo = 0.0
 			hi = 100.0
 		} else {
+			posTotals := make([]float64, n)
+			negTotals := make([]float64, n)
+			for _, s := range spec.Series {
+				for i, v := range s.Data {
+					if i >= n {
+						continue
+					}
+					if v >= 0 {
+						posTotals[i] += v
+					} else {
+						negTotals[i] += v
+					}
+				}
+			}
 			lo = 0.0
 			hi = 0.0
-			for _, t := range totals {
+			for _, t := range negTotals {
 				if t < lo {
 					lo = t
 				}
+			}
+			for _, t := range posTotals {
 				if t > hi {
 					hi = t
 				}

@@ -45,7 +45,7 @@
     "stacking": {
       "type": "string",
       "enum": ["normal", "percent"],
-      "description": "Stack series values per category. 'normal' = absolute stacked, 'percent' = 100% stacked. Absent = no stacking."
+      "description": "Stack series values per category. 'normal' = absolute stacked with signed positive/negative accumulators, 'percent' = 100% stacked using non-negative values only. Absent = no stacking."
     },
     "grouping": {
       "type": "boolean",
@@ -59,6 +59,31 @@
       "items": { "$ref": "#/definitions/series" }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "required": ["stacking"],
+        "properties": {
+          "stacking": { "const": "percent" }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "definitions": {
     "theme": {
       "type": "object",
