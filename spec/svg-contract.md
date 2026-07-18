@@ -56,7 +56,7 @@ the runtime only adds interactivity on top.
 | `svg.sc-chart` | The chart root | `StoneCharts.init()` scans for these |
 | `.sc-series[data-series=N]` | Group for series N (line + points) | Legend toggle shows/hides the whole group |
 | `.sc-point` | A data point | Hover → tooltip + enlarge to `data-r-hover`; leave → back to `data-r` |
-| `.sc-legend-item[data-series=N]` | Legend entry for series N | Click → toggle every `[data-series=N]` (adds `.sc-hidden`) |
+| `.sc-legend-item[data-series=N]` | Legend entry for series N | Click or keyboard activation → toggle every `[data-series=N]` (adds `.sc-hidden`) |
 | `.sc-crosshair` | Vertical guide line (optional) | Shown at the hovered point's `cx`, hidden on leave |
 | `.sc-tooltip` | Floating tooltip (optional; runtime creates if absent) | Filled from `data-x` / `data-series-name` / `data-y` / `data-color` |
 
@@ -78,3 +78,5 @@ the runtime only adds interactivity on top.
 2. Anything the runtime toggles must live under a `[data-series=N]` element.
 3. Coordinates are plain SVG user units; no assumption about viewBox scaling.
 4. The chart must be correct and readable with JavaScript disabled.
+5. Legend controls are focusable runtime buttons; their pressed state mirrors the
+   hidden/visible series state.

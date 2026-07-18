@@ -29,6 +29,7 @@ This document defines observable state and the adaptive boundary of the shared r
   active.
 - Legend state updates the target series, the legend control state, and authored ARIA
   state consistently.
+- Legend controls are focusable and activatable by pointer and keyboard.
 - A hidden series is excluded from active navigation until restored.
 - Runtime initialization is idempotent for a chart root.
 
@@ -51,11 +52,10 @@ SVG coordinates.
 | Arrow keys | Move through available data by declared series/datum order |
 | Home / End | Move to first / last datum in current series |
 | Escape | Clear active state; retain chart focus |
-| Legend activation | Toggle series and expose the resulting state |
+| Legend activation | Toggle series, update control state, and expose the resulting state |
 
-Tooltip hover persistence, bar highlight geometry, keyboard legend activation, focus
-appearance, and hidden-series navigation are known implementation gaps until
-`TEST-RUNTIME-BROWSER` passes.
+Tooltip hover persistence, bar highlight geometry, focus appearance, and full browser
+qualification remain open until `TEST-RUNTIME-BROWSER` passes.
 
 ## Embedding profiles
 
@@ -71,4 +71,3 @@ appearance, and hidden-series navigation are known implementation gaps until
 StoneCharts prevents default behavior only for handled navigation keys. It does not
 guarantee browser event object identity or undocumented bubbling details. Host
 applications remain responsible for integration conflicts outside the chart wrapper.
-

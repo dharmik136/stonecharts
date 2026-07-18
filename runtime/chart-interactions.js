@@ -62,6 +62,21 @@
       wrap.appendChild(tip);
     }
     var crosshair = svg.querySelector(".sc-crosshair");
+    var activePoint = null;
+    var clearActive = function () {};
+
+    function seriesGroupFor(pt) {
+      var node = pt;
+      while (node && node !== svg) {
+        if (node.classList && node.classList.contains("sc-series")) return node;
+        node = node.parentNode;
+      }
+      return null;
+    }
+    function isVisiblePoint(pt) {
+      var group = seriesGroupFor(pt);
+      return !!group && group.style.display !== "none";
+    }
 
     function positionTip(clientX, clientY) {
       var r = wrap.getBoundingClientRect();
@@ -103,6 +118,20 @@
       if (crosshair) crosshair.style.display = "none";
     }
 
+    function setLegendState(item, hidden) {
+      var s = item.getAttribute("data-series");
+      item.classList.toggle("sc-hidden", hidden);
+      item.setAttribute("aria-pressed", hidden ? "false" : "true");
+      var members = svg.querySelectorAll('[data-series="' + s + '"]');
+      for (var k = 0; k < members.length; k++) {
+        if (members[k] === item) continue;
+        members[k].style.display = hidden ? "none" : "";
+        if (hidden) members[k].setAttribute("aria-hidden", "true");
+        else members[k].removeAttribute("aria-hidden");
+      }
+      if (activePoint && !isVisiblePoint(activePoint)) clearActive();
+    }
+
     // Tooltip + highlight on data points (mouse).
     var points = svg.querySelectorAll(".sc-point");
     for (var i = 0; i < points.length; i++) {
@@ -117,57 +146,99 @@
     // points (Left/Right within a series, Up/Down across series, Home/End, Esc).
     // Sighted keyboard users get the visual tooltip; screen-reader users have the
     // data table. tabindex is set here at runtime so the static SVG stays unchanged.
-    setupKeyboard(svg, points, showPoint, hidePoint);
+    setupKeyboard(svg, points, showPoint, hidePoint, function (pt) {
+      activePoint = pt;
+    });
 
-    // Legend click toggles the whole series on/off.
+    // Legend click/keyboard toggles the whole series on/off.
     var items = svg.querySelectorAll(".sc-legend-item");
     for (var j = 0; j < items.length; j++) {
       (function (item) {
         item.style.cursor = "pointer";
+        item.setAttribute("tabindex", "0");
+        item.setAttribute("role", "button");
+        item.setAttribute("aria-pressed", "true");
         item.addEventListener("click", function () {
-          var s = item.getAttribute("data-series");
-          var hidden = item.classList.toggle("sc-hidden");
-          var members = svg.querySelectorAll('[data-series="' + s + '"]');
-          for (var k = 0; k < members.length; k++) {
-            if (members[k] === item) continue;
-            members[k].style.display = hidden ? "none" : "";
+          setLegendState(item, !item.classList.contains("sc-hidden"));
+        });
+        item.addEventListener("keydown", function (e) {
+          var k = e.key;
+          if (k === "Enter" || k === " " || k === "Space" || k === "Spacebar") {
+            e.preventDefault();
+            setLegendState(item, !item.classList.contains("sc-hidden"));
           }
         });
       })(items[j]);
     }
   }
 
-  function setupKeyboard(svg, points, showPoint, hidePoint) {
+  function setupKeyboard(svg, points, showPoint, hidePoint, setActivePoint) {
     if (!points.length) return;
-    // Group points by series in DOM order: series[] holds per-series point arrays.
-    var series = [], byKey = {};
-    for (var i = 0; i < points.length; i++) {
-      var k = points[i].getAttribute("data-series") || "0";
-      if (!byKey[k]) { byKey[k] = []; series.push(byKey[k]); }
-      byKey[k].push(points[i]);
+    function series() {
+      var visible = [], byKey = {};
+      for (var i = 0; i < points.length; i++) {
+        var pt = points[i];
+        var group = pt.parentNode;
+        while (group && (!group.classList || !group.classList.contains("sc-series"))) group = group.parentNode;
+        if (!group || group.style.display === "none") continue;
+        var k = pt.getAttribute("data-series") || "0";
+        if (!byKey[k]) { byKey[k] = []; visible.push(byKey[k]); }
+        byKey[k].push(pt);
+      }
+      return visible;
+    }
+    function pointPosition(series, pt) {
+      for (var si = 0; si < series.length; si++) {
+        for (var pi = 0; pi < series[si].length; pi++) {
+          if (series[si][pi] === pt) return { si: si, pi: pi };
+        }
+      }
+      return null;
     }
     var si = 0, pi = 0, active = null;
-    function go(ns, np) {
+    function go(series, ns, np) {
       var col = series[ns];
       if (!col) return;
       np = Math.max(0, Math.min(np, col.length - 1));
       if (active) hidePoint(active);
       si = ns; pi = np; active = col[pi];
+      setActivePoint(active);
       showPoint(active, true);
     }
-    function clear() { if (active) { hidePoint(active); active = null; } }
+    function clear() {
+      if (active) { hidePoint(active); active = null; }
+      setActivePoint(null);
+    }
+    clearActive = clear;
     svg.setAttribute("tabindex", "0");
-    svg.addEventListener("focus", function () { if (!active) go(si, pi); });
+    svg.addEventListener("focus", function () {
+      var s = series();
+      if (!active && s.length) go(s, 0, 0);
+    });
     svg.addEventListener("blur", clear);
     svg.addEventListener("keydown", function (e) {
       var k = e.key;
-      if (k === "ArrowRight") go(si, pi + 1);
-      else if (k === "ArrowLeft") go(si, pi - 1);
-      else if (k === "ArrowDown") go(Math.min(si + 1, series.length - 1), pi);
-      else if (k === "ArrowUp") go(Math.max(si - 1, 0), pi);
-      else if (k === "Home") go(si, 0);
-      else if (k === "End") go(si, series[si].length - 1);
-      else if (k === "Escape") {
+      var s = series();
+      var pos = active ? pointPosition(s, active) : null;
+      if (k === "ArrowRight") {
+        if (!pos) go(s, 0, 0);
+        else go(s, pos.si, pos.pi + 1);
+      } else if (k === "ArrowLeft") {
+        if (!pos) go(s, 0, 0);
+        else go(s, pos.si, pos.pi - 1);
+      } else if (k === "ArrowDown") {
+        if (!pos) go(s, 0, 0);
+        else go(s, Math.min(pos.si + 1, s.length - 1), pos.pi);
+      } else if (k === "ArrowUp") {
+        if (!pos) go(s, 0, 0);
+        else go(s, Math.max(pos.si - 1, 0), pos.pi);
+      } else if (k === "Home") {
+        if (!pos) go(s, 0, 0);
+        else go(s, pos.si, 0);
+      } else if (k === "End") {
+        if (!pos) go(s, 0, 0);
+        else go(s, pos.si, s[pos.si].length - 1);
+      } else if (k === "Escape") {
         // Collapse the chart's active state but KEEP focus on the SVG (Tab still
         // moves on). If nothing is active, let Esc bubble (e.g. to close a modal).
         if (!active) return;
