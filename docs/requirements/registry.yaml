@@ -159,7 +159,7 @@ requirements:
     rationale: Browser presentation must adapt without changing the meaning or observable state of an interaction.
     kind: functional
     priority: must
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-004

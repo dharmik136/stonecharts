@@ -64,6 +64,6 @@ supporting evidence and do not replace keyboard and screen-reader review.
 ## Current automated evidence
 
 `TEST-RUNTIME-SMOKE` covers the shared interaction runtime's keyboard and ARIA state
-transitions against the documented DOM contract. It is the automated precursor to the
-browser and assistive-technology qualification gate, which remains open until
-`TEST-RUNTIME-BROWSER` and `REVIEW-ACCESSIBILITY-MANUAL` both pass.
+transitions against the documented DOM contract. `TEST-RUNTIME-BROWSER` now covers the
+local HTTP Chromium qualification step for the declared browser profile. The
+accessibility qualification remains open until `REVIEW-ACCESSIBILITY-MANUAL` passes.

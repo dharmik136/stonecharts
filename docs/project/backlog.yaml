@@ -475,13 +475,13 @@ items:
   - id: REQ-RUNTIME-001
     title: Correct and qualify invariant browser interaction semantics
     item_type: Requirement
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-04 Runtime & A11y
     stage: S1 Contract Closure
     target: 0.0.0.1
     outcome: Implement and prove the registered REQ-RUNTIME-001 acceptance contract; the
-      local HTTP browser harness is the next gate after runtime smoke.
+      local HTTP browser harness now closes the browser qualification gate after runtime smoke.
     traceability: [REQ-RUNTIME-001, SC-ARCH-ADR-0004, SC-CON-003, SC-CON-004]
     risks: [RISK-008]
     evidence: [TEST-RUNTIME-BROWSER]
@@ -574,8 +574,7 @@ items:
     stage: S2 Qualification
     target: 0.0.0.1
     outcome: Implement and prove the registered REQ-A11Y-001 acceptance contract; the
-      local HTTP browser harness and manual review are the next gates after runtime
-      smoke.
+      local HTTP browser harness is complete and manual review is the remaining gate after runtime smoke.
     traceability: [REQ-A11Y-001, SC-CON-003, SC-CON-004, SC-CON-007]
     risks: [RISK-008, RISK-010]
     evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]

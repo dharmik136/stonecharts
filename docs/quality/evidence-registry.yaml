@@ -67,10 +67,10 @@ evidence:
     requirements: [REQ-CUST-001, REQ-SEC-001]
   - id: TEST-RUNTIME-BROWSER
     kind: test
-    status: planned
-    description: Next release gate; will exercise tooltip, keyboard, focus, legend, adaptive placement, and DOM state through a local HTTP browser harness.
-    command: null
-    location: null
+    status: implemented
+    description: Exercises tooltip, keyboard, focus, legend, adaptive placement, and DOM state through a local HTTP Chromium browser harness.
+    command: node --test runtime/browser-qualification.test.js
+    location: runtime/browser-qualification.test.js
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
   - id: TEST-RUNTIME-SMOKE
     kind: test

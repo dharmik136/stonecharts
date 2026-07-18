@@ -146,9 +146,14 @@
     // points (Left/Right within a series, Up/Down across series, Home/End, Esc).
     // Sighted keyboard users get the visual tooltip; screen-reader users have the
     // data table. tabindex is set here at runtime so the static SVG stays unchanged.
-    setupKeyboard(svg, points, showPoint, hidePoint, function (pt) {
-      activePoint = pt;
-    });
+    setupKeyboard(
+      svg,
+      points,
+      showPoint,
+      hidePoint,
+      function (pt) { activePoint = pt; },
+      function (fn) { clearActive = fn; }
+    );
 
     // Legend click/keyboard toggles the whole series on/off.
     var items = svg.querySelectorAll(".sc-legend-item");
@@ -172,7 +177,7 @@
     }
   }
 
-  function setupKeyboard(svg, points, showPoint, hidePoint, setActivePoint) {
+  function setupKeyboard(svg, points, showPoint, hidePoint, setActivePoint, setClearActive) {
     if (!points.length) return;
     function series() {
       var visible = [], byKey = {};
@@ -209,7 +214,7 @@
       if (active) { hidePoint(active); active = null; }
       setActivePoint(null);
     }
-    clearActive = clear;
+    setClearActive(clear);
     svg.setAttribute("tabindex", "0");
     svg.addEventListener("focus", function () {
       var s = series();

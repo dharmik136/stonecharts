@@ -55,9 +55,9 @@ SVG coordinates.
 | Legend activation | Toggle series, update control state, and expose the resulting state |
 
 Tooltip hover persistence, bar highlight geometry, focus appearance, and full browser
-qualification remain open until `TEST-RUNTIME-BROWSER` passes. The automated
-runtime smoke test covers the shared JS interaction state machine before that browser
-gate is qualified.
+qualification are covered by `TEST-RUNTIME-BROWSER`, which runs the shared runtime in
+a local HTTP Chromium session. The automated runtime smoke test remains the narrow JS
+state-machine precursor, while manual accessibility review stays open.
 
 ## Embedding profiles
 

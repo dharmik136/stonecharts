@@ -12,6 +12,7 @@ venv/
 
 # Tooling / editors
 .playwright-mcp/
+node_modules/
 .vscode/
 .idea/
 .DS_Store
