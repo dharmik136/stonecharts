@@ -46,12 +46,18 @@ Before making changes, read the documents that define current scope and control:
 
 - The local agent team is private and CLI-only. Do not treat worker roles as GitHub
   collaborators or as a substitute for repo permissions.
+- Agents coordinate through repo artifacts, not through ad hoc user prompts between
+  every step. They may continue work, hand off, and adjust their path from the
+  recorded state as long as the current scope, approvals, and branch ownership stay
+  within the governed model.
 - Prefer one writable git worktree or branch per active agent.
 - Do not let two agents write to the same branch at the same time.
 - If branch sharing is unavoidable, one coordinator owns writes and all others work
   read-only until the coordinator grants a handoff.
 - Record the active owner, intended files, and stop point in the coordination state
   before editing.
+- Use the branch lock, handoff note, and inventory log as the live communication
+  surface between agents.
 - Keep file ownership narrow. An agent should not cross into unrelated files unless
   the handoff explicitly includes them.
 - Merge only after the owning agent has recorded verification evidence and the next
@@ -97,6 +103,11 @@ The normal flow is `planner` -> `stakeholder` -> `developer` -> `qa` -> `complia
 -> `security` when the task is release-adjacent. `notetaker` runs alongside or after
 the active roles to record what happened. `release` only begins after the required
 checks and approvals are already recorded.
+
+The flow is continuous, not one-shot: once a role finishes its bounded outcome, the
+next role may pick up from the recorded handoff without asking the human to restate
+the whole task. The human only needs to re-enter when scope, approvals, or release
+claims must change.
 
 ## Coordination rules
 

@@ -10,6 +10,8 @@ branch or the same file set at the same time.
 
 The roles are local CLI workers, not GitHub collaborators. Their permissions come
 from the repo owner, the current checkout, and the handoff notes in this repository.
+They communicate by writing the current state into the coordination files, not by
+waiting for a fresh human directive at every transition.
 
 ## Preferred topology
 
@@ -18,6 +20,8 @@ from the repo owner, the current checkout, and the handoff notes in this reposit
 3. The worker edits only the files listed in its handoff.
 4. The worker records verification and returns a handoff note.
 5. The coordinator merges only after the handoff is accepted.
+6. The notetaker keeps the live inventory current so later agents can continue from the
+   recorded state.
 
 ## If you insist on one branch
 
@@ -41,6 +45,7 @@ Each handoff should include:
 - Verification still required.
 - Open issues, risks, or blockers.
 - Self-check results or a link to the completed Socratic questions.
+- A short note on what the next agent should do without re-litigating the full plan.
 
 ## Conflict handling
 
@@ -68,3 +73,11 @@ Each handoff should include:
 - Keep the agent roster in local docs and transient state files.
 - Publish only the code, docs, and evidence that are meant to live in the repo.
 - The notetaker records launches and handoffs but does not own implementation files.
+
+## Continuous coordination
+
+- Agents may run in sequence or in parallel as long as write scopes do not overlap.
+- The coordinator should keep the queue moving from recorded handoff to recorded
+  handoff until a blocker or approval boundary appears.
+- The human only needs to intervene for scope changes, approval decisions, or
+  unresolved blockers that cannot be solved from the repo state.

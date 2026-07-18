@@ -25,6 +25,9 @@ governed project or release process.
 
 This model exists to coordinate work safely when several terminal sessions operate in
 the same repository.
+It is designed for continuous operation: one role can finish, record its handoff, and
+the next role can continue from the recorded state without the human restating the
+entire plan.
 
 ## Operating principles
 
@@ -34,6 +37,10 @@ the same repository.
 4. Shared repo files are read-only unless the handoff explicitly authorizes edits.
 5. The coordinator serializes merges when two agents need the same surface.
 6. No agent invents scope, approvals, or release claims.
+7. Agents communicate through repo state files, branch locks, handoff notes, and the
+   inventory log.
+8. Human intervention is required only for scope changes, approval decisions, or
+   blockers that cannot be resolved from the recorded state.
 
 ## Role lanes
 
@@ -67,6 +74,7 @@ A handoff is valid only when the current agent records:
 - current commit or working state
 - blockers, deferrals, and intentional exclusions
 - Socratic self-check results
+- a next-step note that lets the following agent continue without rebriefing
 
 The next agent may not widen the handoff without explicit coordinator approval.
 
@@ -78,6 +86,21 @@ The next agent may not widen the handoff without explicit coordinator approval.
 4. Compliance checks status, traceability, and release readiness.
 5. Security checks the attack surface and workflow boundaries.
 6. Release assembles evidence only after the earlier gates pass.
+
+## Continuous loop
+
+The intended operating pattern is a loop, not a single pass:
+
+1. Planner writes the bounded outcome and file ownership.
+2. Developer implements within the handed-off scope.
+3. QA and compliance verify against the recorded evidence.
+4. Security reviews the surface when the change affects execution, workflow, or
+   external interaction.
+5. Notetaker records what changed and what remains.
+6. The coordinator hands the next bounded outcome to the next role.
+
+This can run concurrently when file ownership is disjoint and serially when one branch
+must carry the work. In both cases, the repo state is the source of truth.
 
 ## Non-goals
 
