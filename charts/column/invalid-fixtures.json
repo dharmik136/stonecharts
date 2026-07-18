@@ -10,5 +10,9 @@
   {
     "spec": {"type": "bogus", "series": [{"name": "s", "data": [1]}]},
     "errors": ["$.type: unknown chart type \"bogus\""]
+  },
+  {
+    "spec": {"type": "area", "series": [{"name": "s", "data": [1]}]},
+    "errors": ["$.type: unknown chart type \"area\""]
   }
 ]

@@ -379,16 +379,16 @@ items:
   - id: REQ-SCOPE-001
     title: Restrict active chart scope to line and column
     item_type: Requirement
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-02 Renderer
     stage: S1 Contract Closure
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-SCOPE-001 acceptance contract.
+    outcome: The active chart scope is limited to line and column across both validators.
     traceability: [REQ-SCOPE-001, SC-ARCH-ADR-0002, SC-CON-002]
     risks: [RISK-001]
     evidence: [TEST-CAPABILITY-MATRIX]
-    dependencies: [DEC-002, GATE-S0]
+    dependencies: [DEC-002]
     compatibility: Narrows validation for unreleased chart designs.
     areas: [spec, python, go]
 

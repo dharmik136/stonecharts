@@ -296,16 +296,10 @@ func vseries(v interface{}, path string, errs *[]string) {
 	}
 }
 
-// knownTypes — discovered from all on-disk example specs at
-// charts/*/examples/*.json. Mirrors _KNOWN_TYPES in validate.py.
+// knownTypes — active 0.0.0.1 release scope. Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
-	"area": true, "arearange": true, "bar": true, "boxplot": true,
-	"bubble": true, "candlestick": true, "column": true, "columnrange": true,
-	"combo": true, "dumbbell": true, "errorbar": true, "error-bar": true,
-	"funnel": true, "histogram": true, "line": true, "lollipop": true,
-	"scatter": true, "streamgraph": true, "technical-indicators": true,
-	"timeline": true, "variwide": true, "vector-plot": true,
-	"waterfall": true, "windbarb": true, "xrange": true,
+	"column": true,
+	"line":   true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.

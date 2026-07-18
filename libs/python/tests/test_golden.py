@@ -19,6 +19,10 @@ from stonecharts.validate import SpecError, validate  # noqa: E402
 
 LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
+ACTIVE_VALIDATION_CASES = {
+    "line-basic": LINE_CASES,
+    "column": COLUMN_CASES,
+}
 
 
 def _check(chart_dir: str, name: str):
@@ -127,11 +131,12 @@ def test_invalid_fixtures_parity():
 
 
 def test_all_example_specs_validate():
-    paths = sorted((ROOT / "charts").glob("*/examples/*.json"))
-    assert paths, "no example specs"
-    for path in paths:
-        spec = json.loads(path.read_text(encoding="utf-8"))
-        assert validate(spec) == [], str(path)
+    assert ACTIVE_VALIDATION_CASES, "no active release examples"
+    for chart_dir, names in ACTIVE_VALIDATION_CASES.items():
+        for name in names:
+            path = ROOT / "charts" / chart_dir / "examples" / f"{name}.json"
+            spec = json.loads(path.read_text(encoding="utf-8"))
+            assert validate(spec) == [], str(path)
 
 
 def test_a11y_toggle():

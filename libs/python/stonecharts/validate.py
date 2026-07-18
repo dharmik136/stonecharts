@@ -213,15 +213,11 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
         _marker(v["marker"], f"{path}.marker", errs)
 
 
-# Known chart types — discovered from all on-disk example specs at
-# charts/*/examples/*.json.  Keep sorted for readability; the set comparison
-# is order-independent.
+# Known chart types for the active 0.0.0.1 release scope.  Keep sorted for
+# readability; the set comparison is order-independent.
 _KNOWN_TYPES = {
-    "area", "arearange", "bar", "boxplot", "bubble", "candlestick",
-    "column", "columnrange", "combo", "dumbbell", "errorbar",
-    "error-bar", "funnel", "histogram", "line", "lollipop", "scatter",
-    "streamgraph", "technical-indicators", "timeline", "variwide",
-    "vector-plot", "waterfall", "windbarb", "xrange",
+    "column",
+    "line",
 }
 
 

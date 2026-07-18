@@ -9,33 +9,10 @@
     "type": {
       "type": "string",
       "enum": [
-        "area",
-        "arearange",
-        "bar",
-        "boxplot",
-        "bubble",
-        "candlestick",
-        "column",
-        "columnrange",
-        "combo",
-        "dumbbell",
-        "errorbar",
-        "error-bar",
-        "funnel",
-        "histogram",
         "line",
-        "lollipop",
-        "scatter",
-        "streamgraph",
-        "technical-indicators",
-        "timeline",
-        "variwide",
-        "vector-plot",
-        "waterfall",
-        "windbarb",
-        "xrange"
+        "column"
       ],
-      "description": "Chart type id; maps to charts/<id>/design.md. Grows as chart types are added."
+      "description": "Chart type id for the active 0.0.0.1 release scope; maps to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",

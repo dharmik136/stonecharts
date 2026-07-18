@@ -327,5 +327,21 @@
     "errors": [
       "$.type: unknown chart type \"unknown-chart\""
     ]
+  },
+  {
+    "spec": {
+      "type": "bar",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.type: unknown chart type \"bar\""
+    ]
   }
 ]

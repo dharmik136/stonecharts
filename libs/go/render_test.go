@@ -167,24 +167,27 @@ func TestInvalidFixturesParity(t *testing.T) {
 }
 
 func TestAllExampleSpecsValidate(t *testing.T) {
-	paths, err := filepath.Glob("../../charts/*/examples/*.json")
-	if err != nil {
-		t.Fatal(err)
+	cases := map[string][]string{
+		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
+		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
 	}
-	if len(paths) == 0 {
-		t.Fatal("no example specs")
+	if len(cases) == 0 {
+		t.Fatal("no active release examples")
 	}
-	for _, path := range paths {
-		b, err := os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-		var raw interface{}
-		if err := json.Unmarshal(b, &raw); err != nil {
-			t.Fatal(err)
-		}
-		if errs := validate(raw); len(errs) > 0 {
-			t.Errorf("%s: %v", path, errs)
+	for chartDir, names := range cases {
+		for _, name := range names {
+			path := "../../charts/" + chartDir + "/examples/" + name + ".json"
+			b, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var raw interface{}
+			if err := json.Unmarshal(b, &raw); err != nil {
+				t.Fatal(err)
+			}
+			if errs := validate(raw); len(errs) > 0 {
+				t.Errorf("%s: %v", path, errs)
+			}
 		}
 	}
 }

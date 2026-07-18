@@ -1,6 +1,6 @@
 id: SC-REQ-REGISTRY
 version: 1
-updated: "2026-07-17"
+updated: "2026-07-18"
 requirements:
   - id: REQ-PROD-001
     title: One language-neutral chart specification
@@ -26,7 +26,7 @@ requirements:
     rationale: Passing validation for an unrenderable chart breaks the public contract and creates runtime failures.
     kind: constraint
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-PROD-002
