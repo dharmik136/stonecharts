@@ -15,7 +15,7 @@ import jsonschema
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from stonecharts import ChartSpec, THEMES  # noqa: E402
+from stonecharts import CapabilityError, ChartSpec, THEMES, capabilities  # noqa: E402
 from stonecharts.render import render_svg  # noqa: E402
 from stonecharts.validate import SpecError, validate  # noqa: E402
 
@@ -161,6 +161,21 @@ def test_schema_parity():
             schema_errors = list(SCHEMA_VALIDATOR.iter_errors(c["spec"]))
             assert schema_errors, c["spec"]
             assert validate(c["spec"]) == c["errors"], c["spec"]
+
+
+def test_capability_manifest_and_error():
+    caps = capabilities()
+    assert caps["specVersion"] == "0.0.0.1"
+    assert caps["svgContractVersion"] == "0.0.0.1"
+    assert caps["chartTypes"] == ["column", "line"]
+    spec = ChartSpec(type="bar", series=[{"name": "s", "data": [1]}])
+    try:
+        render_svg(spec)
+        raise AssertionError("expected capability error")
+    except CapabilityError as exc:
+        assert exc.code == "E_CAPABILITY"
+        assert exc.path == "$.type"
+        assert exc.message == 'unsupported chart type "bar"'
 
 
 def test_a11y_toggle():

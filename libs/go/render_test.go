@@ -27,7 +27,10 @@ func TestGolden(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			got := RenderSVG(spec)
+			got, err := RenderSVG(spec)
+			if err != nil {
+				t.Fatal(err)
+			}
 			want, err := os.ReadFile("../../charts/" + chartDir + "/golden/" + name + ".svg")
 			if err != nil {
 				t.Fatal(err)
@@ -37,6 +40,24 @@ func TestGolden(t *testing.T) {
 			}
 		}
 	}
+}
+
+func mustSVG(t *testing.T, spec *ChartSpec) string {
+	t.Helper()
+	svg, err := RenderSVG(spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return svg
+}
+
+func mustHTML(t *testing.T, spec *ChartSpec, title string) string {
+	t.Helper()
+	html, err := RenderHTML(spec, title)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return html
 }
 
 func TestColumnEdgeCases(t *testing.T) {
@@ -52,7 +73,7 @@ func TestColumnEdgeCases(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		low := strings.ToLower(RenderSVG(spec))
+		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in column render for %s", specJSON)
 		}
@@ -73,10 +94,10 @@ func TestXSSEscaping(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(RenderSVG(spec), "<script>alert(1)</script>") {
+	if strings.Contains(mustSVG(t, spec), "<script>alert(1)</script>") {
 		t.Error("raw <script> leaked into SVG")
 	}
-	if strings.Contains(RenderHTML(spec, ""), "<script>alert(1)</script>") {
+	if strings.Contains(mustHTML(t, spec, ""), "<script>alert(1)</script>") {
 		t.Error("raw <script> leaked into HTML")
 	}
 }
@@ -101,7 +122,7 @@ func TestMalformedNoPanic(t *testing.T) {
 		if err != nil {
 			continue // a clean error is acceptable
 		}
-		if svg := RenderSVG(spec); !strings.HasPrefix(svg, "<svg") {
+		if svg := mustSVG(t, spec); !strings.HasPrefix(svg, "<svg") {
 			t.Errorf("bad SVG for %s", s)
 		}
 	}
@@ -115,7 +136,7 @@ func TestA11yToggle(t *testing.T) {
 	}
 	on := mk()
 	on.applyDefaults()
-	svgOn := RenderSVG(on)
+	svgOn := mustSVG(t, on)
 	if !strings.Contains(svgOn, `role="img"`) || !strings.Contains(svgOn, "<desc>") {
 		t.Error("a11y default should add role=img + <desc>")
 	}
@@ -123,7 +144,7 @@ func TestA11yToggle(t *testing.T) {
 	no := false
 	off.A11y = &no
 	off.applyDefaults()
-	svgOff := RenderSVG(off)
+	svgOff := mustSVG(t, off)
 	if strings.Contains(svgOff, `role="img"`) || strings.Contains(svgOff, "<desc>") {
 		t.Error("a11y:false should omit role=img + <desc>")
 	}
@@ -224,9 +245,34 @@ func TestSplineEdgeCases(t *testing.T) {
 	for _, data := range cases {
 		spec := &ChartSpec{Type: "line", Series: []Series{{Name: "s", Data: data, Curve: "monotone"}}}
 		spec.applyDefaults()
-		low := strings.ToLower(RenderSVG(spec))
+		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in spline for %v", data)
+		}
+	}
+}
+
+func TestCapabilityManifestAndError(t *testing.T) {
+	caps := Capabilities()
+	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
+		t.Fatalf("unexpected manifest versions: %+v", caps)
+	}
+	if got, want := caps.ChartTypes, []string{"column", "line"}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
+	}
+	spec := &ChartSpec{Type: "bar", Series: []Series{{Name: "s", Data: []float64{1}}}}
+	if _, err := RenderSVG(spec); err == nil {
+		t.Fatal("expected capability error")
+	} else {
+		ce, ok := err.(*CapabilityError)
+		if !ok {
+			t.Fatalf("expected *CapabilityError, got %T", err)
+		}
+		if ce.Code != "E_CAPABILITY" || ce.Path != "$.type" {
+			t.Fatalf("unexpected capability error: %+v", ce)
+		}
+		if ce.Message != `unsupported chart type "bar"` {
+			t.Fatalf("unexpected capability message: %+v", ce)
 		}
 	}
 }

@@ -411,12 +411,12 @@ items:
   - id: REQ-CAP-001
     title: Add typed non-fatal renderer capability failures
     item_type: Requirement
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-02 Renderer
     stage: S1 Contract Closure
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-CAP-001 acceptance contract.
+    outcome: Unsupported capabilities now fail with typed non-fatal errors and a machine-readable manifest.
     traceability: [REQ-CAP-001, SC-CON-002]
     risks: [RISK-001, RISK-003]
     evidence: [TEST-CAPABILITY-MATRIX]

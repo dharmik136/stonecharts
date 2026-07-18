@@ -190,10 +190,15 @@ func main() {
 			resSVG := testing.Benchmark(func(b *testing.B) {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
-					_ = stonecharts.RenderSVG(specSVG)
+					if _, err := stonecharts.RenderSVG(specSVG); err != nil {
+						panic(err)
+					}
 				}
 			})
-			svgContent := stonecharts.RenderSVG(specSVG)
+			svgContent, err := stonecharts.RenderSVG(specSVG)
+			if err != nil {
+				panic(err)
+			}
 
 			results = append(results, BenchResult{
 				Points:      size,
@@ -211,10 +216,15 @@ func main() {
 			resHTML := testing.Benchmark(func(b *testing.B) {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
-					_ = stonecharts.RenderHTML(specHTML, "")
+					if _, err := stonecharts.RenderHTML(specHTML, ""); err != nil {
+						panic(err)
+					}
 				}
 			})
-			htmlContent := stonecharts.RenderHTML(specHTML, "")
+			htmlContent, err := stonecharts.RenderHTML(specHTML, "")
+			if err != nil {
+				panic(err)
+			}
 
 			results = append(results, BenchResult{
 				Points:      size,

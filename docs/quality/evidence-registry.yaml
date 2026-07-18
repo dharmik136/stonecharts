@@ -32,10 +32,10 @@ evidence:
     requirements: [REQ-PROD-001, REQ-VAL-001, REQ-CUST-001]
   - id: TEST-CAPABILITY-MATRIX
     kind: test
-    status: planned
-    description: Will verify active schema types, per-renderer capability manifests, typed unsupported errors, and no panic boundaries.
-    command: null
-    location: null
+    status: implemented
+    description: Verifies the active capability manifest, typed unsupported errors, and the no-panic boundary for Python and Go.
+    command: python -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-SCOPE-001, REQ-CAP-001]
   - id: TEST-STACK-SIGNED
     kind: test

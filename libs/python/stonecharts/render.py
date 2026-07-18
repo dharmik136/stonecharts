@@ -12,6 +12,7 @@ from typing import Callable, Dict
 
 from .charts import column as _column
 from .charts import line as _line
+from .capabilities import CapabilityError, capabilities
 from .spec import ChartSpec
 from .util import esc, fmt_num
 
@@ -24,6 +25,7 @@ _RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
     "column": _column.render_svg,
     "line": _line.render_svg,
 }
+_CAPABILITIES = capabilities()
 
 _CSS = """
   .sc-chart-wrap{position:relative;display:inline-block;line-height:0}
@@ -64,10 +66,21 @@ def _data_table(spec: ChartSpec) -> str:
 
 
 def render_svg(spec: ChartSpec) -> str:
-    renderer = _RENDERERS.get(spec.type)
+    resolved_type = spec.type or "line"
+    if resolved_type not in _CAPABILITIES["chartTypes"]:
+        raise CapabilityError(
+            "E_CAPABILITY",
+            "$.type",
+            f'unsupported chart type "{resolved_type}"',
+            {"expected": list(_CAPABILITIES["chartTypes"]), "received": resolved_type},
+        )
+    renderer = _RENDERERS.get(resolved_type)
     if renderer is None:
-        raise ValueError(
-            f"Unknown chart type {spec.type!r}. Known: {', '.join(sorted(_RENDERERS))}"
+        raise CapabilityError(
+            "E_CAPABILITY",
+            "$.type",
+            f'unsupported chart type "{resolved_type}"',
+            {"expected": list(_CAPABILITIES["chartTypes"]), "received": resolved_type},
         )
     return renderer(spec)
 

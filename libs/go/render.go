@@ -63,15 +63,31 @@ func dataTable(spec *ChartSpec) string {
 	return b.String()
 }
 
+func capabilityError(received string) error {
+	return &CapabilityError{
+		Code:    "E_CAPABILITY",
+		Path:    "$.type",
+		Message: fmt.Sprintf("unsupported chart type %q", received),
+		Details: map[string]interface{}{
+			"expected": Capabilities().ChartTypes,
+			"received": received,
+		},
+	}
+}
+
 // RenderSVG renders a spec to an SVG string, dispatched by chart type.
-func RenderSVG(spec *ChartSpec) string {
-	switch spec.Type {
+func RenderSVG(spec *ChartSpec) (string, error) {
+	typ := spec.Type
+	if typ == "" {
+		typ = "line"
+	}
+	switch typ {
 	case "column":
-		return renderColumnSVG(spec)
-	case "line", "":
-		return renderLineSVG(spec)
+		return renderColumnSVG(spec), nil
+	case "line":
+		return renderLineSVG(spec), nil
 	default:
-		panic(fmt.Sprintf("unknown chart type %q", spec.Type))
+		return "", capabilityError(typ)
 	}
 }
 
@@ -95,8 +111,11 @@ func runtimeJS() string {
 }
 
 // RenderHTML returns a self-contained interactive HTML document for the chart.
-func RenderHTML(spec *ChartSpec, pageTitle string) string {
-	svg := RenderSVG(spec)
+func RenderHTML(spec *ChartSpec, pageTitle string) (string, error) {
+	svg, err := RenderSVG(spec)
+	if err != nil {
+		return "", err
+	}
 	title := pageTitle
 	if title == "" {
 		title = spec.Title
@@ -120,10 +139,14 @@ func RenderHTML(spec *ChartSpec, pageTitle string) string {
 		"<body>\n" +
 		`<div class="sc-chart-wrap"` + wrapStyle + `>` + svg + table + `<div class="sc-tooltip" style="display:none"></div></div>` + "\n" +
 		"<script>" + runtimeJS() + "</script>\n" +
-		"</body></html>\n"
+		"</body></html>\n", nil
 }
 
 // SaveHTML writes the interactive HTML document to path.
 func SaveHTML(spec *ChartSpec, path, pageTitle string) error {
-	return os.WriteFile(path, []byte(RenderHTML(spec, pageTitle)), 0o644)
+	html, err := RenderHTML(spec, pageTitle)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, []byte(html), 0o644)
 }
