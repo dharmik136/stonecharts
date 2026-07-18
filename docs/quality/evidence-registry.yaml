@@ -25,10 +25,10 @@ evidence:
     requirements: [REQ-DET-001]
   - id: TEST-VALIDATION-PARITY
     kind: test
-    status: partial
-    description: Shared invalid fixtures currently compare Python and Go error text but do not yet reconcile all JSON Schema differences.
-    command: python -m pytest libs/python/tests && cd libs/go && go test ./...
-    location: charts/line-basic/invalid-fixtures.json
+    status: implemented
+    description: Shared active release fixtures are accepted by the schema, Python validator, and Go validator; shared invalid fixtures are rejected consistently across both languages.
+    command: python -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: spec/chart-spec.schema.json
     requirements: [REQ-PROD-001, REQ-VAL-001, REQ-CUST-001]
   - id: TEST-CAPABILITY-MATRIX
     kind: test
@@ -100,4 +100,3 @@ evidence:
     command: null
     location: docs/releases/0.0.0.1/evidence/manifest.schema.json
     requirements: [REQ-REL-001]
-

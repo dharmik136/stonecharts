@@ -10,6 +10,8 @@ import json
 import pathlib
 import sys
 
+import jsonschema
+
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
@@ -23,6 +25,10 @@ ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
 }
+SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
+SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
+SCHEMA_VALIDATOR_CLASS.check_schema(SCHEMA)
+SCHEMA_VALIDATOR = SCHEMA_VALIDATOR_CLASS(SCHEMA)
 
 
 def _check(chart_dir: str, name: str):
@@ -137,6 +143,24 @@ def test_all_example_specs_validate():
             path = ROOT / "charts" / chart_dir / "examples" / f"{name}.json"
             spec = json.loads(path.read_text(encoding="utf-8"))
             assert validate(spec) == [], str(path)
+
+
+def test_schema_parity():
+    assert ACTIVE_VALIDATION_CASES, "no active release examples"
+    for chart_dir, names in ACTIVE_VALIDATION_CASES.items():
+        for name in names:
+            path = ROOT / "charts" / chart_dir / "examples" / f"{name}.json"
+            spec = json.loads(path.read_text(encoding="utf-8"))
+            schema_errors = list(SCHEMA_VALIDATOR.iter_errors(spec))
+            assert not schema_errors, f"{path}: {schema_errors}"
+            assert validate(spec) == [], str(path)
+
+    for path in sorted((ROOT / "charts").glob("*/invalid-fixtures.json")):
+        cases = json.loads(path.read_text(encoding="utf-8"))
+        for c in cases:
+            schema_errors = list(SCHEMA_VALIDATOR.iter_errors(c["spec"]))
+            assert schema_errors, c["spec"]
+            assert validate(c["spec"]) == c["errors"], c["spec"]
 
 
 def test_a11y_toggle():
