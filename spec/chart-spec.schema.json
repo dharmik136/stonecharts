@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/dharmik136/stonecharts/blob/master/spec/chart-spec.schema.json",
+  "$id": "https://github.com/dharmik136/stonecharts/blob/main/spec/chart-spec.schema.json",
   "title": "StoneCharts Chart Spec",
   "description": "Language-agnostic recipe for one chart. Unknown keys are ignored (forward-compatible); renderers grow field support phase by phase. Keep language spec models (libs/*/spec) in lockstep with this file.",
   "type": "object",

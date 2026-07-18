@@ -1,6 +1,6 @@
 id: SC-REQ-REGISTRY
 version: 1
-updated: "2026-07-18"
+updated: "2026-07-17"
 requirements:
   - id: REQ-PROD-001
     title: One language-neutral chart specification
@@ -8,7 +8,7 @@ requirements:
     rationale: A shared specification is the product boundary that makes cross-language behavior testable and portable.
     kind: functional
     priority: must
-    status: proposed
+    status: approved
     owner: product-owner
     target: 0.0.0.1
     source: SC-PROD-001
@@ -287,4 +287,3 @@ requirements:
     contracts: []
     verification: [BENCH-RENDER-BASELINE]
     implementation: [libs/python/benchmark.py, libs/go/cmd/benchmark/main.go]
-

@@ -1,7 +1,10 @@
 name: Decision Record
 description: Open a bounded product, architecture, release, or operating decision.
 title: "[Decision]: "
-labels: ["type:decision", "status:triage"]
+labels: ["type:decision", "status:triage", "role:planner", "target:0.0.0.1"]
+projects: ["dharmik136/2"]
+assignees:
+  - dharmik136
 body:
   - type: textarea
     id: question

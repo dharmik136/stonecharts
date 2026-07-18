@@ -1,6 +1,6 @@
 id: SC-OPS-BACKLOG
 version: 1
-updated: "2026-07-18"
+updated: "2026-07-17"
 project:
   owner: dharmik136
   number: 2
@@ -84,7 +84,7 @@ items:
   - id: DEC-002
     title: Ratify line and column as the only active 0.0.0.1 chart types
     item_type: Decision
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-01 Governance
     stage: S0 Foundation
@@ -105,7 +105,7 @@ items:
   - id: DEC-003
     title: Decide when additional language renderers may enter development
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-08 Expansion
     stage: S0 Foundation
@@ -126,7 +126,7 @@ items:
   - id: DEC-004
     title: Ratify the structured customization surface for 0.0.0.1
     item_type: Decision
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-05 Customization
     stage: S0 Foundation
@@ -168,7 +168,7 @@ items:
   - id: DEC-006
     title: Decide the default branch and authoritative merge strategy
     item_type: Decision
-    status: Ready
+    status: Done
     priority: P1
     workstream: WS-01 Governance
     stage: S0 Foundation
@@ -178,13 +178,13 @@ items:
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: []
-    compatibility: May rename master to main; branch protection is plan-limited while the repository is private.
+    compatibility: Branch rename is complete and verified; branch protection remains plan-limited while the repository is private.
     areas: [docs, release, security]
     acceptance:
       - Default-branch naming is decided.
       - Merge, history, review, and source-branch deletion rules are recorded.
       - The GitHub plan limitation on branch protection has an explicit treatment.
-    verification: [Repository settings audit and approved operating policy]
+    verification: [Repository settings audit, branch rename verification, and approved operating policy]
 
   - id: DEC-007
     title: Adopt the governed GitHub Project field and workflow model
@@ -358,7 +358,7 @@ items:
   - id: REQ-PROD-001
     title: Qualify one language-neutral chart specification
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-01 Governance
     stage: S0 Foundation
@@ -370,6 +370,11 @@ items:
     dependencies: [DEC-001]
     compatibility: Establishes the released specification boundary across Python and Go.
     areas: [spec, python, go, docs]
+    acceptance:
+      - The product thesis is approved and consistent with the current baseline.
+      - The language-neutral specification boundary is captured without widening active chart scope.
+      - The registered requirement remains aligned with the approved normative thesis.
+    verification: [Approved thesis document and controlled baseline review]
 
   - id: REQ-SCOPE-001
     title: Restrict active chart scope to line and column

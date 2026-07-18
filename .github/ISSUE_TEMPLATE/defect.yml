@@ -2,6 +2,9 @@ name: Defect
 description: Report incorrect, unsafe, divergent, or regressed behavior.
 title: "[Defect]: "
 labels: ["type:defect", "status:triage"]
+projects: ["dharmik136/2"]
+assignees:
+  - dharmik136
 body:
   - type: markdown
     attributes:
@@ -61,6 +64,50 @@ body:
     attributes:
       label: Evidence
       description: Paste errors, hashes, screenshots, or reduced output. Remove secrets.
+  - type: dropdown
+    id: workstream
+    attributes:
+      label: Workstream
+      options:
+        - WS-01 Governance
+        - WS-02 Renderer
+        - WS-03 Conformance
+        - WS-04 Runtime & A11y
+        - WS-05 Customization
+        - WS-06 Release
+        - WS-07 Docs & DX
+        - WS-08 Expansion
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Stage
+      options:
+        - S0 Foundation
+        - S1 Contract Closure
+        - S2 Qualification
+        - S3 Release Candidate
+        - S4 Release
+        - S5 Expansion
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Target release or stage
+      placeholder: 0.0.0.1, S1, post-release, unscheduled
   - type: checkboxes
     id: checks
     attributes:

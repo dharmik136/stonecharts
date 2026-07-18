@@ -1,5 +1,23 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Planner lane
+    url: https://github.com/dharmik136/stonecharts/issues/new?template=planner.yml
+    about: Open planning, decision, or scope-split work.
+  - name: Developer lane
+    url: https://github.com/dharmik136/stonecharts/issues/new?template=developer.yml
+    about: Open implementation work for an approved scope.
+  - name: QA lane
+    url: https://github.com/dharmik136/stonecharts/issues/new?template=qa.yml
+    about: Open verification, parity, or regression work.
+  - name: Security lane
+    url: https://github.com/dharmik136/stonecharts/issues/new?template=security.yml
+    about: Open security or supply-chain review work.
+  - name: Compliance lane
+    url: https://github.com/dharmik136/stonecharts/issues/new?template=compliance.yml
+    about: Open traceability or release-readiness review work.
+  - name: Release lane
+    url: https://github.com/dharmik136/stonecharts/issues/new?template=release.yml
+    about: Open release preparation work.
   - name: Security report
     url: https://github.com/dharmik136/stonecharts/security/advisories/new
     about: Report vulnerabilities privately; do not open a public issue.
