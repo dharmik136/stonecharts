@@ -100,6 +100,13 @@ evidence:
     command: python libs/python/benchmark.py && cd libs/go && go run ./cmd/benchmark
     location: docs/releases/0.0.0.1/evidence/performance-baseline-review.md
     requirements: [REQ-PERF-001]
+  - id: TEST-DIRECT-CROSS-RENDER
+    kind: test
+    status: implemented
+    description: Compares the active release examples byte-for-byte between Python and Go.
+    command: python tools/check_direct_cross_render.py
+    location: tools/check_direct_cross_render.py
+    requirements: [REQ-DET-001]
   - id: TEST-RELEASE-EVIDENCE
     kind: test
     status: planned

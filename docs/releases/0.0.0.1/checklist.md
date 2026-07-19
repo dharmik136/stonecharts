@@ -43,7 +43,7 @@ release evidence directory for the candidate and completed there.
 - [ ] Schema and both validators pass shared valid/invalid fixtures.
 - [ ] Capability matrix rejects unsupported types/features without panic.
 - [ ] Python and Go golden suites pass.
-- [ ] Direct cross-render sweep has zero byte differences.
+- [x] Direct cross-render sweep has zero byte differences.
 - [ ] Signed stack and percent-domain invariants pass.
 - [ ] Category, Unicode, dimension, empty-data, and long-label edges pass.
 - [ ] Fuzz/property run completes with recorded seed and limits.

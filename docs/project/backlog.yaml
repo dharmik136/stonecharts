@@ -531,7 +531,7 @@ items:
   - id: GATE-S1
     title: Pass Stage 1 contract-closure gate
     item_type: Release Gate
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-02 Renderer
     stage: S1 Contract Closure
@@ -539,7 +539,7 @@ items:
     outcome: Active line and column behavior is mathematically safe, validated, bounded, and frozen for qualification.
     traceability: [SC-REL-001, SC-CON-002, SC-CON-005]
     risks: [RISK-001, RISK-002, RISK-003, RISK-004, RISK-005, RISK-007, RISK-008, RISK-010]
-    evidence: [TEST-VALIDATION-PARITY, TEST-CAPABILITY-MATRIX, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN, TEST-LAYOUT-MARGINS, TEST-RUNTIME-BROWSER]
+    evidence: [TEST-VALIDATION-PARITY, TEST-CAPABILITY-MATRIX, TEST-STACK-SIGNED, TEST-PERCENT-DOMAIN, TEST-LAYOUT-MARGINS, TEST-RUNTIME-BROWSER, TEST-DIRECT-CROSS-RENDER]
     dependencies: [GATE-S0, REQ-SCOPE-001, REQ-VAL-001, REQ-CAP-001, REQ-STACK-001, REQ-STACK-002, REQ-LAYOUT-001, REQ-RUNTIME-001, REQ-CUST-001]
     compatibility: Freezes the 0.0.0.1 behavior and canonical fixture domain.
     areas: [spec, python, go, runtime]
@@ -553,12 +553,12 @@ items:
   - id: REQ-DET-001
     title: Qualify canonical SVG byte parity
     item_type: Requirement
-    status: Blocked
+    status: Ready
     priority: P0
     workstream: WS-03 Conformance
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Requalify and prove the registered REQ-DET-001 acceptance contract on the frozen release corpus; the approved goldens are already present, but backlog promotion remains blocked until GATE-S1 is promoted.
+    outcome: Requalify and prove the registered REQ-DET-001 acceptance contract on the frozen release corpus.
     traceability: [REQ-DET-001, SC-CON-001, SC-CON-003]
     risks: [RISK-006]
     evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
@@ -569,14 +569,12 @@ items:
   - id: REQ-A11Y-001
     title: Qualify accessible chart alternatives and operation
     item_type: Requirement
-    status: Blocked
+    status: Ready
     priority: P0
     workstream: WS-04 Runtime & A11y
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-A11Y-001 acceptance contract; the
-      browser harness and manual accessibility review are complete for the 0.0.0.1 release candidate,
-      but backlog promotion remains blocked until GATE-S1 is promoted.
+    outcome: Implement and prove the registered REQ-A11Y-001 acceptance contract; the browser harness and manual accessibility review are complete for the 0.0.0.1 release candidate.
     traceability: [REQ-A11Y-001, SC-CON-003, SC-CON-004, SC-CON-007]
     risks: [RISK-008, RISK-010]
     evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
@@ -587,14 +585,12 @@ items:
   - id: REQ-VIS-001
     title: Qualify explicit visual reproducibility profiles
     item_type: Requirement
-    status: Blocked
+    status: Ready
     priority: P1
     workstream: WS-05 Customization
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-VIS-001 acceptance contract; the
-      host-font visual profile is now documented and reviewed as the 0.0.0.1 baseline,
-      but backlog promotion remains blocked until GATE-S1 is promoted.
+    outcome: Implement and prove the registered REQ-VIS-001 acceptance contract; the host-font visual profile is now documented and reviewed as the 0.0.0.1 baseline.
     traceability: [REQ-VIS-001, SC-CON-001, SC-CON-006]
     risks: [RISK-011]
     evidence: [REVIEW-VISUAL-PROFILE]
@@ -605,13 +601,12 @@ items:
   - id: REQ-SEC-001
     title: Requalify untrusted specification safety
     item_type: Requirement
-    status: Blocked
+    status: Ready
     priority: P0
     workstream: WS-03 Conformance
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Requalify and prove the registered REQ-SEC-001 acceptance contract across all released sinks;
-      the evidence is recorded, but backlog promotion remains blocked until GATE-S1 is promoted.
+    outcome: Requalify and prove the registered REQ-SEC-001 acceptance contract across all released sinks; the evidence is recorded.
     traceability: [REQ-SEC-001, SC-SEC-001, SC-CON-005]
     risks: [RISK-003, RISK-012]
     evidence: [TEST-XSS-ESCAPING]
@@ -622,12 +617,12 @@ items:
   - id: REQ-PERF-001
     title: Establish reproducible performance qualification
     item_type: Requirement
-    status: Blocked
+    status: Ready
     priority: P1
     workstream: WS-03 Conformance
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-PERF-001 acceptance contract; the baseline evidence is recorded, but backlog promotion remains blocked until GATE-S1 is promoted.
+    outcome: Implement and prove the registered REQ-PERF-001 acceptance contract; the baseline evidence is recorded.
     traceability: [REQ-PERF-001, SC-QUAL-002]
     risks: []
     evidence: [BENCH-RENDER-BASELINE]
