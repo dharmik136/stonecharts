@@ -16,3 +16,18 @@ they reported back.
 | 2026-07-19 13:10:55 +05:30 | release | - | coordinator | Draft agent created for release evidence, version mapping, and ship checklist assembly. |
 | 2026-07-19 13:10:55 +05:30 | stakeholder | - | coordinator | Draft agent created for carrying agent outputs into stakeholder-facing discussion. |
 | 2026-07-19 13:10:55 +05:30 | notetaker | - | coordinator | Draft agent created for time-ordered inventory of launches, searches, edits, checks, and handoffs. |
+
+## Live schedules
+
+The published workspace agents are now attached to hourly ChatGPT schedules with
+staggered offsets in `Asia/Calcutta`:
+
+- planner: minute 00
+- developer: minute 05
+- qa: minute 10
+- security: minute 15
+- compliance: minute 20
+- release: minute 25
+- stakeholder: minute 30
+- notetaker: minute 35
+- design partner: minute 40

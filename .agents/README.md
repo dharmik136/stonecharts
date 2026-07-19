@@ -16,6 +16,9 @@ This directory is the Antigravity-native instruction area for StoneCharts.
 The agent team is local and private. GitHub only sees the resulting commits, issues,
 and pull requests that the human decides to publish.
 The persistent inventory log lives in `.agents/state/inventory.md`.
+The published workspace agents currently run on hourly ChatGPT schedules with
+staggered minute offsets so they can continue advancing the governed queue without
+manual re-launch.
 All agents should answer in a factual, bounded style and keep recommendations
 separate from evidence.
 The agent system is meant to run as a continuing loop: each role records its handoff,
