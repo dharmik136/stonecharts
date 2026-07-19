@@ -102,6 +102,12 @@ The intended operating pattern is a loop, not a single pass:
 This can run concurrently when file ownership is disjoint and serially when one branch
 must carry the work. In both cases, the repo state is the source of truth.
 
+If StoneCharts is being coordinated through an external orchestrator such as n8n or a
+different agent runtime, the shared contract in
+[`agent-orchestration.md`](agent-orchestration.md) still applies. The transport may
+change; the task schema, handoff format, stop/resume semantics, evidence logging, and
+branch-lock rules do not.
+
 ## Non-goals
 
 - No GitHub collaborator visibility for the local agent roles.

@@ -10,6 +10,8 @@ This directory is the Antigravity-native instruction area for StoneCharts.
 - `skills/`: reusable task manuals for common work types
 - `state/`: transient lock and handoff notes used during active coordination
 - `workflows/`: stepwise pipelines and slash-command style routines
+- `../docs/project/agent-orchestration.md`: shared contract for task schema, handoff,
+  evidence, and branch-lock semantics across orchestrators
 
 The agent team is local and private. GitHub only sees the resulting commits, issues,
 and pull requests that the human decides to publish.

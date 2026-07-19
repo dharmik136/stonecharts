@@ -10,6 +10,9 @@
 - stakeholder
 - developer
 - qa
+- security
+- compliance
+- release
 - notetaker
 
 ## Rules
