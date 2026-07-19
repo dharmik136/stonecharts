@@ -1,0 +1,67 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "StoneCharts 0.0.0.1 rc.1 evidence-pack sbom",
+  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.1/rc.1/321f24c2447403c04d0d1ce894a08f168f347cfd",
+  "creationInfo": {
+    "created": "2026-07-20T00:05:12+05:30",
+    "creators": [
+      "Tool: Codex CLI",
+      "Person: Dharmik Shingala"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-StoneCharts-Python",
+      "name": "stonecharts",
+      "versionInfo": "0.0.0.1",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Proprietary",
+      "supplier": "Person: Dharmik Shingala",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/stonecharts@0.0.0.1"
+        }
+      ],
+      "annotations": [
+        {
+          "annotationDate": "2026-07-20T00:05:12+05:30",
+          "annotationType": "OTHER",
+          "annotator": "Tool: Codex CLI",
+          "comment": "Python release package metadata is pinned to 0.0.0.1; runtime dependencies are declared as empty in pyproject.toml."
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-StoneCharts-Go",
+      "name": "stonecharts",
+      "versionInfo": "0.0.0.1",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Proprietary",
+      "supplier": "Person: Dharmik Shingala",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:golang/stonecharts"
+        }
+      ],
+      "annotations": [
+        {
+          "annotationDate": "2026-07-20T00:05:12+05:30",
+          "annotationType": "OTHER",
+          "annotator": "Tool: Codex CLI",
+          "comment": "Go module uses local source validation and no third-party module dependencies in go.mod."
+        }
+      ]
+    }
+  ],
+  "files": []
+}

@@ -1,0 +1,66 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "docs/releases/0.0.0.1/evidence/rc.1",
+      "digest": {
+        "sha256": "6e65f6f87ae6e98b0e157ae967b45896cf676ac745b994f1ccd9c2c49bdae0a5"
+      }
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "predicate": {
+    "buildDefinition": {
+      "buildType": "stonecharts/release-evidence-pack",
+      "externalParameters": {
+        "release": "0.0.0.1",
+        "candidate": "rc.1",
+        "branch": "main"
+      },
+      "internalParameters": {
+        "status": "M docs/project/backlog.yaml\n M docs/quality/evidence-registry.yaml\n?? docs/releases/0.0.0.1/evidence/rc.1/\n?? tools/build_release_evidence.py\n?? tools/check_release_evidence.py"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/dharmik136/stonecharts.git",
+          "digest": {
+            "sha1": "321f24c2447403c04d0d1ce894a08f168f347cfd"
+          }
+        },
+        {
+          "uri": "file:docs/releases/0.0.0.1/evidence/manifest.schema.json",
+          "digest": {
+            "sha256": "a0cd71856cab4e3717891906399b4550b210a725dc3c674d551774e3b3799f4b"
+          }
+        },
+        {
+          "uri": "file:docs/quality/evidence-registry.yaml",
+          "digest": {
+            "sha256": "b376a68e5e88cdb8f8208287747c1f2d62d95ef377f1fb6d2776beecaa39dc6b"
+          }
+        },
+        {
+          "uri": "file:tools/check_release_evidence.py",
+          "digest": {
+            "sha256": "503135f1e79a1c4dc40a7e4ea114b6e956d59e478db9b184781a9fb5ea3749d8"
+          }
+        }
+      ]
+    },
+    "runDetails": {
+      "builder": {
+        "id": "codex-cli/powershell"
+      },
+      "metadata": {
+        "invocationId": "321f24c2447403c04d0d1ce894a08f168f347cfd",
+        "completed": "2026-07-20T00:05:12+05:30",
+        "environment": {
+          "python": "Python 3.14.4",
+          "go": "go version go1.26.4 windows/amd64",
+          "os": "Windows 11 Pro",
+          "architecture": "amd64"
+        }
+      }
+    }
+  }
+}

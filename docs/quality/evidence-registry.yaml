@@ -109,8 +109,8 @@ evidence:
     requirements: [REQ-DET-001]
   - id: TEST-RELEASE-EVIDENCE
     kind: test
-    status: planned
-    description: Will validate the immutable release manifest, artifact hashes, SBOM references, and evidence completeness.
-    command: null
-    location: docs/releases/0.0.0.1/evidence/manifest.schema.json
+    status: implemented
+    description: Validates the immutable release manifest, artifact hashes, SBOM references, and evidence completeness.
+    command: python tools/check_release_evidence.py --manifest docs/releases/0.0.0.1/evidence/rc.1/manifest.json
+    location: tools/check_release_evidence.py
     requirements: [REQ-REL-001]

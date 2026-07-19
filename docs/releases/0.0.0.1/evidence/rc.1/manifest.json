@@ -1,0 +1,365 @@
+{
+  "release": "0.0.0.1",
+  "candidate": "rc.1",
+  "source": {
+    "repository": "dharmik136/stonecharts",
+    "commit": "321f24c2447403c04d0d1ce894a08f168f347cfd",
+    "tag": "0.0.0.1",
+    "treeClean": false
+  },
+  "versions": {
+    "product": "0.0.0.1",
+    "python": "0.0.0.1",
+    "go": null,
+    "schema": "manifest.schema.json v1",
+    "svgContract": "spec/svg-contract.md current",
+    "runtime": "node:test browser and DOM harness current"
+  },
+  "environment": {
+    "builder": "Codex CLI / PowerShell",
+    "python": "Python 3.14.4",
+    "go": "go version go1.26.4 windows/amd64",
+    "os": "Windows 11 Pro 10.0.26200",
+    "architecture": "amd64"
+  },
+  "artifacts": [
+    {
+      "name": "plan.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/plan.md",
+      "sha256": "2c1bf928c4c0bb7b216a76ea8654fc28ad66e12cccd9d870ec2a6c8b36db937b",
+      "bytes": 4602
+    },
+    {
+      "name": "checklist.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/checklist.md",
+      "sha256": "5d507e024fb3b58c0425ad81b10e3b67bf005d973c413fe38d79248cb52c82e0",
+      "bytes": 3488
+    },
+    {
+      "name": "README.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/README.md",
+      "sha256": "d6a2735bbab7d16089071287476a93badd544bbb255d9448197f02c6e9a1b3f7",
+      "bytes": 1183
+    },
+    {
+      "name": "manifest.schema.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/manifest.schema.json",
+      "sha256": "a0cd71856cab4e3717891906399b4550b210a725dc3c674d551774e3b3799f4b",
+      "bytes": 4228
+    },
+    {
+      "name": "manual-accessibility-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405",
+      "bytes": 1848
+    },
+    {
+      "name": "visual-profile-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d",
+      "bytes": 1288
+    },
+    {
+      "name": "performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "28530b68b15b59113e8c54bfa00ad1dad43b457dc0dbdfb0e6c55cc093b59dc7",
+      "bytes": 1635
+    },
+    {
+      "name": "direct-cross-render-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/direct-cross-render-review.md",
+      "sha256": "727e7546fa7a1df64eca7de118d992a2df797aee1d68636ea21a984a4ac3745a",
+      "bytes": 877
+    },
+    {
+      "name": "qualification-checklist.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md",
+      "sha256": "d90add65a5cd47f8cacc1529ca294c9fb05a40d1f027b2830d562f39d171cd5e",
+      "bytes": 1244
+    },
+    {
+      "name": "sbom.spdx.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json",
+      "sha256": "ceef7666ceb409605f51fd0d6e24432bc62f6c2553e00f75695ff842ee7b7963",
+      "bytes": 2185
+    },
+    {
+      "name": "provenance.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/rc.1/provenance.json",
+      "sha256": "d98de1b50a9b7ba953095e5e4c210c31fc88727289ab0b488a8c6c960b1936cf",
+      "bytes": 2121
+    },
+    {
+      "name": "package-install-matrix.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/rc.1/package-install-matrix.md",
+      "sha256": "06ba510cdfd0352a98c9e030cf8b1b58bf9f1dc902448f80d6137beb1d65163b",
+      "bytes": 1371
+    },
+    {
+      "name": "evidence-registry.yaml",
+      "kind": "documentation",
+      "path": "docs/quality/evidence-registry.yaml",
+      "sha256": "b376a68e5e88cdb8f8208287747c1f2d62d95ef377f1fb6d2776beecaa39dc6b",
+      "bytes": 5692
+    },
+    {
+      "name": "__init__.py",
+      "kind": "other",
+      "path": "libs/python/stonecharts/__init__.py",
+      "sha256": "79d885d2dbe6197d8aa94553ce563192ff999623ad102574cb521f3eefd41723",
+      "bytes": 1148
+    },
+    {
+      "name": "pyproject.toml",
+      "kind": "documentation",
+      "path": "libs/python/pyproject.toml",
+      "sha256": "25ce445e2c9c487cc464b1d93dc0b601ebf7c2fa8133519c99dcaf417c40caf4",
+      "bytes": 840
+    },
+    {
+      "name": "go.mod",
+      "kind": "other",
+      "path": "libs/go/go.mod",
+      "sha256": "2acd29679ac852b7c32c48c78776ee120931fd25bbdf83821012e708360f66da",
+      "bytes": 28
+    },
+    {
+      "name": "check_docs.py",
+      "kind": "other",
+      "path": "tools/check_docs.py",
+      "sha256": "92c20960d0555a77e8e68c2f42a1dee68e7ded4be3d76eb29345ebfc0f3c27ad",
+      "bytes": 21016
+    },
+    {
+      "name": "check_direct_cross_render.py",
+      "kind": "other",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "0c6eb8e38b4cd045d18e93e3a6a0b39729d6779787efa590a6cd4ea4771a5331",
+      "bytes": 2447
+    },
+    {
+      "name": "check_release_evidence.py",
+      "kind": "other",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "503135f1e79a1c4dc40a7e4ea114b6e956d59e478db9b184781a9fb5ea3749d8",
+      "bytes": 6502
+    },
+    {
+      "name": "browser-qualification.test.js",
+      "kind": "other",
+      "path": "runtime/browser-qualification.test.js",
+      "sha256": "b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50",
+      "bytes": 6168
+    },
+    {
+      "name": "chart-interactions.test.js",
+      "kind": "other",
+      "path": "runtime/chart-interactions.test.js",
+      "sha256": "8153df43c010a46a53a4954dcd9167a9c1fd6910d6ea6f469d215d712457dc80",
+      "bytes": 8182
+    },
+    {
+      "name": "hashes.sha256",
+      "kind": "other",
+      "path": "docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256",
+      "sha256": "92821c10d2157c01e97b2080f7c6c1f57e8ad84f3c2b7ae4b820bf710e38bf60",
+      "bytes": 2425
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TEST-DOCS-CONTROL",
+      "status": "passed",
+      "path": "tools/check_docs.py",
+      "sha256": "92c20960d0555a77e8e68c2f42a1dee68e7ded4be3d76eb29345ebfc0f3c27ad"
+    },
+    {
+      "id": "TEST-PYTHON-GOLDENS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+    },
+    {
+      "id": "TEST-GO-GOLDENS",
+      "status": "passed",
+      "path": "libs/go/render_test.go",
+      "sha256": "b801540405592ef8d2d19edf716e9ee9f3470305497a1da3733411e5ebc8b415"
+    },
+    {
+      "id": "TEST-VALIDATION-PARITY",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+    },
+    {
+      "id": "TEST-CAPABILITY-MATRIX",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+    },
+    {
+      "id": "TEST-STACK-SIGNED",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+    },
+    {
+      "id": "TEST-PERCENT-DOMAIN",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+    },
+    {
+      "id": "TEST-LAYOUT-MARGINS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+    },
+    {
+      "id": "TEST-XSS-ESCAPING",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+    },
+    {
+      "id": "TEST-RUNTIME-BROWSER",
+      "status": "passed",
+      "path": "runtime/browser-qualification.test.js",
+      "sha256": "b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50"
+    },
+    {
+      "id": "TEST-RUNTIME-SMOKE",
+      "status": "passed",
+      "path": "runtime/chart-interactions.test.js",
+      "sha256": "8153df43c010a46a53a4954dcd9167a9c1fd6910d6ea6f469d215d712457dc80"
+    },
+    {
+      "id": "REVIEW-ACCESSIBILITY-MANUAL",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405"
+    },
+    {
+      "id": "REVIEW-VISUAL-PROFILE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d"
+    },
+    {
+      "id": "BENCH-RENDER-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "28530b68b15b59113e8c54bfa00ad1dad43b457dc0dbdfb0e6c55cc093b59dc7"
+    },
+    {
+      "id": "TEST-DIRECT-CROSS-RENDER",
+      "status": "passed",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "0c6eb8e38b4cd045d18e93e3a6a0b39729d6779787efa590a6cd4ea4771a5331"
+    },
+    {
+      "id": "TEST-RELEASE-EVIDENCE",
+      "status": "passed",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "503135f1e79a1c4dc40a7e4ea114b6e956d59e478db9b184781a9fb5ea3749d8"
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-001",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "The active schema is already narrowed; later chart expansion remains outside this candidate pack."
+    },
+    {
+      "id": "RISK-002",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Validator parity is evidenced in the current release corpus; broader schema drift is tracked separately."
+    },
+    {
+      "id": "RISK-003",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Typed capability errors and no-panic boundaries are covered by the stage-1 contract."
+    },
+    {
+      "id": "RISK-004",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Mixed-sign stack geometry has a dedicated acceptance contract and evidence record."
+    },
+    {
+      "id": "RISK-005",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Percent-domain rules are explicit for the current release scope."
+    },
+    {
+      "id": "RISK-006",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Unicode sizing remains fixed by the current deterministic length model and evidence corpus."
+    },
+    {
+      "id": "RISK-007",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Manual margins are the release boundary; auto-fit remains a later capability."
+    },
+    {
+      "id": "RISK-008",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Browser and manual accessibility evidence exists for the current release profile."
+    },
+    {
+      "id": "RISK-009",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Package version mapping is already aligned with 0.0.0.1."
+    },
+    {
+      "id": "RISK-010",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Short category arrays are padded deterministically in both renderers."
+    },
+    {
+      "id": "RISK-011",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Host-font and certified-export profiles are intentionally separate guarantees."
+    },
+    {
+      "id": "RISK-012",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Release provenance is now bounded by the candidate evidence pack and validator, but public publication remains gated."
+    }
+  ],
+  "knownLimits": [
+    "This candidate pack is not a publication approval.",
+    "Go module publication is still held behind a later release gate.",
+    "Pixel identity is only claimed under a certified export profile, not arbitrary host fonts.",
+    "Expansion beyond line and column remains outside this release candidate."
+  ],
+  "review": {
+    "mode": "self",
+    "productOwner": "dharmik136",
+    "maintainer": "dharmik136",
+    "approvedAt": "2026-07-20T00:05:12+05:30"
+  }
+}
