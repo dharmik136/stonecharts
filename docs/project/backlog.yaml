@@ -531,7 +531,7 @@ items:
   - id: GATE-S1
     title: Pass Stage 1 contract-closure gate
     item_type: Release Gate
-    status: Inbox
+    status: Ready
     priority: P0
     workstream: WS-02 Renderer
     stage: S1 Contract Closure
@@ -553,12 +553,12 @@ items:
   - id: REQ-DET-001
     title: Qualify canonical SVG byte parity
     item_type: Requirement
-    status: Inbox
+    status: Blocked
     priority: P0
     workstream: WS-03 Conformance
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Requalify and prove the registered REQ-DET-001 acceptance contract on the frozen release corpus.
+    outcome: Requalify and prove the registered REQ-DET-001 acceptance contract on the frozen release corpus; the approved goldens are already present, but backlog promotion remains blocked until GATE-S1 is promoted.
     traceability: [REQ-DET-001, SC-CON-001, SC-CON-003]
     risks: [RISK-006]
     evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
