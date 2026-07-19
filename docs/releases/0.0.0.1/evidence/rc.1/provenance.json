@@ -4,7 +4,7 @@
     {
       "name": "docs/releases/0.0.0.1/evidence/rc.1",
       "digest": {
-        "sha256": "6e65f6f87ae6e98b0e157ae967b45896cf676ac745b994f1ccd9c2c49bdae0a5"
+        "sha256": "51e53387c329066ae43a9da770a7b3aa37443208b043ae548f6118e3c13f3123"
       }
     }
   ],
@@ -18,13 +18,13 @@
         "branch": "main"
       },
       "internalParameters": {
-        "status": "M docs/project/backlog.yaml\n M docs/quality/evidence-registry.yaml\n?? docs/releases/0.0.0.1/evidence/rc.1/\n?? tools/build_release_evidence.py\n?? tools/check_release_evidence.py"
+        "status": ""
       },
       "resolvedDependencies": [
         {
           "uri": "git+https://github.com/dharmik136/stonecharts.git",
           "digest": {
-            "sha1": "321f24c2447403c04d0d1ce894a08f168f347cfd"
+            "sha1": "046e0652efc53d8ef84eab6e42a7d05f9d846dd0"
           }
         },
         {
@@ -52,8 +52,8 @@
         "id": "codex-cli/powershell"
       },
       "metadata": {
-        "invocationId": "321f24c2447403c04d0d1ce894a08f168f347cfd",
-        "completed": "2026-07-20T00:05:12+05:30",
+        "invocationId": "046e0652efc53d8ef84eab6e42a7d05f9d846dd0",
+        "completed": "2026-07-20T00:06:01+05:30",
         "environment": {
           "python": "Python 3.14.4",
           "go": "go version go1.26.4 windows/amd64",
