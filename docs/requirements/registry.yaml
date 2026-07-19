@@ -1,6 +1,6 @@
 id: SC-REQ-REGISTRY
 version: 1
-updated: "2026-07-18"
+updated: "2026-07-19"
 requirements:
   - id: REQ-PROD-001
     title: One language-neutral chart specification
@@ -275,7 +275,7 @@ requirements:
     rationale: Uncontrolled benchmark numbers are not comparable and create misleading promises.
     kind: quality
     priority: should
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-QUAL-002

@@ -1,6 +1,6 @@
 id: SC-QUAL-EVIDENCE
 version: 1
-updated: "2026-07-18"
+updated: "2026-07-19"
 evidence:
   - id: TEST-DOCS-CONTROL
     kind: test
@@ -95,10 +95,10 @@ evidence:
     requirements: [REQ-VIS-001]
   - id: BENCH-RENDER-BASELINE
     kind: benchmark
-    status: partial
-    description: Existing language benchmarks require controlled workloads, environment capture, repeated samples, and variance reporting.
-    command: null
-    location: libs/python/benchmark.py
+    status: implemented
+    description: Records the approved Python and Go benchmark baseline for the 0.0.0.1 release workloads, including persisted result outputs.
+    command: python libs/python/benchmark.py && cd libs/go && go run ./cmd/benchmark
+    location: docs/releases/0.0.0.1/evidence/performance-baseline-review.md
     requirements: [REQ-PERF-001]
   - id: TEST-RELEASE-EVIDENCE
     kind: test

@@ -1,6 +1,6 @@
 id: SC-OPS-BACKLOG
 version: 1
-updated: "2026-07-18"
+updated: "2026-07-19"
 project:
   owner: dharmik136
   number: 2
@@ -622,12 +622,12 @@ items:
   - id: REQ-PERF-001
     title: Establish reproducible performance qualification
     item_type: Requirement
-    status: Inbox
+    status: Blocked
     priority: P1
     workstream: WS-03 Conformance
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-PERF-001 acceptance contract.
+    outcome: Implement and prove the registered REQ-PERF-001 acceptance contract; the baseline evidence is recorded, but backlog promotion remains blocked until GATE-S1 is promoted.
     traceability: [REQ-PERF-001, SC-QUAL-002]
     risks: []
     evidence: [BENCH-RENDER-BASELINE]
