@@ -36,10 +36,10 @@ hosted service, universal browser support, or universal pixel identity.
 | Source release tag | `0.0.0.1` |
 | Go module tag | Not yet approved; any published mapping must be valid Go semantic versioning |
 
-Current Python metadata reports `0.1.0`; aligning package and runtime version metadata
-is a release blocker. A `v0.0.0.1` Go tag is forbidden because it is not valid semantic
-versioning. No release tag is created until distribution mappings and all release
-surfaces satisfy [ADR 0007](../../architecture/adr/0007-release-identifier.md).
+Python package metadata now reports `0.0.0.1`. A `v0.0.0.1` Go tag is forbidden
+because it is not valid semantic versioning. No release tag is created until
+distribution mappings and all release surfaces satisfy
+[ADR 0007](../../architecture/adr/0007-release-identifier.md).
 
 ## Stage 0 exit gate
 
