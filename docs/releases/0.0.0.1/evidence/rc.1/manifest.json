@@ -3,7 +3,7 @@
   "candidate": "rc.1",
   "source": {
     "repository": "dharmik136/stonecharts",
-    "commit": "046e0652efc53d8ef84eab6e42a7d05f9d846dd0",
+    "commit": "4c18c7db078cd10a102f5a05a951b7a329f63726",
     "tag": "0.0.0.1",
     "treeClean": true
   },
@@ -83,21 +83,21 @@
       "name": "qualification-checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md",
-      "sha256": "36bdf1c40a865f3804c2e71ba6a1144b229a920d2f42ebd77c61b15790f6452e",
+      "sha256": "9749e5333f8a80ecc5722e7e1917106be1225ebddf7a9def6f35ade7a0eafe32",
       "bytes": 1244
     },
     {
       "name": "sbom.spdx.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json",
-      "sha256": "5593d5a9f2c548bb4efaa90802146212096a5b02e4b5bdd947c884b26c9afa1c",
+      "sha256": "21a96d9ce1706c3e26e76eb257e8cd2ad785902653bf6f866283541e63cd3cbc",
       "bytes": 2185
     },
     {
       "name": "provenance.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/provenance.json",
-      "sha256": "77e5bd49d299ba1946d1d5c58d3e734387918951b60296672afb8ad0ca1c39c1",
+      "sha256": "ed70dc4f25bdf9457fa35f232e13c642ca6dd8cac8fe43fb7c2015a688e40fb7",
       "bytes": 1941
     },
     {
@@ -111,8 +111,8 @@
       "name": "evidence-registry.yaml",
       "kind": "documentation",
       "path": "docs/quality/evidence-registry.yaml",
-      "sha256": "b376a68e5e88cdb8f8208287747c1f2d62d95ef377f1fb6d2776beecaa39dc6b",
-      "bytes": 5692
+      "sha256": "0b99ca4e2ae80b29797c70984e2954667a350c95924a93276fcbb43647726326",
+      "bytes": 5762
     },
     {
       "name": "__init__.py",
@@ -174,7 +174,7 @@
       "name": "hashes.sha256",
       "kind": "other",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256",
-      "sha256": "5d7fe333094d12af9922f4c829e4fc4035e0ecda4cba0579e943f932b59740e1",
+      "sha256": "5e63b15c1306fd349a54c0ab56aec8fe7ad8b830a0e1a98141adb5f6615f03ce",
       "bytes": 2425
     }
   ],
@@ -189,49 +189,49 @@
       "id": "TEST-PYTHON-GOLDENS",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
     },
     {
       "id": "TEST-GO-GOLDENS",
       "status": "passed",
       "path": "libs/go/render_test.go",
-      "sha256": "b801540405592ef8d2d19edf716e9ee9f3470305497a1da3733411e5ebc8b415"
+      "sha256": "ec23b45252cb15b93503762c3d5c1c11735a61eae34731ba3fea2bbf956ce52d"
     },
     {
       "id": "TEST-VALIDATION-PARITY",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
     },
     {
       "id": "TEST-CAPABILITY-MATRIX",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
     },
     {
       "id": "TEST-STACK-SIGNED",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
     },
     {
       "id": "TEST-PERCENT-DOMAIN",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
     },
     {
       "id": "TEST-LAYOUT-MARGINS",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
     },
     {
       "id": "TEST-XSS-ESCAPING",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "4d7871e770ef5c6d1fe8ba8d523be50d588dcb8ca29b0965c8d7fa4fa36b7755"
+      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
     },
     {
       "id": "TEST-RUNTIME-BROWSER",
@@ -360,6 +360,6 @@
     "mode": "self",
     "productOwner": "dharmik136",
     "maintainer": "dharmik136",
-    "approvedAt": "2026-07-20T00:06:01+05:30"
+    "approvedAt": "2026-07-20T00:19:13+05:30"
   }
 }
