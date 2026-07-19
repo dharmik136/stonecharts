@@ -48,8 +48,11 @@ def _data_table(spec: ChartSpec) -> str:
     """A visually-hidden HTML data table: the accessible, keyboard-navigable
     alternative to the SVG (which is role="img"). Screen readers read this."""
     n = max((len(s.data) for s in spec.series), default=0)
-    cats = spec.x_axis.categories or [str(i) for i in range(n)]
-    head = "".join(f'<th scope="col">{esc(cats[i])}</th>' for i in range(n))
+    cats = spec.x_axis.categories or []
+    head = "".join(
+        f'<th scope="col">{esc(cats[i] if i < len(cats) else str(i))}</th>'
+        for i in range(n)
+    )
     rows = []
     for s in spec.series:
         cells = "".join(

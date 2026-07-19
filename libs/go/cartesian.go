@@ -453,11 +453,15 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 
 	// X labels.
 	p.WriteString(`<g class="sc-axis sc-axis-x">`)
-	for i := 0; i < f.n && i < len(f.cats); i++ {
+	for i := 0; i < f.n; i++ {
 		lx := f.xpix(i)
+		label := strconv.Itoa(i)
+		if i < len(f.cats) {
+			label = f.cats[i]
+		}
 		p.WriteString(fmt.Sprintf(
 			`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
-			f1(lx), f1(f.plotY+f.plotH+18), theme.AxisLabelColor, esc(f.cats[i])))
+			f1(lx), f1(f.plotY+f.plotH+18), theme.AxisLabelColor, esc(label)))
 	}
 	p.WriteString(`</g>`)
 

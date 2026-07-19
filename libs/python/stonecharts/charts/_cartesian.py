@@ -360,7 +360,8 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
 
     # X labels.
     p.append('<g class="sc-axis sc-axis-x">')
-    for i, label in enumerate(cats[:n]):
+    for i in range(n):
+        label = cats[i] if i < len(cats) else str(i)
         lx = xpix(i)
         p.append(
             f'<text x="{lx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '

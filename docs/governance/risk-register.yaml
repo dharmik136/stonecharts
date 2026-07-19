@@ -87,12 +87,12 @@ risks:
     requirements: [REQ-REL-001]
   - id: RISK-010
     title: Short category arrays can break generated HTML
-    description: The accessible data-table path can index beyond an explicitly supplied category array shorter than the longest series.
+    description: The accessible data-table and x-label paths could index beyond an explicitly supplied category array shorter than the longest series.
     likelihood: medium
     impact: critical
-    status: open
+    status: closed
     owner: maintainer
-    mitigation: Define category-length semantics, validate or pad deterministically, and add shared HTML tests.
+    mitigation: Pad short category arrays deterministically with numeric labels and add shared HTML tests.
     requirements: [REQ-VAL-001, REQ-A11Y-001]
   - id: RISK-011
     title: Byte identity may be misrepresented as pixel identity

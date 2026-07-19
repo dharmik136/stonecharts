@@ -32,12 +32,6 @@ func dataTable(spec *ChartSpec) string {
 		}
 	}
 	cats := spec.XAxis.Categories
-	if len(cats) == 0 {
-		cats = make([]string, n)
-		for i := 0; i < n; i++ {
-			cats[i] = strconv.Itoa(i)
-		}
-	}
 	var b strings.Builder
 	b.WriteString(`<table class="sc-visually-hidden">`)
 	if spec.Title != "" {
@@ -45,7 +39,11 @@ func dataTable(spec *ChartSpec) string {
 	}
 	b.WriteString("<thead><tr><td></td>")
 	for i := 0; i < n; i++ {
-		b.WriteString(`<th scope="col">` + esc(cats[i]) + `</th>`)
+		label := strconv.Itoa(i)
+		if i < len(cats) {
+			label = cats[i]
+		}
+		b.WriteString(`<th scope="col">` + esc(label) + `</th>`)
 	}
 	b.WriteString("</tr></thead><tbody>")
 	for _, s := range spec.Series {

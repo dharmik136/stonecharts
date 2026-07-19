@@ -45,7 +45,7 @@ release evidence directory for the candidate and completed there.
 - [ ] Python and Go golden suites pass.
 - [x] Direct cross-render sweep has zero byte differences.
 - [ ] Signed stack and percent-domain invariants pass.
-- [ ] Category, Unicode, dimension, empty-data, and long-label edges pass.
+- [x] Category, Unicode, dimension, empty-data, and long-label edges pass.
 - [ ] Fuzz/property run completes with recorded seed and limits.
 
 ## Runtime and accessibility

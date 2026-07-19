@@ -119,6 +119,29 @@ func TestLayoutMargins(t *testing.T) {
 	}
 }
 
+func TestShortCategoriesPadAndUnicodeTitle(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"column","title":"Temperature (°C)","xAxis":{"categories":["Jan","Q4 2026 - Production Operations"]},"series":[{"name":"s","data":[1,2,3]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	svg := mustSVG(t, spec)
+	html := mustHTML(t, spec, "")
+	for _, want := range []string{
+		"Temperature (°C)",
+		`Jan</text>`,
+		`Q4 2026 - Production Operations`,
+		`>1</text>`,
+		`>2</text>`,
+		`<th scope="col">Jan</th>`,
+		`<th scope="col">Q4 2026 - Production Operations</th>`,
+		`<th scope="col">2</th>`,
+	} {
+		if !strings.Contains(svg, want) && !strings.Contains(html, want) {
+			t.Fatalf("expected output to contain %q\nsvg=%s\nhtml=%s", want, svg, html)
+		}
+	}
+}
+
 // TestXSSEscaping verifies hostile strings in user-facing fields are escaped.
 func TestXSSEscaping(t *testing.T) {
 	x := `"><script>alert(1)</script>`

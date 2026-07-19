@@ -120,6 +120,27 @@ def test_layout_margins():
     assert 'y="30"' in svg or 'y="30.0"' in svg
 
 
+def test_short_categories_pad_and_unicode_title():
+    spec = ChartSpec.from_dict({
+        "type": "column",
+        "title": "Temperature (°C)",
+        "xAxis": {"categories": ["Jan", "Q4 2026 - Production Operations"]},
+        "series": [{"name": "s", "data": [1, 2, 3]}],
+    })
+    svg = render_svg(spec)
+    from stonecharts.render import render_html
+    html = render_html(spec)
+    assert "Temperature (°C)" in svg
+    assert 'Jan</text>' in svg
+    assert 'Q4 2026 - Production Operations' in svg
+    assert '>1</text>' in svg
+    assert '>2</text>' in svg
+    assert '<th scope="col">Jan</th>' in html
+    assert '<th scope="col">Q4 2026 - Production Operations</th>' in html
+    assert '<th scope="col">2</th>' in html
+    assert '<th scope="col">2</th>' in html
+
+
 def test_xss_escaping():
     """Hostile strings in every user-facing field must be escaped, never injected."""
     x = '"><script>alert(1)</script>'
