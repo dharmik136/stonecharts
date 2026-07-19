@@ -146,10 +146,10 @@ def test_xss_escaping():
     x = '"><script>alert(1)</script>'
     spec = ChartSpec.from_dict({
         "id": x, "type": "line", "title": x, "subtitle": x,
-        "theme": {"name": "light", "gridColor": x, "palette": [x]},
+        "theme": {"name": "light", "gridColor": "#e8e8ee", "palette": ["#2f7ed8"]},
         "xAxis": {"title": x, "categories": [x, "b", "c"]}, "yAxis": {"title": x},
-        "series": [{"name": x, "data": [1, 2, 3], "color": x,
-                    "pattern": {"type": "hatch", "color": x, "background": x},
+        "series": [{"name": x, "data": [1, 2, 3], "color": "#2f7ed8",
+                    "pattern": {"type": "hatch", "color": "#333333", "background": "#ffffff"},
                     "fillOpacity": 0.3}],
     })
     from stonecharts.render import render_html

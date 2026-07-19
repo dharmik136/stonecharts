@@ -343,5 +343,42 @@
     "errors": [
       "$.type: unknown chart type \"bar\""
     ]
+  },
+  {
+    "spec": {
+      "type": "line",
+      "theme": "solarized",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ],
+          "color": "url(#bad)",
+          "dashStyle": "wavy",
+          "step": "through",
+          "curve": "spline",
+          "marker": {
+            "symbol": "star"
+          },
+          "pattern": {
+            "type": "weave",
+            "color": "red",
+            "background": "inherit"
+          }
+        }
+      ]
+    },
+    "errors": [
+      "$.theme: expected one of \"light\", \"dark\", received \"solarized\"",
+      "$.series[0].color: expected hex color, received \"url(#bad)\"",
+      "$.series[0].pattern.type: expected one of \"hatch\", received \"weave\"",
+      "$.series[0].pattern.color: expected hex color, received \"red\"",
+      "$.series[0].pattern.background: expected hex color, received \"inherit\"",
+      "$.series[0].dashStyle: expected one of \"solid\", \"dashed\", \"dotted\", received \"wavy\"",
+      "$.series[0].step: expected one of \"before\", \"after\", \"center\", received \"through\"",
+      "$.series[0].curve: expected one of \"linear\", \"monotone\", received \"spline\"",
+      "$.series[0].marker.symbol: expected one of \"circle\", \"square\", \"triangle\", \"diamond\", received \"star\""
+    ]
   }
 ]

@@ -22,5 +22,25 @@
   {
     "spec": {"type": "area", "series": [{"name": "s", "data": [1]}]},
     "errors": ["$.type: unknown chart type \"area\""]
+  },
+  {
+    "spec": {
+      "type": "column",
+      "theme": {
+        "name": "light",
+        "gridColor": "inherit",
+        "palette": ["#123", "not-a-color"]
+      },
+      "series": [{
+        "name": "s",
+        "data": [1],
+        "pattern": {"type": "weave"}
+      }]
+    },
+    "errors": [
+      "$.theme.gridColor: expected hex color, received \"inherit\"",
+      "$.theme.palette[1]: expected hex color, received \"not-a-color\"",
+      "$.series[0].pattern.type: expected one of \"hatch\", received \"weave\""
+    ]
   }
 ]

@@ -146,12 +146,12 @@ func TestShortCategoriesPadAndUnicodeTitle(t *testing.T) {
 func TestXSSEscaping(t *testing.T) {
 	x := `"><script>alert(1)</script>`
 	specJSON := `{"id":` + jsonStr(x) + `,"type":"line","title":` + jsonStr(x) +
-		`,"subtitle":` + jsonStr(x) + `,"theme":{"name":"light","gridColor":` + jsonStr(x) +
-		`,"palette":[` + jsonStr(x) + `]},"xAxis":{"title":` + jsonStr(x) +
+		`,"subtitle":` + jsonStr(x) + `,"theme":{"name":"light","gridColor":"#e8e8ee"` +
+		`,"palette":["#2f7ed8"]},"xAxis":{"title":` + jsonStr(x) +
 		`,"categories":[` + jsonStr(x) + `,"b","c"]},"yAxis":{"title":` + jsonStr(x) +
-		`},"series":[{"name":` + jsonStr(x) + `,"data":[1,2,3],"color":` + jsonStr(x) +
-		`,"pattern":{"type":"hatch","color":` + jsonStr(x) + `,"background":` + jsonStr(x) +
-		`},"fillOpacity":0.3}]}`
+		`},"series":[{"name":` + jsonStr(x) + `,"data":[1,2,3],"color":"#2f7ed8"` +
+		`,"pattern":{"type":"hatch","color":"#333333","background":"#ffffff"}` +
+		`,"fillOpacity":0.3}]}`
 	spec, err := FromJSON([]byte(specJSON))
 	if err != nil {
 		t.Fatal(err)

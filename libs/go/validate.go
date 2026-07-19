@@ -5,6 +5,15 @@ import (
 	"strings"
 )
 
+var (
+	knownThemeNames = map[string]bool{"light": true, "dark": true}
+	knownDashStyles = map[string]bool{"solid": true, "dashed": true, "dotted": true}
+	knownMarkerSymbols = map[string]bool{"circle": true, "square": true, "triangle": true, "diamond": true}
+	knownStepTypes = map[string]bool{"before": true, "after": true, "center": true}
+	knownCurveTypes = map[string]bool{"linear": true, "monotone": true}
+	knownPatternTypes = map[string]bool{"hatch": true}
+)
+
 // Strict chart-spec validation — mirrors libs/python/stonecharts/validate.py
 // byte-for-byte (same rules, same error text, same order) so both renderers accept
 // and reject exactly the same specs. Runs on the generic decoded JSON (interface{})
@@ -71,6 +80,25 @@ func vstr(v interface{}, path string, errs *[]string) {
 	}
 }
 
+func isHexColor(s string) bool {
+	if len(s) != 4 && len(s) != 5 && len(s) != 7 && len(s) != 9 {
+		return false
+	}
+	if len(s) == 0 || s[0] != '#' {
+		return false
+	}
+	for _, r := range s[1:] {
+		switch {
+		case r >= '0' && r <= '9':
+		case r >= 'a' && r <= 'f':
+		case r >= 'A' && r <= 'F':
+		default:
+			return false
+		}
+	}
+	return true
+}
+
 func vbool(v interface{}, path string, errs *[]string) {
 	if _, ok := v.(bool); !ok {
 		*errs = append(*errs, path+": expected boolean, received "+jtype(v))
@@ -119,9 +147,15 @@ func vgridline(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "color"); ok {
 		vstr(x, path+".color", errs)
+		if s, ok := x.(string); ok && !isHexColor(s) {
+			*errs = append(*errs, path+".color: expected hex color, received \""+s+"\"")
+		}
 	}
 	if x, ok := has(m, "dashStyle"); ok {
 		vstr(x, path+".dashStyle", errs)
+		if s, ok := x.(string); ok && !knownDashStyles[s] {
+			*errs = append(*errs, path+`.dashStyle: expected one of "solid", "dashed", "dotted", received "`+s+`"`)
+		}
 	}
 }
 
@@ -186,6 +220,9 @@ func vmarker(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "symbol"); ok {
 		vstr(x, path+".symbol", errs)
+		if s, ok := x.(string); ok && !knownMarkerSymbols[s] {
+			*errs = append(*errs, path+`.symbol: expected one of "circle", "square", "triangle", "diamond", received "`+s+`"`)
+		}
 	}
 	if x, ok := has(m, "radius"); ok {
 		vnum(x, path+".radius", errs)
@@ -208,6 +245,21 @@ func vpattern(v interface{}, path string, errs *[]string) {
 			vnum(x, path+"."+k, errs)
 		}
 	}
+	if x, ok := has(m, "type"); ok {
+		if s, ok := x.(string); ok && !knownPatternTypes[s] {
+			*errs = append(*errs, path+`.type: expected one of "hatch", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "color"); ok {
+		if s, ok := x.(string); ok && !isHexColor(s) {
+			*errs = append(*errs, path+".color: expected hex color, received \""+s+"\"")
+		}
+	}
+	if x, ok := has(m, "background"); ok {
+		if s, ok := x.(string); ok && !isHexColor(s) {
+			*errs = append(*errs, path+".background: expected hex color, received \""+s+"\"")
+		}
+	}
 }
 
 func vgradient(m map[string]interface{}, path string, errs *[]string) {
@@ -218,6 +270,9 @@ func vgradient(m map[string]interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "type"); ok {
 		vstr(x, path+".type", errs)
+		if s, ok := x.(string); ok && s != "linearGradient" {
+			*errs = append(*errs, path+`.type: expected one of "linearGradient", received "`+s+`"`)
+		}
 	}
 	if x, ok := has(m, "stops"); ok {
 		arr, ok := x.([]interface{})
@@ -237,6 +292,9 @@ func vgradient(m map[string]interface{}, path string, errs *[]string) {
 			}
 			if y, ok := has(sm, "color"); ok {
 				vstr(y, sp+".color", errs)
+				if s, ok := y.(string); ok && !isHexColor(s) {
+					*errs = append(*errs, sp+".color: expected hex color, received \""+s+"\"")
+				}
 			}
 			if y, ok := has(sm, "opacity"); ok {
 				vnum(y, sp+".opacity", errs)
@@ -248,6 +306,9 @@ func vgradient(m map[string]interface{}, path string, errs *[]string) {
 func vcolor(v interface{}, path string, errs *[]string) {
 	switch c := v.(type) {
 	case string:
+		if !isHexColor(c) {
+			*errs = append(*errs, path+": expected hex color, received \""+c+"\"")
+		}
 		return
 	case map[string]interface{}:
 		vgradient(c, path, errs)
@@ -257,7 +318,10 @@ func vcolor(v interface{}, path string, errs *[]string) {
 }
 
 func vtheme(v interface{}, path string, errs *[]string) {
-	if _, ok := v.(string); ok {
+	if s, ok := v.(string); ok {
+		if !knownThemeNames[s] {
+			*errs = append(*errs, path+`: expected one of "light", "dark", received "`+s+`"`)
+		}
 		return
 	}
 	m, ok := v.(map[string]interface{})
@@ -276,10 +340,20 @@ func vtheme(v interface{}, path string, errs *[]string) {
 		"markerHalo", "legendTextColor"} {
 		if x, ok := has(m, k); ok {
 			vstr(x, path+"."+k, errs)
+			if s, ok := x.(string); ok && !isHexColor(s) {
+				*errs = append(*errs, path+"."+k+": expected hex color, received \""+s+"\"")
+			}
 		}
 	}
 	if x, ok := has(m, "palette"); ok {
 		vstrArray(x, path+".palette", errs)
+		if arr, ok := x.([]interface{}); ok {
+			for i, e := range arr {
+				if s, ok := e.(string); ok && !isHexColor(s) {
+					*errs = append(*errs, path+".palette["+itoa(i)+"]: expected hex color, received \""+s+"\"")
+				}
+			}
+		}
 	}
 }
 
@@ -316,6 +390,21 @@ func vseries(v interface{}, path string, errs *[]string) {
 	for _, k := range []string{"dashStyle", "step", "curve"} {
 		if x, ok := has(m, k); ok {
 			vstr(x, path+"."+k, errs)
+		}
+	}
+	if x, ok := has(m, "dashStyle"); ok {
+		if s, ok := x.(string); ok && !knownDashStyles[s] {
+			*errs = append(*errs, path+`.dashStyle: expected one of "solid", "dashed", "dotted", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "step"); ok {
+		if s, ok := x.(string); ok && !knownStepTypes[s] {
+			*errs = append(*errs, path+`.step: expected one of "before", "after", "center", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "curve"); ok {
+		if s, ok := x.(string); ok && !knownCurveTypes[s] {
+			*errs = append(*errs, path+`.curve: expected one of "linear", "monotone", received "`+s+`"`)
 		}
 	}
 	if x, ok := has(m, "marker"); ok {

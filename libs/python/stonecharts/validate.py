@@ -16,9 +16,19 @@ emitted in a deterministic order so both languages produce identical output.
 from __future__ import annotations
 
 import math
+import re
 from typing import Any, List
 
 from .util import fmt_num
+
+
+_HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
+_THEME_NAMES = {"light", "dark"}
+_DASH_STYLES = {"solid", "dashed", "dotted"}
+_MARKER_SYMBOLS = {"circle", "square", "triangle", "diamond"}
+_STEP_TYPES = {"before", "after", "center"}
+_CURVE_TYPES = {"linear", "monotone"}
+_PATTERN_TYPES = {"hatch"}
 
 
 class SpecError(ValueError):
@@ -163,6 +173,12 @@ def _pattern(v: Any, path: str, errs: List[str]) -> None:
     for k in ("size", "angle", "strokeWidth"):
         if k in v:
             _num(v[k], f"{path}.{k}", errs)
+    if isinstance(v.get("type"), str) and v["type"] not in _PATTERN_TYPES:
+        errs.append(f'{path}.type: expected one of "hatch", received "{v["type"]}"')
+    if "color" in v and isinstance(v["color"], str) and not _HEX_COLOR_RE.fullmatch(v["color"]):
+        errs.append(f'{path}.color: expected hex color, received "{v["color"]}"')
+    if "background" in v and isinstance(v["background"], str) and not _HEX_COLOR_RE.fullmatch(v["background"]):
+        errs.append(f'{path}.background: expected hex color, received "{v["background"]}"')
 
 
 def _gradient(v: dict, path: str, errs: List[str]) -> None:
@@ -187,11 +203,15 @@ def _gradient(v: dict, path: str, errs: List[str]) -> None:
                     _str(st["color"], f"{sp}.color", errs)
                 if "opacity" in st:
                     _num(st["opacity"], f"{sp}.opacity", errs)
+                if isinstance(st.get("color"), str) and not _HEX_COLOR_RE.fullmatch(st["color"]):
+                    errs.append(f'{sp}.color: expected hex color, received "{st["color"]}"')
 
 
 def _color(v: Any, path: str, errs: List[str]) -> None:
     # oneOf: hex string OR a linear-gradient object.
     if isinstance(v, str):
+        if not _HEX_COLOR_RE.fullmatch(v):
+            errs.append(f'{path}: expected hex color, received "{v}"')
         return
     if isinstance(v, dict):
         _gradient(v, path, errs)
@@ -202,6 +222,8 @@ def _color(v: Any, path: str, errs: List[str]) -> None:
 def _theme(v: Any, path: str, errs: List[str]) -> None:
     # oneOf: theme name (string) OR a theme object.
     if isinstance(v, str):
+        if v not in _THEME_NAMES:
+            errs.append(f'{path}: expected one of "light", "dark", received "{v}"')
         return
     if not isinstance(v, dict):
         errs.append(f"{path}: expected string or theme object, received {_jtype(v)}")
@@ -215,8 +237,14 @@ def _theme(v: Any, path: str, errs: List[str]) -> None:
               "legendTextColor"):
         if k in v:
             _str(v[k], f"{path}.{k}", errs)
+            if isinstance(v[k], str) and not _HEX_COLOR_RE.fullmatch(v[k]):
+                errs.append(f'{path}.{k}: expected hex color, received "{v[k]}"')
     if "palette" in v:
         _str_array(v["palette"], f"{path}.palette", errs)
+        if isinstance(v["palette"], list):
+            for i, c in enumerate(v["palette"]):
+                if isinstance(c, str) and not _HEX_COLOR_RE.fullmatch(c):
+                    errs.append(f'{path}.palette[{i}]: expected hex color, received "{c}"')
 
 
 def _series(v: Any, path: str, errs: List[str]) -> None:
@@ -243,6 +271,15 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
     for k in ("dashStyle", "step", "curve"):
         if k in v:
             _str(v[k], f"{path}.{k}", errs)
+    if isinstance(v.get("dashStyle"), str) and v["dashStyle"] not in _DASH_STYLES:
+        errs.append(f'{path}.dashStyle: expected one of "solid", "dashed", "dotted", received "{v["dashStyle"]}"')
+    if isinstance(v.get("step"), str) and v["step"] not in _STEP_TYPES:
+        errs.append(f'{path}.step: expected one of "before", "after", "center", received "{v["step"]}"')
+    if isinstance(v.get("curve"), str) and v["curve"] not in _CURVE_TYPES:
+        errs.append(f'{path}.curve: expected one of "linear", "monotone", received "{v["curve"]}"')
+    if "marker" in v and isinstance(v["marker"], dict):
+        if isinstance(v["marker"].get("symbol"), str) and v["marker"]["symbol"] not in _MARKER_SYMBOLS:
+            errs.append(f'{path}.marker.symbol: expected one of "circle", "square", "triangle", "diamond", received "{v["marker"]["symbol"]}"')
     if "marker" in v:
         _marker(v["marker"], f"{path}.marker", errs)
 
