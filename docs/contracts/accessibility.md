@@ -65,5 +65,7 @@ supporting evidence and do not replace keyboard and screen-reader review.
 
 `TEST-RUNTIME-SMOKE` covers the shared interaction runtime's keyboard and ARIA state
 transitions against the documented DOM contract. `TEST-RUNTIME-BROWSER` now covers the
-local HTTP Chromium qualification step for the declared browser profile. The
-accessibility qualification remains open until `REVIEW-ACCESSIBILITY-MANUAL` passes.
+local HTTP Chromium qualification step for the declared browser profile. The manual
+accessibility review is recorded in
+[`docs/releases/0.0.0.1/evidence/manual-accessibility-review.md`](../releases/0.0.0.1/evidence/manual-accessibility-review.md),
+closing `REVIEW-ACCESSIBILITY-MANUAL` for the 0.0.0.1 release candidate.

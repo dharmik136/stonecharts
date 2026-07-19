@@ -57,7 +57,8 @@ SVG coordinates.
 Tooltip hover persistence, bar highlight geometry, focus appearance, and full browser
 qualification are covered by `TEST-RUNTIME-BROWSER`, which runs the shared runtime in
 a local HTTP Chromium session. The automated runtime smoke test remains the narrow JS
-state-machine precursor, while manual accessibility review stays open.
+state-machine precursor, while manual accessibility review is recorded in
+`docs/releases/0.0.0.1/evidence/manual-accessibility-review.md`.
 
 ## Embedding profiles
 

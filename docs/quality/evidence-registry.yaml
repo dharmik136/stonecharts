@@ -81,10 +81,10 @@ evidence:
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
   - id: REVIEW-ACCESSIBILITY-MANUAL
     kind: manual-review
-    status: planned
-    description: Will record keyboard-only and assistive-technology review against the declared component accessibility profile.
+    status: implemented
+    description: Records the manual keyboard and accessibility-tree review against the declared component accessibility profile.
     command: null
-    location: null
+    location: docs/releases/0.0.0.1/evidence/manual-accessibility-review.md
     requirements: [REQ-A11Y-001]
   - id: REVIEW-VISUAL-PROFILE
     kind: manual-review

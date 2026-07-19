@@ -568,13 +568,14 @@ items:
   - id: REQ-A11Y-001
     title: Qualify accessible chart alternatives and operation
     item_type: Requirement
-    status: Inbox
+    status: Blocked
     priority: P0
     workstream: WS-04 Runtime & A11y
     stage: S2 Qualification
     target: 0.0.0.1
     outcome: Implement and prove the registered REQ-A11Y-001 acceptance contract; the
-      local HTTP browser harness is complete and manual review is the remaining gate after runtime smoke.
+      browser harness and manual accessibility review are complete for the 0.0.0.1 release candidate,
+      but backlog promotion remains blocked until GATE-S1 is promoted.
     traceability: [REQ-A11Y-001, SC-CON-003, SC-CON-004, SC-CON-007]
     risks: [RISK-008, RISK-010]
     evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
