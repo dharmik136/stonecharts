@@ -88,10 +88,10 @@ evidence:
     requirements: [REQ-A11Y-001]
   - id: REVIEW-VISUAL-PROFILE
     kind: manual-review
-    status: planned
-    description: Will approve the default font limitation and any future embedded-font or certified-export profile.
+    status: implemented
+    description: Records the host-font visual profile review and the boundary against future embedded-font or certified-export profiles.
     command: null
-    location: null
+    location: docs/releases/0.0.0.1/evidence/visual-profile-review.md
     requirements: [REQ-VIS-001]
   - id: BENCH-RENDER-BASELINE
     kind: benchmark

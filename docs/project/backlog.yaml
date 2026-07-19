@@ -587,12 +587,14 @@ items:
   - id: REQ-VIS-001
     title: Qualify explicit visual reproducibility profiles
     item_type: Requirement
-    status: Inbox
+    status: Blocked
     priority: P1
     workstream: WS-05 Customization
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-VIS-001 acceptance contract.
+    outcome: Implement and prove the registered REQ-VIS-001 acceptance contract; the
+      host-font visual profile is now documented and reviewed as the 0.0.0.1 baseline,
+      but backlog promotion remains blocked until GATE-S1 is promoted.
     traceability: [REQ-VIS-001, SC-CON-001, SC-CON-006]
     risks: [RISK-011]
     evidence: [REVIEW-VISUAL-PROFILE]
