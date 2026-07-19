@@ -605,12 +605,13 @@ items:
   - id: REQ-SEC-001
     title: Requalify untrusted specification safety
     item_type: Requirement
-    status: Inbox
+    status: Blocked
     priority: P0
     workstream: WS-03 Conformance
     stage: S2 Qualification
     target: 0.0.0.1
-    outcome: Requalify and prove the registered REQ-SEC-001 acceptance contract across all released sinks.
+    outcome: Requalify and prove the registered REQ-SEC-001 acceptance contract across all released sinks;
+      the evidence is recorded, but backlog promotion remains blocked until GATE-S1 is promoted.
     traceability: [REQ-SEC-001, SC-SEC-001, SC-CON-005]
     risks: [RISK-003, RISK-012]
     evidence: [TEST-XSS-ESCAPING]
