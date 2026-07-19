@@ -492,12 +492,13 @@ items:
   - id: REQ-CUST-001
     title: Implement the deterministic customization boundary
     item_type: Requirement
-    status: Triage
+    status: Done
     priority: P0
     workstream: WS-05 Customization
     stage: S1 Contract Closure
     target: 0.0.0.1
-    outcome: Implement and prove the registered REQ-CUST-001 acceptance contract.
+    outcome: Implement and prove the registered REQ-CUST-001 acceptance contract; the
+      structured customization boundary is now documented and verified against the current release profile.
     traceability: [REQ-CUST-001, SC-CON-005, SC-ARCH-ADR-0001]
     risks: [RISK-007, RISK-011]
     evidence: [TEST-VALIDATION-PARITY, TEST-XSS-ESCAPING]

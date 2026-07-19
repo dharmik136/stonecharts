@@ -199,7 +199,7 @@ requirements:
     rationale: Identical SVG bytes do not guarantee identical rasterized pixels across fonts, browsers, operating systems, and converters.
     kind: quality
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-006
@@ -218,7 +218,7 @@ requirements:
     rationale: Personalization is central to the product, but unbounded injection defeats portability, security, and parity.
     kind: constraint
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-005
