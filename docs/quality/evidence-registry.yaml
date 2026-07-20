@@ -107,6 +107,13 @@ evidence:
     command: python tools/check_direct_cross_render.py
     location: tools/check_direct_cross_render.py
     requirements: [REQ-DET-001]
+  - id: TEST-FUZZ-PROPERTY
+    kind: test
+    status: implemented
+    description: Runs a deterministic fuzz/property corpus through Python and Go renderers and compares the emitted SVG bytes.
+    command: python tools/check_fuzz_property.py
+    location: tools/check_fuzz_property.py
+    requirements: [REQ-DET-001, REQ-STACK-001, REQ-STACK-002, REQ-SEC-001]
   - id: TEST-RELEASE-EVIDENCE
     kind: test
     status: implemented

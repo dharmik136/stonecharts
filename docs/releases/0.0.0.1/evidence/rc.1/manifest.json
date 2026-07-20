@@ -3,9 +3,9 @@
   "candidate": "rc.1",
   "source": {
     "repository": "dharmik136/stonecharts",
-    "commit": "4c18c7db078cd10a102f5a05a951b7a329f63726",
+    "commit": "5d89445ccb60f20498addbe569ac3fe6c7aaf2d4",
     "tag": "0.0.0.1",
-    "treeClean": true
+    "treeClean": false
   },
   "versions": {
     "product": "0.0.0.1",
@@ -34,7 +34,7 @@
       "name": "checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/checklist.md",
-      "sha256": "5d507e024fb3b58c0425ad81b10e3b67bf005d973c413fe38d79248cb52c82e0",
+      "sha256": "79864d0b57f76b8c8bba67969b82580238c6cdee4bf1eea2bb55961f7b3b2dd1",
       "bytes": 3488
     },
     {
@@ -48,8 +48,8 @@
       "name": "manifest.schema.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/manifest.schema.json",
-      "sha256": "a0cd71856cab4e3717891906399b4550b210a725dc3c674d551774e3b3799f4b",
-      "bytes": 4228
+      "sha256": "fdb60a57977bac795f6f00311a042e094b143097d36004d3ef7372d3be85cfac",
+      "bytes": 4232
     },
     {
       "name": "manual-accessibility-review.md",
@@ -80,25 +80,39 @@
       "bytes": 877
     },
     {
+      "name": "fuzz-corpus.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/rc.1/fuzz-corpus.json",
+      "sha256": "d68bbba70666bc543efae40a4ecaf8169b4f21aea081f41dcca678e3b22320c7",
+      "bytes": 63426
+    },
+    {
+      "name": "fuzz-property-report.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/rc.1/fuzz-property-report.md",
+      "sha256": "d688708d9953715ce4d95418da68f28465da3d861c68d6e8af52c8b5934d8426",
+      "bytes": 725
+    },
+    {
       "name": "qualification-checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md",
-      "sha256": "9749e5333f8a80ecc5722e7e1917106be1225ebddf7a9def6f35ade7a0eafe32",
-      "bytes": 1244
+      "sha256": "2ada4e5fd73dc695aa98f7570846c660c0581f3f4c4dd067ed13afa9a2347222",
+      "bytes": 1259
     },
     {
       "name": "sbom.spdx.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json",
-      "sha256": "21a96d9ce1706c3e26e76eb257e8cd2ad785902653bf6f866283541e63cd3cbc",
+      "sha256": "283923308b19a2134eb992f1af0448acaed3d5bb9f362e637e1ca6547a31b258",
       "bytes": 2185
     },
     {
       "name": "provenance.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/provenance.json",
-      "sha256": "ed70dc4f25bdf9457fa35f232e13c642ca6dd8cac8fe43fb7c2015a688e40fb7",
-      "bytes": 1941
+      "sha256": "084e73f6da503e7ffb7768c477b69ba7b8ee6d89d9c9413b64bf082e8b8c5209",
+      "bytes": 2525
     },
     {
       "name": "package-install-matrix.md",
@@ -111,8 +125,8 @@
       "name": "evidence-registry.yaml",
       "kind": "documentation",
       "path": "docs/quality/evidence-registry.yaml",
-      "sha256": "0b99ca4e2ae80b29797c70984e2954667a350c95924a93276fcbb43647726326",
-      "bytes": 5762
+      "sha256": "08fbff5222974c87cc38d8de5d6c0d28389868e100b99290b0b75f0e6d24f107",
+      "bytes": 6122
     },
     {
       "name": "__init__.py",
@@ -174,8 +188,8 @@
       "name": "hashes.sha256",
       "kind": "other",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256",
-      "sha256": "5e63b15c1306fd349a54c0ab56aec8fe7ad8b830a0e1a98141adb5f6615f03ce",
-      "bytes": 2425
+      "sha256": "506dccaf4eacc449cdf7f14fd777f6bf5d969e42d8a2a8a8aa94be6646cde62c",
+      "bytes": 2672
     }
   ],
   "evidence": [
@@ -195,7 +209,7 @@
       "id": "TEST-GO-GOLDENS",
       "status": "passed",
       "path": "libs/go/render_test.go",
-      "sha256": "ec23b45252cb15b93503762c3d5c1c11735a61eae34731ba3fea2bbf956ce52d"
+      "sha256": "cd4d4063bad6eba4e856b36c78a22f076e9865ebaefcf634306b7df7fa89a42b"
     },
     {
       "id": "TEST-VALIDATION-PARITY",
@@ -268,6 +282,12 @@
       "status": "passed",
       "path": "tools/check_direct_cross_render.py",
       "sha256": "0c6eb8e38b4cd045d18e93e3a6a0b39729d6779787efa590a6cd4ea4771a5331"
+    },
+    {
+      "id": "TEST-FUZZ-PROPERTY",
+      "status": "passed",
+      "path": "tools/check_fuzz_property.py",
+      "sha256": "b2a598755cbe190c3041a2f22a10bded07e6afc8a73ca62985f768b47d969740"
     },
     {
       "id": "TEST-RELEASE-EVIDENCE",
@@ -360,6 +380,6 @@
     "mode": "self",
     "productOwner": "dharmik136",
     "maintainer": "dharmik136",
-    "approvedAt": "2026-07-20T00:19:13+05:30"
+    "approvedAt": "2026-07-20T00:37:03+05:30"
   }
 }

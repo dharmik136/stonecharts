@@ -641,7 +641,7 @@ items:
     outcome: Every product claim is backed by repeatable correctness, browser, accessibility, security, visual, and performance evidence.
     traceability: [SC-QUAL-001, SC-QUAL-002, SC-REL-001]
     risks: [RISK-006, RISK-008, RISK-010, RISK-011, RISK-012]
-    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-VALIDATION-PARITY, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL, REVIEW-VISUAL-PROFILE, BENCH-RENDER-BASELINE]
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-VALIDATION-PARITY, TEST-FUZZ-PROPERTY, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL, REVIEW-VISUAL-PROFILE, BENCH-RENDER-BASELINE]
     dependencies: [GATE-S1, DEC-008, DEC-009, DEC-010, REQ-DET-001, REQ-A11Y-001, REQ-VIS-001, REQ-SEC-001, REQ-PERF-001]
     compatibility: Qualification gate only; evidence must describe any intended behavior change.
     areas: [python, go, runtime, security, release]

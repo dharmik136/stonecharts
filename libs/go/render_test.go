@@ -212,6 +212,23 @@ func TestA11yToggle(t *testing.T) {
 	}
 }
 
+func TestFromJSONPreservesA11yFalse(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"line","title":"T","series":[{"name":"s","data":[1,2,3]}],"a11y":false}`))
+	if err != nil {
+		t.Fatalf("FromJSON failed: %v", err)
+	}
+	if spec.A11y == nil {
+		t.Fatal("FromJSON should preserve explicit a11y:false")
+	}
+	if *spec.A11y {
+		t.Fatal("FromJSON should preserve explicit a11y:false as false")
+	}
+	svg := mustSVG(t, spec)
+	if strings.Contains(svg, `role="img"`) || strings.Contains(svg, "<desc>") {
+		t.Fatal("a11y:false from JSON should omit role=img + <desc>")
+	}
+}
+
 // TestInvalidFixturesParity checks every shared invalid fixture is rejected with
 // the exact expected errors — the SAME file the Python suite checks, so both
 // renderers reject identically.

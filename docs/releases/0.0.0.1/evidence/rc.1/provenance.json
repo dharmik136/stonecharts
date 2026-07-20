@@ -4,7 +4,7 @@
     {
       "name": "docs/releases/0.0.0.1/evidence/rc.1",
       "digest": {
-        "sha256": "c7fcac570514dead906f45185d9cbac3be0b2a2c2a3aa85818fbbce367048c36"
+        "sha256": "959edcbb253077ee5d828981d575914cd49992f80584e9103516d71c3b84099d"
       }
     }
   ],
@@ -18,25 +18,25 @@
         "branch": "main"
       },
       "internalParameters": {
-        "status": ""
+        "status": "M .gitignore\n M docs/project/backlog.yaml\n M docs/quality/evidence-registry.yaml\n M docs/releases/0.0.0.1/checklist.md\n M docs/releases/0.0.0.1/evidence/manifest.schema.json\n M docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256\n M docs/releases/0.0.0.1/evidence/rc.1/manifest.json\n M docs/releases/0.0.0.1/evidence/rc.1/provenance.json\n M docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md\n M docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json\n M libs/go/cartesian.go\n M libs/go/render_test.go\n M tools/build_release_evidence.py\n?? tools/check_fuzz_property.py"
       },
       "resolvedDependencies": [
         {
           "uri": "git+https://github.com/dharmik136/stonecharts.git",
           "digest": {
-            "sha1": "4c18c7db078cd10a102f5a05a951b7a329f63726"
+            "sha1": "5d89445ccb60f20498addbe569ac3fe6c7aaf2d4"
           }
         },
         {
           "uri": "file:docs/releases/0.0.0.1/evidence/manifest.schema.json",
           "digest": {
-            "sha256": "a0cd71856cab4e3717891906399b4550b210a725dc3c674d551774e3b3799f4b"
+            "sha256": "fdb60a57977bac795f6f00311a042e094b143097d36004d3ef7372d3be85cfac"
           }
         },
         {
           "uri": "file:docs/quality/evidence-registry.yaml",
           "digest": {
-            "sha256": "0b99ca4e2ae80b29797c70984e2954667a350c95924a93276fcbb43647726326"
+            "sha256": "08fbff5222974c87cc38d8de5d6c0d28389868e100b99290b0b75f0e6d24f107"
           }
         },
         {
@@ -52,8 +52,8 @@
         "id": "codex-cli/powershell"
       },
       "metadata": {
-        "invocationId": "4c18c7db078cd10a102f5a05a951b7a329f63726",
-        "completed": "2026-07-20T00:19:13+05:30",
+        "invocationId": "5d89445ccb60f20498addbe569ac3fe6c7aaf2d4",
+        "completed": "2026-07-20T00:37:03+05:30",
         "environment": {
           "python": "Python 3.14.4",
           "go": "go version go1.26.4 windows/amd64",

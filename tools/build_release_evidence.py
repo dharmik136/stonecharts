@@ -84,7 +84,7 @@ It is not a publication approval.
 - [x] Controlled-document validation passes.
 - [x] Python and Go goldens pass.
 - [x] Shared validation parity and capability coverage pass.
-- [x] Signed stack, percent-domain, margin, XSS, runtime, accessibility, visual profile, performance, and direct cross-render evidence are attached.
+- [x] Signed stack, percent-domain, margin, XSS, runtime, accessibility, visual profile, performance, direct cross-render, and fuzz/property evidence are attached.
 - [x] Release evidence validator is present.
 
 ## Still open before S3
@@ -252,6 +252,8 @@ It does not claim S3 completeness.
         "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
         "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
         "docs/releases/0.0.0.1/evidence/direct-cross-render-review.md",
+        "docs/releases/0.0.0.1/evidence/rc.1/fuzz-corpus.json",
+        "docs/releases/0.0.0.1/evidence/rc.1/fuzz-property-report.md",
         "docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md",
         "docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json",
         "docs/releases/0.0.0.1/evidence/rc.1/provenance.json",
@@ -409,6 +411,12 @@ It does not claim S3 completeness.
                 "status": "passed",
                 "path": "tools/check_direct_cross_render.py",
                 "sha256": sha256(ROOT / "tools/check_direct_cross_render.py"),
+            },
+            {
+                "id": "TEST-FUZZ-PROPERTY",
+                "status": "passed",
+                "path": "tools/check_fuzz_property.py",
+                "sha256": sha256(ROOT / "tools/check_fuzz_property.py"),
             },
             {
                 "id": "TEST-RELEASE-EVIDENCE",

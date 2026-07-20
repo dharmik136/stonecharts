@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // dashArray maps a dashStyle name to an SVG stroke-dasharray value ("" = solid).
@@ -495,7 +496,7 @@ func chromeTail(f *cartesianFrame, p *strings.Builder) {
 		est := make([]float64, len(spec.Series))
 		total := 0.0
 		for i, s := range spec.Series {
-			est[i] = float64(len(s.Name)*7 + 26)
+			est[i] = float64(utf8.RuneCountInString(s.Name)*7 + 26)
 			total += est[i]
 		}
 		total += gap * float64(len(spec.Series)-1)

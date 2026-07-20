@@ -18,8 +18,8 @@ superseded_by: null
 # 0.0.0.1 Candidate Evidence Checklist
 
 - Candidate: `rc.1`
-- Source commit: `4c18c7db078cd10a102f5a05a951b7a329f63726`
-- Generated at: `2026-07-20T00:19:13+05:30`
+- Source commit: `5d89445ccb60f20498addbe569ac3fe6c7aaf2d4`
+- Generated at: `2026-07-20T00:37:03+05:30`
 
 This pack records the governed release evidence state that is currently available in the repo.
 It is not a publication approval.
@@ -29,7 +29,7 @@ It is not a publication approval.
 - [x] Controlled-document validation passes.
 - [x] Python and Go goldens pass.
 - [x] Shared validation parity and capability coverage pass.
-- [x] Signed stack, percent-domain, margin, XSS, runtime, accessibility, visual profile, performance, and direct cross-render evidence are attached.
+- [x] Signed stack, percent-domain, margin, XSS, runtime, accessibility, visual profile, performance, direct cross-render, and fuzz/property evidence are attached.
 - [x] Release evidence validator is present.
 
 ## Still open before S3
