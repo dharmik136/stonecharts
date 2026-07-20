@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	knownThemeNames = map[string]bool{"light": true, "dark": true}
-	knownDashStyles = map[string]bool{"solid": true, "dashed": true, "dotted": true}
+	knownThemeNames    = map[string]bool{"light": true, "dark": true}
+	knownDashStyles    = map[string]bool{"solid": true, "dashed": true, "dotted": true}
 	knownMarkerSymbols = map[string]bool{"circle": true, "square": true, "triangle": true, "diamond": true}
-	knownStepTypes = map[string]bool{"before": true, "after": true, "center": true}
-	knownCurveTypes = map[string]bool{"linear": true, "monotone": true}
-	knownPatternTypes = map[string]bool{"hatch": true}
+	knownStepTypes     = map[string]bool{"before": true, "after": true, "center": true}
+	knownCurveTypes    = map[string]bool{"linear": true, "monotone": true}
+	knownPatternTypes  = map[string]bool{"hatch": true}
 )
 
 // Strict chart-spec validation — mirrors libs/python/stonecharts/validate.py
@@ -425,6 +425,7 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 // knownTypes — active 0.0.0.1 release scope. Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"area":   true,
+	"bar":    true,
 	"column": true,
 	"line":   true,
 }

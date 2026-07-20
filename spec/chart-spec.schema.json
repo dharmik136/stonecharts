@@ -11,7 +11,8 @@
       "enum": [
         "line",
         "column",
-        "area"
+        "area",
+        "bar"
       ],
       "description": "Chart type id for the active 0.0.0.1 release scope; maps to the released chart design and renderer pair."
     },

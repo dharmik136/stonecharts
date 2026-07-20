@@ -33,7 +33,7 @@ than browser-only breadth.
 
 An authorized 0.0.0.1 user can:
 
-- Describe a supported line, column, or area chart in one JSON-compatible specification.
+- Describe a supported line, column, bar, or area chart in one JSON-compatible specification.
 - Validate and render it natively in Python or Go.
 - Obtain identical canonical SVG for the release conformance corpus.
 - Produce self-contained interactive HTML using the shared runtime.

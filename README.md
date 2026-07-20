@@ -102,7 +102,7 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
 tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
-The active Alpha scope is line, column, and area. Other chart designs remain roadmap
+The active Alpha scope is line, column, bar, and area. Other chart designs remain roadmap
 material until the schema, capability, conformance, packaging, and release gates
 for each type are complete.
 

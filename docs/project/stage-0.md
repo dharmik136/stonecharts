@@ -29,7 +29,7 @@ Release `0.0.0.1` cannot enter contract hardening until `GATE-S0` is complete.
 ## Entry state
 
 - StoneCharts is the canonical product and technical namespace.
-- Python and Go line, column, and area renderers exist with a shared golden corpus.
+- Python and Go line, column, bar, and area renderers exist with a shared golden corpus.
 - Repository and documentation controls execute successfully.
 - Known correctness, runtime, customization, release, and evidence gaps are recorded.
 

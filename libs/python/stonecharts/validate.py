@@ -288,6 +288,7 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
 # readability; the set comparison is order-independent.
 _KNOWN_TYPES = {
     "area",
+    "bar",
     "column",
     "line",
 }

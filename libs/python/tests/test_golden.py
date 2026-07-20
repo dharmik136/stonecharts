@@ -22,10 +22,12 @@ from stonecharts.validate import SpecError, validate  # noqa: E402
 
 LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
+BAR_CASES = ["basic", "grouped", "stacked", "themed-dark"]
 AREA_CASES = ["basic", "stacked", "percent", "themed-dark"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
+    "bar": BAR_CASES,
     "area": AREA_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
@@ -80,6 +82,11 @@ def test_column_goldens():
         _check("column", name)
 
 
+def test_bar_goldens():
+    for name in BAR_CASES:
+        _check("bar", name)
+
+
 def test_area_goldens():
     for name in AREA_CASES:
         _check("area", name)
@@ -99,6 +106,25 @@ def test_column_edge_cases():
          "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
         {"type": "column", "series": [{"name": str(i), "data": [1, 2, 3]} for i in range(10)]},
         {"type": "column", "series": [{"name": "a", "data": [42]}]},
+    ]:
+        low = render_svg(ChartSpec.from_dict(spec)).lower()
+        assert "nan" not in low and "inf" not in low, spec
+
+
+def test_bar_edge_cases():
+    for spec in [
+        {"type": "bar", "stacking": "normal", "xAxis": {"categories": ["mix"]},
+         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
+        {"type": "bar", "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+         "series": [{"name": "s", "data": [1, 2, 3]}]},
+        {"type": "bar", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
+         "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
+        {"type": "bar", "xAxis": {"categories": ["neg", "pos"]},
+         "series": [{"name": "a", "data": [-5, 10]}]},
+        {"type": "bar", "grouping": False,
+         "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
+        {"type": "bar", "series": [{"name": str(i), "data": [1, 2, 3]} for i in range(10)]},
+        {"type": "bar", "series": [{"name": "a", "data": [42]}]},
     ]:
         low = render_svg(ChartSpec.from_dict(spec)).lower()
         assert "nan" not in low and "inf" not in low, spec
@@ -237,15 +263,16 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == ["area", "column", "line"]
-    spec = ChartSpec(type="bar", series=[{"name": "s", "data": [1]}])
+    assert caps["chartTypes"] == ["area", "bar", "column", "line"]
+    spec = ChartSpec.from_dict({"type": "bar", "series": [{"name": "s", "data": [1]}]})
+    assert render_svg(spec).startswith("<svg")
     try:
-        render_svg(spec)
+        render_svg(ChartSpec(type="pie", series=[{"name": "s", "data": [1]}]))
         raise AssertionError("expected capability error")
     except CapabilityError as exc:
         assert exc.code == "E_CAPABILITY"
         assert exc.path == "$.type"
-        assert exc.message == 'unsupported chart type "bar"'
+        assert exc.message == 'unsupported chart type "pie"'
 
 
 def test_a11y_toggle():

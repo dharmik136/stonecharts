@@ -13,12 +13,8 @@
 - **Chart id:** `bar`
 - **Spec `type`:** `"bar"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 2** · **Src:** HC
-- **Status:** design-complete + examples validated · renderers deferred (only
-  `line` has a live renderer today; bar rides the shared cartesian frame — the
-  same frame column uses — once its orientation parameter lands — see
-  [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3
-  Rank 2, §4, §5)
-- **Renderers (planned):** `libs/python/stonecharts/charts/bar.py` · `libs/go/bar.go`
+- **Status:** design-complete + examples validated · renderers implemented in Python and Go
+- **Renderers:** `libs/python/stonecharts/charts/bar.py` · `libs/go/bar.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5

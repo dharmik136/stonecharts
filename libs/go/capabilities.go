@@ -6,7 +6,7 @@ type CapabilityError struct {
 	Code    string                 `json:"code"`
 	Path    string                 `json:"path"`
 	Message string                 `json:"message"`
-	Details map[string]interface{}  `json:"details,omitempty"`
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 func (e *CapabilityError) Error() string {
@@ -21,16 +21,16 @@ func (e *CapabilityError) Error() string {
 
 // CapabilityManifest is the machine-readable active-release renderer contract.
 type CapabilityManifest struct {
-	SpecVersion       string                 `json:"specVersion"`
-	SVGContractVersion string                `json:"svgContractVersion"`
-	ChartTypes        []string               `json:"chartTypes"`
-	Column            map[string][]string    `json:"column"`
+	SpecVersion        string              `json:"specVersion"`
+	SVGContractVersion string              `json:"svgContractVersion"`
+	ChartTypes         []string            `json:"chartTypes"`
+	Column             map[string][]string `json:"column"`
 }
 
 var activeCapabilities = CapabilityManifest{
-	SpecVersion:       "0.0.0.1",
+	SpecVersion:        "0.0.0.1",
 	SVGContractVersion: "0.0.0.1",
-	ChartTypes:        []string{"area", "column", "line"},
+	ChartTypes:         []string{"area", "bar", "column", "line"},
 	Column: map[string][]string{
 		"grouping": []string{"grouped", "overlay"},
 		"stacking": []string{"none", "normal", "percent-nonnegative"},

@@ -82,6 +82,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 	switch typ {
 	case "area":
 		return renderAreaSVG(spec), nil
+	case "bar":
+		return renderBarSVG(spec), nil
 	case "column":
 		return renderColumnSVG(spec), nil
 	case "line":

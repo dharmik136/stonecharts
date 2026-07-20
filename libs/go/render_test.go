@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"regexp"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -18,6 +18,7 @@ func TestGolden(t *testing.T) {
 	cases := map[string][]string{
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"bar":        {"basic", "grouped", "stacked", "themed-dark"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
 	}
 	for chartDir, names := range cases {
@@ -81,6 +82,28 @@ func TestColumnEdgeCases(t *testing.T) {
 		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in column render for %s", specJSON)
+		}
+	}
+}
+
+func TestBarEdgeCases(t *testing.T) {
+	cases := []string{
+		`{"type":"bar","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`,
+		`{"type":"bar","layout":{"margin":{"left":90,"right":40,"top":30,"bottom":50}},"series":[{"name":"s","data":[1,2,3]}]}`,
+		`{"type":"bar","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
+		`{"type":"bar","xAxis":{"categories":["neg","pos"]},"series":[{"name":"a","data":[-5,10]}]}`,
+		`{"type":"bar","grouping":false,"series":[{"name":"a","data":[1,2]},{"name":"b","data":[2,1]}]}`,
+		`{"type":"bar","series":[{"name":"0","data":[1,2,3]},{"name":"1","data":[1,2,3]},{"name":"2","data":[1,2,3]},{"name":"3","data":[1,2,3]},{"name":"4","data":[1,2,3]},{"name":"5","data":[1,2,3]},{"name":"6","data":[1,2,3]},{"name":"7","data":[1,2,3]},{"name":"8","data":[1,2,3]},{"name":"9","data":[1,2,3]}]}`,
+		`{"type":"bar","series":[{"name":"a","data":[42]}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+		low := strings.ToLower(mustSVG(t, spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in bar render for %s", specJSON)
 		}
 	}
 }
@@ -290,6 +313,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 	cases := map[string][]string{
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"bar":        {"basic", "grouped", "stacked", "themed-dark"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
 	}
 	if len(cases) == 0 {
@@ -357,11 +381,17 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "column", "line"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "bar", "column", "line"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "bar", Series: []Series{{Name: "s", Data: []float64{1}}}}
-	if _, err := RenderSVG(spec); err == nil {
+	if svg, err := RenderSVG(spec); err != nil {
+		t.Fatalf("expected bar to render, got %v", err)
+	} else if !strings.HasPrefix(svg, "<svg") {
+		t.Fatalf("expected SVG output for bar, got %q", svg[:min(len(svg), 64)])
+	}
+	bad := &ChartSpec{Type: "pie", Series: []Series{{Name: "s", Data: []float64{1}}}}
+	if _, err := RenderSVG(bad); err == nil {
 		t.Fatal("expected capability error")
 	} else {
 		ce, ok := err.(*CapabilityError)
@@ -371,8 +401,15 @@ func TestCapabilityManifestAndError(t *testing.T) {
 		if ce.Code != "E_CAPABILITY" || ce.Path != "$.type" {
 			t.Fatalf("unexpected capability error: %+v", ce)
 		}
-		if ce.Message != `unsupported chart type "bar"` {
+		if ce.Message != `unsupported chart type "pie"` {
 			t.Fatalf("unexpected capability message: %+v", ce)
 		}
 	}
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

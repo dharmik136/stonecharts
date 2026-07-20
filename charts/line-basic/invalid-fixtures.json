@@ -330,7 +330,7 @@
   },
   {
     "spec": {
-      "type": "bar",
+      "type": "pie",
       "series": [
         {
           "name": "s",
@@ -341,7 +341,7 @@
       ]
     },
     "errors": [
-      "$.type: unknown chart type \"bar\""
+      "$.type: unknown chart type \"pie\""
     ]
   },
   {

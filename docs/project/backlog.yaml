@@ -82,7 +82,7 @@ items:
     verification: [python tools/check_docs.py, GitHub Project conformance check]
 
   - id: DEC-002
-    title: Ratify line, column, and area as the active 0.0.0.1 chart types
+    title: Ratify line, column, bar, and area as the active 0.0.0.1 chart types
     item_type: Decision
     status: Done
     priority: P0
