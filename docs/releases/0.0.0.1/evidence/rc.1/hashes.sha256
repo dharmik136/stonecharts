@@ -8,11 +8,11 @@ fdb60a57977bac795f6f00311a042e094b143097d36004d3ef7372d3be85cfac  docs/releases/
 727e7546fa7a1df64eca7de118d992a2df797aee1d68636ea21a984a4ac3745a  docs/releases/0.0.0.1/evidence/direct-cross-render-review.md
 d68bbba70666bc543efae40a4ecaf8169b4f21aea081f41dcca678e3b22320c7  docs/releases/0.0.0.1/evidence/rc.1/fuzz-corpus.json
 d688708d9953715ce4d95418da68f28465da3d861c68d6e8af52c8b5934d8426  docs/releases/0.0.0.1/evidence/rc.1/fuzz-property-report.md
-2ada4e5fd73dc695aa98f7570846c660c0581f3f4c4dd067ed13afa9a2347222  docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md
-283923308b19a2134eb992f1af0448acaed3d5bb9f362e637e1ca6547a31b258  docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json
-084e73f6da503e7ffb7768c477b69ba7b8ee6d89d9c9413b64bf082e8b8c5209  docs/releases/0.0.0.1/evidence/rc.1/provenance.json
+b61f1bb6337dd003802872c282947f0a7750a37523aaddfa3485e7f120ae5501  docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md
+c976d61262c0ba645855ca6e21b9e0a2c38247ef3a404b232bf299ec4b2ff647  docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json
+3900cd8b443996ee04db65dbdd11842a3da11f0d247e14456aff40dbb8f691e4  docs/releases/0.0.0.1/evidence/rc.1/provenance.json
 06ba510cdfd0352a98c9e030cf8b1b58bf9f1dc902448f80d6137beb1d65163b  docs/releases/0.0.0.1/evidence/rc.1/package-install-matrix.md
-08fbff5222974c87cc38d8de5d6c0d28389868e100b99290b0b75f0e6d24f107  docs/quality/evidence-registry.yaml
+501a8a8a59189b08d6acabcfe1d1ac6a51ac77abe2cd94c98b28b538082b7fc0  docs/quality/evidence-registry.yaml
 79d885d2dbe6197d8aa94553ce563192ff999623ad102574cb521f3eefd41723  libs/python/stonecharts/__init__.py
 25ce445e2c9c487cc464b1d93dc0b601ebf7c2fa8133519c99dcaf417c40caf4  libs/python/pyproject.toml
 2acd29679ac852b7c32c48c78776ee120931fd25bbdf83821012e708360f66da  libs/go/go.mod
@@ -21,4 +21,4 @@ d688708d9953715ce4d95418da68f28465da3d861c68d6e8af52c8b5934d8426  docs/releases/
 503135f1e79a1c4dc40a7e4ea114b6e956d59e478db9b184781a9fb5ea3749d8  tools/check_release_evidence.py
 b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50  runtime/browser-qualification.test.js
 8153df43c010a46a53a4954dcd9167a9c1fd6910d6ea6f469d215d712457dc80  runtime/chart-interactions.test.js
-084e73f6da503e7ffb7768c477b69ba7b8ee6d89d9c9413b64bf082e8b8c5209  docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256
+3900cd8b443996ee04db65dbdd11842a3da11f0d247e14456aff40dbb8f691e4  docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256

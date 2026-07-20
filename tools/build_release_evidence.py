@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -50,7 +51,7 @@ def main() -> int:
     branch = run("git", "branch", "--show-current")
     status = run("git", "status", "--short")
     generated_at = datetime.now(ZoneInfo("Asia/Calcutta")).isoformat(timespec="seconds")
-    python_version = run("python", "--version")
+    python_version = run(sys.executable, "--version")
     go_version = run("go", "version")
 
     checklist = f"""---

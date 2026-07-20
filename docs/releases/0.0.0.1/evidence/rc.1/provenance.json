@@ -4,7 +4,7 @@
     {
       "name": "docs/releases/0.0.0.1/evidence/rc.1",
       "digest": {
-        "sha256": "959edcbb253077ee5d828981d575914cd49992f80584e9103516d71c3b84099d"
+        "sha256": "a42da2127f530fd4e65c3e8059f6a234ff706064deaa3f0e3546ec149b4c9114"
       }
     }
   ],
@@ -18,13 +18,13 @@
         "branch": "main"
       },
       "internalParameters": {
-        "status": "M .gitignore\n M docs/project/backlog.yaml\n M docs/quality/evidence-registry.yaml\n M docs/releases/0.0.0.1/checklist.md\n M docs/releases/0.0.0.1/evidence/manifest.schema.json\n M docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256\n M docs/releases/0.0.0.1/evidence/rc.1/manifest.json\n M docs/releases/0.0.0.1/evidence/rc.1/provenance.json\n M docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md\n M docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json\n M libs/go/cartesian.go\n M libs/go/render_test.go\n M tools/build_release_evidence.py\n?? tools/check_fuzz_property.py"
+        "status": "M docs/quality/evidence-registry.yaml\n M docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256\n M docs/releases/0.0.0.1/evidence/rc.1/manifest.json\n M docs/releases/0.0.0.1/evidence/rc.1/provenance.json\n M docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md\n M docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json\n M tools/build_release_evidence.py"
       },
       "resolvedDependencies": [
         {
           "uri": "git+https://github.com/dharmik136/stonecharts.git",
           "digest": {
-            "sha1": "5d89445ccb60f20498addbe569ac3fe6c7aaf2d4"
+            "sha1": "be3bddc2094d259b639508a0999fd52863cee52e"
           }
         },
         {
@@ -36,7 +36,7 @@
         {
           "uri": "file:docs/quality/evidence-registry.yaml",
           "digest": {
-            "sha256": "08fbff5222974c87cc38d8de5d6c0d28389868e100b99290b0b75f0e6d24f107"
+            "sha256": "501a8a8a59189b08d6acabcfe1d1ac6a51ac77abe2cd94c98b28b538082b7fc0"
           }
         },
         {
@@ -52,8 +52,8 @@
         "id": "codex-cli/powershell"
       },
       "metadata": {
-        "invocationId": "5d89445ccb60f20498addbe569ac3fe6c7aaf2d4",
-        "completed": "2026-07-20T00:37:03+05:30",
+        "invocationId": "be3bddc2094d259b639508a0999fd52863cee52e",
+        "completed": "2026-07-20T13:48:10+05:30",
         "environment": {
           "python": "Python 3.14.4",
           "go": "go version go1.26.4 windows/amd64",
