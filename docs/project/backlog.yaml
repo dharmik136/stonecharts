@@ -82,14 +82,14 @@ items:
     verification: [python tools/check_docs.py, GitHub Project conformance check]
 
   - id: DEC-002
-    title: Ratify line and column as the only active 0.0.0.1 chart types
+    title: Ratify line, column, and area as the active 0.0.0.1 chart types
     item_type: Decision
     status: Done
     priority: P0
     workstream: WS-01 Governance
     stage: S0 Foundation
     target: 0.0.0.1
-    outcome: The first release has one unambiguous chart capability boundary.
+    outcome: The first release has one unambiguous chart capability boundary across line, column, and area.
     traceability: [REQ-SCOPE-001, REQ-CAP-001, SC-ARCH-ADR-0002, SC-CON-002]
     risks: [RISK-001, RISK-003]
     evidence: [TEST-CAPABILITY-MATRIX]
@@ -97,7 +97,7 @@ items:
     compatibility: Narrows the active schema; unreleased design recipes remain informative.
     areas: [spec, python, go]
     acceptance:
-      - Product owner records whether only line and column are actively supported.
+      - Product owner records whether line, column, and area are actively supported.
       - Unsupported designs have an explicit non-normative status.
       - The decision names the required validator and capability behavior.
     verification: [Approved decision record and capability-matrix test plan]

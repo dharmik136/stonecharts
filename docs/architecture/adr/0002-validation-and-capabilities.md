@@ -20,7 +20,7 @@ superseded_by: null
 ## Context
 
 The current schema and validators recognize design-only chart types while dispatchers
-render only line and column. Structural validity and implementation capability are
+render line, column, and area. Structural validity and implementation capability are
 therefore conflated, and accepted input can reach a panic or exception.
 
 ## Decision
@@ -31,7 +31,7 @@ Validation has two explicit phases:
 2. Validate the requested features against a machine-readable renderer capability
    manifest before rendering.
 
-The 0.0.0.1 active schema contains only line and column. Unreleased designs remain
+The 0.0.0.1 active schema contains line, column, and area. Unreleased designs remain
 non-normative. A future spec valid under a newer schema may receive an unsupported
 capability error from an older renderer. All user-input failures are typed and
 non-fatal.

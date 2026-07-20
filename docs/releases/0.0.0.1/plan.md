@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Objective
 
-Ship the first auditable proof of the StoneCharts thesis: line and column rendered
+Ship the first auditable proof of the StoneCharts thesis: line, column, and area rendered
 natively by Python and Go from one released specification, with canonical SVG parity,
 safe validation, bounded customization, qualified browser behavior, and an immutable
 evidence pack.
@@ -50,7 +50,7 @@ Implementation hardening begins after:
   strategy, security controls, and this plan are approved.
 - Every `must` requirement has acceptance criteria and a verification ID.
 - Current implementation gaps are present in the risk register and work backlog.
-- No new chart type or language work is active.
+- No unapproved chart-type or language work is active.
 
 ## Implementation stages
 
@@ -68,7 +68,7 @@ Each stage has semantic tests before implementation and a separate reviewable co
 
 ## Hard release gates
 
-- Active schema and capability manifests expose line and column only.
+- Active schema and capability manifests expose line, column, and area.
 - Schema, Python, and Go accept and reject the same ratified domain.
 - No user-controlled input causes a panic, unhandled exception, NaN, infinity, unsafe
   markup, or partial artifact.

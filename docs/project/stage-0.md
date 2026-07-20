@@ -29,7 +29,7 @@ Release `0.0.0.1` cannot enter contract hardening until `GATE-S0` is complete.
 ## Entry state
 
 - StoneCharts is the canonical product and technical namespace.
-- Python and Go line and column renderers exist with a shared golden corpus.
+- Python and Go line, column, and area renderers exist with a shared golden corpus.
 - Repository and documentation controls execute successfully.
 - Known correctness, runtime, customization, release, and evidence gaps are recorded.
 
@@ -75,7 +75,7 @@ passes.
 4. Every open implementation gap and release-significant risk maps to a Project item.
 5. Project fields and item values conform to `docs/project/backlog.yaml`.
 6. Documentation, schema, reference, and Project conformance checks pass.
-7. No chart-type or language-expansion implementation is active.
+7. No unapproved chart-type or language-expansion implementation is active.
 8. Stage 1 items remain outside `Ready` until this gate is closed.
 
 ## Evidence

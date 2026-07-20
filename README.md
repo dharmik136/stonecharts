@@ -97,11 +97,12 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 |-------|------|--------|----|----|
 | Basic line (`line-basic`) | ✅ | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 | Column (`column`) | qualification pending | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Area (`area`) | implementation complete | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
 tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
-The active Alpha scope is line and column. Other chart designs remain roadmap
+The active Alpha scope is line, column, and area. Other chart designs remain roadmap
 material until the schema, capability, conformance, packaging, and release gates
 for each type are complete.
 

@@ -18,6 +18,7 @@ func TestGolden(t *testing.T) {
 	cases := map[string][]string{
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":       {"basic", "stacked", "percent", "themed-dark"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -80,6 +81,25 @@ func TestColumnEdgeCases(t *testing.T) {
 		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in column render for %s", specJSON)
+		}
+	}
+}
+
+func TestAreaEdgeCases(t *testing.T) {
+	cases := []string{
+		`{"type":"area","xAxis":{"categories":["a","b"]},"series":[{"name":"s","data":[1,2]}]}`,
+		`{"type":"area","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`,
+		`{"type":"area","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
+		`{"type":"area","series":[{"name":"a","data":[42]}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+		low := strings.ToLower(mustSVG(t, spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in area render for %s", specJSON)
 		}
 	}
 }
@@ -270,6 +290,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 	cases := map[string][]string{
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":       {"basic", "stacked", "percent", "themed-dark"},
 	}
 	if len(cases) == 0 {
 		t.Fatal("no active release examples")
@@ -336,7 +357,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"column", "line"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "column", "line"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "bar", Series: []Series{{Name: "s", Data: []float64{1}}}}

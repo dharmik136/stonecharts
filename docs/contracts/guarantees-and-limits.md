@@ -70,7 +70,7 @@ compatibility policy and its evidence requirements.
 
 ## 0.0.0.1 known limits
 
-- Only line and column are released chart types.
+- Line, column, and area are released chart types.
 - Layout uses deterministic defaults and manual margins; there is no automatic text
   measurement, wrapping, collision avoidance, or legend pagination.
 - The default font stack depends on the host viewer and has no pixel identity promise.

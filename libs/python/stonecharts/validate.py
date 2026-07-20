@@ -287,6 +287,7 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
 # Known chart types for the active 0.0.0.1 release scope.  Keep sorted for
 # readability; the set comparison is order-independent.
 _KNOWN_TYPES = {
+    "area",
     "column",
     "line",
 }

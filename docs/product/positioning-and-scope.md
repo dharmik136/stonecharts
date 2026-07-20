@@ -33,7 +33,7 @@ than browser-only breadth.
 
 An authorized 0.0.0.1 user can:
 
-- Describe a supported line or column chart in one JSON-compatible specification.
+- Describe a supported line, column, or area chart in one JSON-compatible specification.
 - Validate and render it natively in Python or Go.
 - Obtain identical canonical SVG for the release conformance corpus.
 - Produce self-contained interactive HTML using the shared runtime.
@@ -43,7 +43,7 @@ An authorized 0.0.0.1 user can:
 
 ## In scope
 
-- Chart types `line` and `column` only.
+- Chart types `line`, `column`, and `area` only.
 - Grouped, overlaid, normal-stacked, and non-negative percent-stacked columns.
 - Categorical x axes and linear numeric y axes.
 - Light, dark, and structured custom themes already represented by the schema.

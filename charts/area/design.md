@@ -12,11 +12,9 @@
 - **Chart id:** `area`
 - **Spec `type`:** `"area"`
 - **Class:** `variant` (Family A — Cartesian/XY) · **Build rank 5** · **Src:** HC
-- **Status:** design-complete + examples validated · renderers deferred (only
-  `line` has a live renderer today; area rides the shared cartesian frame + the
-  line renderer once column's stacking transform lands — see
+- **Status:** implemented + examples validated · renderer shipped in Python and Go (area rides the shared cartesian frame and line-style marks; see
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 5, §4, §5)
-- **Renderers (planned):** `libs/python/stonecharts/charts/area.py` · `libs/go/area.go`
+- **Renderers:** `libs/python/stonecharts/charts/area.py` · `libs/go/area.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -351,7 +349,7 @@ Each file is a complete, realistic spec that passes `validate() == []`:
 The full golden build set additionally pins an **`adversarial`** case carrying
 hostile strings (`<script>`, `"`, `<`, `&`) in **every** marks-emitted field
 (series name, category label, custom color) so the XSS tests run against the area
-marks (§5.5d). `AREA_CASES = ["basic","stacked","percent","dark","adversarial"]`.
+marks (§5.5d). `AREA_CASES = ["basic","stacked","percent","themed-dark","adversarial"]`.
 
 ## Generate it
 
@@ -413,15 +411,14 @@ A self-contained interactive HTML file: inline SVG + CSS + the shared runtime.
   transform — it forks **neither**; the extraction they triggered
   (`_cartesian.py` / `cartesian.go`) is the substrate it reuses.
 
-## Not yet supported (roadmap)
+## Supported and deferred
 
-- Live renderers (`area.py` / `area.go`) — deferred; design + examples +
-  validation are complete. Only `line` renders today.
-- **Streamgraph** (wiggle / silhouette baseline offset) — a variant layering a
-  baseline-offset transform on this stacked-area renderer.
-- **Area range (arearange)** — the pure `{low,high}` band (rank 10); a sibling
-  with its own point model, distinct from the stacked cumulative baseline.
-- **Area-spline / stepped area** — already available via `curve:"monotone"` /
-  `step` on the top edge; called out here as named Highcharts subtypes.
-- Negative-stack handling, area with `null`/gap points, inverted axes — variants
-  layered on this base.
+- Live renderers (`area.py` / `area.go`) are implemented and validated.
+- **Streamgraph** (wiggle / silhouette baseline offset) remains a planned variant
+  layering a baseline-offset transform on this stacked-area renderer.
+- **Area range (arearange)** remains the pure `{low,high}` band (rank 10); a
+  sibling with its own point model, distinct from the stacked cumulative baseline.
+- **Area-spline / stepped area** is available via `curve:"monotone"` / `step` on
+  the top edge; called out here as named Highcharts subtypes.
+- Negative-stack handling, area with `null`/gap points, inverted axes remain
+  variants layered on this base.

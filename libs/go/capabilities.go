@@ -30,7 +30,7 @@ type CapabilityManifest struct {
 var activeCapabilities = CapabilityManifest{
 	SpecVersion:       "0.0.0.1",
 	SVGContractVersion: "0.0.0.1",
-	ChartTypes:        []string{"column", "line"},
+	ChartTypes:        []string{"area", "column", "line"},
 	Column: map[string][]string{
 		"grouping": []string{"grouped", "overlay"},
 		"stacking": []string{"none", "normal", "percent-nonnegative"},

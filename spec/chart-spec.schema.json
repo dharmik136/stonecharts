@@ -10,7 +10,8 @@
       "type": "string",
       "enum": [
         "line",
-        "column"
+        "column",
+        "area"
       ],
       "description": "Chart type id for the active 0.0.0.1 release scope; maps to the released chart design and renderer pair."
     },
