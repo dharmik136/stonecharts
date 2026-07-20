@@ -1,0 +1,17 @@
+[
+  {
+    "spec": {
+      "type": "scatter",
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2, 3],
+          "regression": "yes"
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].regression: expected boolean, received string"
+    ]
+  }
+]

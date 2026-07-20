@@ -1,0 +1,17 @@
+[
+  {
+    "spec": {
+      "type": "arearange",
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2, 3],
+          "low": "bad"
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].low: expected array, received string"
+    ]
+  }
+]

@@ -1,0 +1,100 @@
+[
+  {
+    "spec": {
+      "type": "histogram",
+      "binning": 123,
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2, 3]
+        }
+      ]
+    },
+    "errors": [
+      "$.binning: expected object, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "histogram",
+      "preBinned": "yes",
+      "xAxis": {
+        "binEdges": [0, 1, 2]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2]
+        }
+      ]
+    },
+    "errors": [
+      "$.preBinned: expected boolean, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "histogram",
+      "normalization": "percent",
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2, 3]
+        }
+      ]
+    },
+    "errors": [
+      "$.normalization: expected one of \"frequency\", \"density\", received \"percent\""
+    ]
+  },
+  {
+    "spec": {
+      "type": "histogram",
+      "overlay": "trend",
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2, 3]
+        }
+      ]
+    },
+    "errors": [
+      "$.overlay: expected one of \"pareto\", \"bellcurve\", received \"trend\""
+    ]
+  },
+  {
+    "spec": {
+      "type": "histogram",
+      "binning": {
+        "width": 0
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2, 3]
+        }
+      ]
+    },
+    "errors": [
+      "$.binning.width: expected positive number, received 0"
+    ]
+  },
+  {
+    "spec": {
+      "type": "histogram",
+      "preBinned": true,
+      "xAxis": {
+        "binEdges": "bad"
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [1, 2]
+        }
+      ]
+    },
+    "errors": [
+      "$.xAxis.binEdges: expected array, received string"
+    ]
+  }
+]

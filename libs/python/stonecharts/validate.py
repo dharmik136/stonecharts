@@ -126,6 +126,14 @@ def _axis(v: Any, path: str, errs: List[str]) -> None:
         _num(v["max"], f"{path}.max", errs)
     if "gridLine" in v:
         _gridline(v["gridLine"], f"{path}.gridLine", errs)
+    if "opposite" in v:
+        _bool(v["opposite"], f"{path}.opposite", errs)
+    if "binEdges" in v:
+        if not isinstance(v["binEdges"], list):
+            errs.append(f"{path}.binEdges: expected array, received {_jtype(v['binEdges'])}")
+        else:
+            for i, e in enumerate(v["binEdges"]):
+                _num(e, f"{path}.binEdges[{i}]", errs)
 
 
 def _margin(v: Any, path: str, errs: List[str]) -> None:
@@ -145,6 +153,21 @@ def _layout(v: Any, path: str, errs: List[str]) -> None:
         return
     if "margin" in v:
         _margin(v["margin"], f"{path}.margin", errs)
+
+def _binning(v: Any, path: str, errs: List[str]) -> None:
+    if not isinstance(v, dict):
+        errs.append(f"{path}: expected object, received {_jtype(v)}")
+        return
+    if "count" in v:
+        _intnum(v["count"], f"{path}.count", errs)
+        if isinstance(v["count"], (int, float)) and not isinstance(v["count"], bool) and int(v["count"]) <= 0:
+            errs.append(f"{path}.count: expected positive integer, received {int(v['count'])}")
+    if "width" in v:
+        _num(v["width"], f"{path}.width", errs)
+        if isinstance(v["width"], (int, float)) and not isinstance(v["width"], bool) and float(v["width"]) <= 0:
+            errs.append(f"{path}.width: expected positive number, received {fmt_num(float(v['width']))}")
+    if "start" in v:
+        _num(v["start"], f"{path}.start", errs)
 
 
 def _num_or_default(v: Any, default: float) -> float:
@@ -253,6 +276,14 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
         return
     if "name" in v:
         _str(v["name"], f"{path}.name", errs)
+    if "type" in v:
+        _str(v["type"], f"{path}.type", errs)
+        if isinstance(v["type"], str) and v["type"] not in ("line", "column"):
+            errs.append(f'{path}.type: expected one of "line", "column", received "{v["type"]}"')
+    if "yAxis" in v:
+        _intnum(v["yAxis"], f"{path}.yAxis", errs)
+        if isinstance(v["yAxis"], (int, float)) and not isinstance(v["yAxis"], bool) and int(v["yAxis"]) not in (0, 1):
+            errs.append(f'{path}.yAxis: expected one of 0, 1, received "{int(v["yAxis"])}"')
     if "data" not in v:
         errs.append(f"{path}.data: required")
     elif not isinstance(v["data"], list):
@@ -282,6 +313,15 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
             errs.append(f'{path}.marker.symbol: expected one of "circle", "square", "triangle", "diamond", received "{v["marker"]["symbol"]}"')
     if "marker" in v:
         _marker(v["marker"], f"{path}.marker", errs)
+    if "regression" in v:
+        _bool(v["regression"], f"{path}.regression", errs)
+    if "low" in v:
+        low = v["low"]
+        if not isinstance(low, list):
+            errs.append(f"{path}.low: expected array, received {_jtype(low)}")
+        else:
+            for i, e in enumerate(low):
+                _num(e, f"{path}.low[{i}]", errs)
 
 
 # Known chart types for the active 0.0.0.1 release scope.  Keep sorted for
@@ -289,8 +329,12 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
 _KNOWN_TYPES = {
     "area",
     "bar",
+    "combo",
     "column",
+    "histogram",
     "line",
+    "scatter",
+    "arearange",
 }
 
 
@@ -315,16 +359,30 @@ def validate(d: Any) -> List[str]:
         _str(d["stacking"], "$.stacking", errs)
         if isinstance(d["stacking"], str) and d["stacking"] not in ("normal", "percent"):
             errs.append(f'$.stacking: expected one of "normal", "percent", received "{d["stacking"]}"')
+    if "preBinned" in d:
+        _bool(d["preBinned"], "$.preBinned", errs)
+    if "normalization" in d:
+        _str(d["normalization"], "$.normalization", errs)
+        if isinstance(d["normalization"], str) and d["normalization"] not in ("frequency", "density"):
+            errs.append(f'$.normalization: expected one of "frequency", "density", received "{d["normalization"]}"')
+    if "overlay" in d:
+        _str(d["overlay"], "$.overlay", errs)
+        if isinstance(d["overlay"], str) and d["overlay"] not in ("pareto", "bellcurve"):
+            errs.append(f'$.overlay: expected one of "pareto", "bellcurve", received "{d["overlay"]}"')
     if "grouping" in d:
         _bool(d["grouping"], "$.grouping", errs)
     if "theme" in d:
         _theme(d["theme"], "$.theme", errs)
     if "layout" in d:
         _layout(d["layout"], "$.layout", errs)
+    if "binning" in d:
+        _binning(d["binning"], "$.binning", errs)
     if "xAxis" in d:
         _axis(d["xAxis"], "$.xAxis", errs)
     if "yAxis" in d:
         _axis(d["yAxis"], "$.yAxis", errs)
+    if "secondaryYAxis" in d:
+        _axis(d["secondaryYAxis"], "$.secondaryYAxis", errs)
     if "series" not in d:
         errs.append("$.series: required")
     elif not isinstance(d["series"], list):
@@ -335,6 +393,8 @@ def validate(d: Any) -> List[str]:
     if d.get("stacking") == "percent" and isinstance(d.get("series"), list):
         for i, s in enumerate(d["series"]):
             if not isinstance(s, dict):
+                continue
+            if isinstance(s.get("type"), str) and s["type"] == "line":
                 continue
             data = s.get("data")
             if not isinstance(data, list):

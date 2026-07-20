@@ -56,6 +56,12 @@ type Pattern struct {
 	StrokeWidth *float64 `json:"strokeWidth,omitempty"`
 }
 
+type Binning struct {
+	Count *int     `json:"count,omitempty"`
+	Width *float64 `json:"width,omitempty"`
+	Start *float64 `json:"start,omitempty"`
+}
+
 func (p *Pattern) size() float64        { return fdef(p.Size, 8) }
 func (p *Pattern) angle() float64       { return fdef(p.Angle, 45) }
 func (p *Pattern) strokeWidth() float64 { return fdef(p.StrokeWidth, 1.5) }
@@ -69,6 +75,8 @@ func (p *Pattern) hatchColor() string {
 type Series struct {
 	Name        string          `json:"name"`
 	Data        []float64       `json:"data"`
+	Type        string          `json:"type,omitempty"`        // line | column (combo per-series mark kind)
+	YAxis       int             `json:"yAxis,omitempty"`       // 0 -> primary yAxis; 1 -> secondaryYAxis
 	Color       json.RawMessage `json:"color,omitempty"`       // hex string OR gradient object
 	FillOpacity float64         `json:"fillOpacity,omitempty"` // >0 -> area fill
 	Pattern     *Pattern        `json:"pattern,omitempty"`     // hatch fill for the area
@@ -77,6 +85,8 @@ type Series struct {
 	Step        string          `json:"step,omitempty"`        // "" | before | after | center
 	Curve       string          `json:"curve,omitempty"`       // "" / linear | monotone
 	Marker      *Marker         `json:"marker,omitempty"`
+	Regression  bool            `json:"regression,omitempty"`
+	Low         []float64       `json:"low,omitempty"`
 }
 
 // colorSpec resolves Color (a hex string or a gradient object).
@@ -131,9 +141,11 @@ type GridLine struct {
 type Axis struct {
 	Title      string    `json:"title,omitempty"`
 	Categories []string  `json:"categories,omitempty"`
+	BinEdges   []float64 `json:"binEdges,omitempty"`
 	Min        *float64  `json:"min,omitempty"`
 	Max        *float64  `json:"max,omitempty"`
 	GridLine   *GridLine `json:"gridLine,omitempty"` // yAxis only
+	Opposite   *bool     `json:"opposite,omitempty"` // secondaryYAxis only
 }
 
 type Margin struct {
@@ -281,23 +293,28 @@ func (n *pxInt) UnmarshalJSON(b []byte) error {
 }
 
 type ChartSpec struct {
-	Type       string          `json:"type"`
-	ID         string          `json:"id,omitempty"`
-	Theme      json.RawMessage `json:"theme,omitempty"` // name string OR theme object
-	theme      *Theme          // resolved (set in applyDefaults)
-	Title      string          `json:"title,omitempty"`
-	Subtitle   string   `json:"subtitle,omitempty"`
-	Width      pxInt    `json:"width,omitempty"`
-	Height     pxInt    `json:"height,omitempty"`
-	Legend     *bool    `json:"legend,omitempty"`
-	A11y       *bool    `json:"a11y,omitempty"` // nil -> true
-	Responsive bool     `json:"responsive,omitempty"`
-	Layout     *Layout  `json:"layout,omitempty"`
-	Stacking   string   `json:"stacking,omitempty"` // "" | "normal" | "percent"
-	Grouping   *bool    `json:"grouping,omitempty"` // nil -> true
-	XAxis      Axis     `json:"xAxis"`
-	YAxis      Axis     `json:"yAxis"`
-	Series     []Series `json:"series"`
+	Type           string          `json:"type"`
+	ID             string          `json:"id,omitempty"`
+	Theme          json.RawMessage `json:"theme,omitempty"` // name string OR theme object
+	theme          *Theme          // resolved (set in applyDefaults)
+	Title          string          `json:"title,omitempty"`
+	Subtitle       string          `json:"subtitle,omitempty"`
+	Width          pxInt           `json:"width,omitempty"`
+	Height         pxInt           `json:"height,omitempty"`
+	Legend         *bool           `json:"legend,omitempty"`
+	A11y           *bool           `json:"a11y,omitempty"` // nil -> true
+	Responsive     bool            `json:"responsive,omitempty"`
+	Layout         *Layout         `json:"layout,omitempty"`
+	Stacking       string          `json:"stacking,omitempty"` // "" | "normal" | "percent"
+	Grouping       *bool           `json:"grouping,omitempty"` // nil -> true
+	Binning        *Binning        `json:"binning,omitempty"`
+	PreBinned      bool            `json:"preBinned,omitempty"`
+	Normalization  string          `json:"normalization,omitempty"`
+	Overlay        string          `json:"overlay,omitempty"`
+	XAxis          Axis            `json:"xAxis"`
+	YAxis          Axis            `json:"yAxis"`
+	SecondaryYAxis *Axis           `json:"secondaryYAxis,omitempty"`
+	Series         []Series        `json:"series"`
 }
 
 // applyDefaults mirrors the Python ChartSpec defaults so the two libraries
@@ -323,6 +340,9 @@ func (c *ChartSpec) applyDefaults() {
 	for i := range c.Series {
 		if c.Series[i].Name == "" {
 			c.Series[i].Name = "Series " + strconv.Itoa(i+1)
+		}
+		if c.Series[i].Type == "" {
+			c.Series[i].Type = "column"
 		}
 	}
 }

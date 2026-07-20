@@ -115,6 +115,10 @@ type cartesianFrame struct {
 	includeZero                bool   // value-axis zero-anchor (see buildFrame)
 	orientation                string // "vertical" | "horizontal"
 	stacking                   string // "" | "normal" | "percent" — frame owns the stacked y-domain
+	y2Min                      float64
+	y2Max                      float64
+	y2Ticks                    []float64
+	secondaryAxis              *Axis
 }
 
 // xpix maps a category index i to a pixel x, per the frame's x-scale strategy.
@@ -177,6 +181,14 @@ func (f *cartesianFrame) valuePix(v float64) float64 {
 
 // valueZero returns the pixel coordinate for the zero baseline on the value axis.
 func (f *cartesianFrame) valueZero() float64 { return f.valuePix(0.0) }
+
+// ypix2 maps a secondary-axis value v to a pixel x (used by combo charts).
+func (f *cartesianFrame) ypix2(v float64) float64 {
+	if f.y2Max == f.y2Min {
+		return f.plotX + f.plotW/2
+	}
+	return f.plotX + f.plotW*(v-f.y2Min)/(f.y2Max-f.y2Min)
+}
 
 // marksFn — a chart supplies ONLY this: append its marks for one plot into the
 // shared accumulator p.
@@ -562,6 +574,35 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 			p.WriteString(fmt.Sprintf(
 				`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(-90 14 %s)">%s</text>`,
 				f1(yc), theme.AxisTitleColor, f1(yc), esc(spec.YAxis.Title)))
+		}
+	}
+
+	if f.secondaryAxis != nil && len(f.y2Ticks) > 0 {
+		sideLeft := f.secondaryAxis.Opposite != nil && !*f.secondaryAxis.Opposite
+		axX := plotX - 8
+		anchor := "end"
+		if !sideLeft {
+			axX = plotX + plotW + 8
+			anchor = "start"
+		}
+		p.WriteString(`<g class="sc-axis sc-axis-y2">`)
+		for _, tv := range f.y2Ticks {
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%s" text-anchor="%s" font-size="11" fill="%s">%s</text>`,
+				f1(axX), f1(f.ypix2(tv)+4), anchor, theme.AxisLabelColor, esc(fmtNum(tv))))
+		}
+		p.WriteString(`</g>`)
+		if f.secondaryAxis.Title != "" {
+			mid := f.plotY + f.plotH/2
+			if sideLeft {
+				p.WriteString(fmt.Sprintf(
+					`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(-90 14 %s)">%s</text>`,
+					f1(mid), theme.AxisTitleColor, f1(mid), esc(f.secondaryAxis.Title)))
+			} else {
+				p.WriteString(fmt.Sprintf(
+					`<text x="%d" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(90 %d %s)">%s</text>`,
+					W-14, f1(mid), theme.AxisTitleColor, W-14, f1(mid), esc(f.secondaryAxis.Title)))
+			}
 		}
 	}
 

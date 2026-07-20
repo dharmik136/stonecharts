@@ -171,6 +171,15 @@ func vaxis(v interface{}, path string, errs *[]string) {
 	if x, ok := has(m, "categories"); ok {
 		vstrArray(x, path+".categories", errs)
 	}
+	if x, ok := has(m, "binEdges"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".binEdges: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".binEdges["+itoa(i)+"]", errs)
+			}
+		}
+	}
 	if x, ok := has(m, "min"); ok {
 		vnum(x, path+".min", errs)
 	}
@@ -179,6 +188,9 @@ func vaxis(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "gridLine"); ok {
 		vgridline(x, path+".gridLine", errs)
+	}
+	if x, ok := has(m, "opposite"); ok {
+		vbool(x, path+".opposite", errs)
 	}
 }
 
@@ -206,6 +218,29 @@ func vlayout(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "margin"); ok {
 		vmargin(x, path+".margin", errs)
+	}
+}
+
+func vbinning(v interface{}, path string, errs *[]string) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, path+": expected object, received "+jtype(v))
+		return
+	}
+	if x, ok := has(m, "count"); ok {
+		vintnum(x, path+".count", errs)
+		if f, ok := x.(float64); ok && !math.IsNaN(f) && !math.IsInf(f, 0) && int(f) <= 0 {
+			*errs = append(*errs, path+".count: expected positive integer, received "+itoa(int(f)))
+		}
+	}
+	if x, ok := has(m, "width"); ok {
+		vnum(x, path+".width", errs)
+		if f, ok := x.(float64); ok && !math.IsNaN(f) && !math.IsInf(f, 0) && f <= 0 {
+			*errs = append(*errs, path+".width: expected positive number, received "+fmtNum(f))
+		}
+	}
+	if x, ok := has(m, "start"); ok {
+		vnum(x, path+".start", errs)
 	}
 }
 
@@ -366,6 +401,21 @@ func vseries(v interface{}, path string, errs *[]string) {
 	if x, ok := has(m, "name"); ok {
 		vstr(x, path+".name", errs)
 	}
+	if x, ok := has(m, "type"); ok {
+		vstr(x, path+".type", errs)
+		if s, ok := x.(string); ok && s != "line" && s != "column" {
+			*errs = append(*errs, path+`.type: expected one of "line", "column", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "yAxis"); ok {
+		vintnum(x, path+".yAxis", errs)
+		if f, ok := x.(float64); ok && !math.IsNaN(f) && !math.IsInf(f, 0) {
+			i := int(f)
+			if i != 0 && i != 1 {
+				*errs = append(*errs, path+`.yAxis: expected one of 0, 1, received "`+itoa(i)+`"`)
+			}
+		}
+	}
 	if x, ok := has(m, "data"); !ok {
 		*errs = append(*errs, path+".data: required")
 	} else if arr, ok := x.([]interface{}); !ok {
@@ -410,6 +460,18 @@ func vseries(v interface{}, path string, errs *[]string) {
 	if x, ok := has(m, "marker"); ok {
 		vmarker(x, path+".marker", errs)
 	}
+	if x, ok := has(m, "regression"); ok {
+		vbool(x, path+".regression", errs)
+	}
+	if x, ok := has(m, "low"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".low: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".low["+itoa(i)+"]", errs)
+			}
+		}
+	}
 }
 
 func vnonneg(v interface{}, path string, errs *[]string) {
@@ -424,10 +486,14 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 
 // knownTypes — active 0.0.0.1 release scope. Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
-	"area":   true,
-	"bar":    true,
-	"column": true,
-	"line":   true,
+	"area":      true,
+	"bar":       true,
+	"combo":     true,
+	"column":    true,
+	"histogram": true,
+	"line":      true,
+	"scatter":   true,
+	"arearange": true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
@@ -463,6 +529,21 @@ func validate(v interface{}) []string {
 			errs = append(errs, `$.stacking: expected one of "normal", "percent", received "`+s+`"`)
 		}
 	}
+	if x, ok := has(d, "preBinned"); ok {
+		vbool(x, "$.preBinned", &errs)
+	}
+	if x, ok := has(d, "normalization"); ok {
+		vstr(x, "$.normalization", &errs)
+		if s, ok := x.(string); ok && s != "frequency" && s != "density" {
+			errs = append(errs, `$.normalization: expected one of "frequency", "density", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(d, "overlay"); ok {
+		vstr(x, "$.overlay", &errs)
+		if s, ok := x.(string); ok && s != "pareto" && s != "bellcurve" {
+			errs = append(errs, `$.overlay: expected one of "pareto", "bellcurve", received "`+s+`"`)
+		}
+	}
 	if x, ok := has(d, "grouping"); ok {
 		vbool(x, "$.grouping", &errs)
 	}
@@ -472,11 +553,17 @@ func validate(v interface{}) []string {
 	if x, ok := has(d, "layout"); ok {
 		vlayout(x, "$.layout", &errs)
 	}
+	if x, ok := has(d, "binning"); ok {
+		vbinning(x, "$.binning", &errs)
+	}
 	if x, ok := has(d, "xAxis"); ok {
 		vaxis(x, "$.xAxis", &errs)
 	}
 	if x, ok := has(d, "yAxis"); ok {
 		vaxis(x, "$.yAxis", &errs)
+	}
+	if x, ok := has(d, "secondaryYAxis"); ok {
+		vaxis(x, "$.secondaryYAxis", &errs)
 	}
 	if x, ok := has(d, "series"); !ok {
 		errs = append(errs, "$.series: required")
@@ -495,6 +582,11 @@ func validate(v interface{}) []string {
 						m, ok := s.(map[string]interface{})
 						if !ok {
 							continue
+						}
+						if typ, ok := has(m, "type"); ok {
+							if ts, ok := typ.(string); ok && ts == "line" {
+								continue
+							}
 						}
 						if data, ok := has(m, "data"); ok {
 							if arr, ok := data.([]interface{}); ok {

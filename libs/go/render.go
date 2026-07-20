@@ -82,8 +82,16 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 	switch typ {
 	case "area":
 		return renderAreaSVG(spec), nil
+	case "arearange":
+		return renderAreaRangeSVG(spec), nil
 	case "bar":
 		return renderBarSVG(spec), nil
+	case "combo":
+		return renderComboSVG(spec), nil
+	case "histogram":
+		return renderHistogramSVG(spec), nil
+	case "scatter":
+		return renderScatterSVG(spec), nil
 	case "column":
 		return renderColumnSVG(spec), nil
 	case "line":

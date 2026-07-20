@@ -55,11 +55,18 @@ class Pattern:
     angle: float = 45.0
     stroke_width: float = 1.5
 
+@dataclass
+class Binning:
+    count: Optional[int] = None
+    width: Optional[float] = None
+    start: Optional[float] = None
 
 @dataclass
 class Series:
     name: str
     data: List[float]
+    type: str = "column"                # line | column (combo per-series mark kind)
+    y_axis: int = 0                      # 0 -> primary y_axis; 1 -> secondary_y_axis
     color: Optional[Union[str, Gradient]] = None
     fill_opacity: float = 0.0            # >0 -> area fill under the line
     pattern: Optional[Pattern] = None    # hatch fill for the area
@@ -68,6 +75,8 @@ class Series:
     step: Optional[str] = None           # None | before | after | center
     curve: Optional[str] = None          # None/linear | monotone
     marker: Optional[Marker] = None
+    regression: bool = False
+    low: Optional[List[float]] = None
 
 
 @dataclass
@@ -84,6 +93,10 @@ class Axis:
     min: Optional[float] = None
     max: Optional[float] = None
     grid_line: Optional[GridLine] = None   # yAxis only
+
+    opposite: Optional[bool] = None        # secondaryYAxis only
+
+    bin_edges: Optional[List[float]] = None   # xAxis only (histogram bins)
 
 
 @dataclass
@@ -189,6 +202,16 @@ class ChartSpec:
     subtitle: Optional[str] = None
     x_axis: Axis = field(default_factory=Axis)
     y_axis: Axis = field(default_factory=Axis)
+    secondary_y_axis: Optional[Axis] = None
+
+    binning: Optional[Binning] = None
+
+    pre_binned: bool = False
+
+    normalization: str = "frequency"
+
+    overlay: Optional[str] = None
+
     width: int = 820
     height: int = 460
     legend: bool = True
@@ -255,6 +278,8 @@ class ChartSpec:
                 Series(
                     name=s.get("name") or f"Series {i + 1}",
                     data=[float(v) for v in s["data"]],
+                    type=s.get("type") or "column",
+                    y_axis=int(s.get("yAxis", 0)),
                     color=color,
                     fill_opacity=float(s.get("fillOpacity", 0.0)),
                     pattern=pattern,
@@ -263,10 +288,22 @@ class ChartSpec:
                     step=s.get("step"),
                     curve=s.get("curve"),
                     marker=marker,
+                    regression=bool(s.get("regression", False)),
+                    low=[float(v) for v in s["low"]] if "low" in s and s["low"] is not None else None,
                 )
             )
         xa = d.get("xAxis") or {}
         ya = d.get("yAxis") or {}
+        sy = d.get("secondaryYAxis")
+
+        bn = d.get("binning")
+        binning = None
+        if bn is not None:
+            binning = Binning(
+                count=int(bn["count"]) if "count" in bn and bn["count"] is not None else None,
+                width=_opt_float(bn, "width"),
+                start=_opt_float(bn, "start"),
+            )
 
         grid = None
         gl = ya.get("gridLine")
@@ -291,6 +328,23 @@ class ChartSpec:
                 )
             layout = Layout(margin=margin)
 
+        secondary = None
+        if sy is not None:
+            sgrid = None
+            sgl = sy.get("gridLine")
+            if sgl is not None:
+                sgrid = GridLine(
+                    enabled=sgl.get("enabled", True),
+                    color=sgl.get("color"),
+                    dash_style=sgl.get("dashStyle", "solid"),
+                )
+            secondary = Axis(
+                title=sy.get("title"),
+                min=_opt_float(sy, "min"),
+                max=_opt_float(sy, "max"),
+                grid_line=sgrid,
+                opposite=sy.get("opposite", True),
+            )
         return ChartSpec(
             series=series,
             type=d.get("type") or "line",
@@ -303,6 +357,7 @@ class ChartSpec:
                 categories=xa.get("categories"),
                 min=_opt_float(xa, "min"),
                 max=_opt_float(xa, "max"),
+                bin_edges=xa.get("binEdges"),
             ),
             y_axis=Axis(
                 title=ya.get("title"),
@@ -310,6 +365,16 @@ class ChartSpec:
                 max=_opt_float(ya, "max"),
                 grid_line=grid,
             ),
+            secondary_y_axis=secondary,
+
+            binning=binning,
+
+            pre_binned=bool(d.get("preBinned", False)),
+
+            normalization=d.get("normalization") or "frequency",
+
+            overlay=d.get("overlay"),
+
             width=int(d.get("width", 820)),
             height=int(d.get("height", 460)),
             legend=bool(d.get("legend", True)),
@@ -319,3 +384,4 @@ class ChartSpec:
             stacking=d.get("stacking"),
             grouping=bool(d.get("grouping", True)),
         )
+

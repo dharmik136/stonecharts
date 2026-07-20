@@ -17,7 +17,7 @@ original single-buffer line renderer exactly — byte-identity by construction.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, List, Optional
 
 from ..spec import ChartSpec, Gradient, GridLine, Pattern, Theme
@@ -72,6 +72,10 @@ class CartesianFrame:
     include_zero: bool               # value-axis zero-anchor (see build_frame)
     orientation: str                 # "vertical" | "horizontal"
     stacking: Optional[str]          # None | "normal" | "percent" — frame owns stacked y-domain
+    secondary_axis: Optional[Axis] = None
+    y2_min: float = 0.0
+    y2_max: float = 0.0
+    y2_ticks: List[float] = field(default_factory=list)
 
     def xpix(self, i: int) -> float:
         """Category index -> pixel x, per the frame's x-scale strategy.
@@ -112,6 +116,11 @@ class CartesianFrame:
 
     def value_zero(self) -> float:
         return self.value_pix(0.0)
+
+    def ypix2(self, v: float) -> float:
+        if self.y2_max == self.y2_min:
+            return self.plot_x + self.plot_w / 2
+        return self.plot_x + self.plot_w * (v - self.y2_min) / (self.y2_max - self.y2_min)
 
 
 # A chart supplies ONLY this: append its marks for one plot into the accumulator p.
@@ -248,6 +257,10 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
     else:
         # Y range across all series; include_zero=True anchors the 0 baseline.
         values = [v for s in spec.series for v in s.data]
+        for s in spec.series:
+            low = getattr(s, "low", None)
+            if low is not None:
+                values.extend(low)
         if include_zero:
             lo = spec.y_axis.min if spec.y_axis.min is not None else min(values + [0.0])
             hi = spec.y_axis.max if spec.y_axis.max is not None else max(values + [0.0])
@@ -449,6 +462,26 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
                 f'fill="{theme.axis_title_color}" transform="rotate(-90 14 {yc:.1f})">{esc(spec.y_axis.title)}</text>'
             )
 
+    if fr.secondary_axis is not None and fr.y2_ticks:
+        side_left = bool(getattr(fr.secondary_axis, "opposite", True) is False)
+        ax_x = plot_x - 8 if side_left else plot_x + plot_w + 8
+        anchor = "end" if side_left else "start"
+        title_x = 14 if side_left else max(14, W - 14)
+        title_rot = f'rotate(-90 14 {plot_y+plot_h/2:.1f})' if side_left else f'rotate(90 {W-14} {plot_y+plot_h/2:.1f})'
+        p.append(f'<g class="sc-axis sc-axis-y2">')
+        for tv in fr.y2_ticks:
+            p.append(
+                f'<text x="{ax_x:.1f}" y="{fr.ypix2(tv)+4:.1f}" text-anchor="{anchor}" '
+                f'font-size="11" fill="{theme.axis_label_color}">{esc(fmt_num(tv))}</text>'
+            )
+        p.append("</g>")
+        if fr.secondary_axis.title:
+            p.append(
+                f'<text x="{W-14 if not side_left else 14}" y="{plot_y+plot_h/2:.1f}" '
+                f'text-anchor="middle" font-size="12" fill="{theme.axis_title_color}" '
+                f'transform="{title_rot}">{esc(fr.secondary_axis.title)}</text>'
+            )
+
     # Crosshair (hidden until a point is hovered; driven by the JS runtime).
     p.append(
         f'<line class="sc-crosshair" x1="0" y1="{plot_y:.1f}" x2="0" y2="{plot_y+plot_h:.1f}" '
@@ -497,3 +530,4 @@ def render_cartesian(spec: ChartSpec, chart_noun: str, x_scale: str, marks: Mark
     marks(fr, p)          # chart appends its <g class="sc-series">…</g> blocks here
     _chrome_tail(fr, p)
     return "".join(p)     # single "".join, NO trailing newline
+

@@ -19,7 +19,11 @@ func TestGolden(t *testing.T) {
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
 		"bar":        {"basic", "grouped", "stacked", "themed-dark"},
+		"combo":      {"basic", "dark", "dual-axis", "adversarial"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
+		"arearange":  {"basic", "spline-range", "themed-dark", "adversarial"},
+		"histogram":  {"basic", "pareto", "prebinned", "themed-dark", "adversarial"},
+		"scatter":    {"basic", "correlation", "regression", "themed-dark"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -314,7 +318,11 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
 		"bar":        {"basic", "grouped", "stacked", "themed-dark"},
+		"combo":      {"basic", "dark", "dual-axis", "adversarial"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
+		"arearange":  {"basic", "spline-range", "themed-dark", "adversarial"},
+		"histogram":  {"basic", "pareto", "prebinned", "themed-dark", "adversarial"},
+		"scatter":    {"basic", "correlation", "regression", "themed-dark"},
 	}
 	if len(cases) == 0 {
 		t.Fatal("no active release examples")
@@ -381,14 +389,14 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "bar", "column", "line"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "combo", "column", "histogram", "line", "scatter"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
-	spec := &ChartSpec{Type: "bar", Series: []Series{{Name: "s", Data: []float64{1}}}}
+	spec := &ChartSpec{Type: "combo", Series: []Series{{Name: "s", Type: "column", Data: []float64{1}}}}
 	if svg, err := RenderSVG(spec); err != nil {
-		t.Fatalf("expected bar to render, got %v", err)
+		t.Fatalf("expected combo to render, got %v", err)
 	} else if !strings.HasPrefix(svg, "<svg") {
-		t.Fatalf("expected SVG output for bar, got %q", svg[:min(len(svg), 64)])
+		t.Fatalf("expected SVG output for combo, got %q", svg[:min(len(svg), 64)])
 	}
 	bad := &ChartSpec{Type: "pie", Series: []Series{{Name: "s", Data: []float64{1}}}}
 	if _, err := RenderSVG(bad); err == nil {
