@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 _CAPABILITIES: Dict[str, Any] = {
     "specVersion": "0.0.0.1",
     "svgContractVersion": "0.0.0.1",
-    "chartTypes": ["area", "arearange", "bar", "combo", "column", "histogram", "line", "scatter"],
+    "chartTypes": ["area", "column", "line"],
     "column": {
         "grouping": ["grouped", "overlay"],
         "stacking": ["none", "normal", "percent-nonnegative"],

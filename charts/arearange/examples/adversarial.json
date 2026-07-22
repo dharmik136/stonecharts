@@ -2,36 +2,14 @@
   "type": "arearange",
   "title": "Adversarial <range> & \"band\"",
   "subtitle": "XSS in every marks-emitted field",
-  "xAxis": {
-    "categories": [
-      "<script>alert(1)</script>",
-      "a\"b",
-      "c&d",
-      "<b>x</b>",
-      "'q'"
-    ]
-  },
-  "yAxis": {
-    "title": "value & <units>"
-  },
+  "xAxis": { "categories": ["<script>alert(1)</script>", "a\"b", "c&d", "<b>x</b>", "'q'"] },
+  "yAxis": { "title": "value & <units>" },
   "series": [
     {
       "name": "<script>evil()</script> & \"band\"",
-      "data": [
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
-      "low": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ],
-      "color": "#2f7ed8"
+      "data": [5, 6, 7, 8, 9],
+      "low": [1, 2, 3, 4, 5],
+      "color": "#2f7ed8\" onload=\"alert(1)"
     }
   ]
 }

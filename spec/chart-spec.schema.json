@@ -14,12 +14,7 @@
       "enum": [
         "line",
         "column",
-        "area",
-        "combo",
-        "bar",
-        "histogram",
-        "scatter",
-        "arearange"
+        "area"
       ],
       "description": "Chart type id for the active 0.0.0.1 release scope; maps to the released chart design and renderer pair."
     },
@@ -123,44 +118,6 @@
       "items": {
         "$ref": "#/definitions/series"
       }
-    },
-    "secondaryYAxis": {
-      "$ref": "#/definitions/axis"
-    },
-    "binning": {
-      "type": "object",
-      "properties": {
-        "count": {
-          "type": "integer",
-          "minimum": 1
-        },
-        "width": {
-          "type": "number",
-          "exclusiveMinimum": 0
-        },
-        "start": {
-          "type": "number"
-        }
-      }
-    },
-    "preBinned": {
-      "type": "boolean",
-      "default": false
-    },
-    "normalization": {
-      "type": "string",
-      "enum": [
-        "frequency",
-        "density"
-      ],
-      "default": "frequency"
-    },
-    "overlay": {
-      "type": "string",
-      "enum": [
-        "pareto",
-        "bellcurve"
-      ]
     }
   },
   "allOf": [
@@ -484,34 +441,6 @@
               "default": 3.5
             }
           }
-        },
-        "regression": {
-          "type": "boolean",
-          "default": false,
-          "description": "Scatter only: when true, draw an OLS trend line over the series points."
-        },
-        "low": {
-          "type": "array",
-          "items": {
-            "type": "number"
-          },
-          "description": "Range-area companion low boundary aligned to series.data highs."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "line",
-            "column"
-          ],
-          "default": "column",
-          "description": "Per-series mark kind for combo charts."
-        },
-        "yAxis": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 1,
-          "default": 0,
-          "description": "Value axis index for combo charts: 0 primary, 1 secondary."
         }
       }
     }
