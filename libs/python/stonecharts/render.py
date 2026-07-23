@@ -10,8 +10,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable, Dict
 
+from .charts import area as _area
 from .charts import column as _column
 from .charts import line as _line
+from .capabilities import CapabilityError, capabilities
 from .spec import ChartSpec
 from .util import esc, fmt_num
 
@@ -21,9 +23,11 @@ _RUNTIME_PATH = Path(__file__).resolve().parents[3] / "runtime" / "chart-interac
 
 # chart type -> SVG renderer. New chart types register here.
 _RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
+    "area": _area.render_svg,
     "column": _column.render_svg,
     "line": _line.render_svg,
 }
+_CAPABILITIES = capabilities()
 
 _CSS = """
   .sc-chart-wrap{position:relative;display:inline-block;line-height:0}
@@ -46,8 +50,11 @@ def _data_table(spec: ChartSpec) -> str:
     """A visually-hidden HTML data table: the accessible, keyboard-navigable
     alternative to the SVG (which is role="img"). Screen readers read this."""
     n = max((len(s.data) for s in spec.series), default=0)
-    cats = spec.x_axis.categories or [str(i) for i in range(n)]
-    head = "".join(f'<th scope="col">{esc(cats[i])}</th>' for i in range(n))
+    cats = spec.x_axis.categories or []
+    head = "".join(
+        f'<th scope="col">{esc(cats[i] if i < len(cats) else str(i))}</th>'
+        for i in range(n)
+    )
     rows = []
     for s in spec.series:
         cells = "".join(
@@ -64,10 +71,21 @@ def _data_table(spec: ChartSpec) -> str:
 
 
 def render_svg(spec: ChartSpec) -> str:
-    renderer = _RENDERERS.get(spec.type)
+    resolved_type = spec.type or "line"
+    if resolved_type not in _CAPABILITIES["chartTypes"]:
+        raise CapabilityError(
+            "E_CAPABILITY",
+            "$.type",
+            f'unsupported chart type "{resolved_type}"',
+            {"expected": list(_CAPABILITIES["chartTypes"]), "received": resolved_type},
+        )
+    renderer = _RENDERERS.get(resolved_type)
     if renderer is None:
-        raise ValueError(
-            f"Unknown chart type {spec.type!r}. Known: {', '.join(sorted(_RENDERERS))}"
+        raise CapabilityError(
+            "E_CAPABILITY",
+            "$.type",
+            f'unsupported chart type "{resolved_type}"',
+            {"expected": list(_CAPABILITIES["chartTypes"]), "received": resolved_type},
         )
     return renderer(spec)
 
@@ -108,3 +126,7 @@ def save_html(spec: ChartSpec, path: str | Path, page_title: str | None = None) 
     out = Path(path)
     out.write_text(render_html(spec, page_title), encoding="utf-8")
     return out
+
+
+
+

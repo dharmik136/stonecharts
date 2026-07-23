@@ -1,0 +1,73 @@
+name: Security Review
+description: Route security or supply-chain review work to the security lane.
+title: "[Security]: "
+labels: ["role:security", "status:triage", "type:work", "target:0.0.0.1"]
+projects: ["dharmik136/2"]
+assignees:
+  - dharmik136
+body:
+  - type: textarea
+    id: surface
+    attributes:
+      label: Security surface
+      description: Name the code, workflow, dependency, or automation surface.
+    validations:
+      required: true
+  - type: textarea
+    id: concern
+    attributes:
+      label: Main concern
+      description: State the risk or abuse path that should be examined.
+    validations:
+      required: true
+  - type: textarea
+    id: checks
+    attributes:
+      label: Review checks
+      description: List the exact checks, policies, or threat-model items to confirm.
+    validations:
+      required: true
+  - type: dropdown
+    id: workstream
+    attributes:
+      label: Workstream
+      options:
+        - WS-01 Governance
+        - WS-02 Renderer
+        - WS-03 Conformance
+        - WS-04 Runtime & A11y
+        - WS-05 Customization
+        - WS-06 Release
+        - WS-07 Docs & DX
+        - WS-08 Expansion
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Stage
+      options:
+        - S0 Foundation
+        - S1 Contract Closure
+        - S2 Qualification
+        - S3 Release Candidate
+        - S4 Release
+        - S5 Expansion
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Target release or stage
+      placeholder: 0.0.0.1, S2, post-release, unscheduled

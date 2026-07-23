@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // dashArray maps a dashStyle name to an SVG stroke-dasharray value ("" = solid).
@@ -112,7 +113,12 @@ type cartesianFrame struct {
 	a11yAttr, a11yDesc         string
 	scale                      string // "point" | "band"
 	includeZero                bool   // value-axis zero-anchor (see buildFrame)
+	orientation                string // "vertical" | "horizontal"
 	stacking                   string // "" | "normal" | "percent" — frame owns the stacked y-domain
+	y2Min                      float64
+	y2Max                      float64
+	y2Ticks                    []float64
+	secondaryAxis              *Axis
 }
 
 // xpix maps a category index i to a pixel x, per the frame's x-scale strategy.
@@ -149,6 +155,41 @@ func (f *cartesianFrame) bandWidth() float64 {
 	return f.plotW / float64(f.n)
 }
 
+// bandHeight is the BAND scale per-category slot height for horizontal charts.
+func (f *cartesianFrame) bandHeight() float64 {
+	return f.plotH / float64(f.n)
+}
+
+// bandCenter returns the pixel center of category i on the band axis.
+func (f *cartesianFrame) bandCenter(i int) float64 {
+	if f.orientation == "horizontal" {
+		return f.plotY + f.bandHeight()*float64(i) + f.bandHeight()/2
+	}
+	return f.xpix(i)
+}
+
+// valuePix maps a numeric value to the value-axis pixel.
+func (f *cartesianFrame) valuePix(v float64) float64 {
+	if f.orientation == "horizontal" {
+		if f.yMax == f.yMin {
+			return f.plotX + f.plotW/2
+		}
+		return f.plotX + f.plotW*(v-f.yMin)/(f.yMax-f.yMin)
+	}
+	return f.ypix(v)
+}
+
+// valueZero returns the pixel coordinate for the zero baseline on the value axis.
+func (f *cartesianFrame) valueZero() float64 { return f.valuePix(0.0) }
+
+// ypix2 maps a secondary-axis value v to a pixel x (used by combo charts).
+func (f *cartesianFrame) ypix2(v float64) float64 {
+	if f.y2Max == f.y2Min {
+		return f.plotX + f.plotW/2
+	}
+	return f.plotX + f.plotW*(v-f.y2Min)/(f.y2Max-f.y2Min)
+}
+
 // marksFn — a chart supplies ONLY this: append its marks for one plot into the
 // shared accumulator p.
 type marksFn func(f *cartesianFrame, p *strings.Builder)
@@ -165,7 +206,7 @@ type marksFn func(f *cartesianFrame, p *strings.Builder)
 //	         true and this reproduces its existing domain exactly.
 //	false -> free numeric x (and free numeric y) scatter/bubble axis: domain
 //	         from the DATA ONLY (empty data -> 0,0).
-func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool) *cartesianFrame {
+func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientation string) *cartesianFrame {
 	W, H := int(spec.Width), int(spec.Height)
 	theme := spec.theme
 	if theme == nil {
@@ -180,30 +221,52 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool) *cartesi
 		a11yDesc = "<desc>" + s + "</desc>"
 	}
 
-	mTop := 20
+	mTop := 20.0
 	if spec.Title != "" {
 		mTop += 26
 	}
 	if spec.Subtitle != "" {
 		mTop += 18
 	}
-	mLeft := 52
-	if spec.YAxis.Title != "" {
+	mLeft := 52.0
+	if orientation == "horizontal" {
+		if spec.XAxis.Title != "" {
+			mLeft = 62
+		}
+	} else if spec.YAxis.Title != "" {
 		mLeft = 62
 	}
-	mRight := 22
-	mBottom := 46
+	mRight := 22.0
+	mBottom := 46.0
 	if spec.legendOn() {
 		mBottom += 18
 	}
-	if spec.XAxis.Title != "" {
+	if orientation == "horizontal" {
+		if spec.YAxis.Title != "" {
+			mBottom += 18
+		}
+	} else if spec.XAxis.Title != "" {
 		mBottom += 18
 	}
+	if spec.Layout != nil && spec.Layout.Margin != nil {
+		if spec.Layout.Margin.Top != nil {
+			mTop = *spec.Layout.Margin.Top
+		}
+		if spec.Layout.Margin.Left != nil {
+			mLeft = *spec.Layout.Margin.Left
+		}
+		if spec.Layout.Margin.Right != nil {
+			mRight = *spec.Layout.Margin.Right
+		}
+		if spec.Layout.Margin.Bottom != nil {
+			mBottom = *spec.Layout.Margin.Bottom
+		}
+	}
 
-	plotX := float64(mLeft)
-	plotY := float64(mTop)
-	plotW := float64(W - mLeft - mRight)
-	plotH := float64(H - mTop - mBottom)
+	plotX := mLeft
+	plotY := mTop
+	plotW := float64(W) - mLeft - mRight
+	plotH := float64(H) - mTop - mBottom
 
 	n := 0
 	for _, s := range spec.Series {
@@ -222,24 +285,32 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool) *cartesi
 	// Value-axis range. Stacking changes the domain to per-category totals.
 	lo, hi := 0.0, 0.0
 	if spec.Stacking == "normal" || spec.Stacking == "percent" {
-		totals := make([]float64, n)
-		for _, s := range spec.Series {
-			for i, v := range s.Data {
-				if i < n {
-					totals[i] += v
-				}
-			}
-		}
 		if spec.Stacking == "percent" {
 			lo = 0.0
 			hi = 100.0
 		} else {
+			posTotals := make([]float64, n)
+			negTotals := make([]float64, n)
+			for _, s := range spec.Series {
+				for i, v := range s.Data {
+					if i >= n {
+						continue
+					}
+					if v >= 0 {
+						posTotals[i] += v
+					} else {
+						negTotals[i] += v
+					}
+				}
+			}
 			lo = 0.0
 			hi = 0.0
-			for _, t := range totals {
+			for _, t := range negTotals {
 				if t < lo {
 					lo = t
 				}
+			}
+			for _, t := range posTotals {
 				if t > hi {
 					hi = t
 				}
@@ -350,6 +421,7 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool) *cartesi
 		a11yAttr: a11yAttr, a11yDesc: a11yDesc,
 		scale:       xScale,
 		includeZero: includeZero,
+		orientation: orientation,
 		stacking:    spec.Stacking,
 	}
 }
@@ -361,6 +433,7 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool) *cartesi
 func chromeHead(f *cartesianFrame, p *strings.Builder) {
 	spec, theme := f.spec, f.theme
 	W, H := f.W, f.H
+	plotX, plotY, plotW, plotH := f.plotX, f.plotY, f.plotW, f.plotH
 	if spec.Responsive {
 		p.WriteString(fmt.Sprintf(
 			`<svg class="sc-chart"%s xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" preserveAspectRatio="xMidYMid meet" width="100%%" font-family="Segoe UI, Helvetica, Arial, sans-serif">`,
@@ -403,59 +476,140 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 			f1(float64(W)/2), ty, theme.SubtitleColor, esc(spec.Subtitle)))
 	}
 
-	// Y gridlines + labels. Defaults reproduce the built-in look byte-for-byte.
-	gridEnabled := spec.YAxis.gridEnabled()
-	gridColor := spec.YAxis.gridColorOr(theme.GridColor)
-	gridDashAttr := ""
-	if da := dashArray(spec.YAxis.gridDashStyle()); da != "" {
-		gridDashAttr = ` stroke-dasharray="` + da + `"`
-	}
-	p.WriteString(`<g class="sc-axis sc-axis-y">`)
-	for _, tv := range f.yTicks {
-		gy := f.ypix(tv)
-		if gridEnabled {
-			p.WriteString(fmt.Sprintf(
-				`<line class="sc-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"%s/>`,
-				f1(f.plotX), f1(gy), f1(f.plotX+f.plotW), f1(gy), gridColor, gridDashAttr))
+	if f.orientation == "horizontal" {
+		gridEnabled := spec.YAxis.gridEnabled()
+		gridColor := spec.YAxis.gridColorOr(theme.GridColor)
+		gridDashAttr := ""
+		if da := dashArray(spec.YAxis.gridDashStyle()); da != "" {
+			gridDashAttr = ` stroke-dasharray="` + da + `"`
 		}
-		p.WriteString(fmt.Sprintf(
-			`<text x="%s" y="%s" text-anchor="end" font-size="11" fill="%s">%s</text>`,
-			f1(f.plotX-8), f1(gy+4), theme.AxisLabelColor, esc(fmtNum(tv))))
-	}
-	p.WriteString(`</g>`)
+		p.WriteString(`<g class="sc-axis sc-axis-x">`)
+		for _, tv := range f.yTicks {
+			gx := f.valuePix(tv)
+			if gridEnabled {
+				p.WriteString(fmt.Sprintf(
+					`<line class="sc-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"%s/>`,
+					f1(gx), f1(plotY), f1(gx), f1(plotY+plotH), gridColor, gridDashAttr))
+			}
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
+				f1(gx), f1(plotY+plotH+18), theme.AxisLabelColor, esc(fmtNum(tv))))
+		}
+		p.WriteString(`</g>`)
 
-	// Axis line.
-	p.WriteString(fmt.Sprintf(
-		`<line class="sc-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"/>`,
-		f1(f.plotX), f1(f.plotY+f.plotH), f1(f.plotX+f.plotW), f1(f.plotY+f.plotH), theme.AxisLineColor))
-
-	// X labels.
-	p.WriteString(`<g class="sc-axis sc-axis-x">`)
-	for i := 0; i < f.n && i < len(f.cats); i++ {
-		lx := f.xpix(i)
 		p.WriteString(fmt.Sprintf(
-			`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
-			f1(lx), f1(f.plotY+f.plotH+18), theme.AxisLabelColor, esc(f.cats[i])))
-	}
-	p.WriteString(`</g>`)
+			`<line class="sc-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"/>`,
+			f1(plotX), f1(plotY+plotH), f1(plotX+plotW), f1(plotY+plotH), theme.AxisLineColor))
 
-	// Axis titles.
-	if spec.XAxis.Title != "" {
+		p.WriteString(`<g class="sc-axis sc-axis-y">`)
+		for i := 0; i < f.n; i++ {
+			label := strconv.Itoa(i)
+			if i < len(f.cats) {
+				label = f.cats[i]
+			}
+			gy := f.bandCenter(i)
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%s" text-anchor="end" font-size="11" fill="%s">%s</text>`,
+				f1(plotX-8), f1(gy+4), theme.AxisLabelColor, esc(label)))
+		}
+		p.WriteString(`</g>`)
+
+		if spec.XAxis.Title != "" {
+			yc := f.plotY + f.plotH/2
+			p.WriteString(fmt.Sprintf(
+				`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(-90 14 %s)">%s</text>`,
+				f1(yc), theme.AxisTitleColor, f1(yc), esc(spec.XAxis.Title)))
+		}
+		if spec.YAxis.Title != "" {
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
+				f1(plotX+plotW/2), H-6, theme.AxisTitleColor, esc(spec.YAxis.Title)))
+		}
+	} else {
+		// Y gridlines + labels. Defaults reproduce the built-in look byte-for-byte.
+		gridEnabled := spec.YAxis.gridEnabled()
+		gridColor := spec.YAxis.gridColorOr(theme.GridColor)
+		gridDashAttr := ""
+		if da := dashArray(spec.YAxis.gridDashStyle()); da != "" {
+			gridDashAttr = ` stroke-dasharray="` + da + `"`
+		}
+		p.WriteString(`<g class="sc-axis sc-axis-y">`)
+		for _, tv := range f.yTicks {
+			gy := f.ypix(tv)
+			if gridEnabled {
+				p.WriteString(fmt.Sprintf(
+					`<line class="sc-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"%s/>`,
+					f1(f.plotX), f1(gy), f1(f.plotX+f.plotW), f1(gy), gridColor, gridDashAttr))
+			}
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%s" text-anchor="end" font-size="11" fill="%s">%s</text>`,
+				f1(f.plotX-8), f1(gy+4), theme.AxisLabelColor, esc(fmtNum(tv))))
+		}
+		p.WriteString(`</g>`)
+
 		p.WriteString(fmt.Sprintf(
-			`<text x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
-			f1(f.plotX+f.plotW/2), H-6, theme.AxisTitleColor, esc(spec.XAxis.Title)))
-	}
-	if spec.YAxis.Title != "" {
-		yc := f.plotY + f.plotH/2
-		p.WriteString(fmt.Sprintf(
-			`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(-90 14 %s)">%s</text>`,
-			f1(yc), theme.AxisTitleColor, f1(yc), esc(spec.YAxis.Title)))
+			`<line class="sc-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"/>`,
+			f1(f.plotX), f1(f.plotY+f.plotH), f1(f.plotX+f.plotW), f1(f.plotY+f.plotH), theme.AxisLineColor))
+
+		p.WriteString(`<g class="sc-axis sc-axis-x">`)
+		for i := 0; i < f.n; i++ {
+			lx := f.xpix(i)
+			label := strconv.Itoa(i)
+			if i < len(f.cats) {
+				label = f.cats[i]
+			}
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
+				f1(lx), f1(f.plotY+f.plotH+18), theme.AxisLabelColor, esc(label)))
+		}
+		p.WriteString(`</g>`)
+
+		if spec.XAxis.Title != "" {
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
+				f1(f.plotX+f.plotW/2), H-6, theme.AxisTitleColor, esc(spec.XAxis.Title)))
+		}
+		if spec.YAxis.Title != "" {
+			yc := f.plotY + f.plotH/2
+			p.WriteString(fmt.Sprintf(
+				`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(-90 14 %s)">%s</text>`,
+				f1(yc), theme.AxisTitleColor, f1(yc), esc(spec.YAxis.Title)))
+		}
 	}
 
-	// Crosshair (JS-driven).
+	if f.secondaryAxis != nil && len(f.y2Ticks) > 0 {
+		sideLeft := f.secondaryAxis.Opposite != nil && !*f.secondaryAxis.Opposite
+		axX := plotX - 8
+		anchor := "end"
+		if !sideLeft {
+			axX = plotX + plotW + 8
+			anchor = "start"
+		}
+		p.WriteString(`<g class="sc-axis sc-axis-y2">`)
+		for _, tv := range f.y2Ticks {
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%s" text-anchor="%s" font-size="11" fill="%s">%s</text>`,
+				f1(axX), f1(f.ypix2(tv)+4), anchor, theme.AxisLabelColor, esc(fmtNum(tv))))
+		}
+		p.WriteString(`</g>`)
+		if f.secondaryAxis.Title != "" {
+			mid := f.plotY + f.plotH/2
+			if sideLeft {
+				p.WriteString(fmt.Sprintf(
+					`<text x="14" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(-90 14 %s)">%s</text>`,
+					f1(mid), theme.AxisTitleColor, f1(mid), esc(f.secondaryAxis.Title)))
+			} else {
+				p.WriteString(fmt.Sprintf(
+					`<text x="%d" y="%s" text-anchor="middle" font-size="12" fill="%s" transform="rotate(90 %d %s)">%s</text>`,
+					W-14, f1(mid), theme.AxisTitleColor, W-14, f1(mid), esc(f.secondaryAxis.Title)))
+			}
+		}
+	}
+
+	// Crosshair (hidden until a point is hovered; driven by the JS runtime).
 	p.WriteString(fmt.Sprintf(
 		`<line class="sc-crosshair" x1="0" y1="%s" x2="0" y2="%s" stroke="%s" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>`,
-		f1(f.plotY), f1(f.plotY+f.plotH), theme.CrosshairColor))
+		f1(plotY), f1(plotY+plotH), theme.CrosshairColor))
 }
 
 // chromeTail — §4.1 TAIL — writes into p, in place: legend (bottom-center)
@@ -469,7 +623,7 @@ func chromeTail(f *cartesianFrame, p *strings.Builder) {
 		est := make([]float64, len(spec.Series))
 		total := 0.0
 		for i, s := range spec.Series {
-			est[i] = float64(len(s.Name)*7 + 26)
+			est[i] = float64(utf8.RuneCountInString(s.Name)*7 + 26)
 			total += est[i]
 		}
 		total += gap * float64(len(spec.Series)-1)
@@ -508,8 +662,12 @@ func chromeTail(f *cartesianFrame, p *strings.Builder) {
 //
 //	renderCartesian(spec, "Line", "point", lineMarks, true)
 //	renderCartesian(spec, "Column", "band", columnMarks, true)
-func renderCartesian(spec *ChartSpec, noun, xScale string, marks marksFn, includeZero bool) string {
-	f := buildFrame(spec, noun, xScale, includeZero)
+func renderCartesian(spec *ChartSpec, noun, xScale string, marks marksFn, includeZero bool, orientation ...string) string {
+	orient := "vertical"
+	if len(orientation) > 0 && orientation[0] != "" {
+		orient = orientation[0]
+	}
+	f := buildFrame(spec, noun, xScale, includeZero, orient)
 	var p strings.Builder
 	chromeHead(f, &p)
 	marks(f, &p) // chart appends its <g class="sc-series">…</g> blocks here

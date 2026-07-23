@@ -17,9 +17,9 @@ superseded_by: null
 
 # Chart: Column (`column`)
 
-> **Stage 0 authority note:** this design predates the signed-stacking decision.
-> [`ADR 0003`](../../docs/architecture/adr/0003-signed-stacking.md) overrides any
-> single-accumulator or signed-percent language below until this design is reconciled.
+> **Stage 0 authority note:** this design now reflects the signed-stacking decision.
+> [`ADR 0003`](../../docs/architecture/adr/0003-signed-stacking.md) governs the
+> diverging normal-stack and non-negative percent-stack rules below.
 
 > A single-file, self-describing spec for this chart. Read this and you can
 > produce the chart in any StoneCharts language library without looking anywhere
@@ -91,7 +91,8 @@ samples (use `histogram`). See [`CHARTS.md`](../../CHARTS.md).
 | `legend` | bool | true | bottom legend + click-to-toggle (swatch is the bar `<rect>`) |
 | `a11y` | bool | true | accessibility (on by default): SVG gets `role="img"` + a summary `aria-label` + `<desc>`; HTML adds a visually-hidden data table. `false` restores the pre-a11y bytes |
 | `responsive` | bool | false | scale to container (viewBox + `width:100%`) instead of fixed px |
-| **`stacking`** | string | — (grouped) | **NEW field.** `null`/absent = grouped side-by-side; `"normal"` = bars stacked cumulatively; `"percent"` = stacked then normalized so each category totals 100%. The **frame** owns the resulting stacking-aware y-domain (max column **total**, not per-datum max). Added in the §5.4b five-place lockstep (schema + both validators + both spec models + invalid fixtures) |
+| `layout.margin` | object | — | optional manual margins: `{top,right,bottom,left}` in px. Each value must be finite and non-negative; absent edges fall back to the deterministic defaults |
+| **`stacking`** | string | — (grouped) | **NEW field.** `null`/absent = grouped side-by-side; `"normal"` = bars stacked cumulatively with separate positive/negative accumulators; `"percent"` = stacked then normalized so each category totals 100% using non-negative values only. The **frame** owns the resulting stacking-aware y-domain (signed extrema for normal, 0–100 for percent). Added in the §5.4b five-place lockstep (schema + both validators + both spec models + invalid fixtures) |
 | **`grouping`** | bool | true | **NEW field.** Only meaningful when `stacking` is absent: `true` → `K = len(series)` side-by-side sub-bands per category (the pinned band layout); `false` → `K = 1`, all series share one centered slot (overlaid, drawn in series order). When `stacking` is set, grouping is ignored (a stack occupies one slot) |
 | `xAxis.title` | string | — | axis label |
 | `xAxis.categories` | string[] | index `0..N-1` | x labels (the band categories) |
@@ -116,14 +117,16 @@ marks. Full schema: [`spec/chart-spec.schema.json`](../../spec/chart-spec.schema
   `K = len(series)` equal sub-bands; series `k`'s bar sits in sub-band `k`. Basic
   single-series ⇒ `K = 1` ⇒ one centered bar of width `groupW`.
 - **Stacked (`stacking: "normal"`):** one slot of width `groupW` per category;
-  series segments accumulate on a cumulative baseline — segment `k`'s bottom is
-  the running total through series `k-1`, its top the total through `k`.
+  series segments accumulate on separate positive and negative baselines in
+  series order — non-negative values stack upward from zero, negative values
+  stack downward from zero.
 - **Percent (`stacking: "percent"`):** stacked, then each segment is normalized
-  by its category total so every category fills 0–100%.
-- **The frame owns the y-domain.** For stacked/percent the y-max is the **max
-  category total** (cumulative in the pinned summation order, §4), **not** the
-  per-datum max — the marks never recompute a scale. For grouped it is the usual
-  `nice_ticks` over the data with 0 forced in (`include_zero=True`).
+  by its category total so every category fills 0–100%; negative values are
+  invalid in this mode.
+- **The frame owns the y-domain.** For stacked/percent the frame computes the
+  signed extrema from the pinned summation order (positive and negative totals
+  for normal, 0–100 for percent); the marks never recompute a scale. For grouped
+  it is the usual `nice_ticks` over the data with 0 forced in (`include_zero=True`).
 
 ## Marks — what this renderer draws
 
@@ -201,9 +204,10 @@ left(i,k)   = xpix(i) - groupW/2 + barW*k
 - `PAD = 0.2` and `K = len(series)` are **fixed constants**, not per-author
   choices. `grouping:false` forces `K = 1` (overlaid); `stacking` forces one slot
   (`K = 1`) with cumulative segment heights.
-- **Stacking cumulative sums accumulate in series index order**, and the
-  **frame's** stacked y-max uses that **same** order — pin both so cumulative
-  floats and `%g` output match across languages.
+- **Stacking cumulative sums accumulate in series index order**, with separate
+  positive and negative accumulators for normal stacks. The **frame** uses that
+  same order when computing signed extrema so cumulative floats and `%g` output
+  match across languages.
 - Histogram (a later sibling) is the exception: bins are **contiguous — no
   inter-bar padding**. Column keeps the `PAD = 0.2` gap.
 
@@ -246,12 +250,13 @@ baseline). It passes the bare noun **`"Column"`** — the frame expands it to
   `height`.
 - **`data-y` under stacking** — carries the **raw per-series segment value**, not
   the running cumulative total (the tooltip shows what the user supplied), while
-  the geometry uses cumulative baselines.
+  the geometry uses signed cumulative baselines.
 - **Formatters** — `cx,cy,x,y,width,height` via `:.1f`/`f1`; `data-y`, radii,
   offsets via `fmt_num`/`fmtNum`; every user string via `esc`. A leaked raw `<`
   fails the XSS tests.
-- **Degenerate percent** — a category total of 0 would divide-by-zero; pin the
-  rule identically **before** the divide (Python raises, Go yields `NaN`→`"0"`).
+- **Degenerate percent** — a category total of 0 renders zero-height segments;
+  negative values are rejected before render. Pin the rule identically before
+  the divide so Python and Go produce the same validation error text.
 - **No stray chrome** — head/tail emit no empty `<defs>` or background `<rect>`
   under the light theme (additive-only — Gate C).
 - **Byte-parity hygiene** — goldens carry **no trailing newline**, UTF-8 no BOM;

@@ -1,0 +1,81 @@
+name: QA Task
+description: Route verification, parity checks, or regression analysis to QA.
+title: "[QA]: "
+labels: ["role:qa", "status:triage", "type:work", "target:0.0.0.1"]
+projects: ["dharmik136/2"]
+assignees:
+  - dharmik136
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What to verify
+      description: Describe the change or failure to test.
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: Commands or test flow
+      description: Include the exact commands, screenshots, or browser steps.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: State what passing looks like.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence format
+      description: Explain what artifacts the QA agent should return.
+    validations:
+      required: true
+  - type: dropdown
+    id: workstream
+    attributes:
+      label: Workstream
+      options:
+        - WS-01 Governance
+        - WS-02 Renderer
+        - WS-03 Conformance
+        - WS-04 Runtime & A11y
+        - WS-05 Customization
+        - WS-06 Release
+        - WS-07 Docs & DX
+        - WS-08 Expansion
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Stage
+      options:
+        - S0 Foundation
+        - S1 Contract Closure
+        - S2 Qualification
+        - S3 Release Candidate
+        - S4 Release
+        - S5 Expansion
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Target release or stage
+      placeholder: 0.0.0.1, S2, post-release, unscheduled

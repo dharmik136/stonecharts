@@ -8,7 +8,7 @@ approver: maintainer
 review_mode: self
 applies_to: 0.0.0.1
 requirements: [REQ-A11Y-001, REQ-RUNTIME-001]
-evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
+evidence: [TEST-RUNTIME-SMOKE, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
 last_reviewed: "2026-07-18"
 review_due: "2026-09-18"
 supersedes: null
@@ -61,3 +61,11 @@ The release evidence records browser and assistive-technology versions, operatin
 system, input method, tested tasks, result, defects, and reviewer. Automated checks are
 supporting evidence and do not replace keyboard and screen-reader review.
 
+## Current automated evidence
+
+`TEST-RUNTIME-SMOKE` covers the shared interaction runtime's keyboard and ARIA state
+transitions against the documented DOM contract. `TEST-RUNTIME-BROWSER` now covers the
+local HTTP Chromium qualification step for the declared browser profile. The manual
+accessibility review is recorded in
+[`docs/releases/0.0.0.1/evidence/manual-accessibility-review.md`](../releases/0.0.0.1/evidence/manual-accessibility-review.md),
+closing `REVIEW-ACCESSIBILITY-MANUAL` for the 0.0.0.1 release candidate.

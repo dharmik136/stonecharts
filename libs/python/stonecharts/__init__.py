@@ -15,12 +15,13 @@ Build a chart spec, render it to a self-contained interactive HTML document.
     save_html(spec, "chart.html")
 """
 from .spec import (
-    Axis, ChartSpec, Gradient, GradientStop, Marker, Pattern, Series, Theme, THEMES,
+    Axis, ChartSpec, Gradient, GradientStop, Layout, Margin, Marker, Pattern, Series, Theme, THEMES,
 )
+from .capabilities import CapabilityError, capabilities
 from .validate import SpecError, validate
 from .render import render_html, render_svg, save_html
 
-__version__ = "0.1.0"
+__version__ = "0.0.0.1"
 __all__ = [
     "ChartSpec",
     "Series",
@@ -28,9 +29,13 @@ __all__ = [
     "Marker",
     "Gradient",
     "GradientStop",
+    "Margin",
+    "Layout",
     "Pattern",
     "Theme",
     "THEMES",
+    "CapabilityError",
+    "capabilities",
     "SpecError",
     "validate",
     "render_html",

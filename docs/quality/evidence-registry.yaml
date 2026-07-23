@@ -1,19 +1,19 @@
 id: SC-QUAL-EVIDENCE
 version: 1
-updated: "2026-07-18"
+updated: "2026-07-19"
 evidence:
   - id: TEST-DOCS-CONTROL
     kind: test
     status: implemented
     description: Validates controlled metadata, registries, references, roles, and local documentation links.
-    command: python tools/check_docs.py
+    command: py -3 tools/check_docs.py
     location: tools/check_docs.py
     requirements: []
   - id: TEST-PYTHON-GOLDENS
     kind: test
     status: implemented
     description: Compares Python line and column SVG output to the shared committed golden corpus.
-    command: python -m pytest libs/python/tests
+    command: py -3 -m pytest libs/python/tests
     location: libs/python/tests/test_golden.py
     requirements: [REQ-DET-001]
   - id: TEST-GO-GOLDENS
@@ -25,79 +25,99 @@ evidence:
     requirements: [REQ-DET-001]
   - id: TEST-VALIDATION-PARITY
     kind: test
-    status: partial
-    description: Shared invalid fixtures currently compare Python and Go error text but do not yet reconcile all JSON Schema differences.
-    command: python -m pytest libs/python/tests && cd libs/go && go test ./...
-    location: charts/line-basic/invalid-fixtures.json
+    status: implemented
+    description: Shared active release fixtures are accepted by the schema, Python validator, and Go validator; shared invalid fixtures are rejected consistently across both languages.
+    command: py -3 -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: spec/chart-spec.schema.json
     requirements: [REQ-PROD-001, REQ-VAL-001, REQ-CUST-001]
   - id: TEST-CAPABILITY-MATRIX
     kind: test
-    status: planned
-    description: Will verify active schema types, per-renderer capability manifests, typed unsupported errors, and no panic boundaries.
-    command: null
-    location: null
+    status: implemented
+    description: Verifies the active capability manifest, typed unsupported errors, and the no-panic boundary for Python and Go.
+    command: py -3 -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-SCOPE-001, REQ-CAP-001]
   - id: TEST-STACK-SIGNED
     kind: test
-    status: planned
-    description: Will verify separate positive and negative normal-stack domains and geometry in both languages.
-    command: null
-    location: null
+    status: implemented
+    description: Verifies separate positive and negative normal-stack domains and geometry in both languages.
+    command: py -3 -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-STACK-001]
   - id: TEST-PERCENT-DOMAIN
     kind: test
-    status: planned
-    description: Will reject negative percent-stack values and verify deterministic all-zero category behavior.
-    command: null
-    location: null
+    status: implemented
+    description: Rejects negative percent-stack values and verifies deterministic all-zero category behavior.
+    command: py -3 -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-STACK-002]
   - id: TEST-LAYOUT-MARGINS
     kind: test
-    status: planned
-    description: Will verify manual-margin validation, preserved defaults, plot-area constraints, and cross-language output parity.
-    command: null
-    location: null
+    status: implemented
+    description: Verifies manual-margin validation, preserved defaults, plot-area constraints, and cross-language output parity.
+    command: py -3 -m pytest libs/python/tests/test_golden.py && cd libs/go && go test ./...
+    location: libs/python/tests/test_golden.py
     requirements: [REQ-LAYOUT-001]
   - id: TEST-XSS-ESCAPING
     kind: test
     status: implemented
-    description: Exercises hostile user strings across SVG and HTML sinks in both language implementations.
-    command: python -m pytest libs/python/tests && cd libs/go && go test ./...
+    description: Exercises hostile user strings across SVG and HTML sinks in both language implementations and proves structured style allowlists reject unsafe colors and enums.
+    command: py -3 -m pytest libs/python/tests && cd libs/go && go test ./...
     location: libs/python/tests/test_golden.py
     requirements: [REQ-CUST-001, REQ-SEC-001]
   - id: TEST-RUNTIME-BROWSER
     kind: test
-    status: planned
-    description: Will exercise tooltip, keyboard, focus, legend, adaptive placement, and DOM state through a local HTTP browser harness.
-    command: null
-    location: null
+    status: implemented
+    description: Exercises tooltip, keyboard, focus, legend, adaptive placement, and DOM state through a local HTTP Chromium browser harness.
+    command: node --test runtime/browser-qualification.test.js
+    location: runtime/browser-qualification.test.js
+    requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
+  - id: TEST-RUNTIME-SMOKE
+    kind: test
+    status: implemented
+    description: Exercises the shared interaction runtime and authored accessibility state transitions in the Node DOM harness as the automated precursor to full browser qualification.
+    command: node --test runtime/chart-interactions.test.js
+    location: runtime/chart-interactions.test.js
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
   - id: REVIEW-ACCESSIBILITY-MANUAL
     kind: manual-review
-    status: planned
-    description: Will record keyboard-only and assistive-technology review against the declared component accessibility profile.
+    status: implemented
+    description: Records the manual keyboard and accessibility-tree review against the declared component accessibility profile.
     command: null
-    location: null
+    location: docs/releases/0.0.0.1/evidence/manual-accessibility-review.md
     requirements: [REQ-A11Y-001]
   - id: REVIEW-VISUAL-PROFILE
     kind: manual-review
-    status: planned
-    description: Will approve the default font limitation and any future embedded-font or certified-export profile.
+    status: implemented
+    description: Records the host-font visual profile review and the boundary against future embedded-font or certified-export profiles.
     command: null
-    location: null
+    location: docs/releases/0.0.0.1/evidence/visual-profile-review.md
     requirements: [REQ-VIS-001]
   - id: BENCH-RENDER-BASELINE
     kind: benchmark
-    status: partial
-    description: Existing language benchmarks require controlled workloads, environment capture, repeated samples, and variance reporting.
-    command: null
-    location: libs/python/benchmark.py
+    status: implemented
+    description: Records the approved Python and Go benchmark baseline for the 0.0.0.1 release workloads, including persisted result outputs.
+    command: py -3 libs/python/benchmark.py && cd libs/go && go run ./cmd/benchmark
+    location: docs/releases/0.0.0.1/evidence/performance-baseline-review.md
     requirements: [REQ-PERF-001]
+  - id: TEST-DIRECT-CROSS-RENDER
+    kind: test
+    status: implemented
+    description: Compares the active release examples byte-for-byte between Python and Go.
+    command: py -3 tools/check_direct_cross_render.py
+    location: tools/check_direct_cross_render.py
+    requirements: [REQ-DET-001]
+  - id: TEST-FUZZ-PROPERTY
+    kind: test
+    status: implemented
+    description: Runs a deterministic fuzz/property corpus through Python and Go renderers and compares the emitted SVG bytes.
+    command: py -3 tools/check_fuzz_property.py
+    location: tools/check_fuzz_property.py
+    requirements: [REQ-DET-001, REQ-STACK-001, REQ-STACK-002, REQ-SEC-001]
   - id: TEST-RELEASE-EVIDENCE
     kind: test
-    status: planned
-    description: Will validate the immutable release manifest, artifact hashes, SBOM references, and evidence completeness.
-    command: null
-    location: docs/releases/0.0.0.1/evidence/manifest.schema.json
+    status: implemented
+    description: Validates the immutable release manifest, artifact hashes, SBOM references, and evidence completeness.
+    command: py -3 tools/check_release_evidence.py --manifest docs/releases/0.0.0.1/evidence/rc.1/manifest.json
+    location: tools/check_release_evidence.py
     requirements: [REQ-REL-001]
-

@@ -24,9 +24,12 @@ chart geometry are canonical, but glyph selection, shaping, hinting, antialiasin
 raster pixels are host responsibilities. The profile does not guarantee automatic fit
 or pixel identity.
 
-Layout uses deterministic defaults plus planned explicit margins. Margin fields are
-finite non-negative pixels. Validation rejects a result that leaves less than the
-contracted minimum plot dimensions. Existing defaults remain byte-identical.
+The approved 0.0.0.1 visual profile is recorded in
+[SC-CON-016](visual-profile.md).
+
+Layout uses deterministic defaults plus validated explicit margins. Margin fields are
+finite non-negative pixels. Validation rejects a result that leaves a non-positive
+plot rectangle. Existing defaults remain byte-identical.
 
 ## Embedded-font profile
 
@@ -63,4 +66,3 @@ spike; naming Chromium or librsvg in a draft does not certify either.
 Text outlines MAY be offered for static print workflows. The outlined visual artifact
 must retain a parallel semantic source or accessible alternative when accessibility is
 required. Outlines are not the default interactive profile.
-

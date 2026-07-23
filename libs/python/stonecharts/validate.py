@@ -16,7 +16,19 @@ emitted in a deterministic order so both languages produce identical output.
 from __future__ import annotations
 
 import math
+import re
 from typing import Any, List
+
+from .util import fmt_num
+
+
+_HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
+_THEME_NAMES = {"light", "dark"}
+_DASH_STYLES = {"solid", "dashed", "dotted"}
+_MARKER_SYMBOLS = {"circle", "square", "triangle", "diamond"}
+_STEP_TYPES = {"before", "after", "center"}
+_CURVE_TYPES = {"linear", "monotone"}
+_PATTERN_TYPES = {"hatch"}
 
 
 class SpecError(ValueError):
@@ -49,6 +61,15 @@ def _num(v: Any, path: str, errs: List[str]) -> None:
     elif isinstance(v, float) and not math.isfinite(v):
         errs.append(f"{path}: expected finite number, received "
                     + ("NaN" if math.isnan(v) else "Infinity"))
+
+
+def _nonneg_num(v: Any, path: str, errs: List[str]) -> None:
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return
+    if isinstance(v, float) and not math.isfinite(v):
+        return
+    if float(v) < 0:
+        errs.append(f"{path}: expected non-negative number, received {fmt_num(float(v))}")
 
 
 def _intnum(v: Any, path: str, errs: List[str]) -> None:
@@ -105,6 +126,52 @@ def _axis(v: Any, path: str, errs: List[str]) -> None:
         _num(v["max"], f"{path}.max", errs)
     if "gridLine" in v:
         _gridline(v["gridLine"], f"{path}.gridLine", errs)
+    if "opposite" in v:
+        _bool(v["opposite"], f"{path}.opposite", errs)
+    if "binEdges" in v:
+        if not isinstance(v["binEdges"], list):
+            errs.append(f"{path}.binEdges: expected array, received {_jtype(v['binEdges'])}")
+        else:
+            for i, e in enumerate(v["binEdges"]):
+                _num(e, f"{path}.binEdges[{i}]", errs)
+
+
+def _margin(v: Any, path: str, errs: List[str]) -> None:
+    if not isinstance(v, dict):
+        errs.append(f"{path}: expected object, received {_jtype(v)}")
+        return
+    for k in ("top", "right", "bottom", "left"):
+        if k in v:
+            _num(v[k], f"{path}.{k}", errs)
+            if isinstance(v[k], (int, float)) and not isinstance(v[k], bool) and v[k] < 0:
+                errs.append(f"{path}.{k}: expected non-negative number, received {fmt_num(float(v[k]))}")
+
+
+def _layout(v: Any, path: str, errs: List[str]) -> None:
+    if not isinstance(v, dict):
+        errs.append(f"{path}: expected object, received {_jtype(v)}")
+        return
+    if "margin" in v:
+        _margin(v["margin"], f"{path}.margin", errs)
+
+def _binning(v: Any, path: str, errs: List[str]) -> None:
+    if not isinstance(v, dict):
+        errs.append(f"{path}: expected object, received {_jtype(v)}")
+        return
+    if "count" in v:
+        _intnum(v["count"], f"{path}.count", errs)
+        if isinstance(v["count"], (int, float)) and not isinstance(v["count"], bool) and int(v["count"]) <= 0:
+            errs.append(f"{path}.count: expected positive integer, received {int(v['count'])}")
+    if "width" in v:
+        _num(v["width"], f"{path}.width", errs)
+        if isinstance(v["width"], (int, float)) and not isinstance(v["width"], bool) and float(v["width"]) <= 0:
+            errs.append(f"{path}.width: expected positive number, received {fmt_num(float(v['width']))}")
+    if "start" in v:
+        _num(v["start"], f"{path}.start", errs)
+
+
+def _num_or_default(v: Any, default: float) -> float:
+    return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else default
 
 
 def _marker(v: Any, path: str, errs: List[str]) -> None:
@@ -129,6 +196,12 @@ def _pattern(v: Any, path: str, errs: List[str]) -> None:
     for k in ("size", "angle", "strokeWidth"):
         if k in v:
             _num(v[k], f"{path}.{k}", errs)
+    if isinstance(v.get("type"), str) and v["type"] not in _PATTERN_TYPES:
+        errs.append(f'{path}.type: expected one of "hatch", received "{v["type"]}"')
+    if "color" in v and isinstance(v["color"], str) and not _HEX_COLOR_RE.fullmatch(v["color"]):
+        errs.append(f'{path}.color: expected hex color, received "{v["color"]}"')
+    if "background" in v and isinstance(v["background"], str) and not _HEX_COLOR_RE.fullmatch(v["background"]):
+        errs.append(f'{path}.background: expected hex color, received "{v["background"]}"')
 
 
 def _gradient(v: dict, path: str, errs: List[str]) -> None:
@@ -153,11 +226,15 @@ def _gradient(v: dict, path: str, errs: List[str]) -> None:
                     _str(st["color"], f"{sp}.color", errs)
                 if "opacity" in st:
                     _num(st["opacity"], f"{sp}.opacity", errs)
+                if isinstance(st.get("color"), str) and not _HEX_COLOR_RE.fullmatch(st["color"]):
+                    errs.append(f'{sp}.color: expected hex color, received "{st["color"]}"')
 
 
 def _color(v: Any, path: str, errs: List[str]) -> None:
     # oneOf: hex string OR a linear-gradient object.
     if isinstance(v, str):
+        if not _HEX_COLOR_RE.fullmatch(v):
+            errs.append(f'{path}: expected hex color, received "{v}"')
         return
     if isinstance(v, dict):
         _gradient(v, path, errs)
@@ -168,6 +245,8 @@ def _color(v: Any, path: str, errs: List[str]) -> None:
 def _theme(v: Any, path: str, errs: List[str]) -> None:
     # oneOf: theme name (string) OR a theme object.
     if isinstance(v, str):
+        if v not in _THEME_NAMES:
+            errs.append(f'{path}: expected one of "light", "dark", received "{v}"')
         return
     if not isinstance(v, dict):
         errs.append(f"{path}: expected string or theme object, received {_jtype(v)}")
@@ -181,8 +260,14 @@ def _theme(v: Any, path: str, errs: List[str]) -> None:
               "legendTextColor"):
         if k in v:
             _str(v[k], f"{path}.{k}", errs)
+            if isinstance(v[k], str) and not _HEX_COLOR_RE.fullmatch(v[k]):
+                errs.append(f'{path}.{k}: expected hex color, received "{v[k]}"')
     if "palette" in v:
         _str_array(v["palette"], f"{path}.palette", errs)
+        if isinstance(v["palette"], list):
+            for i, c in enumerate(v["palette"]):
+                if isinstance(c, str) and not _HEX_COLOR_RE.fullmatch(c):
+                    errs.append(f'{path}.palette[{i}]: expected hex color, received "{c}"')
 
 
 def _series(v: Any, path: str, errs: List[str]) -> None:
@@ -191,6 +276,14 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
         return
     if "name" in v:
         _str(v["name"], f"{path}.name", errs)
+    if "type" in v:
+        _str(v["type"], f"{path}.type", errs)
+        if isinstance(v["type"], str) and v["type"] not in ("line", "column"):
+            errs.append(f'{path}.type: expected one of "line", "column", received "{v["type"]}"')
+    if "yAxis" in v:
+        _intnum(v["yAxis"], f"{path}.yAxis", errs)
+        if isinstance(v["yAxis"], (int, float)) and not isinstance(v["yAxis"], bool) and int(v["yAxis"]) not in (0, 1):
+            errs.append(f'{path}.yAxis: expected one of 0, 1, received "{int(v["yAxis"])}"')
     if "data" not in v:
         errs.append(f"{path}.data: required")
     elif not isinstance(v["data"], list):
@@ -209,19 +302,39 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
     for k in ("dashStyle", "step", "curve"):
         if k in v:
             _str(v[k], f"{path}.{k}", errs)
+    if isinstance(v.get("dashStyle"), str) and v["dashStyle"] not in _DASH_STYLES:
+        errs.append(f'{path}.dashStyle: expected one of "solid", "dashed", "dotted", received "{v["dashStyle"]}"')
+    if isinstance(v.get("step"), str) and v["step"] not in _STEP_TYPES:
+        errs.append(f'{path}.step: expected one of "before", "after", "center", received "{v["step"]}"')
+    if isinstance(v.get("curve"), str) and v["curve"] not in _CURVE_TYPES:
+        errs.append(f'{path}.curve: expected one of "linear", "monotone", received "{v["curve"]}"')
+    if "marker" in v and isinstance(v["marker"], dict):
+        if isinstance(v["marker"].get("symbol"), str) and v["marker"]["symbol"] not in _MARKER_SYMBOLS:
+            errs.append(f'{path}.marker.symbol: expected one of "circle", "square", "triangle", "diamond", received "{v["marker"]["symbol"]}"')
     if "marker" in v:
         _marker(v["marker"], f"{path}.marker", errs)
+    if "regression" in v:
+        _bool(v["regression"], f"{path}.regression", errs)
+    if "low" in v:
+        low = v["low"]
+        if not isinstance(low, list):
+            errs.append(f"{path}.low: expected array, received {_jtype(low)}")
+        else:
+            for i, e in enumerate(low):
+                _num(e, f"{path}.low[{i}]", errs)
 
 
-# Known chart types — discovered from all on-disk example specs at
-# charts/*/examples/*.json.  Keep sorted for readability; the set comparison
-# is order-independent.
+# Known chart types for the active 0.0.0.1 release scope.  Keep sorted for
+# readability; the set comparison is order-independent.
 _KNOWN_TYPES = {
-    "area", "arearange", "bar", "boxplot", "bubble", "candlestick",
-    "column", "columnrange", "combo", "dumbbell", "errorbar",
-    "error-bar", "funnel", "histogram", "line", "lollipop", "scatter",
-    "streamgraph", "technical-indicators", "timeline", "variwide",
-    "vector-plot", "waterfall", "windbarb", "xrange",
+    "area",
+    "bar",
+    "combo",
+    "column",
+    "histogram",
+    "line",
+    "scatter",
+    "arearange",
 }
 
 
@@ -246,14 +359,30 @@ def validate(d: Any) -> List[str]:
         _str(d["stacking"], "$.stacking", errs)
         if isinstance(d["stacking"], str) and d["stacking"] not in ("normal", "percent"):
             errs.append(f'$.stacking: expected one of "normal", "percent", received "{d["stacking"]}"')
+    if "preBinned" in d:
+        _bool(d["preBinned"], "$.preBinned", errs)
+    if "normalization" in d:
+        _str(d["normalization"], "$.normalization", errs)
+        if isinstance(d["normalization"], str) and d["normalization"] not in ("frequency", "density"):
+            errs.append(f'$.normalization: expected one of "frequency", "density", received "{d["normalization"]}"')
+    if "overlay" in d:
+        _str(d["overlay"], "$.overlay", errs)
+        if isinstance(d["overlay"], str) and d["overlay"] not in ("pareto", "bellcurve"):
+            errs.append(f'$.overlay: expected one of "pareto", "bellcurve", received "{d["overlay"]}"')
     if "grouping" in d:
         _bool(d["grouping"], "$.grouping", errs)
     if "theme" in d:
         _theme(d["theme"], "$.theme", errs)
+    if "layout" in d:
+        _layout(d["layout"], "$.layout", errs)
+    if "binning" in d:
+        _binning(d["binning"], "$.binning", errs)
     if "xAxis" in d:
         _axis(d["xAxis"], "$.xAxis", errs)
     if "yAxis" in d:
         _axis(d["yAxis"], "$.yAxis", errs)
+    if "secondaryYAxis" in d:
+        _axis(d["secondaryYAxis"], "$.secondaryYAxis", errs)
     if "series" not in d:
         errs.append("$.series: required")
     elif not isinstance(d["series"], list):
@@ -261,4 +390,30 @@ def validate(d: Any) -> List[str]:
     else:
         for i, s in enumerate(d["series"]):
             _series(s, f"$.series[{i}]", errs)
+    if d.get("stacking") == "percent" and isinstance(d.get("series"), list):
+        for i, s in enumerate(d["series"]):
+            if not isinstance(s, dict):
+                continue
+            if isinstance(s.get("type"), str) and s["type"] == "line":
+                continue
+            data = s.get("data")
+            if not isinstance(data, list):
+                continue
+            for j, v in enumerate(data):
+                _nonneg_num(v, f"$.series[{i}].data[{j}]", errs)
+    if isinstance(d.get("layout"), dict) and isinstance(d["layout"].get("margin"), dict):
+        m = d["layout"]["margin"]
+        if isinstance(d.get("width"), (int, float)) and isinstance(d.get("height"), (int, float)):
+            ya = d.get("yAxis") if isinstance(d.get("yAxis"), dict) else {}
+            xa = d.get("xAxis") if isinstance(d.get("xAxis"), dict) else {}
+            left = _num_or_default(m.get("left"), 62 if ya.get("title") else 52)
+            right = _num_or_default(m.get("right"), 22)
+            top = _num_or_default(m.get("top"), 20 + (26 if d.get("title") else 0) + (18 if d.get("subtitle") else 0))
+            bottom = _num_or_default(m.get("bottom"), 46 + (18 if d.get("legend", True) else 0) + (18 if xa.get("title") else 0))
+            plot_w = float(d["width"]) - left - right
+            plot_h = float(d["height"]) - top - bottom
+            if plot_w <= 0:
+                errs.append(f"$.layout.margin: plot width must remain positive, received {fmt_num(plot_w)}")
+            if plot_h <= 0:
+                errs.append(f"$.layout.margin: plot height must remain positive, received {fmt_num(plot_h)}")
     return errs

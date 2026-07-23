@@ -5,6 +5,15 @@ import (
 	"strings"
 )
 
+var (
+	knownThemeNames    = map[string]bool{"light": true, "dark": true}
+	knownDashStyles    = map[string]bool{"solid": true, "dashed": true, "dotted": true}
+	knownMarkerSymbols = map[string]bool{"circle": true, "square": true, "triangle": true, "diamond": true}
+	knownStepTypes     = map[string]bool{"before": true, "after": true, "center": true}
+	knownCurveTypes    = map[string]bool{"linear": true, "monotone": true}
+	knownPatternTypes  = map[string]bool{"hatch": true}
+)
+
 // Strict chart-spec validation — mirrors libs/python/stonecharts/validate.py
 // byte-for-byte (same rules, same error text, same order) so both renderers accept
 // and reject exactly the same specs. Runs on the generic decoded JSON (interface{})
@@ -71,6 +80,25 @@ func vstr(v interface{}, path string, errs *[]string) {
 	}
 }
 
+func isHexColor(s string) bool {
+	if len(s) != 4 && len(s) != 5 && len(s) != 7 && len(s) != 9 {
+		return false
+	}
+	if len(s) == 0 || s[0] != '#' {
+		return false
+	}
+	for _, r := range s[1:] {
+		switch {
+		case r >= '0' && r <= '9':
+		case r >= 'a' && r <= 'f':
+		case r >= 'A' && r <= 'F':
+		default:
+			return false
+		}
+	}
+	return true
+}
+
 func vbool(v interface{}, path string, errs *[]string) {
 	if _, ok := v.(bool); !ok {
 		*errs = append(*errs, path+": expected boolean, received "+jtype(v))
@@ -119,9 +147,15 @@ func vgridline(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "color"); ok {
 		vstr(x, path+".color", errs)
+		if s, ok := x.(string); ok && !isHexColor(s) {
+			*errs = append(*errs, path+".color: expected hex color, received \""+s+"\"")
+		}
 	}
 	if x, ok := has(m, "dashStyle"); ok {
 		vstr(x, path+".dashStyle", errs)
+		if s, ok := x.(string); ok && !knownDashStyles[s] {
+			*errs = append(*errs, path+`.dashStyle: expected one of "solid", "dashed", "dotted", received "`+s+`"`)
+		}
 	}
 }
 
@@ -137,6 +171,15 @@ func vaxis(v interface{}, path string, errs *[]string) {
 	if x, ok := has(m, "categories"); ok {
 		vstrArray(x, path+".categories", errs)
 	}
+	if x, ok := has(m, "binEdges"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".binEdges: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".binEdges["+itoa(i)+"]", errs)
+			}
+		}
+	}
 	if x, ok := has(m, "min"); ok {
 		vnum(x, path+".min", errs)
 	}
@@ -145,6 +188,59 @@ func vaxis(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "gridLine"); ok {
 		vgridline(x, path+".gridLine", errs)
+	}
+	if x, ok := has(m, "opposite"); ok {
+		vbool(x, path+".opposite", errs)
+	}
+}
+
+func vmargin(v interface{}, path string, errs *[]string) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, path+": expected object, received "+jtype(v))
+		return
+	}
+	for _, k := range []string{"top", "right", "bottom", "left"} {
+		if x, ok := has(m, k); ok {
+			vnum(x, path+"."+k, errs)
+			if f, ok := x.(float64); ok && f < 0 {
+				*errs = append(*errs, path+"."+k+": expected non-negative number, received "+fmtNum(f))
+			}
+		}
+	}
+}
+
+func vlayout(v interface{}, path string, errs *[]string) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, path+": expected object, received "+jtype(v))
+		return
+	}
+	if x, ok := has(m, "margin"); ok {
+		vmargin(x, path+".margin", errs)
+	}
+}
+
+func vbinning(v interface{}, path string, errs *[]string) {
+	m, ok := v.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, path+": expected object, received "+jtype(v))
+		return
+	}
+	if x, ok := has(m, "count"); ok {
+		vintnum(x, path+".count", errs)
+		if f, ok := x.(float64); ok && !math.IsNaN(f) && !math.IsInf(f, 0) && int(f) <= 0 {
+			*errs = append(*errs, path+".count: expected positive integer, received "+itoa(int(f)))
+		}
+	}
+	if x, ok := has(m, "width"); ok {
+		vnum(x, path+".width", errs)
+		if f, ok := x.(float64); ok && !math.IsNaN(f) && !math.IsInf(f, 0) && f <= 0 {
+			*errs = append(*errs, path+".width: expected positive number, received "+fmtNum(f))
+		}
+	}
+	if x, ok := has(m, "start"); ok {
+		vnum(x, path+".start", errs)
 	}
 }
 
@@ -159,6 +255,9 @@ func vmarker(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "symbol"); ok {
 		vstr(x, path+".symbol", errs)
+		if s, ok := x.(string); ok && !knownMarkerSymbols[s] {
+			*errs = append(*errs, path+`.symbol: expected one of "circle", "square", "triangle", "diamond", received "`+s+`"`)
+		}
 	}
 	if x, ok := has(m, "radius"); ok {
 		vnum(x, path+".radius", errs)
@@ -181,6 +280,21 @@ func vpattern(v interface{}, path string, errs *[]string) {
 			vnum(x, path+"."+k, errs)
 		}
 	}
+	if x, ok := has(m, "type"); ok {
+		if s, ok := x.(string); ok && !knownPatternTypes[s] {
+			*errs = append(*errs, path+`.type: expected one of "hatch", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "color"); ok {
+		if s, ok := x.(string); ok && !isHexColor(s) {
+			*errs = append(*errs, path+".color: expected hex color, received \""+s+"\"")
+		}
+	}
+	if x, ok := has(m, "background"); ok {
+		if s, ok := x.(string); ok && !isHexColor(s) {
+			*errs = append(*errs, path+".background: expected hex color, received \""+s+"\"")
+		}
+	}
 }
 
 func vgradient(m map[string]interface{}, path string, errs *[]string) {
@@ -191,6 +305,9 @@ func vgradient(m map[string]interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "type"); ok {
 		vstr(x, path+".type", errs)
+		if s, ok := x.(string); ok && s != "linearGradient" {
+			*errs = append(*errs, path+`.type: expected one of "linearGradient", received "`+s+`"`)
+		}
 	}
 	if x, ok := has(m, "stops"); ok {
 		arr, ok := x.([]interface{})
@@ -210,6 +327,9 @@ func vgradient(m map[string]interface{}, path string, errs *[]string) {
 			}
 			if y, ok := has(sm, "color"); ok {
 				vstr(y, sp+".color", errs)
+				if s, ok := y.(string); ok && !isHexColor(s) {
+					*errs = append(*errs, sp+".color: expected hex color, received \""+s+"\"")
+				}
 			}
 			if y, ok := has(sm, "opacity"); ok {
 				vnum(y, sp+".opacity", errs)
@@ -221,6 +341,9 @@ func vgradient(m map[string]interface{}, path string, errs *[]string) {
 func vcolor(v interface{}, path string, errs *[]string) {
 	switch c := v.(type) {
 	case string:
+		if !isHexColor(c) {
+			*errs = append(*errs, path+": expected hex color, received \""+c+"\"")
+		}
 		return
 	case map[string]interface{}:
 		vgradient(c, path, errs)
@@ -230,7 +353,10 @@ func vcolor(v interface{}, path string, errs *[]string) {
 }
 
 func vtheme(v interface{}, path string, errs *[]string) {
-	if _, ok := v.(string); ok {
+	if s, ok := v.(string); ok {
+		if !knownThemeNames[s] {
+			*errs = append(*errs, path+`: expected one of "light", "dark", received "`+s+`"`)
+		}
 		return
 	}
 	m, ok := v.(map[string]interface{})
@@ -249,10 +375,20 @@ func vtheme(v interface{}, path string, errs *[]string) {
 		"markerHalo", "legendTextColor"} {
 		if x, ok := has(m, k); ok {
 			vstr(x, path+"."+k, errs)
+			if s, ok := x.(string); ok && !isHexColor(s) {
+				*errs = append(*errs, path+"."+k+": expected hex color, received \""+s+"\"")
+			}
 		}
 	}
 	if x, ok := has(m, "palette"); ok {
 		vstrArray(x, path+".palette", errs)
+		if arr, ok := x.([]interface{}); ok {
+			for i, e := range arr {
+				if s, ok := e.(string); ok && !isHexColor(s) {
+					*errs = append(*errs, path+".palette["+itoa(i)+"]: expected hex color, received \""+s+"\"")
+				}
+			}
+		}
 	}
 }
 
@@ -264,6 +400,21 @@ func vseries(v interface{}, path string, errs *[]string) {
 	}
 	if x, ok := has(m, "name"); ok {
 		vstr(x, path+".name", errs)
+	}
+	if x, ok := has(m, "type"); ok {
+		vstr(x, path+".type", errs)
+		if s, ok := x.(string); ok && s != "line" && s != "column" {
+			*errs = append(*errs, path+`.type: expected one of "line", "column", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "yAxis"); ok {
+		vintnum(x, path+".yAxis", errs)
+		if f, ok := x.(float64); ok && !math.IsNaN(f) && !math.IsInf(f, 0) {
+			i := int(f)
+			if i != 0 && i != 1 {
+				*errs = append(*errs, path+`.yAxis: expected one of 0, 1, received "`+itoa(i)+`"`)
+			}
+		}
 	}
 	if x, ok := has(m, "data"); !ok {
 		*errs = append(*errs, path+".data: required")
@@ -291,21 +442,58 @@ func vseries(v interface{}, path string, errs *[]string) {
 			vstr(x, path+"."+k, errs)
 		}
 	}
+	if x, ok := has(m, "dashStyle"); ok {
+		if s, ok := x.(string); ok && !knownDashStyles[s] {
+			*errs = append(*errs, path+`.dashStyle: expected one of "solid", "dashed", "dotted", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "step"); ok {
+		if s, ok := x.(string); ok && !knownStepTypes[s] {
+			*errs = append(*errs, path+`.step: expected one of "before", "after", "center", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(m, "curve"); ok {
+		if s, ok := x.(string); ok && !knownCurveTypes[s] {
+			*errs = append(*errs, path+`.curve: expected one of "linear", "monotone", received "`+s+`"`)
+		}
+	}
 	if x, ok := has(m, "marker"); ok {
 		vmarker(x, path+".marker", errs)
 	}
+	if x, ok := has(m, "regression"); ok {
+		vbool(x, path+".regression", errs)
+	}
+	if x, ok := has(m, "low"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".low: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".low["+itoa(i)+"]", errs)
+			}
+		}
+	}
 }
 
-// knownTypes — discovered from all on-disk example specs at
-// charts/*/examples/*.json. Mirrors _KNOWN_TYPES in validate.py.
+func vnonneg(v interface{}, path string, errs *[]string) {
+	f, ok := v.(float64)
+	if !ok {
+		return
+	}
+	if f < 0 {
+		*errs = append(*errs, path+": expected non-negative number, received "+fmtNum(f))
+	}
+}
+
+// knownTypes — active 0.0.0.1 release scope. Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
-	"area": true, "arearange": true, "bar": true, "boxplot": true,
-	"bubble": true, "candlestick": true, "column": true, "columnrange": true,
-	"combo": true, "dumbbell": true, "errorbar": true, "error-bar": true,
-	"funnel": true, "histogram": true, "line": true, "lollipop": true,
-	"scatter": true, "streamgraph": true, "technical-indicators": true,
-	"timeline": true, "variwide": true, "vector-plot": true,
-	"waterfall": true, "windbarb": true, "xrange": true,
+	"area":      true,
+	"bar":       true,
+	"combo":     true,
+	"column":    true,
+	"histogram": true,
+	"line":      true,
+	"scatter":   true,
+	"arearange": true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
@@ -341,17 +529,41 @@ func validate(v interface{}) []string {
 			errs = append(errs, `$.stacking: expected one of "normal", "percent", received "`+s+`"`)
 		}
 	}
+	if x, ok := has(d, "preBinned"); ok {
+		vbool(x, "$.preBinned", &errs)
+	}
+	if x, ok := has(d, "normalization"); ok {
+		vstr(x, "$.normalization", &errs)
+		if s, ok := x.(string); ok && s != "frequency" && s != "density" {
+			errs = append(errs, `$.normalization: expected one of "frequency", "density", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(d, "overlay"); ok {
+		vstr(x, "$.overlay", &errs)
+		if s, ok := x.(string); ok && s != "pareto" && s != "bellcurve" {
+			errs = append(errs, `$.overlay: expected one of "pareto", "bellcurve", received "`+s+`"`)
+		}
+	}
 	if x, ok := has(d, "grouping"); ok {
 		vbool(x, "$.grouping", &errs)
 	}
 	if x, ok := has(d, "theme"); ok {
 		vtheme(x, "$.theme", &errs)
 	}
+	if x, ok := has(d, "layout"); ok {
+		vlayout(x, "$.layout", &errs)
+	}
+	if x, ok := has(d, "binning"); ok {
+		vbinning(x, "$.binning", &errs)
+	}
 	if x, ok := has(d, "xAxis"); ok {
 		vaxis(x, "$.xAxis", &errs)
 	}
 	if x, ok := has(d, "yAxis"); ok {
 		vaxis(x, "$.yAxis", &errs)
+	}
+	if x, ok := has(d, "secondaryYAxis"); ok {
+		vaxis(x, "$.secondaryYAxis", &errs)
 	}
 	if x, ok := has(d, "series"); !ok {
 		errs = append(errs, "$.series: required")
@@ -360,6 +572,101 @@ func validate(v interface{}) []string {
 	} else {
 		for i, s := range arr {
 			vseries(s, "$.series["+itoa(i)+"]", &errs)
+		}
+	}
+	if x, ok := has(d, "stacking"); ok {
+		if s, ok := x.(string); ok && s == "percent" {
+			if arr, ok := has(d, "series"); ok {
+				if series, ok := arr.([]interface{}); ok {
+					for i, s := range series {
+						m, ok := s.(map[string]interface{})
+						if !ok {
+							continue
+						}
+						if typ, ok := has(m, "type"); ok {
+							if ts, ok := typ.(string); ok && ts == "line" {
+								continue
+							}
+						}
+						if data, ok := has(m, "data"); ok {
+							if arr, ok := data.([]interface{}); ok {
+								for j, v := range arr {
+									vnonneg(v, "$.series["+itoa(i)+"].data["+itoa(j)+"]", &errs)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if x, ok := has(d, "layout"); ok {
+		if ly, ok := x.(map[string]interface{}); ok {
+			left := 52.0
+			if yAxis, ok := has(d, "yAxis"); ok {
+				if ya, ok := yAxis.(map[string]interface{}); ok {
+					if title, ok := has(ya, "title"); ok && title != "" {
+						left = 62.0
+					}
+				}
+			}
+			right := 22.0
+			top := 20.0
+			if title, ok := has(d, "title"); ok && title != "" {
+				top += 26.0
+			}
+			if subtitle, ok := has(d, "subtitle"); ok && subtitle != "" {
+				top += 18.0
+			}
+			bottom := 46.0
+			if legend, ok := has(d, "legend"); !ok || legend == nil || legend == true {
+				bottom += 18.0
+			}
+			if xAxis, ok := has(d, "xAxis"); ok {
+				if xa, ok := xAxis.(map[string]interface{}); ok {
+					if title, ok := has(xa, "title"); ok && title != "" {
+						bottom += 18.0
+					}
+				}
+			}
+			if margin, ok := has(ly, "margin"); ok {
+				if m, ok := margin.(map[string]interface{}); ok {
+					if v, ok := has(m, "left"); ok {
+						if f, ok := v.(float64); ok {
+							left = f
+						}
+					}
+					if v, ok := has(m, "right"); ok {
+						if f, ok := v.(float64); ok {
+							right = f
+						}
+					}
+					if v, ok := has(m, "top"); ok {
+						if f, ok := v.(float64); ok {
+							top = f
+						}
+					}
+					if v, ok := has(m, "bottom"); ok {
+						if f, ok := v.(float64); ok {
+							bottom = f
+						}
+					}
+				}
+			}
+			if w, ok := has(d, "width"); ok {
+				if h, ok := has(d, "height"); ok {
+					if wf, ok := w.(float64); ok {
+						if hf, ok := h.(float64); ok {
+							if wf-left-right <= 0 {
+								errs = append(errs, "$.layout.margin: plot width must remain positive, received "+fmtNum(wf-left-right))
+							}
+							if hf-top-bottom <= 0 {
+								errs = append(errs, "$.layout.margin: plot height must remain positive, received "+fmtNum(hf-top-bottom))
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	return errs

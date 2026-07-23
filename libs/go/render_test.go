@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -16,6 +18,7 @@ func TestGolden(t *testing.T) {
 	cases := map[string][]string{
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":       {"basic", "stacked", "percent", "themed-dark"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -27,7 +30,10 @@ func TestGolden(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			got := RenderSVG(spec)
+			got, err := RenderSVG(spec)
+			if err != nil {
+				t.Fatal(err)
+			}
 			want, err := os.ReadFile("../../charts/" + chartDir + "/golden/" + name + ".svg")
 			if err != nil {
 				t.Fatal(err)
@@ -39,8 +45,28 @@ func TestGolden(t *testing.T) {
 	}
 }
 
+func mustSVG(t *testing.T, spec *ChartSpec) string {
+	t.Helper()
+	svg, err := RenderSVG(spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return svg
+}
+
+func mustHTML(t *testing.T, spec *ChartSpec, title string) string {
+	t.Helper()
+	html, err := RenderHTML(spec, title)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return html
+}
+
 func TestColumnEdgeCases(t *testing.T) {
 	cases := []string{
+		`{"type":"column","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`,
+		`{"type":"column","layout":{"margin":{"left":90,"right":40,"top":30,"bottom":50}},"series":[{"name":"s","data":[1,2,3]}]}`,
 		`{"type":"column","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
 		`{"type":"column","xAxis":{"categories":["neg","pos"]},"series":[{"name":"a","data":[-5,10]}]}`,
 		`{"type":"column","grouping":false,"series":[{"name":"a","data":[1,2]},{"name":"b","data":[2,1]}]}`,
@@ -52,9 +78,86 @@ func TestColumnEdgeCases(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		low := strings.ToLower(RenderSVG(spec))
+		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in column render for %s", specJSON)
+		}
+	}
+}
+
+func TestAreaEdgeCases(t *testing.T) {
+	cases := []string{
+		`{"type":"area","xAxis":{"categories":["a","b"]},"series":[{"name":"s","data":[1,2]}]}`,
+		`{"type":"area","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`,
+		`{"type":"area","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
+		`{"type":"area","series":[{"name":"a","data":[42]}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+		low := strings.ToLower(mustSVG(t, spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in area render for %s", specJSON)
+		}
+	}
+}
+
+func TestColumnSignedStackGeometry(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"column","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	svg := mustSVG(t, spec)
+	re := regexp.MustCompile(`data-series="(\d)"[^>]* y="([^"]+)"`)
+	matches := re.FindAllStringSubmatch(svg, -1)
+	got := map[string]float64{}
+	for _, m := range matches {
+		if len(m) != 3 {
+			continue
+		}
+		f, err := strconv.ParseFloat(m[2], 64)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got[m[1]] = f
+	}
+	if !(got["1"] > got["0"]) {
+		t.Fatalf("expected negative stack segment below positive segment, got %+v", got)
+	}
+}
+
+func TestLayoutMargins(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"column","layout":{"margin":{"left":90,"right":40,"top":30,"bottom":50}},"series":[{"name":"s","data":[1,2,3]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	svg := mustSVG(t, spec)
+	if !strings.Contains(svg, `x1="90.0"`) {
+		t.Fatalf("expected manual left margin to shift plot area, got %s", svg)
+	}
+}
+
+func TestShortCategoriesPadAndUnicodeTitle(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"column","title":"Temperature (°C)","xAxis":{"categories":["Jan","Q4 2026 - Production Operations"]},"series":[{"name":"s","data":[1,2,3]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	svg := mustSVG(t, spec)
+	html := mustHTML(t, spec, "")
+	for _, want := range []string{
+		"Temperature (°C)",
+		`Jan</text>`,
+		`Q4 2026 - Production Operations`,
+		`>1</text>`,
+		`>2</text>`,
+		`<th scope="col">Jan</th>`,
+		`<th scope="col">Q4 2026 - Production Operations</th>`,
+		`<th scope="col">2</th>`,
+	} {
+		if !strings.Contains(svg, want) && !strings.Contains(html, want) {
+			t.Fatalf("expected output to contain %q\nsvg=%s\nhtml=%s", want, svg, html)
 		}
 	}
 }
@@ -63,20 +166,20 @@ func TestColumnEdgeCases(t *testing.T) {
 func TestXSSEscaping(t *testing.T) {
 	x := `"><script>alert(1)</script>`
 	specJSON := `{"id":` + jsonStr(x) + `,"type":"line","title":` + jsonStr(x) +
-		`,"subtitle":` + jsonStr(x) + `,"theme":{"name":"light","gridColor":` + jsonStr(x) +
-		`,"palette":[` + jsonStr(x) + `]},"xAxis":{"title":` + jsonStr(x) +
+		`,"subtitle":` + jsonStr(x) + `,"theme":{"name":"light","gridColor":"#e8e8ee"` +
+		`,"palette":["#2f7ed8"]},"xAxis":{"title":` + jsonStr(x) +
 		`,"categories":[` + jsonStr(x) + `,"b","c"]},"yAxis":{"title":` + jsonStr(x) +
-		`},"series":[{"name":` + jsonStr(x) + `,"data":[1,2,3],"color":` + jsonStr(x) +
-		`,"pattern":{"type":"hatch","color":` + jsonStr(x) + `,"background":` + jsonStr(x) +
-		`},"fillOpacity":0.3}]}`
+		`},"series":[{"name":` + jsonStr(x) + `,"data":[1,2,3],"color":"#2f7ed8"` +
+		`,"pattern":{"type":"hatch","color":"#333333","background":"#ffffff"}` +
+		`,"fillOpacity":0.3}]}`
 	spec, err := FromJSON([]byte(specJSON))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(RenderSVG(spec), "<script>alert(1)</script>") {
+	if strings.Contains(mustSVG(t, spec), "<script>alert(1)</script>") {
 		t.Error("raw <script> leaked into SVG")
 	}
-	if strings.Contains(RenderHTML(spec, ""), "<script>alert(1)</script>") {
+	if strings.Contains(mustHTML(t, spec, ""), "<script>alert(1)</script>") {
 		t.Error("raw <script> leaked into HTML")
 	}
 }
@@ -101,7 +204,7 @@ func TestMalformedNoPanic(t *testing.T) {
 		if err != nil {
 			continue // a clean error is acceptable
 		}
-		if svg := RenderSVG(spec); !strings.HasPrefix(svg, "<svg") {
+		if svg := mustSVG(t, spec); !strings.HasPrefix(svg, "<svg") {
 			t.Errorf("bad SVG for %s", s)
 		}
 	}
@@ -115,7 +218,7 @@ func TestA11yToggle(t *testing.T) {
 	}
 	on := mk()
 	on.applyDefaults()
-	svgOn := RenderSVG(on)
+	svgOn := mustSVG(t, on)
 	if !strings.Contains(svgOn, `role="img"`) || !strings.Contains(svgOn, "<desc>") {
 		t.Error("a11y default should add role=img + <desc>")
 	}
@@ -123,9 +226,26 @@ func TestA11yToggle(t *testing.T) {
 	no := false
 	off.A11y = &no
 	off.applyDefaults()
-	svgOff := RenderSVG(off)
+	svgOff := mustSVG(t, off)
 	if strings.Contains(svgOff, `role="img"`) || strings.Contains(svgOff, "<desc>") {
 		t.Error("a11y:false should omit role=img + <desc>")
+	}
+}
+
+func TestFromJSONPreservesA11yFalse(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"line","title":"T","series":[{"name":"s","data":[1,2,3]}],"a11y":false}`))
+	if err != nil {
+		t.Fatalf("FromJSON failed: %v", err)
+	}
+	if spec.A11y == nil {
+		t.Fatal("FromJSON should preserve explicit a11y:false")
+	}
+	if *spec.A11y {
+		t.Fatal("FromJSON should preserve explicit a11y:false as false")
+	}
+	svg := mustSVG(t, spec)
+	if strings.Contains(svg, `role="img"`) || strings.Contains(svg, "<desc>") {
+		t.Fatal("a11y:false from JSON should omit role=img + <desc>")
 	}
 }
 
@@ -167,24 +287,28 @@ func TestInvalidFixturesParity(t *testing.T) {
 }
 
 func TestAllExampleSpecsValidate(t *testing.T) {
-	paths, err := filepath.Glob("../../charts/*/examples/*.json")
-	if err != nil {
-		t.Fatal(err)
+	cases := map[string][]string{
+		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
+		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":       {"basic", "stacked", "percent", "themed-dark"},
 	}
-	if len(paths) == 0 {
-		t.Fatal("no example specs")
+	if len(cases) == 0 {
+		t.Fatal("no active release examples")
 	}
-	for _, path := range paths {
-		b, err := os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-		var raw interface{}
-		if err := json.Unmarshal(b, &raw); err != nil {
-			t.Fatal(err)
-		}
-		if errs := validate(raw); len(errs) > 0 {
-			t.Errorf("%s: %v", path, errs)
+	for chartDir, names := range cases {
+		for _, name := range names {
+			path := "../../charts/" + chartDir + "/examples/" + name + ".json"
+			b, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var raw interface{}
+			if err := json.Unmarshal(b, &raw); err != nil {
+				t.Fatal(err)
+			}
+			if errs := validate(raw); len(errs) > 0 {
+				t.Errorf("%s: %v", path, errs)
+			}
 		}
 	}
 }
@@ -221,9 +345,47 @@ func TestSplineEdgeCases(t *testing.T) {
 	for _, data := range cases {
 		spec := &ChartSpec{Type: "line", Series: []Series{{Name: "s", Data: data, Curve: "monotone"}}}
 		spec.applyDefaults()
-		low := strings.ToLower(RenderSVG(spec))
+		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in spline for %v", data)
 		}
 	}
+}
+
+func TestCapabilityManifestAndError(t *testing.T) {
+	caps := Capabilities()
+	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
+		t.Fatalf("unexpected manifest versions: %+v", caps)
+	}
+	if got, want := caps.ChartTypes, []string{"area", "column", "line"}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
+	}
+	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}
+	if svg, err := RenderSVG(spec); err != nil {
+		t.Fatalf("expected column to render, got %v", err)
+	} else if !strings.HasPrefix(svg, "<svg") {
+		t.Fatalf("expected SVG output for column, got %q", svg[:min(len(svg), 64)])
+	}
+	bad := &ChartSpec{Type: "pie", Series: []Series{{Name: "s", Data: []float64{1}}}}
+	if _, err := RenderSVG(bad); err == nil {
+		t.Fatal("expected capability error")
+	} else {
+		ce, ok := err.(*CapabilityError)
+		if !ok {
+			t.Fatalf("expected *CapabilityError, got %T", err)
+		}
+		if ce.Code != "E_CAPABILITY" || ce.Path != "$.type" {
+			t.Fatalf("unexpected capability error: %+v", ce)
+		}
+		if ce.Message != `unsupported chart type "pie"` {
+			t.Fatalf("unexpected capability message: %+v", ce)
+		}
+	}
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

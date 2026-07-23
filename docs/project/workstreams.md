@@ -23,7 +23,7 @@ one primary workstream even when it changes several repositories or languages.
 | ID | Workstream | Durable outcome | 0.0.0.1 focus |
 |---|---|---|---|
 | WS-01 | Product contract and governance | Claims, scope, ownership, risks, and decisions remain explicit and traceable | Approve the release contract and resolve blockers without fictional approvals |
-| WS-02 | Renderer correctness and active scope | Every accepted specification renders safely and mathematically correctly | Restrict active capability to line and column; close signed stacking, percent, layout, and edge-case gaps |
+| WS-02 | Renderer correctness and active scope | Every accepted specification renders safely and mathematically correctly | Keep active capability aligned with the implemented release scope; close signed stacking, percent, layout, and edge-case gaps for active charts |
 | WS-03 | Parity and conformance | Every certified renderer satisfies one executable corpus and canonical serializer | Direct cross-render, invalid parity, fuzzing, golden integrity, and deterministic evidence |
 | WS-04 | Runtime, browser, and accessibility | Interactive behavior satisfies the DOM and accessibility contracts in supported browsers | Live tooltip, legend, focus, keyboard, multi-chart, and no-JS qualification |
 | WS-05 | Customization, layout, and visual profiles | Structured freedom grows without invalidating safety or guarantee levels | Manual margins, theme/style boundaries, overflow behavior, and default visual profile |

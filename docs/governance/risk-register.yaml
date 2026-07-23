@@ -2,7 +2,7 @@ id: SC-GOV-003
 title: StoneCharts product and engineering risk register
 status: proposed
 owner: maintainer
-updated: "2026-07-18"
+updated: "2026-07-19"
 risks:
   - id: RISK-001
     title: Released schema overstates renderer support
@@ -78,21 +78,21 @@ risks:
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
   - id: RISK-009
     title: Package version conflicts with planned release
-    description: Python package metadata and __version__ currently report 0.1.0 while the planned product release is 0.0.0.1.
+    description: Python package metadata and __version__ now report 0.0.0.1, matching the planned product release.
     likelihood: high
     impact: high
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Adopt ecosystem-specific version mappings and verify every emitted package before tagging.
     requirements: [REQ-REL-001]
   - id: RISK-010
     title: Short category arrays can break generated HTML
-    description: The accessible data-table path can index beyond an explicitly supplied category array shorter than the longest series.
+    description: The accessible data-table and x-label paths could index beyond an explicitly supplied category array shorter than the longest series.
     likelihood: medium
     impact: critical
-    status: open
+    status: closed
     owner: maintainer
-    mitigation: Define category-length semantics, validate or pad deterministically, and add shared HTML tests.
+    mitigation: Pad short category arrays deterministically with numeric labels and add shared HTML tests.
     requirements: [REQ-VAL-001, REQ-A11Y-001]
   - id: RISK-011
     title: Byte identity may be misrepresented as pixel identity
@@ -112,4 +112,3 @@ risks:
     owner: maintainer
     mitigation: Build the 0.0.0.1 evidence pack and supply-chain workflow before public distribution.
     requirements: [REQ-REL-001, REQ-SEC-001]
-

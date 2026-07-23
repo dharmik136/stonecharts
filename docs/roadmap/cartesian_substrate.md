@@ -51,10 +51,11 @@ The Cartesian frame occupies a fixed `width` × `height` canvas. The inner plott
 ```
 
 ### Margin Calculation Rules
-*   **Top Margin (`mTop`):** Start at `20px`. Add `26px` if `title` is present. Add `18px` if `subtitle` is present.
-*   **Left Margin (`mLeft`):** Defaults to `52px`. If `yAxis.title` is present, increase to `62px`.
-*   **Right Margin (`mRight`):** Fixed at `22px`.
-*   **Bottom Margin (`mBottom`):** Start at `46px`. Add `18px` if `legend` is enabled. Add `18px` if `xAxis.title` is present.
+*   **Top Margin (`mTop`):** Start at `20px`. Add `26px` if `title` is present. Add `18px` if `subtitle` is present. Override with `layout.margin.top` when supplied.
+*   **Left Margin (`mLeft`):** Defaults to `52px`. If `yAxis.title` is present, increase to `62px`. Override with `layout.margin.left` when supplied.
+*   **Right Margin (`mRight`):** Fixed at `22px` unless `layout.margin.right` is supplied.
+*   **Bottom Margin (`mBottom`):** Start at `46px`. Add `18px` if `legend` is enabled. Add `18px` if `xAxis.title` is present. Override with `layout.margin.bottom` when supplied.
+*   **Validation:** all manual margin overrides must be finite, non-negative numbers, and the resulting plot rectangle must remain positive in both dimensions.
 
 ---
 

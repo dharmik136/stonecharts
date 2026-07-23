@@ -41,7 +41,8 @@ before SVG serialization and is equivalent in every renderer.
 - Titles, subtitles, axis titles, categories, limits, gridline styles, legend toggle,
   line width/dash/curve/markers, gradients, patterns, and area opacity.
 - Grouped, overlaid, and supported stack modes for columns.
-- Manual margins after `REQ-LAYOUT-001` is implemented.
+- Manual margins are a certified layout primitive with validated non-negative
+  margins and a non-positive plot-rectangle rejection rule.
 
 The capability manifest, not the presence of a field in a design document, determines
 which primitives are certified.
@@ -71,4 +72,3 @@ declarative lane and an unverified expert lane; it must never blur them.
 Adding an optional primitive is backward-compatible only when old specs retain the
 same canonical bytes. Changing a default, resolution order, or serialization is a
 contract change and requires an ADR, golden review, and release note.
-

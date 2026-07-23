@@ -2,6 +2,9 @@ name: Planned Work Item
 description: Propose implementation, qualification, documentation, or operations work.
 title: "[Work]: "
 labels: ["type:work", "status:triage"]
+projects: ["dharmik136/2"]
+assignees:
+  - dharmik136
 body:
   - type: textarea
     id: outcome
@@ -65,9 +68,27 @@ body:
     attributes:
       label: Proposed priority
       options:
-        - P0 - release or security blocker
-        - P1 - required for target milestone
-        - P2 - valuable but deferrable
-        - P3 - exploratory or backlog
+        - P0
+        - P1
+        - P2
+        - P3
     validations:
       required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Stage
+      options:
+        - S0 Foundation
+        - S1 Contract Closure
+        - S2 Qualification
+        - S3 Release Candidate
+        - S4 Release
+        - S5 Expansion
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Target release or stage
+      placeholder: 0.0.0.1, S1, post-release, unscheduled

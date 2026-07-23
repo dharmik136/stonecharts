@@ -123,6 +123,9 @@ it reports drift for review.
 ## Related project controls
 
 - [Workstreams](workstreams.md)
+- [Local agent operating model](local-agent-model.md)
+- [Agent comparison benchmark](agent-comparison-benchmark.md)
+- [Cross-orchestrator agent contract](agent-orchestration.md)
 - [Stage and milestone map](milestones.md)
 - [Decision register](decisions.md)
 - [Stage 0 foundation gate](stage-0.md)

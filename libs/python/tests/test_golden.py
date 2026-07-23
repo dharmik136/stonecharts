@@ -9,16 +9,29 @@ Or with pytest:  pytest libs/python/tests/
 import json
 import pathlib
 import sys
+import re
+
+import jsonschema
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from stonecharts import ChartSpec, THEMES  # noqa: E402
+from stonecharts import CapabilityError, ChartSpec, THEMES, capabilities  # noqa: E402
 from stonecharts.render import render_svg  # noqa: E402
 from stonecharts.validate import SpecError, validate  # noqa: E402
 
 LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
+AREA_CASES = ["basic", "stacked", "percent", "themed-dark"]
+ACTIVE_VALIDATION_CASES = {
+    "line-basic": LINE_CASES,
+    "column": COLUMN_CASES,
+    "area": AREA_CASES,
+}
+SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
+SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
+SCHEMA_VALIDATOR_CLASS.check_schema(SCHEMA)
+SCHEMA_VALIDATOR = SCHEMA_VALIDATOR_CLASS(SCHEMA)
 
 
 def _check(chart_dir: str, name: str):
@@ -67,8 +80,17 @@ def test_column_goldens():
         _check("column", name)
 
 
+def test_area_goldens():
+    for name in AREA_CASES:
+        _check("area", name)
+
+
 def test_column_edge_cases():
     for spec in [
+        {"type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
+         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
+        {"type": "column", "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+         "series": [{"name": "s", "data": [1, 2, 3]}]},
         {"type": "column", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
          "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
         {"type": "column", "xAxis": {"categories": ["neg", "pos"]},
@@ -82,15 +104,73 @@ def test_column_edge_cases():
         assert "nan" not in low and "inf" not in low, spec
 
 
+def test_area_edge_cases():
+    for spec in [
+        {"type": "area", "xAxis": {"categories": ["a", "b"]},
+         "series": [{"name": "s", "data": [1, 2]}]},
+        {"type": "area", "stacking": "normal", "xAxis": {"categories": ["mix"]},
+         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
+        {"type": "area", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
+         "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
+        {"type": "area", "series": [{"name": "a", "data": [42]}]},
+    ]:
+        low = render_svg(ChartSpec.from_dict(spec)).lower()
+        assert "nan" not in low and "inf" not in low, spec
+
+
+def test_column_signed_stack_geometry():
+    svg = render_svg(ChartSpec.from_dict({
+        "type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
+        "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}],
+    }))
+    rects = {
+        int(series): float(y)
+        for series, y in re.findall(r'data-series="(\d)"[^>]* y="([^"]+)"', svg)
+    }
+    assert rects[1] > rects[0], rects
+
+
+def test_layout_margins():
+    spec = ChartSpec.from_dict({
+        "type": "column",
+        "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+        "series": [{"name": "s", "data": [1, 2, 3]}],
+    })
+    svg = render_svg(spec)
+    assert 'x1="90.0"' in svg
+    assert 'y="30"' in svg or 'y="30.0"' in svg
+
+
+def test_short_categories_pad_and_unicode_title():
+    spec = ChartSpec.from_dict({
+        "type": "column",
+        "title": "Temperature (°C)",
+        "xAxis": {"categories": ["Jan", "Q4 2026 - Production Operations"]},
+        "series": [{"name": "s", "data": [1, 2, 3]}],
+    })
+    svg = render_svg(spec)
+    from stonecharts.render import render_html
+    html = render_html(spec)
+    assert "Temperature (°C)" in svg
+    assert 'Jan</text>' in svg
+    assert 'Q4 2026 - Production Operations' in svg
+    assert '>1</text>' in svg
+    assert '>2</text>' in svg
+    assert '<th scope="col">Jan</th>' in html
+    assert '<th scope="col">Q4 2026 - Production Operations</th>' in html
+    assert '<th scope="col">2</th>' in html
+    assert '<th scope="col">2</th>' in html
+
+
 def test_xss_escaping():
     """Hostile strings in every user-facing field must be escaped, never injected."""
     x = '"><script>alert(1)</script>'
     spec = ChartSpec.from_dict({
         "id": x, "type": "line", "title": x, "subtitle": x,
-        "theme": {"name": "light", "gridColor": x, "palette": [x]},
+        "theme": {"name": "light", "gridColor": "#e8e8ee", "palette": ["#2f7ed8"]},
         "xAxis": {"title": x, "categories": [x, "b", "c"]}, "yAxis": {"title": x},
-        "series": [{"name": x, "data": [1, 2, 3], "color": x,
-                    "pattern": {"type": "hatch", "color": x, "background": x},
+        "series": [{"name": x, "data": [1, 2, 3], "color": "#2f7ed8",
+                    "pattern": {"type": "hatch", "color": "#333333", "background": "#ffffff"},
                     "fillOpacity": 0.3}],
     })
     from stonecharts.render import render_html
@@ -127,11 +207,46 @@ def test_invalid_fixtures_parity():
 
 
 def test_all_example_specs_validate():
-    paths = sorted((ROOT / "charts").glob("*/examples/*.json"))
-    assert paths, "no example specs"
-    for path in paths:
-        spec = json.loads(path.read_text(encoding="utf-8"))
-        assert validate(spec) == [], str(path)
+    assert ACTIVE_VALIDATION_CASES, "no active release examples"
+    for chart_dir, names in ACTIVE_VALIDATION_CASES.items():
+        for name in names:
+            path = ROOT / "charts" / chart_dir / "examples" / f"{name}.json"
+            spec = json.loads(path.read_text(encoding="utf-8"))
+            assert validate(spec) == [], str(path)
+
+
+def test_schema_parity():
+    assert ACTIVE_VALIDATION_CASES, "no active release examples"
+    for chart_dir, names in ACTIVE_VALIDATION_CASES.items():
+        for name in names:
+            path = ROOT / "charts" / chart_dir / "examples" / f"{name}.json"
+            spec = json.loads(path.read_text(encoding="utf-8"))
+            schema_errors = list(SCHEMA_VALIDATOR.iter_errors(spec))
+            assert not schema_errors, f"{path}: {schema_errors}"
+            assert validate(spec) == [], str(path)
+
+    for path in sorted((ROOT / "charts").glob("*/invalid-fixtures.json")):
+        cases = json.loads(path.read_text(encoding="utf-8"))
+        for c in cases:
+            schema_errors = list(SCHEMA_VALIDATOR.iter_errors(c["spec"]))
+            assert schema_errors, c["spec"]
+            assert validate(c["spec"]) == c["errors"], c["spec"]
+
+
+def test_capability_manifest_and_error():
+    caps = capabilities()
+    assert caps["specVersion"] == "0.0.0.1"
+    assert caps["svgContractVersion"] == "0.0.0.1"
+    assert caps["chartTypes"] == ["area", "column", "line"]
+    spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
+    assert render_svg(spec).startswith("<svg")
+    try:
+        render_svg(ChartSpec(type="pie", series=[{"name": "s", "data": [1]}]))
+        raise AssertionError("expected capability error")
+    except CapabilityError as exc:
+        assert exc.code == "E_CAPABILITY"
+        assert exc.path == "$.type"
+        assert exc.message == 'unsupported chart type "pie"'
 
 
 def test_a11y_toggle():
@@ -186,5 +301,9 @@ if __name__ == "__main__":
     for _n in COLUMN_CASES:
         _check("column", _n)
         print(f"PASS: python column-{_n} golden")
+    for _n in AREA_CASES:
+        _check("area", _n)
+        print(f"PASS: python area-{_n} golden")
     test_spline_edge_cases()
     print("PASS: python spline edge cases")
+

@@ -39,8 +39,8 @@ tool, or included in reports.
 
 | Threat | Current or required control | Residual gap |
 |---|---|---|
-| SVG/HTML script injection | Contextual escaping and hostile-string tests | Structured color/style validation remains incomplete |
-| CSS/style injection | No raw CSS in certified spec | Color and URL grammar need explicit allowlists |
+| SVG/HTML script injection | Contextual escaping and hostile-string tests | None in the active 0.0.0.1 scope |
+| CSS/style injection | No raw CSS in certified spec; hex color and enum allowlists are enforced | Future style grammars must extend the allowlist deliberately |
 | Identifier/reference injection | Escaped IDs and scoped defs | Pure-static multi-chart IDs require unique chart IDs |
 | Runtime DOM XSS | Runtime encodes tooltip text | Inline color insertion requires validated color grammar |
 | Denial of service | Dimension and input validation | Formal data-size and complexity limits not yet set |
@@ -52,7 +52,7 @@ tool, or included in reports.
 ## Security rules
 
 - The certified schema MUST NOT accept executable code, raw markup, event attributes,
-  or unrestricted URLs.
+  unrestricted URLs, or unrestricted style values.
 - Encoding is contextual; XML text encoding is not assumed safe for style, URL, or
   script contexts.
 - Unknown fields MUST NOT create hidden executable behavior.
@@ -68,4 +68,3 @@ StoneCharts is not yet a hosted multi-tenant service. Authentication, authorizat
 tenant isolation, network controls, billing, account recovery, production monitoring,
 and service incident response require a separate service threat model before an app is
 deployed.
-

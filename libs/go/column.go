@@ -47,7 +47,8 @@ func columnMarks(f *cartesianFrame, p *strings.Builder) {
 		}
 	}
 
-	cumulative := make([]float64, f.n)
+	positive := make([]float64, f.n)
+	negative := make([]float64, f.n)
 	for si, s := range f.spec.Series {
 		st := f.styles[si]
 		p.WriteString(fmt.Sprintf(`<g class="sc-series" data-series="%d">`, si))
@@ -68,9 +69,16 @@ func columnMarks(f *cartesianFrame, p *strings.Builder) {
 						value = raw / total * 100.0
 					}
 				}
-				bottomV := cumulative[i]
-				topV := bottomV + value
-				cumulative[i] = topV
+				var bottomV, topV float64
+				if value >= 0 {
+					bottomV = positive[i]
+					topV = bottomV + value
+					positive[i] = topV
+				} else {
+					bottomV = negative[i]
+					topV = bottomV + value
+					negative[i] = topV
+				}
 				y0 := f.ypix(bottomV)
 				y1 := f.ypix(topV)
 				y = math.Min(y0, y1)

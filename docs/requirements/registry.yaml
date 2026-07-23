@@ -1,6 +1,6 @@
 id: SC-REQ-REGISTRY
 version: 1
-updated: "2026-07-18"
+updated: "2026-07-19"
 requirements:
   - id: REQ-PROD-001
     title: One language-neutral chart specification
@@ -8,7 +8,7 @@ requirements:
     rationale: A shared specification is the product boundary that makes cross-language behavior testable and portable.
     kind: functional
     priority: must
-    status: proposed
+    status: approved
     owner: product-owner
     target: 0.0.0.1
     source: SC-PROD-001
@@ -26,7 +26,7 @@ requirements:
     rationale: Passing validation for an unrenderable chart breaks the public contract and creates runtime failures.
     kind: constraint
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-PROD-002
@@ -63,7 +63,7 @@ requirements:
     rationale: Identical rendering is irrelevant when language entry points disagree about which input is legal.
     kind: quality
     priority: must
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-002
@@ -82,7 +82,7 @@ requirements:
     rationale: Capability negotiation is distinct from schema validity and must be safe across renderer versions.
     kind: functional
     priority: must
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-002
@@ -101,7 +101,7 @@ requirements:
     rationale: A shared accumulator produces invalid geometry when signs differ within a category.
     kind: functional
     priority: must
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-ARCH-ADR-0003
@@ -120,7 +120,7 @@ requirements:
     rationale: Net-sum and absolute-sum conventions assign different meanings to signed data; 0.0.0.1 must not choose silently.
     kind: constraint
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-ARCH-ADR-0003
@@ -139,13 +139,13 @@ requirements:
     rationale: Host text measurement is not stable enough for the canonical byte profile, while fixed margins can clip real data.
     kind: functional
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-ARCH-ADR-0005
     acceptance:
       - Margin values are finite and non-negative.
-      - Invalid remaining plot dimensions are rejected.
+      - Invalid remaining plot dimensions are rejected before render.
       - Defaults preserve approved line and column output.
       - Overflow and no-auto-fit limitations are published.
     decisions: [SC-ARCH-ADR-0005]
@@ -159,7 +159,7 @@ requirements:
     rationale: Browser presentation must adapt without changing the meaning or observable state of an interaction.
     kind: functional
     priority: must
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-004
@@ -170,7 +170,7 @@ requirements:
       - Placement stays within the declared container without fixed cross-viewport coordinates.
     decisions: [SC-ARCH-ADR-0004]
     contracts: [SC-CON-003, SC-CON-004]
-    verification: [TEST-RUNTIME-BROWSER]
+    verification: [TEST-RUNTIME-SMOKE, TEST-RUNTIME-BROWSER]
     implementation: [runtime/chart-interactions.js, spec/svg-contract.md]
 
   - id: REQ-A11Y-001
@@ -179,7 +179,7 @@ requirements:
     rationale: SVG text and visual marks alone do not expose sufficient chart meaning or operation to assistive technology.
     kind: quality
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-007
@@ -190,7 +190,7 @@ requirements:
       - Component claims are scoped rather than asserting whole-page WCAG conformance.
     decisions: [SC-ARCH-ADR-0004]
     contracts: [SC-CON-003, SC-CON-004, SC-CON-007]
-    verification: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
+    verification: [TEST-RUNTIME-SMOKE, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
     implementation: [runtime/chart-interactions.js, libs/python/stonecharts/render.py, libs/go/render.go]
 
   - id: REQ-VIS-001
@@ -199,7 +199,7 @@ requirements:
     rationale: Identical SVG bytes do not guarantee identical rasterized pixels across fonts, browsers, operating systems, and converters.
     kind: quality
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-006
@@ -218,7 +218,7 @@ requirements:
     rationale: Personalization is central to the product, but unbounded injection defeats portability, security, and parity.
     kind: constraint
     priority: must
-    status: proposed
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-005
@@ -275,7 +275,7 @@ requirements:
     rationale: Uncontrolled benchmark numbers are not comparable and create misleading promises.
     kind: quality
     priority: should
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-QUAL-002
@@ -287,4 +287,3 @@ requirements:
     contracts: []
     verification: [BENCH-RENDER-BASELINE]
     implementation: [libs/python/benchmark.py, libs/go/cmd/benchmark/main.go]
-

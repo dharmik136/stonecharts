@@ -28,7 +28,11 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	svg := stonecharts.RenderSVG(spec)
+	svg, err := stonecharts.RenderSVG(spec)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	if len(os.Args) >= 3 {
 		if err := os.WriteFile(os.Args[2], []byte(svg), 0o644); err != nil {

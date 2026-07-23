@@ -9,7 +9,7 @@ review_mode: self
 applies_to: 0.0.0.1
 requirements: [REQ-PROD-001]
 evidence: [TEST-DOCS-CONTROL]
-last_reviewed: "2026-07-18"
+last_reviewed: "2026-07-17"
 review_due: "2026-08-18"
 supersedes: null
 superseded_by: null
@@ -29,7 +29,7 @@ Release `0.0.0.1` cannot enter contract hardening until `GATE-S0` is complete.
 ## Entry state
 
 - StoneCharts is the canonical product and technical namespace.
-- Python and Go line and column renderers exist with a shared golden corpus.
+- Python and Go line, column, bar, and area renderers exist with a shared golden corpus.
 - Repository and documentation controls execute successfully.
 - Known correctness, runtime, customization, release, and evidence gaps are recorded.
 
@@ -38,10 +38,10 @@ Release `0.0.0.1` cannot enter contract hardening until `GATE-S0` is complete.
 Stage 0 resolves the following decisions before its exit review:
 
 - `DEC-001`: canonical release identifier.
-- `DEC-002`: active chart scope.
-- `DEC-003`: language-expansion timing.
+- `DEC-002`: active chart scope. Resolved.
+- `DEC-003`: language-expansion timing. Resolved.
 - `DEC-004`: guaranteed customization boundary.
-- `DEC-006`: branch and merge policy, including the private-plan protection limit.
+- `DEC-006`: branch and merge policy. Resolved.
 - `DEC-007`: GitHub Project fields, workflow, and conformance controls.
 
 Later decisions remain scheduled and owned; they do not silently block Stage 0 unless
@@ -75,7 +75,7 @@ passes.
 4. Every open implementation gap and release-significant risk maps to a Project item.
 5. Project fields and item values conform to `docs/project/backlog.yaml`.
 6. Documentation, schema, reference, and Project conformance checks pass.
-7. No chart-type or language-expansion implementation is active.
+7. No unapproved chart-type or language-expansion implementation is active.
 8. Stage 1 items remain outside `Ready` until this gate is closed.
 
 ## Evidence

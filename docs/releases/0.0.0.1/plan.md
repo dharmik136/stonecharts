@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Objective
 
-Ship the first auditable proof of the StoneCharts thesis: line and column rendered
+Ship the first auditable proof of the StoneCharts thesis: line, column, bar, and area rendered
 natively by Python and Go from one released specification, with canonical SVG parity,
 safe validation, bounded customization, qualified browser behavior, and an immutable
 evidence pack.
@@ -36,10 +36,10 @@ hosted service, universal browser support, or universal pixel identity.
 | Source release tag | `0.0.0.1` |
 | Go module tag | Not yet approved; any published mapping must be valid Go semantic versioning |
 
-Current Python metadata reports `0.1.0`; aligning package and runtime version metadata
-is a release blocker. A `v0.0.0.1` Go tag is forbidden because it is not valid semantic
-versioning. No release tag is created until distribution mappings and all release
-surfaces satisfy [ADR 0007](../../architecture/adr/0007-release-identifier.md).
+Python package metadata now reports `0.0.0.1`. A `v0.0.0.1` Go tag is forbidden
+because it is not valid semantic versioning. No release tag is created until
+distribution mappings and all release surfaces satisfy
+[ADR 0007](../../architecture/adr/0007-release-identifier.md).
 
 ## Stage 0 exit gate
 
@@ -50,7 +50,7 @@ Implementation hardening begins after:
   strategy, security controls, and this plan are approved.
 - Every `must` requirement has acceptance criteria and a verification ID.
 - Current implementation gaps are present in the risk register and work backlog.
-- No new chart type or language work is active.
+- No unapproved chart-type or language work is active.
 
 ## Implementation stages
 
@@ -68,14 +68,15 @@ Each stage has semantic tests before implementation and a separate reviewable co
 
 ## Hard release gates
 
-- Active schema and capability manifests expose line and column only.
+- Active schema and capability manifests expose line, column, and area.
 - Schema, Python, and Go accept and reject the same ratified domain.
 - No user-controlled input causes a panic, unhandled exception, NaN, infinity, unsafe
   markup, or partial artifact.
 - Signed normal-stack geometry and percent-domain rules pass in both languages.
 - All approved canonical fixtures match byte for byte in Python and Go.
 - Direct cross-render of all released examples and stress fixtures has zero diff.
-- Chromium browser qualification passes through local HTTP.
+- Chromium browser qualification passes through local HTTP. This is the next open
+  qualification gate after the automated runtime smoke evidence.
 - Manual keyboard and accessibility tasks pass or have an approved non-critical known
   limit.
 - Benchmark baseline and compatibility matrix are complete.

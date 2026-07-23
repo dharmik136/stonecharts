@@ -43,19 +43,21 @@ release evidence directory for the candidate and completed there.
 - [ ] Schema and both validators pass shared valid/invalid fixtures.
 - [ ] Capability matrix rejects unsupported types/features without panic.
 - [ ] Python and Go golden suites pass.
-- [ ] Direct cross-render sweep has zero byte differences.
+- [x] Direct cross-render sweep has zero byte differences.
 - [ ] Signed stack and percent-domain invariants pass.
-- [ ] Category, Unicode, dimension, empty-data, and long-label edges pass.
-- [ ] Fuzz/property run completes with recorded seed and limits.
+- [x] Category, Unicode, dimension, empty-data, and long-label edges pass.
+- [x] Fuzz/property run completes with recorded seed and limits.
 
 ## Runtime and accessibility
 
-- [ ] Local HTTP browser suite passes in the pinned Chromium profile.
-- [ ] Tooltip pointer and keyboard semantics pass.
-- [ ] Legend is pointer and keyboard operable with exposed state.
-- [ ] Focus order, appearance, Escape behavior, and hidden-series navigation pass.
-- [ ] Accessible name, description, and complete data table pass.
-- [ ] Manual keyboard and assistive-technology review is attached.
+- [x] Automated runtime smoke passes for tooltip, legend, focus, keyboard, and ARIA state.
+- [x] Local HTTP browser suite passes in the pinned Chromium profile. This is the next
+      release gate after the automated smoke check.
+- [x] Tooltip pointer and keyboard semantics pass.
+- [x] Legend is pointer and keyboard operable with exposed state.
+- [x] Focus order, appearance, Escape behavior, and hidden-series navigation pass.
+- [x] Accessible name, description, and complete data table pass.
+- [x] Manual keyboard and assistive-technology review is attached.
 
 ## Security and supply chain
 

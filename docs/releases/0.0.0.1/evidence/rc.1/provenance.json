@@ -1,0 +1,66 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "docs/releases/0.0.0.1/evidence/rc.1",
+      "digest": {
+        "sha256": "a42da2127f530fd4e65c3e8059f6a234ff706064deaa3f0e3546ec149b4c9114"
+      }
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "predicate": {
+    "buildDefinition": {
+      "buildType": "stonecharts/release-evidence-pack",
+      "externalParameters": {
+        "release": "0.0.0.1",
+        "candidate": "rc.1",
+        "branch": "main"
+      },
+      "internalParameters": {
+        "status": "M docs/quality/evidence-registry.yaml\n M docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256\n M docs/releases/0.0.0.1/evidence/rc.1/manifest.json\n M docs/releases/0.0.0.1/evidence/rc.1/provenance.json\n M docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md\n M docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json\n M tools/build_release_evidence.py"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/dharmik136/stonecharts.git",
+          "digest": {
+            "sha1": "be3bddc2094d259b639508a0999fd52863cee52e"
+          }
+        },
+        {
+          "uri": "file:docs/releases/0.0.0.1/evidence/manifest.schema.json",
+          "digest": {
+            "sha256": "fdb60a57977bac795f6f00311a042e094b143097d36004d3ef7372d3be85cfac"
+          }
+        },
+        {
+          "uri": "file:docs/quality/evidence-registry.yaml",
+          "digest": {
+            "sha256": "501a8a8a59189b08d6acabcfe1d1ac6a51ac77abe2cd94c98b28b538082b7fc0"
+          }
+        },
+        {
+          "uri": "file:tools/check_release_evidence.py",
+          "digest": {
+            "sha256": "503135f1e79a1c4dc40a7e4ea114b6e956d59e478db9b184781a9fb5ea3749d8"
+          }
+        }
+      ]
+    },
+    "runDetails": {
+      "builder": {
+        "id": "codex-cli/powershell"
+      },
+      "metadata": {
+        "invocationId": "be3bddc2094d259b639508a0999fd52863cee52e",
+        "completed": "2026-07-20T13:48:10+05:30",
+        "environment": {
+          "python": "Python 3.14.4",
+          "go": "go version go1.26.4 windows/amd64",
+          "os": "Windows 11 Pro",
+          "architecture": "amd64"
+        }
+      }
+    }
+  }
+}

@@ -9,9 +9,12 @@ venv/
 
 # Generated example outputs (goldens under charts/*/golden are committed)
 *.out.html
+docs/releases/0.0.0.1/evidence/rc.1/fuzz-corpus.json
+docs/releases/0.0.0.1/evidence/rc.1/fuzz-property-report.md
 
 # Tooling / editors
 .playwright-mcp/
+node_modules/
 .vscode/
 .idea/
 .DS_Store

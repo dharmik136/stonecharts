@@ -1,7 +1,7 @@
 ---
 id: SC-PROD-001
 title: StoneCharts Product Thesis
-status: proposed
+status: approved
 classification: normative
 owner: product-owner
 approver: maintainer
@@ -9,7 +9,7 @@ review_mode: self
 applies_to: all
 requirements: [REQ-PROD-001]
 evidence: []
-last_reviewed: "2026-07-18"
+last_reviewed: "2026-07-17"
 review_due: "2026-10-18"
 supersedes: null
 superseded_by: null
@@ -50,6 +50,10 @@ The exact boundary of each promise is defined by
 [`SC-CON-001`](../contracts/guarantees-and-limits.md). Product language MUST NOT turn
 an internal byte-parity oracle into an unsupported claim of universal pixel identity.
 
+The thesis is intentionally aligned with the current baseline: `line` and `column`
+are the only active 0.0.0.1 chart types, and all other chart recipes remain
+informative until their contracts and renderers are admitted.
+
 ## Primary users
 
 - Backend and platform engineers producing charts from Python, Go, and later native
@@ -88,4 +92,3 @@ The initial product succeeds when independent teams can use one supported spec i
 certified languages, receive the same canonical chart or equivalent error, customize
 it within the declared boundary, operate it accessibly in the certified browser
 profile, and audit the release evidence without relying on the implementation author.
-
