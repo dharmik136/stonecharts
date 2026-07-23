@@ -553,7 +553,7 @@ items:
   - id: REQ-DET-001
     title: Qualify canonical SVG byte parity
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S2 Qualification
@@ -561,7 +561,7 @@ items:
     outcome: Requalify and prove the registered REQ-DET-001 acceptance contract on the frozen release corpus.
     traceability: [REQ-DET-001, SC-CON-001, SC-CON-003]
     risks: [RISK-006]
-    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER]
     dependencies: [GATE-S1]
     compatibility: Certifies canonical output; unapproved byte changes fail qualification.
     areas: [python, go, spec]

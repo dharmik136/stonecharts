@@ -54,8 +54,8 @@ requirements:
       - A direct Python-to-Go cross-render sweep reports no differences.
     decisions: [SC-ARCH-ADR-0001]
     contracts: [SC-CON-001, SC-CON-003]
-    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
-    implementation: [libs/python/stonecharts, libs/go, charts/line-basic/golden, charts/column/golden]
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER]
+    implementation: [libs/python/stonecharts, libs/go, charts/line-basic/golden, charts/column/golden, charts/area/golden]
 
   - id: REQ-VAL-001
     title: Cross-language validation parity

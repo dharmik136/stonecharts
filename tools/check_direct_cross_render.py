@@ -29,6 +29,7 @@ ACTIVE = {
         "gradient-partial",
     ],
     "column": ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"],
+    "area": ["basic", "stacked", "percent", "themed-dark"],
 }
 
 
