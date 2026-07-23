@@ -633,7 +633,7 @@ items:
   - id: GATE-S2
     title: Pass Stage 2 qualification gate
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S2 Qualification
@@ -655,7 +655,7 @@ items:
   - id: REQ-REL-001
     title: Build immutable release qualification evidence
     item_type: Requirement
-    status: Blocked
+    status: Ready
     priority: P0
     workstream: WS-06 Release
     stage: S3 Release Candidate
