@@ -87,12 +87,12 @@ It is not a publication approval.
 - [x] Shared validation parity and capability coverage pass.
 - [x] Signed stack, percent-domain, margin, XSS, runtime, accessibility, visual profile, performance, direct cross-render, and fuzz/property evidence are attached.
 - [x] Release evidence validator is present.
+- [x] SBOM generation and validation.
+- [x] Provenance statement.
+- [x] Package install matrix: Python wheel install (3.14 local, 3.9 in CI) and Go module consumption via local `replace` both proven.
 
 ## Still open before S3
 
-- [ ] SBOM generation and validation.
-- [ ] Provenance statement.
-- [ ] Package install matrix.
 - [ ] Release tag and publication.
 - [ ] Public support channel sign-off.
 """
@@ -239,8 +239,9 @@ It does not claim S3 completeness.
 | Go source module | `cd libs/go && go test ./...` | PASS | Exercises the Go module directly from the current repo. |
 | Controlled docs | `python tools/check_docs.py` | PASS | Confirms governed document consistency. |
 | Release evidence manifest | `python tools/check_release_evidence.py --manifest docs/releases/0.0.0.1/evidence/rc.1/manifest.json` | PASS | Confirms the candidate pack and its recorded hashes. |
-| Python wheel install | pending | not run | Release artifact packaging has not been qualified yet. |
-| Go release module install | pending | not run | Release-tagged module publication has not been qualified yet. |
+| Python wheel install (3.14, local) | `python -m build --wheel --outdir dist libs/python` then fresh-venv install and import/render smoke test | PASS | Built a `py3-none-any` wheel, installed it into an isolated venv, confirmed the import resolves to site-packages (not the source tree), and rendered a chart from the installed copy. Confirmed no unapproved chart-type module (`bar`) is present in the built wheel. |
+| Python wheel install (3.9) | CI job `python-wheel-install` (matrix: 3.9, 3.14) in `.github/workflows/quality.yml` | PASS in CI | 3.9 is not installed on this local machine; qualified via the same build-install-smoke-test sequence in GitHub Actions, which has clean access to the pinned interpreter version. |
+| Go module consumption | Separate consumer module with a local `replace stonecharts => <path>` directive; `go mod tidy && go run .` | PASS | Confirms the module builds and executes when imported as a dependency by an external module, not just via its own package tests. No git tag exists yet (release publication is a separate, later gate per DEC-011), so this is local-path consumption, not a tagged-version fetch. |
 """
     write_text(PACK / "package-install-matrix.md", install_matrix)
 
