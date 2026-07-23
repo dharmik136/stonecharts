@@ -22,5 +22,5 @@ contact_links:
     url: https://github.com/dharmik136/stonecharts/security/advisories/new
     about: Report vulnerabilities privately; do not open a public issue.
   - name: Support policy
-    url: https://github.com/dharmik136/stonecharts/blob/master/SUPPORT.md
+    url: https://github.com/dharmik136/stonecharts/blob/main/SUPPORT.md
     about: Check supported channels and response boundaries.
