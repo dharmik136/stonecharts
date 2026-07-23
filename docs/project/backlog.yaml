@@ -569,7 +569,7 @@ items:
   - id: REQ-A11Y-001
     title: Qualify accessible chart alternatives and operation
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-04 Runtime & A11y
     stage: S2 Qualification
@@ -577,7 +577,7 @@ items:
     outcome: Implement and prove the registered REQ-A11Y-001 acceptance contract; the browser harness and manual accessibility review are complete for the 0.0.0.1 release candidate.
     traceability: [REQ-A11Y-001, SC-CON-003, SC-CON-004, SC-CON-007]
     risks: [RISK-008, RISK-010]
-    evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
+    evidence: [TEST-RUNTIME-SMOKE, TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
     dependencies: [REQ-RUNTIME-001, GATE-S1]
     compatibility: Defines the supported component accessibility profile without whole-page claims.
     areas: [runtime, python, go, docs]
@@ -585,7 +585,7 @@ items:
   - id: REQ-VIS-001
     title: Qualify explicit visual reproducibility profiles
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P1
     workstream: WS-05 Customization
     stage: S2 Qualification
