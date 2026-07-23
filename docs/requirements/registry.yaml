@@ -256,7 +256,7 @@ requirements:
     rationale: Claims must be auditable against the exact artifacts delivered to users.
     kind: delivery
     priority: must
-    status: proposed
+    status: implemented
     owner: maintainer
     target: 0.0.0.1
     source: SC-REL-001
@@ -267,7 +267,7 @@ requirements:
     decisions: []
     contracts: [SC-CON-001]
     verification: [TEST-RELEASE-EVIDENCE]
-    implementation: [docs/releases/0.0.0.1/evidence/manifest.schema.json]
+    implementation: [docs/releases/0.0.0.1/evidence/manifest.schema.json, tools/build_release_evidence.py, tools/check_release_evidence.py]
 
   - id: REQ-PERF-001
     title: Reproducible performance qualification

@@ -444,7 +444,7 @@ It does not claim S3 completeness.
             "This candidate pack is not a publication approval.",
             "Go module publication is still held behind a later release gate.",
             "Pixel identity is only claimed under a certified export profile, not arbitrary host fonts.",
-            "Expansion beyond line and column remains outside this release candidate.",
+            "Expansion beyond line, column, and area remains outside this release candidate.",
         ],
         "review": {
             "mode": "self",

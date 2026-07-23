@@ -655,7 +655,7 @@ items:
   - id: REQ-REL-001
     title: Build immutable release qualification evidence
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-06 Release
     stage: S3 Release Candidate

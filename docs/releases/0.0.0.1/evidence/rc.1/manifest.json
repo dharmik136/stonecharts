@@ -3,7 +3,7 @@
   "candidate": "rc.1",
   "source": {
     "repository": "dharmik136/stonecharts",
-    "commit": "be3bddc2094d259b639508a0999fd52863cee52e",
+    "commit": "ac0dd36f5c8a88561e512bd61d7408a209fba2e1",
     "tag": "0.0.0.1",
     "treeClean": false
   },
@@ -27,8 +27,8 @@
       "name": "plan.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/plan.md",
-      "sha256": "2c1bf928c4c0bb7b216a76ea8654fc28ad66e12cccd9d870ec2a6c8b36db937b",
-      "bytes": 4602
+      "sha256": "c3743bc05d43abb3c916c94e0f59db47c4c82370a37d36bbd1560aa6ee14f6eb",
+      "bytes": 4720
     },
     {
       "name": "checklist.md",
@@ -69,8 +69,8 @@
       "name": "performance-baseline-review.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
-      "sha256": "28530b68b15b59113e8c54bfa00ad1dad43b457dc0dbdfb0e6c55cc093b59dc7",
-      "bytes": 1635
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48",
+      "bytes": 3922
     },
     {
       "name": "direct-cross-render-review.md",
@@ -97,22 +97,22 @@
       "name": "qualification-checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md",
-      "sha256": "b61f1bb6337dd003802872c282947f0a7750a37523aaddfa3485e7f120ae5501",
+      "sha256": "594e29a0281ced51423f5c1776595b76a9c23fd5ad60f288600222b66754b0a1",
       "bytes": 1259
     },
     {
       "name": "sbom.spdx.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json",
-      "sha256": "c976d61262c0ba645855ca6e21b9e0a2c38247ef3a404b232bf299ec4b2ff647",
+      "sha256": "8a7855cddd93d842b93b8628e49ca34ac54a55286bb76768c555602d6bd47d8c",
       "bytes": 2185
     },
     {
       "name": "provenance.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/provenance.json",
-      "sha256": "3900cd8b443996ee04db65dbdd11842a3da11f0d247e14456aff40dbb8f691e4",
-      "bytes": 2300
+      "sha256": "b1a22093eea5366e7db79bda6c3fb1eef92138157fce142ffcefb94e30bf0694",
+      "bytes": 2303
     },
     {
       "name": "package-install-matrix.md",
@@ -160,8 +160,8 @@
       "name": "check_direct_cross_render.py",
       "kind": "other",
       "path": "tools/check_direct_cross_render.py",
-      "sha256": "0c6eb8e38b4cd045d18e93e3a6a0b39729d6779787efa590a6cd4ea4771a5331",
-      "bytes": 2447
+      "sha256": "3d60673122b88fc77749fd4bd6a0757c6c138a9e4df18e3029604f78c05baea3",
+      "bytes": 2507
     },
     {
       "name": "check_release_evidence.py",
@@ -188,7 +188,7 @@
       "name": "hashes.sha256",
       "kind": "other",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256",
-      "sha256": "9eef1224613dc17213adde0830f850478a6b62fb776eb4384d3e1e42102af80b",
+      "sha256": "63407f4f6a1c243fcbad56b014174fd8aa15289a255618f6d6b2e7827f26d78e",
       "bytes": 2672
     }
   ],
@@ -203,49 +203,49 @@
       "id": "TEST-PYTHON-GOLDENS",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
+      "sha256": "8af29d2e96a37fd2141338a085d17546915a1fc7c9085e1f4b014572cc2ce115"
     },
     {
       "id": "TEST-GO-GOLDENS",
       "status": "passed",
       "path": "libs/go/render_test.go",
-      "sha256": "cd4d4063bad6eba4e856b36c78a22f076e9865ebaefcf634306b7df7fa89a42b"
+      "sha256": "a01dbb4594117aff2854ab8ebc20c14a266cbc4a461b053da67343fa04def720"
     },
     {
       "id": "TEST-VALIDATION-PARITY",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
+      "sha256": "8af29d2e96a37fd2141338a085d17546915a1fc7c9085e1f4b014572cc2ce115"
     },
     {
       "id": "TEST-CAPABILITY-MATRIX",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
+      "sha256": "8af29d2e96a37fd2141338a085d17546915a1fc7c9085e1f4b014572cc2ce115"
     },
     {
       "id": "TEST-STACK-SIGNED",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
+      "sha256": "8af29d2e96a37fd2141338a085d17546915a1fc7c9085e1f4b014572cc2ce115"
     },
     {
       "id": "TEST-PERCENT-DOMAIN",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
+      "sha256": "8af29d2e96a37fd2141338a085d17546915a1fc7c9085e1f4b014572cc2ce115"
     },
     {
       "id": "TEST-LAYOUT-MARGINS",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
+      "sha256": "8af29d2e96a37fd2141338a085d17546915a1fc7c9085e1f4b014572cc2ce115"
     },
     {
       "id": "TEST-XSS-ESCAPING",
       "status": "passed",
       "path": "libs/python/tests/test_golden.py",
-      "sha256": "acd3fa997feec21d5dcab07ce758572e60647c4d11d45a0a36aa244967d6beda"
+      "sha256": "8af29d2e96a37fd2141338a085d17546915a1fc7c9085e1f4b014572cc2ce115"
     },
     {
       "id": "TEST-RUNTIME-BROWSER",
@@ -275,13 +275,13 @@
       "id": "BENCH-RENDER-BASELINE",
       "status": "passed",
       "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
-      "sha256": "28530b68b15b59113e8c54bfa00ad1dad43b457dc0dbdfb0e6c55cc093b59dc7"
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48"
     },
     {
       "id": "TEST-DIRECT-CROSS-RENDER",
       "status": "passed",
       "path": "tools/check_direct_cross_render.py",
-      "sha256": "0c6eb8e38b4cd045d18e93e3a6a0b39729d6779787efa590a6cd4ea4771a5331"
+      "sha256": "3d60673122b88fc77749fd4bd6a0757c6c138a9e4df18e3029604f78c05baea3"
     },
     {
       "id": "TEST-FUZZ-PROPERTY",
@@ -374,12 +374,12 @@
     "This candidate pack is not a publication approval.",
     "Go module publication is still held behind a later release gate.",
     "Pixel identity is only claimed under a certified export profile, not arbitrary host fonts.",
-    "Expansion beyond line and column remains outside this release candidate."
+    "Expansion beyond line, column, and area remains outside this release candidate."
   ],
   "review": {
     "mode": "self",
     "productOwner": "dharmik136",
     "maintainer": "dharmik136",
-    "approvedAt": "2026-07-20T13:48:10+05:30"
+    "approvedAt": "2026-07-23T18:31:12+05:30"
   }
 }

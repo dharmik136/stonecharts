@@ -18,8 +18,8 @@ superseded_by: null
 # 0.0.0.1 Candidate Evidence Checklist
 
 - Candidate: `rc.1`
-- Source commit: `be3bddc2094d259b639508a0999fd52863cee52e`
-- Generated at: `2026-07-20T13:48:10+05:30`
+- Source commit: `ac0dd36f5c8a88561e512bd61d7408a209fba2e1`
+- Generated at: `2026-07-23T18:31:12+05:30`
 
 This pack records the governed release evidence state that is currently available in the repo.
 It is not a publication approval.
