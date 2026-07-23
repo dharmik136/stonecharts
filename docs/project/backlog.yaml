@@ -601,7 +601,7 @@ items:
   - id: REQ-SEC-001
     title: Requalify untrusted specification safety
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S2 Qualification
