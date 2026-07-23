@@ -617,7 +617,7 @@ items:
   - id: REQ-PERF-001
     title: Establish reproducible performance qualification
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P1
     workstream: WS-03 Conformance
     stage: S2 Qualification
