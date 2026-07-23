@@ -3,7 +3,7 @@
   "candidate": "rc.1",
   "source": {
     "repository": "dharmik136/stonecharts",
-    "commit": "ac0dd36f5c8a88561e512bd61d7408a209fba2e1",
+    "commit": "4734f310c31229b171edafbaadea937f80aac243",
     "tag": "0.0.0.1",
     "treeClean": false
   },
@@ -97,29 +97,29 @@
       "name": "qualification-checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md",
-      "sha256": "594e29a0281ced51423f5c1776595b76a9c23fd5ad60f288600222b66754b0a1",
-      "bytes": 1259
+      "sha256": "5ca7f1519d6c93a751e98d711a2d0eed758cd2b9c70f9f3e0adcbd09c62a1a9e",
+      "bytes": 1363
     },
     {
       "name": "sbom.spdx.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json",
-      "sha256": "8a7855cddd93d842b93b8628e49ca34ac54a55286bb76768c555602d6bd47d8c",
+      "sha256": "3daaaf6b1cdfb5a1386b11a05e24374fb427da178157b2910a669e5bea981134",
       "bytes": 2185
     },
     {
       "name": "provenance.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/provenance.json",
-      "sha256": "b1a22093eea5366e7db79bda6c3fb1eef92138157fce142ffcefb94e30bf0694",
-      "bytes": 2303
+      "sha256": "fe4e973320a5923d0b136925ee1aa1cf8bae0b9c247c0d31f4adf6ea5c4c4ed0",
+      "bytes": 1982
     },
     {
       "name": "package-install-matrix.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/package-install-matrix.md",
-      "sha256": "06ba510cdfd0352a98c9e030cf8b1b58bf9f1dc902448f80d6137beb1d65163b",
-      "bytes": 1371
+      "sha256": "b107b96f01cc82df3f44edbd91781c5135bf6ce8536cf7d73356d933d17848ec",
+      "bytes": 2304
     },
     {
       "name": "evidence-registry.yaml",
@@ -188,7 +188,7 @@
       "name": "hashes.sha256",
       "kind": "other",
       "path": "docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256",
-      "sha256": "63407f4f6a1c243fcbad56b014174fd8aa15289a255618f6d6b2e7827f26d78e",
+      "sha256": "f445155ef93f2d9001e49ac09ff2bfda9624ffd3b4a3d8aa0e77f17a9765c79d",
       "bytes": 2672
     }
   ],
@@ -380,6 +380,6 @@
     "mode": "self",
     "productOwner": "dharmik136",
     "maintainer": "dharmik136",
-    "approvedAt": "2026-07-23T18:31:12+05:30"
+    "approvedAt": "2026-07-23T23:17:37+05:30"
   }
 }

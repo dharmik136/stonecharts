@@ -18,8 +18,8 @@ superseded_by: null
 # 0.0.0.1 Candidate Evidence Checklist
 
 - Candidate: `rc.1`
-- Source commit: `ac0dd36f5c8a88561e512bd61d7408a209fba2e1`
-- Generated at: `2026-07-23T18:31:12+05:30`
+- Source commit: `4734f310c31229b171edafbaadea937f80aac243`
+- Generated at: `2026-07-23T23:17:37+05:30`
 
 This pack records the governed release evidence state that is currently available in the repo.
 It is not a publication approval.
@@ -31,11 +31,11 @@ It is not a publication approval.
 - [x] Shared validation parity and capability coverage pass.
 - [x] Signed stack, percent-domain, margin, XSS, runtime, accessibility, visual profile, performance, direct cross-render, and fuzz/property evidence are attached.
 - [x] Release evidence validator is present.
+- [x] SBOM generation and validation.
+- [x] Provenance statement.
+- [x] Package install matrix: Python wheel install (3.14 local, 3.9 in CI) and Go module consumption via local `replace` both proven.
 
 ## Still open before S3
 
-- [ ] SBOM generation and validation.
-- [ ] Provenance statement.
-- [ ] Package install matrix.
 - [ ] Release tag and publication.
 - [ ] Public support channel sign-off.

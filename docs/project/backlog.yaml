@@ -671,7 +671,7 @@ items:
   - id: GATE-S3
     title: Pass Stage 3 release-candidate gate
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-06 Release
     stage: S3 Release Candidate
