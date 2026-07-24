@@ -19,7 +19,7 @@ superseded_by: null
 
 ## Objective
 
-Ship the first auditable proof of the StoneCharts thesis: line, column, bar, and area rendered
+Ship the first auditable proof of the StoneCharts thesis: line, column, and area rendered
 natively by Python and Go from one released specification, with canonical SVG parity,
 safe validation, bounded customization, qualified browser behavior, and an immutable
 evidence pack.
