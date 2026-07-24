@@ -4,7 +4,7 @@
     {
       "name": "docs/releases/0.0.0.1/evidence/rc.1",
       "digest": {
-        "sha256": "3dd32eeb4672ca58bd5133ac89ed1e6cde06eb10801ba9e2263336b95253cebd"
+        "sha256": "707bfab73bf4e1b5cb7776cf139dae2ba39e664a7694d09b8edc711cb5373fc8"
       }
     }
   ],
@@ -18,13 +18,13 @@
         "branch": "main"
       },
       "internalParameters": {
-        "status": "?? .claude/\n?? docs/product-antigravity/"
+        "status": "M docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256\n M docs/releases/0.0.0.1/evidence/rc.1/manifest.json\n M docs/releases/0.0.0.1/evidence/rc.1/provenance.json\n M docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md\n M docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json\n M tools/build_release_evidence.py\n?? .claude/\n?? docs/product-antigravity/"
       },
       "resolvedDependencies": [
         {
           "uri": "git+https://github.com/dharmik136/stonecharts.git",
           "digest": {
-            "sha1": "4734f310c31229b171edafbaadea937f80aac243"
+            "sha1": "da9f7004774fa5dc5a42618df01d018a5e989fa3"
           }
         },
         {
@@ -52,8 +52,8 @@
         "id": "codex-cli/powershell"
       },
       "metadata": {
-        "invocationId": "4734f310c31229b171edafbaadea937f80aac243",
-        "completed": "2026-07-23T23:17:37+05:30",
+        "invocationId": "da9f7004774fa5dc5a42618df01d018a5e989fa3",
+        "completed": "2026-07-24T22:30:52+05:30",
         "environment": {
           "python": "Python 3.14.4",
           "go": "go version go1.26.4 windows/amd64",

@@ -3,9 +3,9 @@
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
   "name": "StoneCharts 0.0.0.1 rc.1 evidence-pack sbom",
-  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.1/rc.1/4734f310c31229b171edafbaadea937f80aac243",
+  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.1/rc.1/da9f7004774fa5dc5a42618df01d018a5e989fa3",
   "creationInfo": {
-    "created": "2026-07-23T23:17:37+05:30",
+    "created": "2026-07-24T22:30:52+05:30",
     "creators": [
       "Tool: Codex CLI",
       "Person: Dharmik Shingala"
@@ -30,7 +30,7 @@
       ],
       "annotations": [
         {
-          "annotationDate": "2026-07-23T23:17:37+05:30",
+          "annotationDate": "2026-07-24T22:30:52+05:30",
           "annotationType": "OTHER",
           "annotator": "Tool: Codex CLI",
           "comment": "Python release package metadata is pinned to 0.0.0.1; runtime dependencies are declared as empty in pyproject.toml."
@@ -55,7 +55,7 @@
       ],
       "annotations": [
         {
-          "annotationDate": "2026-07-23T23:17:37+05:30",
+          "annotationDate": "2026-07-24T22:30:52+05:30",
           "annotationType": "OTHER",
           "annotator": "Tool: Codex CLI",
           "comment": "Go module uses local source validation and no third-party module dependencies in go.mod."
