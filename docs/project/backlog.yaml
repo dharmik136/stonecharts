@@ -693,7 +693,7 @@ items:
   - id: GATE-S4
     title: Authorize and publish release 0.0.0.1
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-06 Release
     stage: S4 Release
