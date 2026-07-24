@@ -715,7 +715,7 @@ items:
   - id: GATE-S5
     title: Admit post-0.0.0.1 chart and language expansion
     item_type: Release Gate
-    status: Inbox
+    status: Ready
     priority: P1
     workstream: WS-08 Expansion
     stage: S5 Expansion
