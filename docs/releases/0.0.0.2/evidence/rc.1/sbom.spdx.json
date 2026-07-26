@@ -1,0 +1,67 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "StoneCharts 0.0.0.2 rc.1 evidence-pack sbom",
+  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.2/rc.1/92b3a40b291fc2106050129a89f8d16dffcc393c",
+  "creationInfo": {
+    "created": "2026-07-26T21:50:09+05:30",
+    "creators": [
+      "Tool: Claude Code",
+      "Person: Dharmik Shingala"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-StoneCharts-Python",
+      "name": "stonecharts",
+      "versionInfo": "0.0.0.2",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Proprietary",
+      "supplier": "Person: Dharmik Shingala",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:pypi/stonecharts@0.0.0.2"
+        }
+      ],
+      "annotations": [
+        {
+          "annotationDate": "2026-07-26T21:50:09+05:30",
+          "annotationType": "OTHER",
+          "annotator": "Tool: Claude Code",
+          "comment": "Python release package metadata is pinned to 0.0.0.2 (bumped from 0.0.0.1); runtime dependencies remain declared as empty in pyproject.toml. The active chart-type module set now additionally includes bar."
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Package-StoneCharts-Go",
+      "name": "stonecharts",
+      "versionInfo": "0.0.0.2",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Proprietary",
+      "supplier": "Person: Dharmik Shingala",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:golang/stonecharts"
+        }
+      ],
+      "annotations": [
+        {
+          "annotationDate": "2026-07-26T21:50:09+05:30",
+          "annotationType": "OTHER",
+          "annotator": "Tool: Claude Code",
+          "comment": "Go module uses local source validation and no third-party module dependencies in go.mod; no Go module tag exists (ADR 0007), unchanged from 0.0.0.1."
+        }
+      ]
+    }
+  ],
+  "files": []
+}

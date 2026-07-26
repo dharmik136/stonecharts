@@ -807,13 +807,13 @@ items:
   - id: GATE-S7
     title: Pass 0.0.0.2 release-candidate gate
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S7 Release Candidate 0.0.0.2
     target: 0.0.0.2
     outcome: One immutable commit can reproducibly produce installable artifacts, documentation, and a complete evidence pack for 0.0.0.2.
-    traceability: [SC-REL-013]
+    traceability: [SC-REL-013, SC-REL-016, SC-REL-017]
     risks: []
     evidence: [TEST-RELEASE-EVIDENCE]
     dependencies: [GATE-S6]

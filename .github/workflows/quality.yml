@@ -50,7 +50,7 @@ jobs:
       - run: python -m pip install "build>=1,<2"
       - run: python -m build --wheel --outdir dist libs/python
       - run: python -m venv /tmp/install-test-venv
-      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.1-py3-none-any.whl
+      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.2-py3-none-any.whl
       - name: Smoke-test the installed wheel from a neutral directory
         working-directory: /tmp
         run: |

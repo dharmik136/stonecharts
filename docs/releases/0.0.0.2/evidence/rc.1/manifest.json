@@ -1,0 +1,430 @@
+{
+  "release": "0.0.0.2",
+  "candidate": "rc.1",
+  "source": {
+    "repository": "dharmik136/stonecharts",
+    "commit": "92b3a40b291fc2106050129a89f8d16dffcc393c",
+    "tag": "0.0.0.2",
+    "treeClean": false
+  },
+  "versions": {
+    "product": "0.0.0.2",
+    "python": "0.0.0.2",
+    "go": null,
+    "schema": "manifest.schema.json v1",
+    "svgContract": "spec/svg-contract.md current",
+    "runtime": "node:test browser and DOM harness current"
+  },
+  "environment": {
+    "builder": "Claude Code / bash",
+    "python": "Python 3.14.4",
+    "go": "go version go1.26.4 windows/amd64",
+    "os": "Windows 11 Pro 10.0.26200",
+    "architecture": "amd64"
+  },
+  "artifacts": [
+    {
+      "name": "plan.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/plan.md",
+      "sha256": "817ab91541b201445e30fda4361d528ca2db5224334a68d2609cfda1ad25b0d9",
+      "bytes": 3972
+    },
+    {
+      "name": "manifest.schema.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/manifest.schema.json",
+      "sha256": "77be7aa424e343f52b38a48fe3f28056298cd789fdc3ff5101fd68f45e6235a9",
+      "bytes": 4232
+    },
+    {
+      "name": "bar-accessibility-security-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md",
+      "sha256": "d6f0ff8c98868a7dd466f75769461ae38336c1959af5c582d37ba6d3570ffd10",
+      "bytes": 4351
+    },
+    {
+      "name": "bar-performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md",
+      "sha256": "df54b2d840210362e7debd79193c9340a9b9f888791dd9177441310822ce2d60",
+      "bytes": 3310
+    },
+    {
+      "name": "qualification-checklist.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/rc.1/qualification-checklist.md",
+      "sha256": "b23dfc4f711865af01ac991abf1986a6b33feebb6097fe30cdf93452183077dd",
+      "bytes": 2972
+    },
+    {
+      "name": "sbom.spdx.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/rc.1/sbom.spdx.json",
+      "sha256": "70499b1b87c6d5e15c0343b18dbefcc3f497ea6ad8123b58b0e6f2da4cb38b2b",
+      "bytes": 2340
+    },
+    {
+      "name": "provenance.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/rc.1/provenance.json",
+      "sha256": "1b9c0286e5fed81b5ffb37b647997c8d3d9f0d06569704a51c3c4bbedd0cceb5",
+      "bytes": 2215
+    },
+    {
+      "name": "package-install-matrix.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/rc.1/package-install-matrix.md",
+      "sha256": "49b68199ca26ec202a65c6221d1f44907f01647fd201c1d7ceef2bd3a958d6bc",
+      "bytes": 2368
+    },
+    {
+      "name": "manual-accessibility-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405",
+      "bytes": 1848
+    },
+    {
+      "name": "visual-profile-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d",
+      "bytes": 1288
+    },
+    {
+      "name": "performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48",
+      "bytes": 3922
+    },
+    {
+      "name": "direct-cross-render-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/direct-cross-render-review.md",
+      "sha256": "727e7546fa7a1df64eca7de118d992a2df797aee1d68636ea21a984a4ac3745a",
+      "bytes": 877
+    },
+    {
+      "name": "security-qualification-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/security-qualification-review.md",
+      "sha256": "edc486a793b374cc318a99672aa1556ddc1ec359f86b0cd61be8373e675eec57",
+      "bytes": 2512
+    },
+    {
+      "name": "evidence-registry.yaml",
+      "kind": "documentation",
+      "path": "docs/quality/evidence-registry.yaml",
+      "sha256": "ce9b0efc962f9498559214d098f94f096572a7212ed944484b2e7e6453b6c966",
+      "bytes": 7065
+    },
+    {
+      "name": "__init__.py",
+      "kind": "other",
+      "path": "libs/python/stonecharts/__init__.py",
+      "sha256": "760f76dac310eb67e59d0dec6c74550d7f82918b7e215fe462baf0d99881d6ab",
+      "bytes": 1148
+    },
+    {
+      "name": "pyproject.toml",
+      "kind": "documentation",
+      "path": "libs/python/pyproject.toml",
+      "sha256": "8479fb3ba13952270341c1ea06d19a7bb6a5fce8d30527122de0068953dbcb8e",
+      "bytes": 850
+    },
+    {
+      "name": "bar.py",
+      "kind": "other",
+      "path": "libs/python/stonecharts/charts/bar.py",
+      "sha256": "4df4607a0378b308c54174f2d2d97b1399cb24f6c7844e94ddcb1b423d6a502a",
+      "bytes": 3176
+    },
+    {
+      "name": "go.mod",
+      "kind": "other",
+      "path": "libs/go/go.mod",
+      "sha256": "2acd29679ac852b7c32c48c78776ee120931fd25bbdf83821012e708360f66da",
+      "bytes": 28
+    },
+    {
+      "name": "bar.go",
+      "kind": "other",
+      "path": "libs/go/bar.go",
+      "sha256": "65bd1b7265ec7142fcdfadd3c8fc0c727340bbc90ccaee8c42b8613db8fc83b8",
+      "bytes": 3024
+    },
+    {
+      "name": "design.md",
+      "kind": "documentation",
+      "path": "charts/bar/design.md",
+      "sha256": "c1b8d94056965730924ab72685284077a23ac27dce69851d0f4fee4dddff1288",
+      "bytes": 27477
+    },
+    {
+      "name": "invalid-fixtures.json",
+      "kind": "documentation",
+      "path": "charts/bar/invalid-fixtures.json",
+      "sha256": "1f05bbb8a8cfb3ea1a81f7ff924473f1e12ee015b5b4bfa26f25151084cd9d8b",
+      "bytes": 1807
+    },
+    {
+      "name": "check_docs.py",
+      "kind": "other",
+      "path": "tools/check_docs.py",
+      "sha256": "372b9c298c3ebd35c2d584b96faee57f061784f625b11e432b9a934e44e3e285",
+      "bytes": 21121
+    },
+    {
+      "name": "check_direct_cross_render.py",
+      "kind": "other",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "09f9ad1b296280851e3ecef2616fee4ae6b1f38ef9c5c4dfab5eb39c07401220",
+      "bytes": 2581
+    },
+    {
+      "name": "check_release_evidence.py",
+      "kind": "other",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "81a60dc0466fbb684cad84f92e1c62f23c81063dd5234028d6e7ba1af0dae056",
+      "bytes": 6796
+    },
+    {
+      "name": "browser-qualification.test.js",
+      "kind": "other",
+      "path": "runtime/browser-qualification.test.js",
+      "sha256": "b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50",
+      "bytes": 6168
+    },
+    {
+      "name": "bar-browser-qualification.test.js",
+      "kind": "other",
+      "path": "runtime/bar-browser-qualification.test.js",
+      "sha256": "37cb91b1ca20765e256101d355fad5bdd5ee1f2b9c86bf638a1b53f768ab282a",
+      "bytes": 6457
+    },
+    {
+      "name": "hashes.sha256",
+      "kind": "other",
+      "path": "docs/releases/0.0.0.2/evidence/rc.1/hashes.sha256",
+      "sha256": "d50f9e742832f61f8cacff73c38d31759a3bb5ec00ef8c7717ce984e0a8d37be",
+      "bytes": 2996
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TEST-DOCS-CONTROL",
+      "status": "passed",
+      "path": "tools/check_docs.py",
+      "sha256": "372b9c298c3ebd35c2d584b96faee57f061784f625b11e432b9a934e44e3e285"
+    },
+    {
+      "id": "TEST-PYTHON-GOLDENS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "0c033ba380807f17da74c2964f57b5a1bfab96aa1d523661caef8ae183f80bb7"
+    },
+    {
+      "id": "TEST-GO-GOLDENS",
+      "status": "passed",
+      "path": "libs/go/render_test.go",
+      "sha256": "4bd1cf896fc8b62cd836d22a51eac47d8f5ff52103866ff0c26c857c6d91822c"
+    },
+    {
+      "id": "TEST-VALIDATION-PARITY",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "0c033ba380807f17da74c2964f57b5a1bfab96aa1d523661caef8ae183f80bb7"
+    },
+    {
+      "id": "TEST-CAPABILITY-MATRIX",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "0c033ba380807f17da74c2964f57b5a1bfab96aa1d523661caef8ae183f80bb7"
+    },
+    {
+      "id": "TEST-STACK-SIGNED",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "0c033ba380807f17da74c2964f57b5a1bfab96aa1d523661caef8ae183f80bb7"
+    },
+    {
+      "id": "TEST-PERCENT-DOMAIN",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "0c033ba380807f17da74c2964f57b5a1bfab96aa1d523661caef8ae183f80bb7"
+    },
+    {
+      "id": "TEST-LAYOUT-MARGINS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "0c033ba380807f17da74c2964f57b5a1bfab96aa1d523661caef8ae183f80bb7"
+    },
+    {
+      "id": "TEST-XSS-ESCAPING",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "0c033ba380807f17da74c2964f57b5a1bfab96aa1d523661caef8ae183f80bb7"
+    },
+    {
+      "id": "TEST-RUNTIME-BROWSER",
+      "status": "passed",
+      "path": "runtime/browser-qualification.test.js",
+      "sha256": "b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50"
+    },
+    {
+      "id": "TEST-RUNTIME-SMOKE",
+      "status": "passed",
+      "path": "runtime/chart-interactions.test.js",
+      "sha256": "8153df43c010a46a53a4954dcd9167a9c1fd6910d6ea6f469d215d712457dc80"
+    },
+    {
+      "id": "REVIEW-ACCESSIBILITY-MANUAL",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405"
+    },
+    {
+      "id": "REVIEW-VISUAL-PROFILE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d"
+    },
+    {
+      "id": "BENCH-RENDER-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48"
+    },
+    {
+      "id": "TEST-DIRECT-CROSS-RENDER",
+      "status": "passed",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "09f9ad1b296280851e3ecef2616fee4ae6b1f38ef9c5c4dfab5eb39c07401220"
+    },
+    {
+      "id": "TEST-FUZZ-PROPERTY",
+      "status": "passed",
+      "path": "tools/check_fuzz_property.py",
+      "sha256": "b2a598755cbe190c3041a2f22a10bded07e6afc8a73ca62985f768b47d969740"
+    },
+    {
+      "id": "TEST-RELEASE-EVIDENCE",
+      "status": "passed",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "81a60dc0466fbb684cad84f92e1c62f23c81063dd5234028d6e7ba1af0dae056"
+    },
+    {
+      "id": "REVIEW-BAR-ACCESSIBILITY-SECURITY",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md",
+      "sha256": "d6f0ff8c98868a7dd466f75769461ae38336c1959af5c582d37ba6d3570ffd10"
+    },
+    {
+      "id": "BENCH-BAR-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md",
+      "sha256": "df54b2d840210362e7debd79193c9340a9b9f888791dd9177441310822ce2d60"
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-001",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "The active schema is narrowed to line/column/area/bar; no unrendereable type is exposed."
+    },
+    {
+      "id": "RISK-002",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Validator parity is evidenced across the full active corpus including bar."
+    },
+    {
+      "id": "RISK-003",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Typed capability errors and no-panic boundaries cover bar identically to line/column/area."
+    },
+    {
+      "id": "RISK-004",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Mixed-sign stack geometry evidence is unchanged and still passes; bar does not stack."
+    },
+    {
+      "id": "RISK-005",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Percent-domain rules are explicit and unchanged for this release scope."
+    },
+    {
+      "id": "RISK-006",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Unicode sizing remains fixed by the current deterministic length model; bar reuses it unchanged."
+    },
+    {
+      "id": "RISK-007",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Manual margins are the release boundary; unchanged for bar."
+    },
+    {
+      "id": "RISK-008",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Browser and accessibility evidence now exists for bar specifically (SC-REL-014), matching line/column/area."
+    },
+    {
+      "id": "RISK-009",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Package version is aligned with 0.0.0.2 across pyproject.toml and __init__.py."
+    },
+    {
+      "id": "RISK-010",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Short category arrays are padded deterministically in both renderers, exercised by bar's edge-case tests."
+    },
+    {
+      "id": "RISK-011",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Host-font and certified-export profiles remain intentionally separate guarantees, unchanged from 0.0.0.1."
+    },
+    {
+      "id": "RISK-012",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Release provenance is bounded by this candidate evidence pack and validator; public publication remains gated."
+    },
+    {
+      "id": "RISK-013",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "No branch-protection technical control exists yet (private repo tier); unchanged from 0.0.0.1, enforcement remains the governed gate sequence."
+    },
+    {
+      "id": "RISK-014",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "No GitHub-native private vulnerability reporting exists yet; unchanged from 0.0.0.1."
+    }
+  ],
+  "knownLimits": [
+    "This candidate pack is not a publication approval.",
+    "Go module publication is still held behind a later release gate (ADR 0007).",
+    "Pixel identity is only claimed under a certified export profile, not arbitrary host fonts.",
+    "Expansion beyond line, column, area, and bar remains outside this release candidate."
+  ],
+  "review": {
+    "mode": "self",
+    "productOwner": "dharmik136",
+    "maintainer": "dharmik136",
+    "approvedAt": "2026-07-26T21:50:09+05:30"
+  }
+}

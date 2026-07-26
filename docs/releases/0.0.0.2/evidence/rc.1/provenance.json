@@ -1,0 +1,66 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "docs/releases/0.0.0.2/evidence/rc.1",
+      "digest": {
+        "sha256": "aae29fbc428f736117214d289072f7e1c7cbd1f9273daaebf75c9ecd2c05af89"
+      }
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "predicate": {
+    "buildDefinition": {
+      "buildType": "stonecharts/release-evidence-pack",
+      "externalParameters": {
+        "release": "0.0.0.2",
+        "candidate": "rc.1",
+        "branch": "main"
+      },
+      "internalParameters": {
+        "status": "M .github/workflows/quality.yml\n M libs/python/pyproject.toml\n M libs/python/stonecharts/__init__.py\n M tools/check_release_evidence.py\n?? .claude/\n?? docs/product-antigravity/\n?? docs/releases/0.0.0.2/evidence/manifest.schema.json\n?? tools/build_release_evidence_0002.py"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/dharmik136/stonecharts.git",
+          "digest": {
+            "sha1": "92b3a40b291fc2106050129a89f8d16dffcc393c"
+          }
+        },
+        {
+          "uri": "file:docs/releases/0.0.0.2/evidence/manifest.schema.json",
+          "digest": {
+            "sha256": "77be7aa424e343f52b38a48fe3f28056298cd789fdc3ff5101fd68f45e6235a9"
+          }
+        },
+        {
+          "uri": "file:docs/quality/evidence-registry.yaml",
+          "digest": {
+            "sha256": "ce9b0efc962f9498559214d098f94f096572a7212ed944484b2e7e6453b6c966"
+          }
+        },
+        {
+          "uri": "file:tools/check_release_evidence.py",
+          "digest": {
+            "sha256": "81a60dc0466fbb684cad84f92e1c62f23c81063dd5234028d6e7ba1af0dae056"
+          }
+        }
+      ]
+    },
+    "runDetails": {
+      "builder": {
+        "id": "claude-code/bash"
+      },
+      "metadata": {
+        "invocationId": "92b3a40b291fc2106050129a89f8d16dffcc393c",
+        "completed": "2026-07-26T21:50:09+05:30",
+        "environment": {
+          "python": "Python 3.14.4",
+          "go": "go version go1.26.4 windows/amd64",
+          "os": "Windows 11 Pro",
+          "architecture": "amd64"
+        }
+      }
+    }
+  }
+}

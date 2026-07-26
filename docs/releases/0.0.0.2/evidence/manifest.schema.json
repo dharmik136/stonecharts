@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stonecharts.dev/releases/0.0.0.2/evidence/manifest.schema.json",
+  "title": "StoneCharts release evidence manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "release", "candidate", "source", "versions", "environment", "artifacts",
+    "evidence", "risks", "knownLimits", "review"
+  ],
+  "properties": {
+    "release": { "const": "0.0.0.2" },
+    "candidate": { "type": "string", "pattern": "^rc\\.[1-9][0-9]*$" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tag", "treeClean"],
+      "properties": {
+        "repository": { "type": "string" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tag": { "const": "0.0.0.2" },
+        "treeClean": { "type": "boolean" }
+      }
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "python", "go", "schema", "svgContract", "runtime"],
+      "properties": {
+        "product": { "const": "0.0.0.2" },
+        "python": { "const": "0.0.0.2" },
+        "go": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+              "not": { "const": "v0.0.0.2" }
+            }
+          ]
+        },
+        "schema": { "type": "string" },
+        "svgContract": { "type": "string" },
+        "runtime": { "type": "string" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["builder", "python", "go", "os", "architecture"],
+      "additionalProperties": { "type": ["string", "number", "boolean", "null"] },
+      "properties": {
+        "builder": { "type": "string" },
+        "python": { "type": "string" },
+        "go": { "type": "string" },
+        "os": { "type": "string" },
+        "architecture": { "type": "string" }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "path", "sha256"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^(TEST|BENCH|REVIEW)-[A-Z0-9-]+$" },
+          "status": { "enum": ["passed", "failed", "skipped", "unavailable"] },
+          "path": { "type": ["string", "null"] },
+          "sha256": {
+            "oneOf": [
+              { "type": "null" },
+              { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            ]
+          }
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "disposition"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^RISK-\\d{3}$" },
+          "disposition": { "enum": ["closed", "accepted", "not-applicable"] },
+          "expires": { "type": ["string", "null"], "format": "date" },
+          "rationale": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "knownLimits": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 5 }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "productOwner", "maintainer", "approvedAt"],
+      "properties": {
+        "mode": { "enum": ["self", "independent"] },
+        "productOwner": { "type": "string" },
+        "maintainer": { "type": "string" },
+        "approvedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind", "path", "sha256", "bytes"],
+      "properties": {
+        "name": { "type": "string" },
+        "kind": { "enum": ["python-package", "go-source", "sbom", "provenance", "documentation", "other"] },
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

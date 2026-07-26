@@ -24,8 +24,12 @@ except ImportError as exc:  # pragma: no cover - bootstrap path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "docs" / "releases" / "0.0.0.1" / "evidence" / "rc.1" / "manifest.json"
-SCHEMA = ROOT / "docs" / "releases" / "0.0.0.1" / "evidence" / "manifest.schema.json"
 EVIDENCE_REGISTRY = ROOT / "docs" / "quality" / "evidence-registry.yaml"
+
+
+def schema_for(manifest_path: Path) -> Path:
+    # docs/releases/<release>/evidence/<candidate>/manifest.json -> .../evidence/manifest.schema.json
+    return manifest_path.parent.parent / "manifest.schema.json"
 
 
 def rel(path: Path) -> str:
@@ -56,8 +60,8 @@ def error(message: str) -> None:
     raise SystemExit(1)
 
 
-def validate_schema(manifest: dict[str, Any]) -> None:
-    schema = load_json(SCHEMA)
+def validate_schema(manifest: dict[str, Any], schema_path: Path) -> None:
+    schema = load_json(schema_path)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     issues = sorted(validator.iter_errors(manifest), key=lambda item: list(item.path))
     if issues:
@@ -167,7 +171,10 @@ def main() -> int:
         error(f"missing manifest: {rel(manifest_path)}")
 
     manifest = load_json(manifest_path)
-    validate_schema(manifest)
+    schema_path = schema_for(manifest_path)
+    if not schema_path.exists():
+        error(f"missing schema: {rel(schema_path)}")
+    validate_schema(manifest, schema_path)
     validate_manifest(manifest_path, manifest)
     print(f"release evidence PASS: {rel(manifest_path)}")
     return 0
