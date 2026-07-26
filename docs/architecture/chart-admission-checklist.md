@@ -1,7 +1,7 @@
 ---
 id: SC-ARCH-011
 title: StoneCharts Chart Admission Checklist
-status: proposed
+status: approved
 classification: normative
 owner: maintainer
 approver: product-owner
