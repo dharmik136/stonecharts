@@ -2,9 +2,9 @@
 77be7aa424e343f52b38a48fe3f28056298cd789fdc3ff5101fd68f45e6235a9  docs/releases/0.0.0.2/evidence/manifest.schema.json
 d6f0ff8c98868a7dd466f75769461ae38336c1959af5c582d37ba6d3570ffd10  docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md
 df54b2d840210362e7debd79193c9340a9b9f888791dd9177441310822ce2d60  docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md
-b23dfc4f711865af01ac991abf1986a6b33feebb6097fe30cdf93452183077dd  docs/releases/0.0.0.2/evidence/rc.1/qualification-checklist.md
-70499b1b87c6d5e15c0343b18dbefcc3f497ea6ad8123b58b0e6f2da4cb38b2b  docs/releases/0.0.0.2/evidence/rc.1/sbom.spdx.json
-1b9c0286e5fed81b5ffb37b647997c8d3d9f0d06569704a51c3c4bbedd0cceb5  docs/releases/0.0.0.2/evidence/rc.1/provenance.json
+c84346ab3c29012dc1d81357caf2197f02c1d5d18ecd3b8f0b0c355e6214e565  docs/releases/0.0.0.2/evidence/rc.1/qualification-checklist.md
+53b57e3c083b93e34808a70ae36f02d9a6350fbd8c06cecfbf985b300cf804e3  docs/releases/0.0.0.2/evidence/rc.1/sbom.spdx.json
+b2d0c7e86cd95609707398d1164610bdc586ec50d5cb7b7b26977e290525080b  docs/releases/0.0.0.2/evidence/rc.1/provenance.json
 49b68199ca26ec202a65c6221d1f44907f01647fd201c1d7ceef2bd3a958d6bc  docs/releases/0.0.0.2/evidence/rc.1/package-install-matrix.md
 5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405  docs/releases/0.0.0.1/evidence/manual-accessibility-review.md
 21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d  docs/releases/0.0.0.1/evidence/visual-profile-review.md
@@ -24,4 +24,4 @@ c1b8d94056965730924ab72685284077a23ac27dce69851d0f4fee4dddff1288  charts/bar/des
 81a60dc0466fbb684cad84f92e1c62f23c81063dd5234028d6e7ba1af0dae056  tools/check_release_evidence.py
 b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50  runtime/browser-qualification.test.js
 37cb91b1ca20765e256101d355fad5bdd5ee1f2b9c86bf638a1b53f768ab282a  runtime/bar-browser-qualification.test.js
-1b9c0286e5fed81b5ffb37b647997c8d3d9f0d06569704a51c3c4bbedd0cceb5  docs/releases/0.0.0.2/evidence/rc.1/hashes.sha256
+b2d0c7e86cd95609707398d1164610bdc586ec50d5cb7b7b26977e290525080b  docs/releases/0.0.0.2/evidence/rc.1/hashes.sha256

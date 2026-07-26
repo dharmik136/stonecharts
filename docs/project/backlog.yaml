@@ -828,13 +828,13 @@ items:
   - id: GATE-S8
     title: Authorize and publish release 0.0.0.2
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S8 Release 0.0.0.2
     target: 0.0.0.2
     outcome: 0.0.0.2 is published only after explicit product and technical authorization, exactly as 0.0.0.1 was.
-    traceability: [SC-REL-013]
+    traceability: [SC-REL-013, SC-REL-016]
     risks: []
     evidence: [TEST-RELEASE-EVIDENCE]
     dependencies: [GATE-S7]

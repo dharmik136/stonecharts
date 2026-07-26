@@ -3,7 +3,7 @@
   "candidate": "rc.1",
   "source": {
     "repository": "dharmik136/stonecharts",
-    "commit": "92b3a40b291fc2106050129a89f8d16dffcc393c",
+    "commit": "724c8c072a5710499c4a643414ece3c536150339",
     "tag": "0.0.0.2",
     "treeClean": false
   },
@@ -55,22 +55,22 @@
       "name": "qualification-checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.2/evidence/rc.1/qualification-checklist.md",
-      "sha256": "b23dfc4f711865af01ac991abf1986a6b33feebb6097fe30cdf93452183077dd",
-      "bytes": 2972
+      "sha256": "c84346ab3c29012dc1d81357caf2197f02c1d5d18ecd3b8f0b0c355e6214e565",
+      "bytes": 3505
     },
     {
       "name": "sbom.spdx.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.2/evidence/rc.1/sbom.spdx.json",
-      "sha256": "70499b1b87c6d5e15c0343b18dbefcc3f497ea6ad8123b58b0e6f2da4cb38b2b",
+      "sha256": "53b57e3c083b93e34808a70ae36f02d9a6350fbd8c06cecfbf985b300cf804e3",
       "bytes": 2340
     },
     {
       "name": "provenance.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.2/evidence/rc.1/provenance.json",
-      "sha256": "1b9c0286e5fed81b5ffb37b647997c8d3d9f0d06569704a51c3c4bbedd0cceb5",
-      "bytes": 2215
+      "sha256": "b2d0c7e86cd95609707398d1164610bdc586ec50d5cb7b7b26977e290525080b",
+      "bytes": 2018
     },
     {
       "name": "package-install-matrix.md",
@@ -209,7 +209,7 @@
       "name": "hashes.sha256",
       "kind": "other",
       "path": "docs/releases/0.0.0.2/evidence/rc.1/hashes.sha256",
-      "sha256": "d50f9e742832f61f8cacff73c38d31759a3bb5ec00ef8c7717ce984e0a8d37be",
+      "sha256": "bc09eecdf6d28fd51fa27b4fda18ff18a15f02914eba5a525dfd7e9970a15b2d",
       "bytes": 2996
     }
   ],
@@ -425,6 +425,6 @@
     "mode": "self",
     "productOwner": "dharmik136",
     "maintainer": "dharmik136",
-    "approvedAt": "2026-07-26T21:50:09+05:30"
+    "approvedAt": "2026-07-27T00:56:33+05:30"
   }
 }

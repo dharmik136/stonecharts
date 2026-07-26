@@ -117,17 +117,23 @@ already-tagged `rc.1` evidence.
 
 ## GATE-S8 sign-off
 
-Not yet recorded. Tagging `0.0.0.2` remains a separate, later authorization
-(`GATE-S8`), matching how `0.0.0.1`'s tag was a distinct step after its `rc.1` pack
-was built and validated.
+Product-owner and maintainer approval (`review_mode: self` - both roles are held by
+dharmik136; this is not an independent audit) for tagging `0.0.0.2` on the qualified
+commit above is recorded here. Scope of this authorization, per `DEC-014` (which
+already named bar and `0.0.0.2` as the specific expansion target) and the commercial
+terms policy (`SC-CON-020`), mirrors `0.0.0.1`'s `GATE-S4` sign-off exactly: create and
+push the source-control tag on the qualified commit only. No repository visibility
+change, package-registry upload, or Go module tag is authorized by this sign-off -
+those remain separately gated (Go module publication additionally requires an
+ecosystem-mapping decision that does not yet exist, per ADR 0007).
 
 ## Still open before further publication
 
-- [ ] `GATE-S8` product-owner/maintainer sign-off and the `0.0.0.2` source-control tag.
 - [ ] Repository visibility / public distribution decision (not authorized yet;
       unchanged from `0.0.0.1`).
 - [ ] Go module ecosystem-mapping decision (required before any Go tag; ADR 0007;
       unchanged from `0.0.0.1`).
+- [ ] Public support channel sign-off (unchanged from `0.0.0.1`).
 """
     write_text(PACK / "qualification-checklist.md", checklist)
 
