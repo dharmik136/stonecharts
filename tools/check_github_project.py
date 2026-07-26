@@ -79,10 +79,14 @@ SELECT_STYLE = {
         "S3 Release Candidate": ("ORANGE", "Build artifacts and immutable evidence"),
         "S4 Release": ("PINK", "Authorize and publish 0.0.0.1"),
         "S5 Expansion": ("GRAY", "Admit post-release charts and languages"),
+        "S6 Qualification 0.0.0.2": ("GREEN", "Collect conformance and quality evidence for 0.0.0.2"),
+        "S7 Release Candidate 0.0.0.2": ("ORANGE", "Build artifacts and immutable evidence for 0.0.0.2"),
+        "S8 Release 0.0.0.2": ("PINK", "Authorize and publish 0.0.0.2"),
     },
     "Target": {
         "0.0.0.1": ("GREEN", "Required for the first governed release"),
-        "Post-0.0.0.1": ("BLUE", "Begins only after the first release"),
+        "0.0.0.2": ("BLUE", "Required for the second governed release"),
+        "Post-0.0.0.1": ("PURPLE", "Begins only after the first release"),
         "Unscheduled": ("GRAY", "No approved release target"),
     },
 }

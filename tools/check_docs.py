@@ -345,8 +345,9 @@ def main() -> int:
         "stages": [
             "S0 Foundation", "S1 Contract Closure", "S2 Qualification",
             "S3 Release Candidate", "S4 Release", "S5 Expansion",
+            "S6 Qualification 0.0.0.2", "S7 Release Candidate 0.0.0.2", "S8 Release 0.0.0.2",
         ],
-        "targets": ["0.0.0.1", "Post-0.0.0.1", "Unscheduled"],
+        "targets": ["0.0.0.1", "0.0.0.2", "Post-0.0.0.1", "Unscheduled"],
         "item_types": ["Decision", "Requirement", "Work Package", "Defect", "Release Gate"],
     }
     for field, expected in expected_workflow.items():

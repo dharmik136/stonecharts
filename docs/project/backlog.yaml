@@ -56,7 +56,10 @@ workflow:
     - S3 Release Candidate
     - S4 Release
     - S5 Expansion
-  targets: [0.0.0.1, Post-0.0.0.1, Unscheduled]
+    - S6 Qualification 0.0.0.2
+    - S7 Release Candidate 0.0.0.2
+    - S8 Release 0.0.0.2
+  targets: [0.0.0.1, 0.0.0.2, Post-0.0.0.1, Unscheduled]
   item_types: [Decision, Requirement, Work Package, Defect, Release Gate]
 
 items:
