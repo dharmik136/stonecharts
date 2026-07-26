@@ -306,5 +306,5 @@ requirements:
       - Chart-admission-checklist.md phases 1-9 (design through release-evidence-adjacent documentation) are closed before this requirement moves to verified. Phase 10 (the immutable release evidence pack) is GATE-S7's concern, not this requirement's - mirroring how REQ-REL-001 was a separate concern from REQ-DET-001/REQ-A11Y-001/etc. in the 0.0.0.1 cycle, not bundled into each of them individually.
     decisions: []
     contracts: []
-    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE, REVIEW-BAR-ACCESSIBILITY-SECURITY, BENCH-BAR-BASELINE]
     implementation: [libs/python/stonecharts/charts/bar.py, libs/go/bar.go, charts/bar/golden, charts/bar/invalid-fixtures.json, runtime/bar-browser-qualification.test.js]

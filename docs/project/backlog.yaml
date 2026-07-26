@@ -785,15 +785,15 @@ items:
   - id: GATE-S6
     title: Pass 0.0.0.2 qualification gate
     item_type: Release Gate
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S6 Qualification 0.0.0.2
     target: 0.0.0.2
     outcome: Bar's admission evidence is formally reviewed as release-quality qualification, not just passing checks during implementation.
-    traceability: [SC-REL-013, SC-ARCH-011]
+    traceability: [SC-REL-013, SC-ARCH-011, SC-REL-014, SC-REL-015]
     risks: []
-    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, BENCH-RENDER-BASELINE]
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, BENCH-RENDER-BASELINE, REVIEW-BAR-ACCESSIBILITY-SECURITY, BENCH-BAR-BASELINE]
     dependencies: [REQ-CHART-001]
     compatibility: Qualification gate only; line/column/area are not requalified, only bar is newly reviewed.
     areas: [python, go, release]

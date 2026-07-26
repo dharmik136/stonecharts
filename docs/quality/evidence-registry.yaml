@@ -121,3 +121,17 @@ evidence:
     command: py -3 tools/check_release_evidence.py --manifest docs/releases/0.0.0.1/evidence/rc.1/manifest.json
     location: tools/check_release_evidence.py
     requirements: [REQ-REL-001]
+  - id: REVIEW-BAR-ACCESSIBILITY-SECURITY
+    kind: manual-review
+    status: implemented
+    description: Records a fresh, bar-specific accessibility (live ARIA tree, browser qualification) and security (XSS/injection corpus) review for GATE-S6.
+    command: null
+    location: docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md
+    requirements: [REQ-CHART-001, REQ-A11Y-001, REQ-SEC-001]
+  - id: BENCH-BAR-BASELINE
+    kind: benchmark
+    status: implemented
+    description: Records a fresh review of bar's benchmark results against the existing line/column/area baseline for GATE-S6.
+    command: py -3 libs/python/benchmark.py && cd libs/go && go run ./cmd/benchmark
+    location: docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md
+    requirements: [REQ-CHART-001, REQ-PERF-001]

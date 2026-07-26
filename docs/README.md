@@ -64,6 +64,8 @@ Document status and classification are authoritative in each file's metadata.
 - [0.0.0.2 release plan](releases/0.0.0.2/plan.md)
 - [0.0.0.1 qualification checklist](releases/0.0.0.1/checklist.md)
 - [0.0.0.1 release findings](releases/0.0.0.1/evidence/release-findings.md)
+- [Bar accessibility and security review](releases/0.0.0.2/evidence/bar-accessibility-security-review.md)
+- [Bar performance baseline review](releases/0.0.0.2/evidence/bar-performance-baseline-review.md)
 
 Research and long-range roadmaps remain under `docs/research` and `docs/roadmap`.
 They inform decisions but do not override approved requirements, ADRs, or contracts.
