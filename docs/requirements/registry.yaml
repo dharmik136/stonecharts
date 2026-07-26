@@ -294,7 +294,7 @@ requirements:
     rationale: DEC-014 authorizes bar as the next expansion target; the admission checklist exists precisely so authorization does not get conflated with completion.
     kind: functional
     priority: must
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.2
     source: SC-ARCH-011
@@ -303,8 +303,8 @@ requirements:
       - Bar output byte-matches its golden corpus in both languages, and the direct cross-render sweep includes bar with zero diff (mirrors REQ-DET-001).
       - Bar's accessible data table and XSS/injection coverage match the standard already proven for line, column, and area (mirrors REQ-A11Y-001, REQ-SEC-001).
       - Bar is added to the benchmark workload matrix across all four approved profiles (mirrors REQ-PERF-001).
-      - Every chart-admission-checklist.md phase 0-10 checkbox is closed before this requirement moves to verified.
+      - Chart-admission-checklist.md phases 1-9 (design through release-evidence-adjacent documentation) are closed before this requirement moves to verified. Phase 10 (the immutable release evidence pack) is GATE-S7's concern, not this requirement's - mirroring how REQ-REL-001 was a separate concern from REQ-DET-001/REQ-A11Y-001/etc. in the 0.0.0.1 cycle, not bundled into each of them individually.
     decisions: []
     contracts: []
     verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
-    implementation: [libs/python/stonecharts/charts/bar.py, libs/go/bar.go, charts/bar/golden, charts/bar/invalid-fixtures.json]
+    implementation: [libs/python/stonecharts/charts/bar.py, libs/go/bar.go, charts/bar/golden, charts/bar/invalid-fixtures.json, runtime/bar-browser-qualification.test.js]

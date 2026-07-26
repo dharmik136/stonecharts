@@ -741,7 +741,7 @@ items:
     priority: P1
     workstream: WS-08 Expansion
     stage: S5 Expansion
-    target: Post-0.0.0.1
+    target: 0.0.0.2
     outcome: Bar is admitted as the next chart type, targeting release 0.0.0.2; no other chart type or language is admitted by this decision.
     traceability: [SC-ARCH-011, SC-ARCH-006]
     risks: []
@@ -758,11 +758,11 @@ items:
   - id: REQ-CHART-001
     title: Admit bar as a certified 0.0.0.2 chart type
     item_type: Requirement
-    status: In Review
+    status: Done
     priority: P1
     workstream: WS-08 Expansion
     stage: S5 Expansion
-    target: Post-0.0.0.1
+    target: 0.0.0.2
     outcome: Bar reaches Certified status per the renderer constitution before 0.0.0.2 documentation describes it as supported.
     traceability: [REQ-CHART-001, SC-ARCH-011]
     risks: []
@@ -771,9 +771,75 @@ items:
     compatibility: Adds a new certified chart type; does not change any 0.0.0.1 golden, schema behavior, or guarantee.
     areas: [spec, python, go, docs, release]
     acceptance:
-      - Every chart-admission-checklist.md phase (1 through 10) is complete.
+      - Chart-admission-checklist.md phases 1 through 9 are complete (phase 10 is GATE-S7's concern).
       - Schema, Python, and Go accept and reject bar specs identically.
       - Bar byte-matches its golden corpus in both languages; direct cross-render sweep includes bar with zero diff.
       - Bar's accessible data table and XSS coverage match the standard already proven for line, column, and area.
       - Bar is added to the benchmark workload matrix across all four approved profiles.
+      - Bar's interactive runtime behavior (tooltip, keyboard nav, legend toggle, ARIA state) is directly verified in a live browser, not inferred from line's passing test.
     verification: [python tools/check_direct_cross_render.py, python -m pytest libs/python/tests, go test ./..., python tools/check_docs.py]
+
+  - id: GATE-S6
+    title: Pass 0.0.0.2 qualification gate
+    item_type: Release Gate
+    status: Ready
+    priority: P0
+    workstream: WS-08 Expansion
+    stage: S6 Qualification 0.0.0.2
+    target: 0.0.0.2
+    outcome: Bar's admission evidence is formally reviewed as release-quality qualification, not just passing checks during implementation.
+    traceability: [SC-REL-013, SC-ARCH-011]
+    risks: []
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, BENCH-RENDER-BASELINE]
+    dependencies: [REQ-CHART-001]
+    compatibility: Qualification gate only; line/column/area are not requalified, only bar is newly reviewed.
+    areas: [python, go, release]
+    acceptance:
+      - Cross-language, golden, and invalid-fixture qualification passes for bar specifically, re-run fresh, not inferred from REQ-CHART-001's implementation-time passes.
+      - Bar's accessibility and security coverage is reviewed against the same standard as line/column/area, with a recorded review artifact.
+      - Bar's benchmark results are reviewed as a baseline, not just recorded.
+      - No known P0 correctness or runtime defect remains for bar.
+    verification: [Fresh re-run of the full qualification suite against the exact commit under review]
+
+  - id: GATE-S7
+    title: Pass 0.0.0.2 release-candidate gate
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-08 Expansion
+    stage: S7 Release Candidate 0.0.0.2
+    target: 0.0.0.2
+    outcome: One immutable commit can reproducibly produce installable artifacts, documentation, and a complete evidence pack for 0.0.0.2.
+    traceability: [SC-REL-013]
+    risks: []
+    evidence: [TEST-RELEASE-EVIDENCE]
+    dependencies: [GATE-S6]
+    compatibility: Freezes the 0.0.0.2 candidate source, versions, artifacts, and known limits; does not touch the already-tagged 0.0.0.1 rc.1 evidence pack.
+    areas: [python, go, docs, release, security]
+    acceptance:
+      - A 0.0.0.2-specific evidence pack (manifest, SBOM, provenance, hashes, package install matrix) is built - not a reuse or overwrite of 0.0.0.1's rc.1 pack.
+      - Built artifacts install and execute bar in every supported profile.
+      - Evidence manifest validates and references immutable results for the 0.0.0.2 candidate commit.
+    verification: [python tools/check_docs.py, release evidence validator against the 0.0.0.2 pack, package installation matrix]
+
+  - id: GATE-S8
+    title: Authorize and publish release 0.0.0.2
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-08 Expansion
+    stage: S8 Release 0.0.0.2
+    target: 0.0.0.2
+    outcome: 0.0.0.2 is published only after explicit product and technical authorization, exactly as 0.0.0.1 was.
+    traceability: [SC-REL-013]
+    risks: []
+    evidence: [TEST-RELEASE-EVIDENCE]
+    dependencies: [GATE-S7]
+    compatibility: Creates the second governed release baseline; does not alter the 0.0.0.1 tag or its evidence.
+    areas: [release, docs, security]
+    acceptance:
+      - Product owner and maintainer sign-off are recorded for 0.0.0.2 specifically.
+      - Release tag 0.0.0.2 and artifacts are published from the qualified commit only.
+      - Evidence manifest and hashes are archived immutably for 0.0.0.2.
+      - Support, vulnerability, and feedback channels remain operational (unchanged from 0.0.0.1's disclosed posture).
+    verification: [Published-artifact hash recomputation and release-record audit]

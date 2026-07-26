@@ -61,6 +61,7 @@ Document status and classification are authoritative in each file's metadata.
 - [Threat model](security/threat-model.md)
 - [Supply-chain policy](security/supply-chain.md)
 - [0.0.0.1 release plan](releases/0.0.0.1/plan.md)
+- [0.0.0.2 release plan](releases/0.0.0.2/plan.md)
 - [0.0.0.1 qualification checklist](releases/0.0.0.1/checklist.md)
 - [0.0.0.1 release findings](releases/0.0.0.1/evidence/release-findings.md)
 
