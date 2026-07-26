@@ -287,3 +287,24 @@ requirements:
     contracts: []
     verification: [BENCH-RENDER-BASELINE]
     implementation: [libs/python/benchmark.py, libs/go/cmd/benchmark/main.go]
+
+  - id: REQ-CHART-001
+    title: Admit bar as a certified 0.0.0.2 chart type
+    statement: Bar MUST be admitted through the full chart admission checklist (SC-ARCH-011) and reach Certified status per the renderer constitution before 0.0.0.2 documentation may describe it as supported.
+    rationale: DEC-014 authorizes bar as the next expansion target; the admission checklist exists precisely so authorization does not get conflated with completion.
+    kind: functional
+    priority: must
+    status: approved
+    owner: maintainer
+    target: 0.0.0.2
+    source: SC-ARCH-011
+    acceptance:
+      - Schema, Python, and Go accept and reject bar specs identically (mirrors REQ-VAL-001's contract, extended to bar).
+      - Bar output byte-matches its golden corpus in both languages, and the direct cross-render sweep includes bar with zero diff (mirrors REQ-DET-001).
+      - Bar's accessible data table and XSS/injection coverage match the standard already proven for line, column, and area (mirrors REQ-A11Y-001, REQ-SEC-001).
+      - Bar is added to the benchmark workload matrix across all four approved profiles (mirrors REQ-PERF-001).
+      - Every chart-admission-checklist.md phase 0-10 checkbox is closed before this requirement moves to verified.
+    decisions: []
+    contracts: []
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
+    implementation: []

@@ -733,3 +733,47 @@ items:
       - Expansion order and next release target are approved.
       - No new implementation starts before this gate is Ready and authorized.
     verification: [Approved expansion plan and conformance admission review]
+
+  - id: DEC-014
+    title: Post-0.0.0.1 expansion order
+    item_type: Decision
+    status: Done
+    priority: P1
+    workstream: WS-08 Expansion
+    stage: S5 Expansion
+    target: Post-0.0.0.1
+    outcome: Bar is admitted as the next chart type, targeting release 0.0.0.2; no other chart type or language is admitted by this decision.
+    traceability: [SC-ARCH-011, SC-ARCH-006]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [GATE-S4]
+    compatibility: Opens REQ-CHART-001; does not change any 0.0.0.1 guarantee or shipped behavior.
+    areas: [docs, release]
+    acceptance:
+      - The specific chart type and target release are named, not left open-ended.
+      - The decision cites the technical basis (roadmap reuse analysis), not an unsupported preference.
+      - No implementation work is authorized beyond Phase 0 of the chart admission checklist by this decision alone.
+    verification: [Approved decision record in docs/project/decisions.md]
+
+  - id: REQ-CHART-001
+    title: Admit bar as a certified 0.0.0.2 chart type
+    item_type: Requirement
+    status: Ready
+    priority: P1
+    workstream: WS-08 Expansion
+    stage: S5 Expansion
+    target: Post-0.0.0.1
+    outcome: Bar reaches Certified status per the renderer constitution before 0.0.0.2 documentation describes it as supported.
+    traceability: [REQ-CHART-001, SC-ARCH-011]
+    risks: []
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
+    dependencies: [DEC-014]
+    compatibility: Adds a new certified chart type; does not change any 0.0.0.1 golden, schema behavior, or guarantee.
+    areas: [spec, python, go, docs, release]
+    acceptance:
+      - Every chart-admission-checklist.md phase (1 through 10) is complete.
+      - Schema, Python, and Go accept and reject bar specs identically.
+      - Bar byte-matches its golden corpus in both languages; direct cross-render sweep includes bar with zero diff.
+      - Bar's accessible data table and XSS coverage match the standard already proven for line, column, and area.
+      - Bar is added to the benchmark workload matrix across all four approved profiles.
+    verification: [python tools/check_direct_cross_render.py, python -m pytest libs/python/tests, go test ./..., python tools/check_docs.py]
