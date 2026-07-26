@@ -2,14 +2,14 @@ id: SC-GOV-003
 title: StoneCharts product and engineering risk register
 status: proposed
 owner: maintainer
-updated: "2026-07-19"
+updated: "2026-07-26"
 risks:
   - id: RISK-001
     title: Released schema overstates renderer support
     description: The active schema and handwritten validators accept chart types that Python and Go cannot render.
     likelihood: high
     impact: critical
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Restrict the active schema to released types and add explicit renderer capability validation.
     requirements: [REQ-SCOPE-001, REQ-CAP-001]
@@ -18,7 +18,7 @@ risks:
     description: Minimum dimensions and non-empty series requirements currently differ between the JSON Schema and both runtime validators.
     likelihood: high
     impact: high
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Ratify one rule set, encode it in all three validators, and add shared accept-and-reject fixtures.
     requirements: [REQ-VAL-001]
@@ -27,7 +27,7 @@ risks:
     description: Unsupported chart types may pass validation and then cause a Go panic or Python exception during rendering.
     likelihood: high
     impact: critical
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Make render entry points return canonical typed errors for every user-controlled failure.
     requirements: [REQ-CAP-001]
@@ -36,7 +36,7 @@ risks:
     description: Positive and negative values share one accumulator, which can place bars far outside the plotting area.
     likelihood: high
     impact: critical
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Use separate positive and negative accumulators in both the domain and mark transforms.
     requirements: [REQ-STACK-001]
@@ -45,7 +45,7 @@ risks:
     description: Net-total normalization can divide by zero or erase non-zero values when positive and negative values cancel.
     likelihood: high
     impact: high
-    status: open
+    status: closed
     owner: product-owner
     mitigation: Restrict 0.0.0.1 percent stacking to finite non-negative values and define all-zero categories explicitly.
     requirements: [REQ-STACK-002]
@@ -54,7 +54,7 @@ risks:
     description: Python code-point length and Go byte length produce different legend estimates for non-ASCII names.
     likelihood: high
     impact: high
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Define one Unicode length model and lock it with cross-language fixtures.
     requirements: [REQ-DET-001, REQ-LAYOUT-001]
@@ -63,7 +63,7 @@ risks:
     description: Current deterministic fixed margins do not auto-fit long axis and category labels.
     likelihood: high
     impact: medium
-    status: open
+    status: closed
     owner: product-owner
     mitigation: Add validated manual margins and publish the no-auto-fit 0.0.0.1 limitation.
     requirements: [REQ-LAYOUT-001]
@@ -72,7 +72,7 @@ risks:
     description: Rect highlight behavior, tooltip persistence, legend keyboard operation, and accessibility semantics are not fully verified in a browser matrix.
     likelihood: high
     impact: high
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Ratify runtime semantics and add automated browser plus manual accessibility qualification.
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
@@ -99,7 +99,7 @@ risks:
     description: Host fonts and viewer rasterizers can produce different pixels from identical SVG bytes.
     likelihood: high
     impact: high
-    status: mitigating
+    status: closed
     owner: product-owner
     mitigation: Publish separate canonical, embedded-font, and certified-export guarantee profiles.
     requirements: [REQ-VIS-001]
@@ -108,7 +108,25 @@ risks:
     description: The repository has no automated immutable release manifest, SBOM, package hashes, or build provenance.
     likelihood: high
     impact: high
-    status: open
+    status: closed
     owner: maintainer
     mitigation: Build the 0.0.0.1 evidence pack and supply-chain workflow before public distribution.
     requirements: [REQ-REL-001, REQ-SEC-001]
+  - id: RISK-013
+    title: No automated branch-protection gate on main
+    description: This repository's tier does not support GitHub branch protection (confirmed via the API), so no technical control prevents a direct push or an unreviewed merge to main from bypassing CI.
+    likelihood: high
+    impact: medium
+    status: accepted
+    owner: maintainer
+    mitigation: Rely on the governed Stage-gate release process and the solo-maintainer risk-acceptance policy in threat-model.md until the repository qualifies for a tier with branch protection (GitHub Pro, or making the repository public).
+    requirements: [REQ-SEC-001]
+  - id: RISK-014
+    title: No GitHub-native private vulnerability reporting
+    description: GitHub private vulnerability reporting is not available on this repository's current tier (confirmed via the API; enabling it also 404s), so SECURITY.md's primary reporting channel falls back to its documented alternative.
+    likelihood: low
+    impact: medium
+    status: accepted
+    owner: security-contact
+    mitigation: Enable GitHub-native private vulnerability reporting once available on this repository's tier. Until then, SECURITY.md's documented fallback (contact the repository owner through GitHub to establish a private channel) is the operational reporting path.
+    requirements: [REQ-SEC-001]

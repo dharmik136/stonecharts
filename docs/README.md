@@ -62,6 +62,7 @@ Document status and classification are authoritative in each file's metadata.
 - [Supply-chain policy](security/supply-chain.md)
 - [0.0.0.1 release plan](releases/0.0.0.1/plan.md)
 - [0.0.0.1 qualification checklist](releases/0.0.0.1/checklist.md)
+- [0.0.0.1 release findings](releases/0.0.0.1/evidence/release-findings.md)
 
 Research and long-range roadmaps remain under `docs/research` and `docs/roadmap`.
 They inform decisions but do not override approved requirements, ADRs, or contracts.
