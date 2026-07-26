@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-004
 title: StoneCharts Decision Register
-status: proposed
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer
@@ -9,8 +9,8 @@ review_mode: self
 applies_to: 0.0.0.1 and later
 requirements: []
 evidence: [TEST-DOCS-CONTROL]
-last_reviewed: "2026-07-17"
-review_due: "2026-08-18"
+last_reviewed: "2026-07-27"
+review_due: "2026-08-27"
 supersedes: null
 superseded_by: null
 ---

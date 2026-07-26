@@ -8,7 +8,7 @@ requirements:
     rationale: A shared specification is the product boundary that makes cross-language behavior testable and portable.
     kind: functional
     priority: must
-    status: approved
+    status: implemented
     owner: product-owner
     target: 0.0.0.1
     source: SC-PROD-001
