@@ -44,6 +44,7 @@ Document status and classification are authoritative in each file's metadata.
 
 - [System design](architecture/system-design.md)
 - [Renderer constitution](architecture/renderer-constitution.md)
+- [Chart admission checklist](architecture/chart-admission-checklist.md)
 - [Architecture decisions](architecture/adr/README.md)
 - [Guarantees and limits](contracts/guarantees-and-limits.md)
 - [Validation and capabilities](contracts/validation-and-capabilities.md)

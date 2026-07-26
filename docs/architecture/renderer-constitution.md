@@ -33,7 +33,7 @@ A new language renderer MUST provide:
 3. Canonical number formatting, escaping, ordering, whitespace, and UTF-8 output.
 4. Native SVG generation without invoking Python, Go, Node, a browser, or a remote
    rendering service.
-5. Complete line, column, bar, and area conformance against the release corpus.
+5. Complete line, column, and area conformance against the release corpus.
 6. Identical canonical error codes and paths for shared invalid fixtures.
 7. Package metadata, supported runtime versions, license metadata, and installation
    documentation appropriate to the ecosystem.

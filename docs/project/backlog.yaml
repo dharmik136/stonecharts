@@ -721,7 +721,7 @@ items:
     stage: S5 Expansion
     target: Post-0.0.0.1
     outcome: New charts and language renderers enter only through an approved conformance admission protocol.
-    traceability: [SC-ARCH-002, SC-OPS-003]
+    traceability: [SC-ARCH-002, SC-ARCH-011, SC-OPS-003]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [DEC-003, GATE-S4]
