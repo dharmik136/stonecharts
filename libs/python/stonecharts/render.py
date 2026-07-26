@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Callable, Dict
 
 from .charts import area as _area
+from .charts import bar as _bar
 from .charts import column as _column
 from .charts import line as _line
 from .capabilities import CapabilityError, capabilities
@@ -24,6 +25,7 @@ _RUNTIME_PATH = Path(__file__).resolve().parents[3] / "runtime" / "chart-interac
 # chart type -> SVG renderer. New chart types register here.
 _RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
     "area": _area.render_svg,
+    "bar": _bar.render_svg,
     "column": _column.render_svg,
     "line": _line.render_svg,
 }

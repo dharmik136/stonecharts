@@ -23,10 +23,12 @@ from stonecharts.validate import SpecError, validate  # noqa: E402
 LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
 AREA_CASES = ["basic", "stacked", "percent", "themed-dark"]
+BAR_CASES = ["basic", "grouped", "stacked", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
     "area": AREA_CASES,
+    "bar": BAR_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -85,6 +87,11 @@ def test_area_goldens():
         _check("area", name)
 
 
+def test_bar_goldens():
+    for name in BAR_CASES:
+        _check("bar", name)
+
+
 def test_column_edge_cases():
     for spec in [
         {"type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
@@ -113,6 +120,25 @@ def test_area_edge_cases():
         {"type": "area", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
          "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
         {"type": "area", "series": [{"name": "a", "data": [42]}]},
+    ]:
+        low = render_svg(ChartSpec.from_dict(spec)).lower()
+        assert "nan" not in low and "inf" not in low, spec
+
+
+def test_bar_edge_cases():
+    for spec in [
+        {"type": "bar", "stacking": "normal", "xAxis": {"categories": ["mix"]},
+         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
+        {"type": "bar", "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+         "series": [{"name": "s", "data": [1, 2, 3]}]},
+        {"type": "bar", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
+         "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
+        {"type": "bar", "xAxis": {"categories": ["neg", "pos"]},
+         "series": [{"name": "a", "data": [-5, 10]}]},
+        {"type": "bar", "grouping": False,
+         "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
+        {"type": "bar", "series": [{"name": str(i), "data": [1, 2, 3]} for i in range(10)]},
+        {"type": "bar", "series": [{"name": "a", "data": [42]}]},
     ]:
         low = render_svg(ChartSpec.from_dict(spec)).lower()
         assert "nan" not in low and "inf" not in low, spec
@@ -237,7 +263,7 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == ["area", "column", "line"]
+    assert caps["chartTypes"] == ["area", "bar", "column", "line"]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
@@ -304,6 +330,9 @@ if __name__ == "__main__":
     for _n in AREA_CASES:
         _check("area", _n)
         print(f"PASS: python area-{_n} golden")
+    for _n in BAR_CASES:
+        _check("bar", _n)
+        print(f"PASS: python bar-{_n} golden")
     test_spline_edge_cases()
     print("PASS: python spline edge cases")
 

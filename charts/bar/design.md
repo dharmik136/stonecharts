@@ -13,12 +13,20 @@
 - **Chart id:** `bar`
 - **Spec `type`:** `"bar"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 2** · **Src:** HC
-- **Status:** design-complete + examples validated · renderers deferred (only
-  `line` has a live renderer today; bar rides the shared cartesian frame — the
-  same frame column uses — once its orientation parameter lands — see
-  [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3
-  Rank 2, §4, §5)
-- **Renderers (planned):** `libs/python/stonecharts/charts/bar.py` · `libs/go/bar.go`
+- **Status:** implemented and byte-parity verified in both languages (Python +
+  Go), admitted per [`DEC-014`](../../docs/project/decisions.md) and
+  [`REQ-CHART-001`](../../docs/requirements/registry.yaml), targeting release
+  `0.0.0.2`. `0.0.0.1` is already tagged and does not include bar. Chart
+  admission checklist phases 1-9
+  ([`SC-ARCH-011`](../../docs/architecture/chart-admission-checklist.md))
+  complete: schema, both renderers, 5 golden fixtures cross-verified
+  byte-identical, invalid-fixtures, direct cross-render sweep, accessibility
+  (data table + a11y toggle), XSS coverage, benchmark workload matrix, and
+  this document. Phase 10 (regenerating the immutable release evidence pack)
+  is intentionally deferred until `0.0.0.2`'s own release cycle begins - the
+  existing `rc.1` evidence pack belongs to the already-tagged `0.0.0.1` and
+  must not be overwritten with post-release changes.
+- **Renderers:** `libs/python/stonecharts/charts/bar.py` · `libs/go/bar.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -453,9 +461,6 @@ A self-contained interactive HTML file: inline SVG + CSS + the shared runtime.
 
 ## Not yet supported (roadmap)
 
-- Live renderers (`bar.py` / `bar.go`) — deferred; design + examples + validation
-  are complete. Only `line` renders today. Bar lands after column (rank 1) and the
-  orientation parameter it introduces.
 - **Column range / bar range** (floating `(low,high)` bars) — the horizontal
   variant falls out of this orientation generalization + the floating-bar
   primitive (rank 11).

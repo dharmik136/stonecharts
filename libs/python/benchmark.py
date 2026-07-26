@@ -1,10 +1,10 @@
 """Python benchmarking script for StoneCharts rendering.
 
 Implements the workload matrix from docs/quality/benchmark-spec.md (SC-QUAL-002):
-Small/Business/Dense/Stress profiles, each with line, grouped-column, and
-stacked-column variants. Records cold and warm timing (p50/p95/p99/min/max/
-stddev/count), peak memory, output bytes, an approximate DOM element count,
-and the exact input spec bytes/SHA-256 alongside every result.
+Small/Business/Dense/Stress profiles, each with line, grouped-column,
+stacked-column, and bar variants. Records cold and warm timing (p50/p95/p99/
+min/max/stddev/count), peak memory, output bytes, an approximate DOM element
+count, and the exact input spec bytes/SHA-256 alongside every result.
 
 Deliberately out of scope for this pass (disclosed, not silently omitted):
 runtime initialization / first-interaction latency in the browser profile
@@ -44,7 +44,7 @@ WORKLOADS = [
     ("dense", 20, 1000),
     ("stress", 20, 5000),
 ]
-VARIANTS = ["line", "grouped-column", "stacked-column"]
+VARIANTS = ["line", "grouped-column", "stacked-column", "bar"]
 MODES = ["svg", "html"]
 
 _DOM_TAG_RE = re.compile(r"<(rect|circle|ellipse|line|polyline|polygon|path|text|g)\b")
@@ -66,7 +66,12 @@ def generate_spec(n_series: int, n_categories: int, variant: str) -> tuple[Chart
         for s in range(n_series)
     ]
 
-    chart_type = "column" if variant in ("grouped-column", "stacked-column") else "line"
+    if variant in ("grouped-column", "stacked-column"):
+        chart_type = "column"
+    elif variant == "bar":
+        chart_type = "bar"
+    else:
+        chart_type = "line"
     spec_dict = {
         "type": chart_type,
         "title": f"Benchmark {variant}",

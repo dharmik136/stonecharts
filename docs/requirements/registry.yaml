@@ -294,7 +294,7 @@ requirements:
     rationale: DEC-014 authorizes bar as the next expansion target; the admission checklist exists precisely so authorization does not get conflated with completion.
     kind: functional
     priority: must
-    status: approved
+    status: implemented
     owner: maintainer
     target: 0.0.0.2
     source: SC-ARCH-011
@@ -307,4 +307,4 @@ requirements:
     decisions: []
     contracts: []
     verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
-    implementation: []
+    implementation: [libs/python/stonecharts/charts/bar.py, libs/go/bar.go, charts/bar/golden, charts/bar/invalid-fixtures.json]

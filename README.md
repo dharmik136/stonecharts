@@ -95,16 +95,19 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 
 | Chart | Spec | Python | Go | Interactivity |
 |-------|------|--------|----|----|
-| Basic line (`line-basic`) | ✅ | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Column (`column`) | qualification pending | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Area (`area`) | implementation complete | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Basic line (`line-basic`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Column (`column`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Area (`area`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Bar (`bar`) | implementation complete, targeting 0.0.0.2 (DEC-014) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
 tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
-The active Alpha scope is line, column, and area. Other chart designs remain roadmap
-material until the schema, capability, conformance, packaging, and release gates
-for each type are complete.
+The released 0.0.0.1 scope is line, column, and area. Bar is implemented and
+byte-parity verified but has not shipped in a tagged release yet - see
+`docs/architecture/chart-admission-checklist.md` for what "certified" requires.
+Other chart designs remain roadmap material until the schema, capability,
+conformance, packaging, and release gates for each type are complete.
 
 ## License
 

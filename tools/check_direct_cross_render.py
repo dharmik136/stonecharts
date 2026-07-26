@@ -30,6 +30,7 @@ ACTIVE = {
     ],
     "column": ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"],
     "area": ["basic", "stacked", "percent", "themed-dark"],
+    "bar": ["basic", "grouped", "stacked", "themed-dark", "adversarial"],
 }
 
 

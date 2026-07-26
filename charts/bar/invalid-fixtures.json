@@ -1,0 +1,104 @@
+[
+  {
+    "spec": {
+      "type": "bar",
+      "stacking": 123,
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.stacking: expected string, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bar",
+      "grouping": "yes",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.grouping: expected boolean, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bar",
+      "layout": {
+        "margin": {
+          "left": -1
+        }
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.layout.margin.left: expected non-negative number, received -1"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bar",
+      "stacking": "percent",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            -2
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[1]: expected non-negative number, received -2"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bar",
+      "theme": {
+        "name": "light",
+        "gridColor": "inherit",
+        "palette": [
+          "#123",
+          "not-a-color"
+        ]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ],
+          "pattern": {
+            "type": "weave"
+          }
+        }
+      ]
+    },
+    "errors": [
+      "$.theme.gridColor: expected hex color, received \"inherit\"",
+      "$.theme.palette[1]: expected hex color, received \"not-a-color\"",
+      "$.series[0].pattern.type: expected one of \"hatch\", received \"weave\""
+    ]
+  }
+]

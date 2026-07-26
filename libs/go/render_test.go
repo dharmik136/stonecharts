@@ -19,6 +19,7 @@ func TestGolden(t *testing.T) {
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
+		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -100,6 +101,28 @@ func TestAreaEdgeCases(t *testing.T) {
 		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in area render for %s", specJSON)
+		}
+	}
+}
+
+func TestBarEdgeCases(t *testing.T) {
+	cases := []string{
+		`{"type":"bar","stacking":"normal","xAxis":{"categories":["mix"]},"series":[{"name":"pos","data":[10]},{"name":"neg","data":[-9]}]}`,
+		`{"type":"bar","layout":{"margin":{"left":90,"right":40,"top":30,"bottom":50}},"series":[{"name":"s","data":[1,2,3]}]}`,
+		`{"type":"bar","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"a","data":[0,2]},{"name":"b","data":[0,3]}]}`,
+		`{"type":"bar","xAxis":{"categories":["neg","pos"]},"series":[{"name":"a","data":[-5,10]}]}`,
+		`{"type":"bar","grouping":false,"series":[{"name":"a","data":[1,2]},{"name":"b","data":[2,1]}]}`,
+		`{"type":"bar","series":[{"name":"0","data":[1,2,3]},{"name":"1","data":[1,2,3]},{"name":"2","data":[1,2,3]},{"name":"3","data":[1,2,3]},{"name":"4","data":[1,2,3]},{"name":"5","data":[1,2,3]},{"name":"6","data":[1,2,3]},{"name":"7","data":[1,2,3]},{"name":"8","data":[1,2,3]},{"name":"9","data":[1,2,3]}]}`,
+		`{"type":"bar","series":[{"name":"a","data":[42]}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+		low := strings.ToLower(mustSVG(t, spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in bar render for %s", specJSON)
 		}
 	}
 }
@@ -291,6 +314,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
+		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
 	}
 	if len(cases) == 0 {
 		t.Fatal("no active release examples")
@@ -357,7 +381,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "column", "line"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "bar", "column", "line"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}

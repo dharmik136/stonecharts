@@ -2,9 +2,9 @@
 //
 // Implements the workload matrix from docs/quality/benchmark-spec.md
 // (SC-QUAL-002): Small/Business/Dense/Stress profiles, each with line,
-// grouped-column, and stacked-column variants. Records cold and warm timing
-// (p50/p95/p99/min/max/stddev/count), peak allocation, output bytes, an
-// approximate DOM element count, and the exact input spec bytes/SHA-256
+// grouped-column, stacked-column, and bar variants. Records cold and warm
+// timing (p50/p95/p99/min/max/stddev/count), peak allocation, output bytes,
+// an approximate DOM element count, and the exact input spec bytes/SHA-256
 // alongside every result.
 //
 // Deliberately out of scope for this pass (disclosed, not silently omitted):
@@ -54,7 +54,7 @@ var workloads = []workload{
 	{"stress", 20, 5000},
 }
 
-var variants = []string{"line", "grouped-column", "stacked-column"}
+var variants = []string{"line", "grouped-column", "stacked-column", "bar"}
 var modes = []string{"svg", "html"}
 
 var domTagRE = regexp.MustCompile(`<(rect|circle|ellipse|line|polyline|polygon|path|text|g)\b`)
@@ -84,6 +84,8 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 	chartType := "line"
 	if variant == "grouped-column" || variant == "stacked-column" {
 		chartType = "column"
+	} else if variant == "bar" {
+		chartType = "bar"
 	}
 
 	specMap := map[string]interface{}{

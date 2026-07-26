@@ -758,7 +758,7 @@ items:
   - id: REQ-CHART-001
     title: Admit bar as a certified 0.0.0.2 chart type
     item_type: Requirement
-    status: Ready
+    status: In Review
     priority: P1
     workstream: WS-08 Expansion
     stage: S5 Expansion
