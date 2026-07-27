@@ -11,9 +11,10 @@
 - **Chart id:** `scatter`
 - **Spec `type`:** `"scatter"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 3** · **Src:** HC
-- **Status:** implemented and byte-parity verified in both languages (Python and
-  Go), including the point-model element type and the numeric linear x-scale —
-  targeting release 0.0.0.3 per DEC-015. See
+- **Status:** certified and shipped in `0.0.0.3` (tagged), including the
+  point-model element type and the numeric linear x-scale, admitted per
+  [`DEC-015`](../../docs/project/decisions.md) and
+  [`REQ-CHART-002`](../../docs/requirements/registry.yaml). See
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3
   Rank 3, §3.2, §4, §5 for the generalization this admission landed.
 - **Renderers:** `libs/python/stonecharts/charts/scatter.py` · `libs/go/scatter.go`

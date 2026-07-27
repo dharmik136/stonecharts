@@ -13,19 +13,15 @@
 - **Chart id:** `bar`
 - **Spec `type`:** `"bar"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 2** · **Src:** HC
-- **Status:** implemented and byte-parity verified in both languages (Python +
-  Go), admitted per [`DEC-014`](../../docs/project/decisions.md) and
-  [`REQ-CHART-001`](../../docs/requirements/registry.yaml), targeting release
-  `0.0.0.2`. `0.0.0.1` is already tagged and does not include bar. Chart
-  admission checklist phases 1-9
+- **Status:** certified and shipped in `0.0.0.2` (tagged), admitted per
+  [`DEC-014`](../../docs/project/decisions.md) and
+  [`REQ-CHART-001`](../../docs/requirements/registry.yaml). `0.0.0.1` does not
+  include bar. Chart admission checklist phases 1-10
   ([`SC-ARCH-011`](../../docs/architecture/chart-admission-checklist.md))
   complete: schema, both renderers, 5 golden fixtures cross-verified
   byte-identical, invalid-fixtures, direct cross-render sweep, accessibility
-  (data table + a11y toggle), XSS coverage, benchmark workload matrix, and
-  this document. Phase 10 (regenerating the immutable release evidence pack)
-  is intentionally deferred until `0.0.0.2`'s own release cycle begins - the
-  existing `rc.1` evidence pack belongs to the already-tagged `0.0.0.1` and
-  must not be overwritten with post-release changes.
+  (data table + a11y toggle), XSS coverage, benchmark workload matrix, this
+  document, and the immutable `0.0.0.2` release evidence pack.
 - **Renderers:** `libs/python/stonecharts/charts/bar.py` · `libs/go/bar.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract

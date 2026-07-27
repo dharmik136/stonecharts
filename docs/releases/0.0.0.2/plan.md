@@ -77,11 +77,12 @@ other change.
 - Bar's accessible data table and XSS/injection coverage match the standard already
   proven for line/column/area (done).
 - Bar is in the benchmark workload matrix across all four approved profiles (done).
-- Python and Go packages install and execute bar from built artifacts (pending -
+- Python and Go packages install and execute bar from built artifacts (done -
   `GATE-S7`).
 - Release manifest, hashes, SBOM, provenance status, changelog, support status, and
   known limits are complete and immutable for `0.0.0.2` specifically, not inherited
-  unchanged from `0.0.0.1`'s already-tagged `rc.1` pack (pending - `GATE-S7`).
+  unchanged from `0.0.0.1`'s already-tagged `rc.1` pack (done - `GATE-S7`).
+- `0.0.0.2` tagged and published per `GATE-S8` sign-off (done).
 
 ## Approval
 

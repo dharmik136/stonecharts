@@ -99,15 +99,14 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 | Column (`column`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 | Area (`area`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 | Bar (`bar`) | ✅ certified (0.0.0.2) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Scatter (`scatter`) | implementation complete, targeting 0.0.0.3 (DEC-015) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Scatter (`scatter`) | ✅ certified (0.0.0.3) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
 tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
-The released scope is line, column, and area (0.0.0.1), plus bar (0.0.0.2). Scatter is
-implemented and byte-parity verified but has not shipped in a tagged release yet - see
-`docs/architecture/chart-admission-checklist.md` for what "certified" requires.
-Other chart designs remain roadmap material until the schema, capability,
+The released scope is line, column, and area (0.0.0.1), bar (0.0.0.2), and scatter
+(0.0.0.3) - see `docs/architecture/chart-admission-checklist.md` for what "certified"
+requires. Other chart designs remain roadmap material until the schema, capability,
 conformance, packaging, and release gates for each type are complete.
 
 ## License
