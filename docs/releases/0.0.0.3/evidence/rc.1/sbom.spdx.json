@@ -3,9 +3,9 @@
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
   "name": "StoneCharts 0.0.0.3 rc.1 evidence-pack sbom",
-  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.3/rc.1/ca9a5bff0adf7acd5e4aa1ba9689dd74f86a911f",
+  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.3/rc.1/03f62a3e95b0ff6ba5e1b1ddedf09a0cc766fbfe",
   "creationInfo": {
-    "created": "2026-07-27T11:13:05+05:30",
+    "created": "2026-07-27T11:25:40+05:30",
     "creators": [
       "Tool: Claude Code",
       "Person: Dharmik Shingala"
@@ -30,7 +30,7 @@
       ],
       "annotations": [
         {
-          "annotationDate": "2026-07-27T11:13:05+05:30",
+          "annotationDate": "2026-07-27T11:25:40+05:30",
           "annotationType": "OTHER",
           "annotator": "Tool: Claude Code",
           "comment": "Python release package metadata is pinned to 0.0.0.3 (bumped from 0.0.0.2); runtime dependencies remain declared as empty in pyproject.toml. The active chart-type module set now additionally includes scatter, and Series gained a data_points field (point-model, scatter-only)."
@@ -55,7 +55,7 @@
       ],
       "annotations": [
         {
-          "annotationDate": "2026-07-27T11:13:05+05:30",
+          "annotationDate": "2026-07-27T11:25:40+05:30",
           "annotationType": "OTHER",
           "annotator": "Tool: Claude Code",
           "comment": "Go module uses local source validation and no third-party module dependencies in go.mod; no Go module tag exists (ADR 0007), unchanged from 0.0.0.1/0.0.0.2."

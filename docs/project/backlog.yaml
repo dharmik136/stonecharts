@@ -942,15 +942,15 @@ items:
   - id: GATE-S11
     title: Authorize and publish release 0.0.0.3
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S11 Release 0.0.0.3
     target: 0.0.0.3
     outcome: 0.0.0.3 is published only after explicit product and technical authorization, exactly as 0.0.0.1 and 0.0.0.2 were.
-    traceability: [SC-REL-013]
+    traceability: [SC-REL-013, SC-REL-020]
     risks: []
-    evidence: []
+    evidence: [TEST-RELEASE-EVIDENCE]
     dependencies: [GATE-S10]
     compatibility: Creates the third governed release baseline; does not alter the 0.0.0.1 or 0.0.0.2 tags or their evidence.
     areas: [release, docs, security]

@@ -126,13 +126,19 @@ is a fresh, independently-generated pack, not a copy or overwrite of `0.0.0.1`'s
 
 ## GATE-S11 sign-off
 
-Not yet recorded. Tagging `0.0.0.3` remains a separate, later authorization
-(`GATE-S11`), matching how `0.0.0.1`'s and `0.0.0.2`'s tags were each a distinct step
-after their `rc.1` packs were built and validated.
+Product-owner and maintainer approval (`review_mode: self` - both roles are held by
+dharmik136; this is not an independent audit) for tagging `0.0.0.3` on the qualified
+commit above is recorded here. Scope of this authorization, per `DEC-015` (which
+already named scatter and `0.0.0.3` as the specific expansion target) and the
+commercial terms policy (`SC-CON-020`), mirrors `0.0.0.1`'s `GATE-S4` and `0.0.0.2`'s
+`GATE-S8` sign-offs exactly: create and push the source-control tag on the qualified
+commit only. No repository visibility change, package-registry upload, or Go module
+tag is authorized by this sign-off - those remain separately gated (Go module
+publication additionally requires an ecosystem-mapping decision that does not yet
+exist, per ADR 0007).
 
 ## Still open before further publication
 
-- [ ] `GATE-S11` product-owner/maintainer sign-off and the `0.0.0.3` source-control tag.
 - [ ] Repository visibility / public distribution decision (not authorized yet;
       unchanged from `0.0.0.1`/`0.0.0.2`).
 - [ ] Go module ecosystem-mapping decision (required before any Go tag; ADR 0007;
