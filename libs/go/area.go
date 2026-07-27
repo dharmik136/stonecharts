@@ -84,9 +84,9 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 			}
 			bottomPts := make([][2]float64, len(rawVals))
 			for i := range vals {
-				bottomPts[i] = [2]float64{f.xpix(i), f.ypix(running[i])}
+				bottomPts[i] = [2]float64{f.xpix(float64(i)), f.ypix(running[i])}
 				running[i] += vals[i]
-				topPts[i] = [2]float64{f.xpix(i), f.ypix(running[i])}
+				topPts[i] = [2]float64{f.xpix(float64(i)), f.ypix(running[i])}
 			}
 			if len(topPts) > 0 {
 				fillOp := st.areaOp
@@ -108,8 +108,8 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 		} else {
 			bottomPts := make([][2]float64, len(rawVals))
 			for i, raw := range rawVals {
-				topPts[i] = [2]float64{f.xpix(i), f.ypix(raw)}
-				bottomPts[i] = [2]float64{f.xpix(i), f.ypix(0.0)}
+				topPts[i] = [2]float64{f.xpix(float64(i)), f.ypix(raw)}
+				bottomPts[i] = [2]float64{f.xpix(float64(i)), f.ypix(0.0)}
 			}
 			if len(topPts) > 0 {
 				base := f.ypix(0.0)
@@ -146,7 +146,7 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 				common := fmt.Sprintf(
 					`class="sc-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="%s" data-r-hover="%s"`,
 					si, esc(s.Name), esc(xlabel), esc(fmtNum(rawVals[i])), st.solid, fmtNum(radius), fmtNum(radiusHover))
-				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, st.solid, f.theme.MarkerHalo))
+				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, st.solid, f.theme.MarkerHalo, 1.0))
 			}
 		}
 		p.WriteString(`</g>`)

@@ -119,13 +119,19 @@ type cartesianFrame struct {
 	y2Max                      float64
 	y2Ticks                    []float64
 	secondaryAxis              *Axis
+	xMin, xMax                 float64   // LINEAR scale only (scatter) — free numeric x-domain
+	xTicks                     []float64
 }
 
-// xpix maps a category index i to a pixel x, per the frame's x-scale strategy.
-// Both formulas are PINNED (identical in both languages, in this exact
-// operation order) so f1 rounding lands ULP-for-ULP identically (§4.3):
+// xpix maps a category index (or, under LINEAR scale, a numeric x-VALUE) to a
+// pixel x. All formulas are PINNED (identical in both languages, in this
+// exact operation order) so f1 rounding lands ULP-for-ULP identically (§4.3):
 //
-//	POINT (line/area/scatter-with-categories) — line.go verbatim:
+//	LINEAR (scatter, §3.3 Rank 3) — a free numeric x-domain, mirrors ypix:
+//	    xpix(v) = plotX + plotW*(v - xMin)/(xMax - xMin)
+//	    Degenerate domain (xMax == xMin) pins to plot center BEFORE the
+//	    divide, identically to valuePix's existing y-degenerate guard.
+//	POINT (line/area) — line.go verbatim:
 //	    xpix(i) = plotX + plotW*i/(n-1),  and  plotX + plotW/2  when n <= 1
 //	    Line MUST keep this exact formula so its bytes do not move.
 //	BAND (column/bar):
@@ -133,14 +139,20 @@ type cartesianFrame struct {
 //
 // The x-label loop calls xpix(i), so labels land under points (point) or band
 // centers (band) with no per-chart label code.
-func (f *cartesianFrame) xpix(i int) float64 {
+func (f *cartesianFrame) xpix(i float64) float64 {
+	if f.scale == "linear" {
+		if f.xMax == f.xMin {
+			return f.plotX + f.plotW/2
+		}
+		return f.plotX + f.plotW*(i-f.xMin)/(f.xMax-f.xMin)
+	}
 	if f.scale == "band" {
-		return f.plotX + f.bandWidth()*float64(i) + f.bandWidth()/2
+		return f.plotX + f.bandWidth()*i + f.bandWidth()/2
 	}
 	if f.n <= 1 {
 		return f.plotX + f.plotW/2
 	}
-	return f.plotX + f.plotW*float64(i)/float64(f.n-1)
+	return f.plotX + f.plotW*i/float64(f.n-1)
 }
 
 // ypix maps a value v to a pixel y — moved from line.go verbatim.
@@ -165,7 +177,7 @@ func (f *cartesianFrame) bandCenter(i int) float64 {
 	if f.orientation == "horizontal" {
 		return f.plotY + f.bandHeight()*float64(i) + f.bandHeight()/2
 	}
-	return f.xpix(i)
+	return f.xpix(float64(i))
 }
 
 // valuePix maps a numeric value to the value-axis pixel.
@@ -268,10 +280,25 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 	plotW := float64(W) - mLeft - mRight
 	plotH := float64(H) - mTop - mBottom
 
+	// LINEAR scale (scatter, §3.3 Rank 3): series carry point-model
+	// DataPoints instead of a plain []float64 — n/values/x-domain extraction
+	// branches here, additively, so every ELSE branch below (line/column/
+	// area/bar) is byte-for-byte the same code that ran before scatter
+	// existed.
+	isPointModel := xScale == "linear"
+
 	n := 0
-	for _, s := range spec.Series {
-		if len(s.Data) > n {
-			n = len(s.Data)
+	if isPointModel {
+		for _, s := range spec.Series {
+			if len(s.DataPoints) > n {
+				n = len(s.DataPoints)
+			}
+		}
+	} else {
+		for _, s := range spec.Series {
+			if len(s.Data) > n {
+				n = len(s.Data)
+			}
 		}
 	}
 	cats := spec.XAxis.Categories
@@ -280,6 +307,35 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		for i := 0; i < n; i++ {
 			cats[i] = strconv.Itoa(i)
 		}
+	}
+
+	xMin, xMax := 0.0, 0.0
+	var xTicks []float64
+	if isPointModel {
+		xFirst := true
+		xLo, xHi := 0.0, 0.0
+		for _, s := range spec.Series {
+			for _, d := range s.DataPoints {
+				if xFirst {
+					xLo, xHi = d.X, d.X
+					xFirst = false
+					continue
+				}
+				if d.X < xLo {
+					xLo = d.X
+				}
+				if d.X > xHi {
+					xHi = d.X
+				}
+			}
+		}
+		if spec.XAxis.Min != nil {
+			xLo = *spec.XAxis.Min
+		}
+		if spec.XAxis.Max != nil {
+			xHi = *spec.XAxis.Max
+		}
+		xMin, xMax, xTicks = niceTicks(xLo, xHi, 6)
 	}
 
 	// Value-axis range. Stacking changes the domain to per-category totals.
@@ -330,6 +386,32 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 				}
 				if v > hi {
 					hi = v
+				}
+			}
+		}
+		if spec.YAxis.Min != nil {
+			lo = *spec.YAxis.Min
+		}
+		if spec.YAxis.Max != nil {
+			hi = *spec.YAxis.Max
+		}
+	} else if isPointModel {
+		// Free y-domain via DataPoints (scatter always passes includeZero=false;
+		// unlike s.Data, DataPoints is populated regardless of bare-number,
+		// positional, or object input form — see Series.UnmarshalJSON).
+		first := true
+		for _, s := range spec.Series {
+			for _, d := range s.DataPoints {
+				if first {
+					lo, hi = d.Y, d.Y
+					first = false
+					continue
+				}
+				if d.Y < lo {
+					lo = d.Y
+				}
+				if d.Y > hi {
+					hi = d.Y
 				}
 			}
 		}
@@ -423,6 +505,7 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		includeZero: includeZero,
 		orientation: orientation,
 		stacking:    spec.Stacking,
+		xMin: xMin, xMax: xMax, xTicks: xTicks,
 	}
 }
 
@@ -551,18 +634,53 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 			`<line class="sc-axis-line" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"/>`,
 			f1(f.plotX), f1(f.plotY+f.plotH), f1(f.plotX+f.plotW), f1(f.plotY+f.plotH), theme.AxisLineColor))
 
-		p.WriteString(`<g class="sc-axis sc-axis-x">`)
-		for i := 0; i < f.n; i++ {
-			lx := f.xpix(i)
-			label := strconv.Itoa(i)
-			if i < len(f.cats) {
-				label = f.cats[i]
+		// X labels. LINEAR scale (scatter, §3.3 Rank 3) draws numeric ticks +
+		// optional vertical gridlines, mirroring the y-axis; every other scale
+		// keeps the original categorical-label loop unchanged.
+		if f.scale == "linear" {
+			xGridEnabled := spec.XAxis.GridLine != nil && spec.XAxis.GridLine.Enabled != nil && *spec.XAxis.GridLine.Enabled
+			xGridColor := theme.GridColor
+			if spec.XAxis.GridLine != nil && spec.XAxis.GridLine.Color != "" {
+				xGridColor = spec.XAxis.GridLine.Color
 			}
-			p.WriteString(fmt.Sprintf(
-				`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
-				f1(lx), f1(f.plotY+f.plotH+18), theme.AxisLabelColor, esc(label)))
+			xGridDashAttr := ""
+			if spec.XAxis.GridLine != nil {
+				if da := dashArray(spec.XAxis.GridLine.DashStyle); da != "" {
+					xGridDashAttr = ` stroke-dasharray="` + da + `"`
+				}
+			}
+			if xGridEnabled {
+				p.WriteString(`<g class="sc-gridlines-x">`)
+				for _, tv := range f.xTicks {
+					gx := f.xpix(tv)
+					p.WriteString(fmt.Sprintf(
+						`<line class="sc-gridline" x1="%s" y1="%s" x2="%s" y2="%s" stroke="%s" stroke-width="1"%s/>`,
+						f1(gx), f1(f.plotY), f1(gx), f1(f.plotY+f.plotH), xGridColor, xGridDashAttr))
+				}
+				p.WriteString(`</g>`)
+			}
+			p.WriteString(`<g class="sc-axis sc-axis-x">`)
+			for _, tv := range f.xTicks {
+				lx := f.xpix(tv)
+				p.WriteString(fmt.Sprintf(
+					`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
+					f1(lx), f1(f.plotY+f.plotH+18), theme.AxisLabelColor, esc(fmtNum(tv))))
+			}
+			p.WriteString(`</g>`)
+		} else {
+			p.WriteString(`<g class="sc-axis sc-axis-x">`)
+			for i := 0; i < f.n; i++ {
+				lx := f.xpix(float64(i))
+				label := strconv.Itoa(i)
+				if i < len(f.cats) {
+					label = f.cats[i]
+				}
+				p.WriteString(fmt.Sprintf(
+					`<text x="%s" y="%s" text-anchor="middle" font-size="11" fill="%s">%s</text>`,
+					f1(lx), f1(f.plotY+f.plotH+18), theme.AxisLabelColor, esc(label)))
+			}
+			p.WriteString(`</g>`)
 		}
-		p.WriteString(`</g>`)
 
 		if spec.XAxis.Title != "" {
 			p.WriteString(fmt.Sprintf(

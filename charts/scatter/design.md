@@ -11,10 +11,12 @@
 - **Chart id:** `scatter`
 - **Spec `type`:** `"scatter"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 3** · **Src:** HC
-- **Status:** design-complete + examples validated · renderers deferred (only
-  `line` has a live renderer today; scatter rides the shared cartesian frame once
-  the point model lands — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 3, §3.2, §4, §5)
-- **Renderers (planned):** `libs/python/stonecharts/charts/scatter.py` · `libs/go/scatter.go`
+- **Status:** implemented and byte-parity verified in both languages (Python and
+  Go), including the point-model element type and the numeric linear x-scale —
+  targeting release 0.0.0.3 per DEC-015. See
+  [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3
+  Rank 3, §3.2, §4, §5 for the generalization this admission landed.
+- **Renderers:** `libs/python/stonecharts/charts/scatter.py` · `libs/go/scatter.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -86,16 +88,17 @@ reused for x **with the zero-anchor OFF**, or a scatter with `x ∈ [100, 200]`
 would be wrongly anchored at 0. The marks never recompute a scale — they call
 `fr.xpix(x)` / `fr.ypix(y)` only.
 
-> **Shipped examples note.** The current shared validator (`validate.py` /
-> `validate.go`) still types `series[].data` as `number[]` — the point-model
-> element type (object `{x,y}` / positional `[x,y]`) lands with the Rank-3
-> five-place lockstep (§5.4b) and its byte-identity gate (§3.3 Rank 3, Gate A′).
-> Until then the **shipped `examples/*.json` ride the bare-number fast path**
-> (`x = index`) so each passes `validate() == []` today, exactly as `column`'s
-> examples ride `number[]`. The object/positional forms above are shown
-> throughout this recipe as the **target** input the point model accepts; they
-> begin validating (and are added to the golden set) the moment the point-model
-> element type is registered in the two validators.
+> **Shipped examples note.** The point-model element type (object `{x,y}` /
+> positional `[x,y]` / the pinned bare-number fast path `x = index`) is now
+> registered identically in the schema, the Python validator, and the Go
+> validator (the Rank-3 five-place lockstep, §5.4b), and the byte-identity
+> gate (§3.3 Rank 3, Gate A′) proved every existing line/column/area/bar
+> golden unchanged before any scatter golden was added. `examples/basic.json`,
+> `correlation.json`, `regression.json`, and `themed-dark.json` still ride the
+> bare-number fast path (`x = index`) deliberately, as a realistic usage
+> pattern; `examples/xy-points.json` exercises the positional and object forms
+> explicitly. All six examples (including `adversarial.json`) are in the
+> golden set and cross-render Py==Go with zero diff.
 
 ## Spec fields
 
@@ -361,12 +364,13 @@ Each file is a complete, realistic spec that passes `validate() == []`:
 | [`examples/correlation.json`](examples/correlation.json) | two series (overlaid clouds), distinct marker symbols (`circle`/`triangle`), `fillOpacity` overlap density |
 | [`examples/regression.json`](examples/regression.json) | `series[].regression` trend-line (planned field, forward-compatible), vertical x-gridlines via `xAxis.gridLine`, clamped free axes |
 | [`examples/themed-dark.json`](examples/themed-dark.json) | `theme:"dark"` + a gradient point fill (defs pre-pass) + a second series with a custom hex + `diamond`/`square` symbols |
+| [`examples/xy-points.json`](examples/xy-points.json) | explicit point-model forms: positional `[x,y]` pairs and object `{x,y}` observations, both in the same spec |
 
-The full golden build set additionally pins an **`adversarial`** case carrying
-hostile strings (`<script>`, `"`, `<`, `&`) in **every** marks-emitted field
-(series name, custom point color, and — once numeric-x lands — any label) so the
-XSS tests run against the scatter marks (§5.5d). `SCATTER_CASES =
-["basic","correlation","regression","dark","adversarial"]`.
+The golden build set additionally pins an **`adversarial`** case carrying
+hostile strings (`<script>`, `"`, `<`, `&`) in every marks-emitted field (series
+name, custom point color, id/title/subtitle/xAxis title) so the XSS tests run
+against the scatter marks (§5.5d). `SCATTER_CASES =
+["basic","correlation","regression","themed-dark","adversarial","xy-points"]`.
 
 ## Generate it
 
@@ -427,12 +431,14 @@ A self-contained interactive HTML file: inline SVG + CSS + the shared runtime.
 
 ## Not yet supported (roadmap)
 
-- Live renderers (`scatter.py` / `scatter.go`) — deferred; design + examples +
-  validation are complete. Only `line` renders today.
-- **Point-model validator support** — the object `{x,y}` / positional `[x,y]`
-  `data` element type (§5.4b five-place lockstep + Gate A′ byte-identity proof);
-  shipped examples ride the bare-number fast path until then.
 - **Regression / trend line** (`series[].regression`) — OLS fit line overlay.
+  The field is accepted (forward-compatible) but not yet consumed; a scatter
+  spec with `regression: true` renders points only, no trend path.
 - **Bubble** (rank 4) — scatter `{x,y,z}` + the size-scale (`z → marker radius`).
+- **Gap handling for a missing/null `y`** — the design's original aspiration
+  ("absent/null field → gap, never coerced to 0") was deliberately deferred
+  from this admission: REQ-CHART-002's acceptance contract does not require
+  it, and the current schema requires `y` on the object form. A future
+  requirement can add it without touching the point-model shape landed here.
 - Categorized scatter, polygon/convex-hull overlay, jitter for tied x, and a
   two-axis crosshair — variants layered on this base.

@@ -315,7 +315,7 @@ requirements:
     rationale: DEC-015 authorizes scatter as the next expansion target; scatter is rank 3 in the roadmap's own build order and the first sibling to force a shared-frame generalization rather than an isolated marks function, so its admission carries a stricter no-regression bar than bar's.
     kind: functional
     priority: must
-    status: approved
+    status: verified
     owner: maintainer
     target: 0.0.0.3
     source: SC-ARCH-011
@@ -329,5 +329,5 @@ requirements:
       - Chart-admission-checklist.md phases 1-9 (design through release-evidence-adjacent documentation) are closed before this requirement moves to verified. Phase 10 (the immutable release evidence pack) is GATE-S10's concern, not this requirement's, mirroring the 0.0.0.2 cycle's REQ-CHART-001/GATE-S7 split.
     decisions: []
     contracts: []
-    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
-    implementation: [charts/scatter/design.md]
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE, REVIEW-SCATTER-ACCESSIBILITY-SECURITY, BENCH-SCATTER-BASELINE]
+    implementation: [libs/python/stonecharts/charts/scatter.py, libs/go/scatter.go, charts/scatter/golden, charts/scatter/invalid-fixtures.json, runtime/scatter-browser-qualification.test.js]

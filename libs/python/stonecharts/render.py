@@ -14,6 +14,7 @@ from .charts import area as _area
 from .charts import bar as _bar
 from .charts import column as _column
 from .charts import line as _line
+from .charts import scatter as _scatter
 from .capabilities import CapabilityError, capabilities
 from .spec import ChartSpec
 from .util import esc, fmt_num
@@ -28,6 +29,7 @@ _RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
     "bar": _bar.render_svg,
     "column": _column.render_svg,
     "line": _line.render_svg,
+    "scatter": _scatter.render_svg,
 }
 _CAPABILITIES = capabilities()
 
@@ -51,6 +53,24 @@ _CSS = """
 def _data_table(spec: ChartSpec) -> str:
     """A visually-hidden HTML data table: the accessible, keyboard-navigable
     alternative to the SVG (which is role="img"). Screen readers read this."""
+    caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
+    if spec.type == "scatter":
+        # Point-model data (§3.3 Rank 3 / §5.4b-DT): data is (x, y) pairs, not
+        # a coerced single number per shared category — a long-format table
+        # (one row per point) is the only lossless shape.
+        rows = []
+        for s in spec.series:
+            for d in s.data_points or []:
+                rows.append(
+                    f"<tr><th scope=\"row\">{esc(s.name)}</th>"
+                    f"<td>{esc(fmt_num(d.x))}</td><td>{esc(fmt_num(d.y))}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Series</th><th scope="col">X</th>'
+            '<th scope="col">Y</th></tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table>'
+        )
     n = max((len(s.data) for s in spec.series), default=0)
     cats = spec.x_axis.categories or []
     head = "".join(
@@ -64,7 +84,6 @@ def _data_table(spec: ChartSpec) -> str:
             for i in range(n)
         )
         rows.append(f'<tr><th scope="row">{esc(s.name)}</th>{cells}</tr>')
-    caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
     return (
         f'<table class="sc-visually-hidden">{caption}'
         f'<thead><tr><td></td>{head}</tr></thead>'

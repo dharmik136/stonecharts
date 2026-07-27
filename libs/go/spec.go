@@ -72,9 +72,20 @@ func (p *Pattern) hatchColor() string {
 	return "#333333"
 }
 
+// Datum is one (x, y) observation — the scatter point model (§3.3 Rank 3).
+// Populated on every Series (see Series.UnmarshalJSON) but read ONLY by the
+// scatter renderer; every other chart type continues to read Series.Data
+// (plain float y-values, x = category index) completely unchanged, so this
+// addition carries zero byte-parity risk for line/column/area/bar.
+type Datum struct {
+	X float64
+	Y float64
+}
+
 type Series struct {
 	Name        string          `json:"name"`
 	Data        []float64       `json:"data"`
+	DataPoints  []Datum         `json:"-"` // scatter only — see Datum; built by UnmarshalJSON
 	Type        string          `json:"type,omitempty"`        // line | column (combo per-series mark kind)
 	YAxis       int             `json:"yAxis,omitempty"`       // 0 -> primary yAxis; 1 -> secondaryYAxis
 	Color       json.RawMessage `json:"color,omitempty"`       // hex string OR gradient object
@@ -87,6 +98,63 @@ type Series struct {
 	Marker      *Marker         `json:"marker,omitempty"`
 	Regression  bool            `json:"regression,omitempty"`
 	Low         []float64       `json:"low,omitempty"`
+}
+
+// UnmarshalJSON normalizes the point model (§3.3 Rank 3 / §5.4b lockstep):
+// each data[i] element is a bare number, a positional [x,y] pair, or an
+// {x,y} object. validate() already rejected any other shape by the time this
+// runs. Data []float64 is populated only when every element in the series is
+// a bare number (reproducing the exact original decode for line/column/
+// area/bar); DataPoints []Datum is always populated in lockstep so scatter
+// can read it regardless of which literal form the input used.
+func (s *Series) UnmarshalJSON(b []byte) error {
+	type seriesAlias Series
+	aux := struct {
+		Data []json.RawMessage `json:"data"`
+		*seriesAlias
+	}{seriesAlias: (*seriesAlias)(s)}
+	if err := json.Unmarshal(b, &aux); err != nil {
+		return err
+	}
+	nums := make([]float64, 0, len(aux.Data))
+	points := make([]Datum, 0, len(aux.Data))
+	allNumeric := true
+	for i, raw := range aux.Data {
+		trimmed := bytes.TrimSpace(raw)
+		switch {
+		case len(trimmed) > 0 && trimmed[0] == '{':
+			var obj struct {
+				X float64 `json:"x"`
+				Y float64 `json:"y"`
+			}
+			if err := json.Unmarshal(raw, &obj); err != nil {
+				return err
+			}
+			points = append(points, Datum{X: obj.X, Y: obj.Y})
+			allNumeric = false
+		case len(trimmed) > 0 && trimmed[0] == '[':
+			var pair [2]float64
+			if err := json.Unmarshal(raw, &pair); err != nil {
+				return err
+			}
+			points = append(points, Datum{X: pair[0], Y: pair[1]})
+			allNumeric = false
+		default:
+			var v float64
+			if err := json.Unmarshal(raw, &v); err != nil {
+				return err
+			}
+			nums = append(nums, v)
+			points = append(points, Datum{X: float64(i), Y: v})
+		}
+	}
+	if allNumeric {
+		s.Data = nums
+	} else {
+		s.Data = nil
+	}
+	s.DataPoints = points
+	return nil
 }
 
 // colorSpec resolves Color (a hex string or a gradient object).

@@ -254,7 +254,35 @@ def _theme(v: Any, path: str, errs: List[str]) -> None:
                     errs.append(f'{path}.palette[{i}]: expected hex color, received "{c}"')
 
 
-def _series(v: Any, path: str, errs: List[str]) -> None:
+def _datum(v: Any, path: str, errs: List[str]) -> None:
+    """Point-model element (scatter only, §3.3 Rank 3): number | [x,y] | {x,y}."""
+    if isinstance(v, bool):
+        errs.append(f"{path}: expected number, [x,y], or {{x,y}}, received boolean")
+    elif isinstance(v, (int, float)):
+        _num(v, path, errs)
+    elif isinstance(v, list):
+        if len(v) != 2:
+            errs.append(f"{path}: expected a 2-element [x,y] array, received {len(v)} elements")
+        else:
+            _num(v[0], f"{path}[0]", errs)
+            _num(v[1], f"{path}[1]", errs)
+    elif isinstance(v, dict):
+        if "x" not in v:
+            errs.append(f"{path}.x: required")
+        else:
+            _num(v["x"], f"{path}.x", errs)
+        if "y" not in v:
+            errs.append(f"{path}.y: required")
+        else:
+            _num(v["y"], f"{path}.y", errs)
+        extra = sorted(set(v.keys()) - {"x", "y"})
+        for k in extra:
+            errs.append(f"{path}.{k}: unknown field")
+    else:
+        errs.append(f"{path}: expected number, [x,y], or {{x,y}}, received {_jtype(v)}")
+
+
+def _series(v: Any, path: str, errs: List[str], chart_type: Any = None) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
@@ -268,6 +296,9 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
         errs.append(f"{path}.data: required")
     elif not isinstance(v["data"], list):
         errs.append(f"{path}.data: expected array, received {_jtype(v['data'])}")
+    elif chart_type == "scatter":
+        for i, e in enumerate(v["data"]):
+            _datum(e, f"{path}.data[{i}]", errs)
     else:
         for i, e in enumerate(v["data"]):
             _num(e, f"{path}.data[{i}]", errs)
@@ -296,12 +327,13 @@ def _series(v: Any, path: str, errs: List[str]) -> None:
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
-# 0.0.0.2 admits bar per DEC-014).
+# 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015).
 _KNOWN_TYPES = {
     "area",
     "bar",
     "column",
     "line",
+    "scatter",
 }
 
 
@@ -342,7 +374,7 @@ def validate(d: Any) -> List[str]:
         errs.append(f"$.series: expected array, received {_jtype(d['series'])}")
     else:
         for i, s in enumerate(d["series"]):
-            _series(s, f"$.series[{i}]", errs)
+            _series(s, f"$.series[{i}]", errs, d.get("type"))
     if d.get("stacking") == "percent" and isinstance(d.get("series"), list):
         for i, s in enumerate(d["series"]):
             if not isinstance(s, dict):

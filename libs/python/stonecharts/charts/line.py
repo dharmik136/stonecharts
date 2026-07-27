@@ -83,10 +83,14 @@ def _spline_d(pts) -> str:
     return " ".join(parts)
 
 
-def _marker(symbol, x, y, r, common, color, halo) -> str:
+def _marker(symbol, x, y, r, common, color, halo, fill_opacity: float = 1.0) -> str:
     """One data-point marker. `common` = the shared class + data-* attributes.
-    Non-circle shapes carry cx/cy attrs so the JS runtime (crosshair) still works."""
-    fs = f'fill="{color}" stroke="{halo}" stroke-width="1"'
+    Non-circle shapes carry cx/cy attrs so the JS runtime (crosshair) still works.
+    `fill_opacity` is opt-in (default 1.0 reproduces the original byte-for-byte
+    output with no attribute added) — scatter's primary points are the only
+    caller that passes a value < 1.0 (§3.3 Rank 3)."""
+    op_attr = f' fill-opacity="{fmt_num(fill_opacity)}"' if fill_opacity != 1.0 else ""
+    fs = f'fill="{color}" stroke="{halo}" stroke-width="1"{op_attr}'
     if symbol == "square":
         return (
             f'<rect {common} cx="{x:.1f}" cy="{y:.1f}" x="{x-r:.1f}" y="{y-r:.1f}" '

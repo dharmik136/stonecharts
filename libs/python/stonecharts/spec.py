@@ -22,6 +22,20 @@ def _opt_float(d: dict, key: str) -> Optional[float]:
     return float(d[key]) if key in d else None
 
 
+def _normalize_datum(v: object, index: int) -> "Datum":
+    """Point-model normalization (scatter only, §3.3 Rank 3 / §5.4b lockstep).
+
+    Bare number -> Datum(x=index, y=v) (the pinned fast path — must match Go's
+    UnmarshalJSON byte-for-byte). Positional [x, y] and object {x, y} are sugar
+    over the same datum. validate() already rejected any other shape.
+    """
+    if isinstance(v, dict):
+        return Datum(x=float(v["x"]), y=float(v["y"]))
+    if isinstance(v, list):
+        return Datum(x=float(v[0]), y=float(v[1]))
+    return Datum(x=float(index), y=float(v))
+
+
 @dataclass
 class Marker:
     enabled: bool = True
@@ -62,6 +76,20 @@ class Binning:
     start: Optional[float] = None
 
 @dataclass
+class Datum:
+    """One (x, y) observation — the scatter point model (§3.3 Rank 3).
+
+    Populated ONLY on Series.data_points, and only for chart type "scatter";
+    every other chart type continues to use Series.data (plain float y-values,
+    x = category index) completely unchanged, so this addition carries zero
+    byte-parity risk for line/column/area/bar.
+    """
+
+    x: float
+    y: float
+
+
+@dataclass
 class Series:
     name: str
     data: List[float]
@@ -77,6 +105,7 @@ class Series:
     marker: Optional[Marker] = None
     regression: bool = False
     low: Optional[List[float]] = None
+    data_points: Optional[List[Datum]] = None   # scatter only — see Datum
 
 
 @dataclass
@@ -92,7 +121,7 @@ class Axis:
     categories: Optional[List[str]] = None
     min: Optional[float] = None
     max: Optional[float] = None
-    grid_line: Optional[GridLine] = None   # yAxis only
+    grid_line: Optional[GridLine] = None   # yAxis always; xAxis only meaningful for scatter's numeric x
 
     opposite: Optional[bool] = None        # secondaryYAxis only
 
@@ -208,6 +237,21 @@ class ChartSpec:
 
     pre_binned: bool = False
 
+    def __post_init__(self) -> None:
+        """Point-model normalization for the typed-construction path (§3.3
+        Rank 3): from_dict() normalizes scatter's data_points itself before
+        the Series objects exist, but a caller building ChartSpec/Series
+        directly (see charts/scatter/design.md "Generate it - typed") never
+        goes through from_dict, so it lands here instead. Guarded by
+        `data_points is None` so from_dict's own already-normalized series
+        are never touched twice.
+        """
+        if self.type == "scatter":
+            for s in self.series:
+                if s.data_points is None:
+                    s.data_points = [_normalize_datum(v, i) for i, v in enumerate(s.data)]
+                    s.data = []
+
     normalization: str = "frequency"
 
     overlay: Optional[str] = None
@@ -232,6 +276,7 @@ class ChartSpec:
         errs = validate(d)
         if errs:
             raise SpecError(errs)
+        chart_type = d.get("type") or "line"
         series = []
         for i, s in enumerate(d.get("series", [])):
             m = s.get("marker")
@@ -274,10 +319,17 @@ class ChartSpec:
                     angle=float(p.get("angle", 45.0)),
                     stroke_width=float(p.get("strokeWidth", 1.5)),
                 )
+            if chart_type == "scatter":
+                data_points = [_normalize_datum(v, j) for j, v in enumerate(s["data"])]
+                data_field: List[float] = []
+            else:
+                data_points = None
+                data_field = [float(v) for v in s["data"]]
             series.append(
                 Series(
                     name=s.get("name") or f"Series {i + 1}",
-                    data=[float(v) for v in s["data"]],
+                    data=data_field,
+                    data_points=data_points,
                     type=s.get("type") or "column",
                     y_axis=int(s.get("yAxis", 0)),
                     color=color,
@@ -312,6 +364,17 @@ class ChartSpec:
                 enabled=gl.get("enabled", True),
                 color=gl.get("color"),
                 dash_style=gl.get("dashStyle", "solid"),
+            )
+
+        # xAxis.gridLine (scatter's numeric x only; default OFF, unlike yAxis's
+        # default-ON — an explicit object always wins, matching yAxis's pattern).
+        xgrid = None
+        xgl = xa.get("gridLine")
+        if xgl is not None:
+            xgrid = GridLine(
+                enabled=xgl.get("enabled", False),
+                color=xgl.get("color"),
+                dash_style=xgl.get("dashStyle", "solid"),
             )
 
         layout = None
@@ -358,6 +421,7 @@ class ChartSpec:
                 min=_opt_float(xa, "min"),
                 max=_opt_float(xa, "max"),
                 bin_edges=xa.get("binEdges"),
+                grid_line=xgrid,
             ),
             y_axis=Axis(
                 title=ya.get("title"),

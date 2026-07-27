@@ -20,6 +20,7 @@ func TestGolden(t *testing.T) {
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
 		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
+		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -123,6 +124,40 @@ func TestBarEdgeCases(t *testing.T) {
 		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in bar render for %s", specJSON)
+		}
+	}
+}
+
+func TestScatterEdgeCases(t *testing.T) {
+	cases := []string{
+		// Degenerate x-domain: every point shares the same x (xpix must pin to
+		// plot center before the divide, not divide by zero).
+		`{"type":"scatter","series":[{"name":"s","data":[[5,1],[5,2],[5,3]]}]}`,
+		// Degenerate y-domain: every point shares the same y.
+		`{"type":"scatter","series":[{"name":"s","data":[[1,5],[2,5],[3,5]]}]}`,
+		// Single point (n=1 degenerate on both axes).
+		`{"type":"scatter","series":[{"name":"s","data":[[7,9]]}]}`,
+		// Empty series.
+		`{"type":"scatter","series":[{"name":"s","data":[]}]}`,
+		// Negative x and y — free domain, no zero anchor.
+		`{"type":"scatter","series":[{"name":"s","data":[[-10,-20],[-5,-8],[-1,-30]]}]}`,
+		// Manual xAxis/yAxis min/max clamp.
+		`{"type":"scatter","xAxis":{"min":0,"max":100},"yAxis":{"min":-50,"max":50},"series":[{"name":"s","data":[[10,5],[90,-40]]}]}`,
+		// Mixed element shapes within one series (bare number, positional, object).
+		`{"type":"scatter","series":[{"name":"s","data":[3,[10,20],{"x":30,"y":40}]}]}`,
+		// Vertical x-gridlines enabled.
+		`{"type":"scatter","xAxis":{"gridLine":{"enabled":true}},"series":[{"name":"s","data":[[1,2],[3,4],[5,6]]}]}`,
+		// fillOpacity explicitly 0 must still render a fully opaque point (NN#2).
+		`{"type":"scatter","series":[{"name":"s","data":[[1,2]],"fillOpacity":0}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+		low := strings.ToLower(mustSVG(t, spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in scatter render for %s", specJSON)
 		}
 	}
 }
@@ -315,6 +350,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
 		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
+		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
 	}
 	if len(cases) == 0 {
 		t.Fatal("no active release examples")
@@ -381,7 +417,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "bar", "column", "line"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "bar", "column", "line", "scatter"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}

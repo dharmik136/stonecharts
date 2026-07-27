@@ -98,8 +98,15 @@ func splineD(pts [][2]float64) string {
 
 // markerSVG renders one data-point marker. `common` = shared class + data-* attrs.
 // Non-circle shapes carry cx/cy attrs so the JS runtime (crosshair) still works.
-func markerSVG(symbol string, x, y, r float64, common, color, halo string) string {
-	fs := fmt.Sprintf(`fill="%s" stroke="%s" stroke-width="1"`, color, halo)
+// fillOpacity of 1.0 reproduces the original byte-for-byte output with no
+// attribute added — scatter's primary points are the only caller that passes
+// a value < 1.0 (§3.3 Rank 3).
+func markerSVG(symbol string, x, y, r float64, common, color, halo string, fillOpacity float64) string {
+	opAttr := ""
+	if fillOpacity != 1.0 {
+		opAttr = fmt.Sprintf(` fill-opacity="%s"`, fmtNum(fillOpacity))
+	}
+	fs := fmt.Sprintf(`fill="%s" stroke="%s" stroke-width="1"%s`, color, halo, opAttr)
 	switch symbol {
 	case "square":
 		return fmt.Sprintf(`<rect %s cx="%s" cy="%s" x="%s" y="%s" width="%s" height="%s" %s/>`,
@@ -135,7 +142,7 @@ func lineMarks(f *cartesianFrame, p *strings.Builder) {
 		color := st.solid
 		pts := make([][2]float64, len(s.Data))
 		for i, v := range s.Data {
-			pts[i] = [2]float64{f.xpix(i), f.ypix(v)}
+			pts[i] = [2]float64{f.xpix(float64(i)), f.ypix(v)}
 		}
 		var d string
 		if s.Curve == "monotone" {
@@ -172,7 +179,7 @@ func lineMarks(f *cartesianFrame, p *strings.Builder) {
 				common := fmt.Sprintf(
 					`class="sc-point" data-series="%d" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-r="%s" data-r-hover="%s"`,
 					si, esc(s.Name), esc(xlabel), esc(fmtNum(s.Data[i])), color, fmtNum(radius), fmtNum(radiusHover))
-				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, color, theme.MarkerHalo))
+				p.WriteString(markerSVG(symbol, pt[0], pt[1], radius, common, color, theme.MarkerHalo, 1.0))
 			}
 		}
 		p.WriteString(`</g>`)

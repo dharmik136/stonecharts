@@ -68,7 +68,7 @@ class CartesianFrame:
     defs_parts: List[str]
     a11y_attr: str
     a11y_desc: str
-    scale: str                       # "point" | "band"
+    scale: str                       # "point" | "band" | "linear"
     include_zero: bool               # value-axis zero-anchor (see build_frame)
     orientation: str                 # "vertical" | "horizontal"
     stacking: Optional[str]          # None | "normal" | "percent" — frame owns stacked y-domain
@@ -76,15 +76,26 @@ class CartesianFrame:
     y2_min: float = 0.0
     y2_max: float = 0.0
     y2_ticks: List[float] = field(default_factory=list)
+    x_min: float = 0.0               # LINEAR scale only (scatter) — free numeric x-domain
+    x_max: float = 0.0
+    x_ticks: List[float] = field(default_factory=list)
 
-    def xpix(self, i: int) -> float:
-        """Category index -> pixel x, per the frame's x-scale strategy.
+    def xpix(self, i: float) -> float:
+        """Category index (or, under LINEAR scale, a numeric x-VALUE) -> pixel x.
 
+        LINEAR scale (scatter, §3.3 Rank 3) — a free numeric x-domain, mirrors
+        ypix exactly: xpix(v) = plot_x + plot_w*(v - x_min)/(x_max - x_min).
+        Degenerate domain (x_max == x_min) is pinned to plot center BEFORE the
+        divide, identically to value_pix's existing y-degenerate guard.
         POINT scale (line/area) — the original line formula, verbatim:
             xpix(i) = plot_x + plot_w*i/(n-1),  and  plot_x + plot_w/2  when n<=1
         BAND scale (column/bar) — §4.3 pinned formula, this operation order:
             xpix(i) = plot_x + band_width()*i + band_width()/2   (band center)
         """
+        if self.scale == "linear":
+            if self.x_max == self.x_min:
+                return self.plot_x + self.plot_w / 2
+            return self.plot_x + self.plot_w * (i - self.x_min) / (self.x_max - self.x_min)
         if self.scale == "band":
             return self.plot_x + self.band_width() * i + self.band_width() / 2
         if self.n <= 1:
@@ -233,9 +244,26 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
     plot_x, plot_y = m_left, m_top
     plot_w, plot_h = W - m_left - m_right, H - m_top - m_bottom
 
+    # LINEAR scale (scatter, §3.3 Rank 3): series carry point-model data_points
+    # instead of a plain number[] — n/values/x-domain extraction branches here,
+    # additively, so the ELSE branch below (line/column/area/bar) is byte-for-
+    # byte the same code that ran before scatter existed.
+    is_point_model = x_scale == "linear"
+
     # X categories (labels). Numeric fallback to index.
-    n = max((len(s.data) for s in spec.series), default=0)
+    if is_point_model:
+        n = max((len(s.data_points or []) for s in spec.series), default=0)
+    else:
+        n = max((len(s.data) for s in spec.series), default=0)
     cats = spec.x_axis.categories or [str(i) for i in range(n)]
+
+    x_min = x_max = 0.0
+    x_ticks: List[float] = []
+    if is_point_model:
+        xs = [d.x for s in spec.series for d in (s.data_points or [])]
+        x_lo = spec.x_axis.min if spec.x_axis.min is not None else (min(xs) if xs else 0.0)
+        x_hi = spec.x_axis.max if spec.x_axis.max is not None else (max(xs) if xs else 0.0)
+        x_min, x_max, x_ticks = nice_ticks(x_lo, x_hi)
 
     # Value-axis domain — owned by the frame, never by the marks.
     stacking = spec.stacking
@@ -254,6 +282,11 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
                         neg_totals[i] += v
             lo = spec.y_axis.min if spec.y_axis.min is not None else min(neg_totals + [0.0])
             hi = spec.y_axis.max if spec.y_axis.max is not None else max(pos_totals + [0.0])
+    elif is_point_model:
+        # Free y-domain (include_zero=False is always passed for scatter).
+        values = [d.y for s in spec.series for d in (s.data_points or [])]
+        lo = spec.y_axis.min if spec.y_axis.min is not None else (min(values) if values else 0.0)
+        hi = spec.y_axis.max if spec.y_axis.max is not None else (max(values) if values else 0.0)
     else:
         # Y range across all series; include_zero=True anchors the 0 baseline.
         values = [v for s in spec.series for v in s.data]
@@ -310,6 +343,7 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
         cid=cid, styles=styles, defs_parts=defs_parts,
         a11y_attr=a11y_attr, a11y_desc=a11y_desc,
         scale=x_scale, include_zero=include_zero, orientation=orientation, stacking=stacking,
+        x_min=x_min, x_max=x_max, x_ticks=x_ticks,
     )
 
 
@@ -438,16 +472,42 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
             f'x2="{plot_x+plot_w:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{theme.axis_line_color}" stroke-width="1"/>'
         )
 
-        # X labels.
-        p.append('<g class="sc-axis sc-axis-x">')
-        for i in range(n):
-            label = cats[i] if i < len(cats) else str(i)
-            lx = xpix(i)
-            p.append(
-                f'<text x="{lx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '
-                f'font-size="11" fill="{theme.axis_label_color}">{esc(label)}</text>'
-            )
-        p.append("</g>")
+        # X labels. LINEAR scale (scatter, §3.3 Rank 3) draws numeric ticks +
+        # optional vertical gridlines, mirroring the y-axis; every other scale
+        # keeps the original categorical-label loop unchanged.
+        if fr.scale == "linear":
+            xgl = spec.x_axis.grid_line or GridLine(enabled=False)
+            xgrid_color = xgl.color or theme.grid_color
+            xgrid_dash = dash_array(xgl.dash_style)
+            xdash_attr = f' stroke-dasharray="{xgrid_dash}"' if xgrid_dash else ''
+            if xgl.enabled:
+                p.append('<g class="sc-gridlines-x">')
+                for tv in fr.x_ticks:
+                    gx = xpix(tv)
+                    p.append(
+                        f'<line class="sc-gridline" x1="{gx:.1f}" y1="{plot_y:.1f}" '
+                        f'x2="{gx:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{xgrid_color}" '
+                        f'stroke-width="1"{xdash_attr}/>'
+                    )
+                p.append("</g>")
+            p.append('<g class="sc-axis sc-axis-x">')
+            for tv in fr.x_ticks:
+                lx = xpix(tv)
+                p.append(
+                    f'<text x="{lx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '
+                    f'font-size="11" fill="{theme.axis_label_color}">{esc(fmt_num(tv))}</text>'
+                )
+            p.append("</g>")
+        else:
+            p.append('<g class="sc-axis sc-axis-x">')
+            for i in range(n):
+                label = cats[i] if i < len(cats) else str(i)
+                lx = xpix(i)
+                p.append(
+                    f'<text x="{lx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '
+                    f'font-size="11" fill="{theme.axis_label_color}">{esc(label)}</text>'
+                )
+            p.append("</g>")
 
         # Axis titles.
         if spec.x_axis.title:

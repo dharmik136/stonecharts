@@ -1,0 +1,85 @@
+[
+  {
+    "spec": {
+      "type": "scatter",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            { "x": 1 }
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0].y: required"
+    ]
+  },
+  {
+    "spec": {
+      "type": "scatter",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            { "x": 1, "y": 2, "z": 3 }
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0].z: unknown field"
+    ]
+  },
+  {
+    "spec": {
+      "type": "scatter",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            [1, 2, 3]
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0]: expected a 2-element [x,y] array, received 3 elements"
+    ]
+  },
+  {
+    "spec": {
+      "type": "scatter",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            ["a", 2]
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0][0]: expected number, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "scatter",
+      "layout": {
+        "margin": {
+          "left": -1
+        }
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [1]
+        }
+      ]
+    },
+    "errors": [
+      "$.layout.margin.left: expected non-negative number, received -1"
+    ]
+  }
+]

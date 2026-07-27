@@ -24,11 +24,13 @@ LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adver
 COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
 AREA_CASES = ["basic", "stacked", "percent", "themed-dark"]
 BAR_CASES = ["basic", "grouped", "stacked", "themed-dark", "adversarial"]
+SCATTER_CASES = ["basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
     "area": AREA_CASES,
     "bar": BAR_CASES,
+    "scatter": SCATTER_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -92,6 +94,11 @@ def test_bar_goldens():
         _check("bar", name)
 
 
+def test_scatter_goldens():
+    for name in SCATTER_CASES:
+        _check("scatter", name)
+
+
 def test_column_edge_cases():
     for spec in [
         {"type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
@@ -139,6 +146,35 @@ def test_bar_edge_cases():
          "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
         {"type": "bar", "series": [{"name": str(i), "data": [1, 2, 3]} for i in range(10)]},
         {"type": "bar", "series": [{"name": "a", "data": [42]}]},
+    ]:
+        low = render_svg(ChartSpec.from_dict(spec)).lower()
+        assert "nan" not in low and "inf" not in low, spec
+
+
+def test_scatter_edge_cases():
+    for spec in [
+        # Degenerate x-domain: every point shares the same x (xpix must pin to
+        # plot center before the divide, not divide by zero).
+        {"type": "scatter", "series": [{"name": "s", "data": [[5, 1], [5, 2], [5, 3]]}]},
+        # Degenerate y-domain: every point shares the same y.
+        {"type": "scatter", "series": [{"name": "s", "data": [[1, 5], [2, 5], [3, 5]]}]},
+        # Single point (n=1 degenerate on both axes).
+        {"type": "scatter", "series": [{"name": "s", "data": [[7, 9]]}]},
+        # Empty series.
+        {"type": "scatter", "series": [{"name": "s", "data": []}]},
+        # Negative x and y — free domain, no zero anchor.
+        {"type": "scatter", "series": [{"name": "s", "data": [[-10, -20], [-5, -8], [-1, -30]]}]},
+        # Manual xAxis/yAxis min/max clamp.
+        {"type": "scatter", "xAxis": {"min": 0, "max": 100}, "yAxis": {"min": -50, "max": 50},
+         "series": [{"name": "s", "data": [[10, 5], [90, -40]]}]},
+        # Mixed element shapes within one series (bare number, positional, object) —
+        # schema-legal since the point-model union applies per element, not per series.
+        {"type": "scatter", "series": [{"name": "s", "data": [3, [10, 20], {"x": 30, "y": 40}]}]},
+        # Vertical x-gridlines enabled.
+        {"type": "scatter", "xAxis": {"gridLine": {"enabled": True}},
+         "series": [{"name": "s", "data": [[1, 2], [3, 4], [5, 6]]}]},
+        # fillOpacity explicitly 0 must still render a fully opaque point (NN#2).
+        {"type": "scatter", "series": [{"name": "s", "data": [[1, 2]], "fillOpacity": 0}]},
     ]:
         low = render_svg(ChartSpec.from_dict(spec)).lower()
         assert "nan" not in low and "inf" not in low, spec
@@ -263,7 +299,7 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == ["area", "bar", "column", "line"]
+    assert caps["chartTypes"] == ["area", "bar", "column", "line", "scatter"]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
@@ -333,6 +369,9 @@ if __name__ == "__main__":
     for _n in BAR_CASES:
         _check("bar", _n)
         print(f"PASS: python bar-{_n} golden")
+    for _n in SCATTER_CASES:
+        _check("scatter", _n)
+        print(f"PASS: python scatter-{_n} golden")
     test_spline_edge_cases()
     print("PASS: python spline edge cases")
 

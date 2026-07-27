@@ -2,6 +2,7 @@ package stonecharts
 
 import (
 	"math"
+	"sort"
 	"strings"
 )
 
@@ -369,7 +370,48 @@ func vtheme(v interface{}, path string, errs *[]string) {
 	}
 }
 
-func vseries(v interface{}, path string, errs *[]string) {
+// vdatum validates a point-model element (scatter only, §3.3 Rank 3):
+// number | [x,y] | {x,y}. Mirrors _datum in validate.py.
+func vdatum(v interface{}, path string, errs *[]string) {
+	switch e := v.(type) {
+	case bool:
+		*errs = append(*errs, path+": expected number, [x,y], or {x,y}, received boolean")
+	case float64:
+		vnum(v, path, errs)
+	case []interface{}:
+		if len(e) != 2 {
+			*errs = append(*errs, path+": expected a 2-element [x,y] array, received "+itoa(len(e))+" elements")
+		} else {
+			vnum(e[0], path+"[0]", errs)
+			vnum(e[1], path+"[1]", errs)
+		}
+	case map[string]interface{}:
+		if x, ok := has(e, "x"); !ok {
+			*errs = append(*errs, path+".x: required")
+		} else {
+			vnum(x, path+".x", errs)
+		}
+		if y, ok := has(e, "y"); !ok {
+			*errs = append(*errs, path+".y: required")
+		} else {
+			vnum(y, path+".y", errs)
+		}
+		extra := []string{}
+		for k := range e {
+			if k != "x" && k != "y" {
+				extra = append(extra, k)
+			}
+		}
+		sort.Strings(extra)
+		for _, k := range extra {
+			*errs = append(*errs, path+"."+k+": unknown field")
+		}
+	default:
+		*errs = append(*errs, path+": expected number, [x,y], or {x,y}, received "+jtype(v))
+	}
+}
+
+func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	m, ok := v.(map[string]interface{})
 	if !ok {
 		*errs = append(*errs, path+": expected object, received "+jtype(v))
@@ -391,6 +433,10 @@ func vseries(v interface{}, path string, errs *[]string) {
 		*errs = append(*errs, path+".data: required")
 	} else if arr, ok := x.([]interface{}); !ok {
 		*errs = append(*errs, path+".data: expected array, received "+jtype(x))
+	} else if chartType == "scatter" {
+		for i, e := range arr {
+			vdatum(e, path+".data["+itoa(i)+"]", errs)
+		}
 	} else {
 		for i, e := range arr {
 			vnum(e, path+".data["+itoa(i)+"]", errs)
@@ -444,12 +490,14 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 }
 
 // knownTypes — active release scope (0.0.0.1: area/column/line; 0.0.0.2 admits
-// bar per DEC-014). Mirrors _KNOWN_TYPES in validate.py.
+// bar per DEC-014; 0.0.0.3 admits scatter per DEC-015). Mirrors _KNOWN_TYPES
+// in validate.py.
 var knownTypes = map[string]bool{
-	"area":   true,
-	"bar":    true,
-	"column": true,
-	"line":   true,
+	"area":    true,
+	"bar":     true,
+	"column":  true,
+	"line":    true,
+	"scatter": true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
@@ -500,13 +548,15 @@ func validate(v interface{}) []string {
 	if x, ok := has(d, "yAxis"); ok {
 		vaxis(x, "$.yAxis", &errs)
 	}
+	chartType, _ := has(d, "type")
+	chartTypeStr, _ := chartType.(string)
 	if x, ok := has(d, "series"); !ok {
 		errs = append(errs, "$.series: required")
 	} else if arr, ok := x.([]interface{}); !ok {
 		errs = append(errs, "$.series: expected array, received "+jtype(x))
 	} else {
 		for i, s := range arr {
-			vseries(s, "$.series["+itoa(i)+"]", &errs)
+			vseries(s, "$.series["+itoa(i)+"]", &errs, chartTypeStr)
 		}
 	}
 	if x, ok := has(d, "stacking"); ok {

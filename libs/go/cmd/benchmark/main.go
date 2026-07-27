@@ -2,7 +2,7 @@
 //
 // Implements the workload matrix from docs/quality/benchmark-spec.md
 // (SC-QUAL-002): Small/Business/Dense/Stress profiles, each with line,
-// grouped-column, stacked-column, and bar variants. Records cold and warm
+// grouped-column, stacked-column, bar, and scatter variants. Records cold and warm
 // timing (p50/p95/p99/min/max/stddev/count), peak allocation, output bytes,
 // an approximate DOM element count, and the exact input spec bytes/SHA-256
 // alongside every result.
@@ -54,7 +54,7 @@ var workloads = []workload{
 	{"stress", 20, 5000},
 }
 
-var variants = []string{"line", "grouped-column", "stacked-column", "bar"}
+var variants = []string{"line", "grouped-column", "stacked-column", "bar", "scatter"}
 var modes = []string{"svg", "html"}
 
 var domTagRE = regexp.MustCompile(`<(rect|circle|ellipse|line|polyline|polygon|path|text|g)\b`)
@@ -68,17 +68,28 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 		categories[i] = fmt.Sprintf("C%d", i)
 	}
 
-	type seriesDict struct {
-		Name string    `json:"name"`
-		Data []float64 `json:"data"`
-	}
-	series := make([]seriesDict, nSeries)
-	for s := 0; s < nSeries; s++ {
-		data := make([]float64, nCategories)
-		for i := range data {
-			data[i] = math.Round(rng.Float64()*100*100) / 100
+	series := make([]map[string]interface{}, nSeries)
+	if variant == "scatter" {
+		// Point-model data (positional [x,y] pairs), exercising the linear
+		// x-scale path, not just the bare-number fast path (§3.3 Rank 3).
+		for s := 0; s < nSeries; s++ {
+			data := make([][2]float64, nCategories)
+			for i := range data {
+				data[i] = [2]float64{
+					math.Round(rng.Float64()*1000*100) / 100,
+					math.Round(rng.Float64()*100*100) / 100,
+				}
+			}
+			series[s] = map[string]interface{}{"name": fmt.Sprintf("Series %d", s), "data": data}
 		}
-		series[s] = seriesDict{Name: fmt.Sprintf("Series %d", s), Data: data}
+	} else {
+		for s := 0; s < nSeries; s++ {
+			data := make([]float64, nCategories)
+			for i := range data {
+				data[i] = math.Round(rng.Float64()*100*100) / 100
+			}
+			series[s] = map[string]interface{}{"name": fmt.Sprintf("Series %d", s), "data": data}
+		}
 	}
 
 	chartType := "line"
@@ -86,12 +97,18 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 		chartType = "column"
 	} else if variant == "bar" {
 		chartType = "bar"
+	} else if variant == "scatter" {
+		chartType = "scatter"
 	}
 
+	xAxis := map[string]interface{}{"title": "X Axis"}
+	if variant != "scatter" {
+		xAxis["categories"] = categories
+	}
 	specMap := map[string]interface{}{
 		"type":   chartType,
 		"title":  fmt.Sprintf("Benchmark %s", variant),
-		"xAxis":  map[string]interface{}{"title": "X Axis", "categories": categories},
+		"xAxis":  xAxis,
 		"yAxis":  map[string]interface{}{"title": "Y Axis"},
 		"series": series,
 	}

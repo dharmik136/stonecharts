@@ -56,7 +56,7 @@ func columnMarks(f *cartesianFrame, p *strings.Builder) {
 			if i >= f.n {
 				break
 			}
-			cxBand := f.xpix(i)
+			cxBand := f.xpix(float64(i))
 			var left, y, h float64
 			if stacked {
 				left = cxBand - groupW/2

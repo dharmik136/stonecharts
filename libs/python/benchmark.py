@@ -2,7 +2,7 @@
 
 Implements the workload matrix from docs/quality/benchmark-spec.md (SC-QUAL-002):
 Small/Business/Dense/Stress profiles, each with line, grouped-column,
-stacked-column, and bar variants. Records cold and warm timing (p50/p95/p99/
+stacked-column, bar, and scatter variants. Records cold and warm timing (p50/p95/p99/
 min/max/stddev/count), peak memory, output bytes, an approximate DOM element
 count, and the exact input spec bytes/SHA-256 alongside every result.
 
@@ -44,7 +44,7 @@ WORKLOADS = [
     ("dense", 20, 1000),
     ("stress", 20, 5000),
 ]
-VARIANTS = ["line", "grouped-column", "stacked-column", "bar"]
+VARIANTS = ["line", "grouped-column", "stacked-column", "bar", "scatter"]
 MODES = ["svg", "html"]
 
 _DOM_TAG_RE = re.compile(r"<(rect|circle|ellipse|line|polyline|polygon|path|text|g)\b")
@@ -58,27 +58,46 @@ def generate_spec(n_series: int, n_categories: int, variant: str) -> tuple[Chart
     """
     rng = random.Random(SEED)
     categories = [f"C{i}" for i in range(n_categories)]
-    series = [
-        {
-            "name": f"Series {s}",
-            "data": [round(rng.uniform(0, 100), 2) for _ in range(n_categories)],
-        }
-        for s in range(n_series)
-    ]
+
+    if variant == "scatter":
+        # Point-model data (positional [x,y] pairs), exercising the linear
+        # x-scale path, not just the bare-number fast path (§3.3 Rank 3).
+        series = [
+            {
+                "name": f"Series {s}",
+                "data": [
+                    [round(rng.uniform(0, 1000), 2), round(rng.uniform(0, 100), 2)]
+                    for _ in range(n_categories)
+                ],
+            }
+            for s in range(n_series)
+        ]
+    else:
+        series = [
+            {
+                "name": f"Series {s}",
+                "data": [round(rng.uniform(0, 100), 2) for _ in range(n_categories)],
+            }
+            for s in range(n_series)
+        ]
 
     if variant in ("grouped-column", "stacked-column"):
         chart_type = "column"
     elif variant == "bar":
         chart_type = "bar"
+    elif variant == "scatter":
+        chart_type = "scatter"
     else:
         chart_type = "line"
     spec_dict = {
         "type": chart_type,
         "title": f"Benchmark {variant}",
-        "xAxis": {"title": "X Axis", "categories": categories},
+        "xAxis": {"title": "X Axis"},
         "yAxis": {"title": "Y Axis"},
         "series": series,
     }
+    if variant != "scatter":
+        spec_dict["xAxis"]["categories"] = categories
     if variant == "stacked-column":
         spec_dict["stacking"] = "normal"
 
