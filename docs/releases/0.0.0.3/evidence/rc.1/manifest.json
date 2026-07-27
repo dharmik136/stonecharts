@@ -1,0 +1,457 @@
+{
+  "release": "0.0.0.3",
+  "candidate": "rc.1",
+  "source": {
+    "repository": "dharmik136/stonecharts",
+    "commit": "ca9a5bff0adf7acd5e4aa1ba9689dd74f86a911f",
+    "tag": "0.0.0.3",
+    "treeClean": false
+  },
+  "versions": {
+    "product": "0.0.0.3",
+    "python": "0.0.0.3",
+    "go": null,
+    "schema": "manifest.schema.json v1",
+    "svgContract": "spec/svg-contract.md current",
+    "runtime": "node:test browser and DOM harness current"
+  },
+  "environment": {
+    "builder": "Claude Code / bash",
+    "python": "Python 3.14.4",
+    "go": "go version go1.26.4 windows/amd64",
+    "os": "Windows 11 Pro 10.0.26200",
+    "architecture": "amd64"
+  },
+  "artifacts": [
+    {
+      "name": "manifest.schema.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/manifest.schema.json",
+      "sha256": "6bf4172e85fe5ac7a002bcc33f6e82ced5db55477796fa7efe84312c242ffccd",
+      "bytes": 4232
+    },
+    {
+      "name": "scatter-accessibility-security-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-accessibility-security-review.md",
+      "sha256": "7eded9ca4e0b94352d78b8189ea8c585b77da6f5633aed9635a6c43843a5c962",
+      "bytes": 6929
+    },
+    {
+      "name": "scatter-performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-performance-baseline-review.md",
+      "sha256": "63b128c02216ee2d8b8b7acf05115e169d5feeba597e84e89e718fbef4986087",
+      "bytes": 4883
+    },
+    {
+      "name": "qualification-checklist.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/rc.1/qualification-checklist.md",
+      "sha256": "2bc2225b9649d7c22b635ea8c21f7f5161797692c65f1cdc2f51a948d3e65aea",
+      "bytes": 3630
+    },
+    {
+      "name": "sbom.spdx.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/rc.1/sbom.spdx.json",
+      "sha256": "19177845938a9938d5daa8472ec6d320236a88e1e1fea13d56683fffa07cd6a7",
+      "bytes": 2419
+    },
+    {
+      "name": "provenance.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/rc.1/provenance.json",
+      "sha256": "b0df5687f1d8e07e32aff0cacda22dad27febb09b4faa6f10bb1bd988829b7e1",
+      "bytes": 2179
+    },
+    {
+      "name": "package-install-matrix.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/rc.1/package-install-matrix.md",
+      "sha256": "3d63d2a4f77da41c689d420bc84fab60213ad0f7f7e95e6caeb324951358d3c6",
+      "bytes": 2712
+    },
+    {
+      "name": "bar-accessibility-security-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md",
+      "sha256": "d6f0ff8c98868a7dd466f75769461ae38336c1959af5c582d37ba6d3570ffd10",
+      "bytes": 4351
+    },
+    {
+      "name": "bar-performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md",
+      "sha256": "df54b2d840210362e7debd79193c9340a9b9f888791dd9177441310822ce2d60",
+      "bytes": 3310
+    },
+    {
+      "name": "manual-accessibility-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405",
+      "bytes": 1848
+    },
+    {
+      "name": "visual-profile-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d",
+      "bytes": 1288
+    },
+    {
+      "name": "performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48",
+      "bytes": 3922
+    },
+    {
+      "name": "direct-cross-render-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/direct-cross-render-review.md",
+      "sha256": "727e7546fa7a1df64eca7de118d992a2df797aee1d68636ea21a984a4ac3745a",
+      "bytes": 877
+    },
+    {
+      "name": "security-qualification-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/security-qualification-review.md",
+      "sha256": "edc486a793b374cc318a99672aa1556ddc1ec359f86b0cd61be8373e675eec57",
+      "bytes": 2512
+    },
+    {
+      "name": "evidence-registry.yaml",
+      "kind": "documentation",
+      "path": "docs/quality/evidence-registry.yaml",
+      "sha256": "85760b07102fea4c9a2f49324f5fc0de9fce6ac18679c8f24cddedf4476226ee",
+      "bytes": 8000
+    },
+    {
+      "name": "__init__.py",
+      "kind": "other",
+      "path": "libs/python/stonecharts/__init__.py",
+      "sha256": "8c71cd6c4100cb9aa1fce53004766a215428a4b5b6fcd2ad3c17721ed55f0745",
+      "bytes": 1148
+    },
+    {
+      "name": "pyproject.toml",
+      "kind": "documentation",
+      "path": "libs/python/pyproject.toml",
+      "sha256": "bfb62571cc29c8a1c36bfd9a78ddae2ad0eec236851e2310cd39bda321ae577b",
+      "bytes": 850
+    },
+    {
+      "name": "scatter.py",
+      "kind": "other",
+      "path": "libs/python/stonecharts/charts/scatter.py",
+      "sha256": "6391a4f5f842b970d08b6ba4129194af0d645b5afc6bf21755a03cd3f4fe911e",
+      "bytes": 1977
+    },
+    {
+      "name": "go.mod",
+      "kind": "other",
+      "path": "libs/go/go.mod",
+      "sha256": "2acd29679ac852b7c32c48c78776ee120931fd25bbdf83821012e708360f66da",
+      "bytes": 28
+    },
+    {
+      "name": "scatter.go",
+      "kind": "other",
+      "path": "libs/go/scatter.go",
+      "sha256": "7f329fc3cbfcf8712157074b4da151e24688a39c8d4476858a2ae85d652387b5",
+      "bytes": 2745
+    },
+    {
+      "name": "design.md",
+      "kind": "documentation",
+      "path": "charts/scatter/design.md",
+      "sha256": "c5d8019f96f9f52e5ae275b06cc247775befa63b3d0f06f61b3f23294b7abba7",
+      "bytes": 25544
+    },
+    {
+      "name": "invalid-fixtures.json",
+      "kind": "documentation",
+      "path": "charts/scatter/invalid-fixtures.json",
+      "sha256": "6494990ffcccbe98d0f49ee74f0c7d4e313cd33a261c7cff6c00ef88227b18b3",
+      "bytes": 1371
+    },
+    {
+      "name": "check_docs.py",
+      "kind": "other",
+      "path": "tools/check_docs.py",
+      "sha256": "10606a857736d4ea69f984d8385af5ebacf78e5ad77144ad54b8f51105001f46",
+      "bytes": 21228
+    },
+    {
+      "name": "check_direct_cross_render.py",
+      "kind": "other",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "b90de3dcaab1168ef164c29e9b6c8e79bb034a247cce0703be2d7d625b31ef67",
+      "bytes": 2679
+    },
+    {
+      "name": "check_release_evidence.py",
+      "kind": "other",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "81a60dc0466fbb684cad84f92e1c62f23c81063dd5234028d6e7ba1af0dae056",
+      "bytes": 6796
+    },
+    {
+      "name": "browser-qualification.test.js",
+      "kind": "other",
+      "path": "runtime/browser-qualification.test.js",
+      "sha256": "b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50",
+      "bytes": 6168
+    },
+    {
+      "name": "bar-browser-qualification.test.js",
+      "kind": "other",
+      "path": "runtime/bar-browser-qualification.test.js",
+      "sha256": "37cb91b1ca20765e256101d355fad5bdd5ee1f2b9c86bf638a1b53f768ab282a",
+      "bytes": 6457
+    },
+    {
+      "name": "scatter-browser-qualification.test.js",
+      "kind": "other",
+      "path": "runtime/scatter-browser-qualification.test.js",
+      "sha256": "0c2bf6677c5bce080e1309d230438c43d3c46d639e01778596de7b3744f68f82",
+      "bytes": 6987
+    },
+    {
+      "name": "hashes.sha256",
+      "kind": "other",
+      "path": "docs/releases/0.0.0.3/evidence/rc.1/hashes.sha256",
+      "sha256": "8de2a1e60722a2b6d0422fb2195b767adfe310201095548fc9ca15a07d4e8523",
+      "bytes": 3304
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TEST-DOCS-CONTROL",
+      "status": "passed",
+      "path": "tools/check_docs.py",
+      "sha256": "10606a857736d4ea69f984d8385af5ebacf78e5ad77144ad54b8f51105001f46"
+    },
+    {
+      "id": "TEST-PYTHON-GOLDENS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "3cfaaa1a6f19c982bfa40686ed40793f9521fa4342580e4f6e08a19792514e2a"
+    },
+    {
+      "id": "TEST-GO-GOLDENS",
+      "status": "passed",
+      "path": "libs/go/render_test.go",
+      "sha256": "92e599fe00bcbdd38e5ab8ba8318abfd312864a753a3f4a650afb1c34ef7f97e"
+    },
+    {
+      "id": "TEST-VALIDATION-PARITY",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "3cfaaa1a6f19c982bfa40686ed40793f9521fa4342580e4f6e08a19792514e2a"
+    },
+    {
+      "id": "TEST-CAPABILITY-MATRIX",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "3cfaaa1a6f19c982bfa40686ed40793f9521fa4342580e4f6e08a19792514e2a"
+    },
+    {
+      "id": "TEST-STACK-SIGNED",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "3cfaaa1a6f19c982bfa40686ed40793f9521fa4342580e4f6e08a19792514e2a"
+    },
+    {
+      "id": "TEST-PERCENT-DOMAIN",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "3cfaaa1a6f19c982bfa40686ed40793f9521fa4342580e4f6e08a19792514e2a"
+    },
+    {
+      "id": "TEST-LAYOUT-MARGINS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "3cfaaa1a6f19c982bfa40686ed40793f9521fa4342580e4f6e08a19792514e2a"
+    },
+    {
+      "id": "TEST-XSS-ESCAPING",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "3cfaaa1a6f19c982bfa40686ed40793f9521fa4342580e4f6e08a19792514e2a"
+    },
+    {
+      "id": "TEST-RUNTIME-BROWSER",
+      "status": "passed",
+      "path": "runtime/browser-qualification.test.js",
+      "sha256": "b3f54416c273ae25568571d093b7a76d10430978df3826c66c082bab4be82d50"
+    },
+    {
+      "id": "TEST-RUNTIME-SMOKE",
+      "status": "passed",
+      "path": "runtime/chart-interactions.test.js",
+      "sha256": "8153df43c010a46a53a4954dcd9167a9c1fd6910d6ea6f469d215d712457dc80"
+    },
+    {
+      "id": "REVIEW-ACCESSIBILITY-MANUAL",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405"
+    },
+    {
+      "id": "REVIEW-VISUAL-PROFILE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d"
+    },
+    {
+      "id": "BENCH-RENDER-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48"
+    },
+    {
+      "id": "TEST-DIRECT-CROSS-RENDER",
+      "status": "passed",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "b90de3dcaab1168ef164c29e9b6c8e79bb034a247cce0703be2d7d625b31ef67"
+    },
+    {
+      "id": "TEST-FUZZ-PROPERTY",
+      "status": "passed",
+      "path": "tools/check_fuzz_property.py",
+      "sha256": "b2a598755cbe190c3041a2f22a10bded07e6afc8a73ca62985f768b47d969740"
+    },
+    {
+      "id": "TEST-RELEASE-EVIDENCE",
+      "status": "passed",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "81a60dc0466fbb684cad84f92e1c62f23c81063dd5234028d6e7ba1af0dae056"
+    },
+    {
+      "id": "REVIEW-BAR-ACCESSIBILITY-SECURITY",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md",
+      "sha256": "d6f0ff8c98868a7dd466f75769461ae38336c1959af5c582d37ba6d3570ffd10"
+    },
+    {
+      "id": "BENCH-BAR-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md",
+      "sha256": "df54b2d840210362e7debd79193c9340a9b9f888791dd9177441310822ce2d60"
+    },
+    {
+      "id": "REVIEW-SCATTER-ACCESSIBILITY-SECURITY",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-accessibility-security-review.md",
+      "sha256": "7eded9ca4e0b94352d78b8189ea8c585b77da6f5633aed9635a6c43843a5c962"
+    },
+    {
+      "id": "BENCH-SCATTER-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-performance-baseline-review.md",
+      "sha256": "63b128c02216ee2d8b8b7acf05115e169d5feeba597e84e89e718fbef4986087"
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-001",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "The active schema is narrowed to line/column/area/bar/scatter; no unrendereable type is exposed."
+    },
+    {
+      "id": "RISK-002",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Validator parity is evidenced across the full active corpus including scatter's new point-model element type."
+    },
+    {
+      "id": "RISK-003",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Typed capability errors and no-panic boundaries cover scatter identically to line/column/area/bar."
+    },
+    {
+      "id": "RISK-004",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Mixed-sign stack geometry evidence is unchanged and still passes; scatter does not stack."
+    },
+    {
+      "id": "RISK-005",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Percent-domain rules are explicit and unchanged for this release scope."
+    },
+    {
+      "id": "RISK-006",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Unicode sizing remains fixed by the current deterministic length model; scatter reuses it unchanged."
+    },
+    {
+      "id": "RISK-007",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Manual margins are the release boundary; unchanged for scatter."
+    },
+    {
+      "id": "RISK-008",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Browser and accessibility evidence now exists for scatter specifically (SC-REL-018), matching line/column/area/bar, including the generalized long-format data table."
+    },
+    {
+      "id": "RISK-009",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Package version is aligned with 0.0.0.3 across pyproject.toml and __init__.py."
+    },
+    {
+      "id": "RISK-010",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Short category arrays are padded deterministically in both renderers; scatter's free axes are exercised by its edge-case tests."
+    },
+    {
+      "id": "RISK-011",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Host-font and certified-export profiles remain intentionally separate guarantees, unchanged from 0.0.0.1/0.0.0.2."
+    },
+    {
+      "id": "RISK-012",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Release provenance is bounded by this candidate evidence pack and validator; public publication remains gated."
+    },
+    {
+      "id": "RISK-013",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "No branch-protection technical control exists yet (private repo tier); unchanged from 0.0.0.1/0.0.0.2, enforcement remains the governed gate sequence."
+    },
+    {
+      "id": "RISK-014",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "No GitHub-native private vulnerability reporting exists yet; unchanged from 0.0.0.1/0.0.0.2."
+    }
+  ],
+  "knownLimits": [
+    "This candidate pack is not a publication approval.",
+    "Go module publication is still held behind a later release gate (ADR 0007).",
+    "Pixel identity is only claimed under a certified export profile, not arbitrary host fonts.",
+    "Scatter's gap handling for a missing/null y is deliberately deferred (see charts/scatter/design.md 'Not yet supported').",
+    "Expansion beyond line, column, area, bar, and scatter remains outside this release candidate."
+  ],
+  "review": {
+    "mode": "self",
+    "productOwner": "dharmik136",
+    "maintainer": "dharmik136",
+    "approvedAt": "2026-07-27T11:13:05+05:30"
+  }
+}

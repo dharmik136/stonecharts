@@ -921,15 +921,15 @@ items:
   - id: GATE-S10
     title: Pass 0.0.0.3 release-candidate gate
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S10 Release Candidate 0.0.0.3
     target: 0.0.0.3
     outcome: One immutable commit can reproducibly produce installable artifacts, documentation, and a complete evidence pack for 0.0.0.3.
-    traceability: [SC-REL-013]
+    traceability: [SC-REL-013, SC-REL-020, SC-REL-021]
     risks: []
-    evidence: []
+    evidence: [TEST-RELEASE-EVIDENCE]
     dependencies: [GATE-S9]
     compatibility: Freezes the 0.0.0.3 candidate source, versions, artifacts, and known limits; does not touch the already-tagged 0.0.0.1/0.0.0.2 evidence packs.
     areas: [python, go, docs, release, security]

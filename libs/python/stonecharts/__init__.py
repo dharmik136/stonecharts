@@ -21,7 +21,7 @@ from .capabilities import CapabilityError, capabilities
 from .validate import SpecError, validate
 from .render import render_html, render_svg, save_html
 
-__version__ = "0.0.0.2"
+__version__ = "0.0.0.3"
 __all__ = [
     "ChartSpec",
     "Series",

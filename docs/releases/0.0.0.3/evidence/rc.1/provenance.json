@@ -1,0 +1,66 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "docs/releases/0.0.0.3/evidence/rc.1",
+      "digest": {
+        "sha256": "38dd0351bdace7bd785c696e21f54528d0b49054d15b3bdd3df05801f00e4455"
+      }
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "predicate": {
+    "buildDefinition": {
+      "buildType": "stonecharts/release-evidence-pack",
+      "externalParameters": {
+        "release": "0.0.0.3",
+        "candidate": "rc.1",
+        "branch": "main"
+      },
+      "internalParameters": {
+        "status": "M .github/workflows/quality.yml\n M libs/python/pyproject.toml\n M libs/python/stonecharts/__init__.py\n?? .claude/\n?? docs/product-antigravity/\n?? docs/releases/0.0.0.3/evidence/manifest.schema.json\n?? tools/build_release_evidence_0003.py"
+      },
+      "resolvedDependencies": [
+        {
+          "uri": "git+https://github.com/dharmik136/stonecharts.git",
+          "digest": {
+            "sha1": "ca9a5bff0adf7acd5e4aa1ba9689dd74f86a911f"
+          }
+        },
+        {
+          "uri": "file:docs/releases/0.0.0.3/evidence/manifest.schema.json",
+          "digest": {
+            "sha256": "6bf4172e85fe5ac7a002bcc33f6e82ced5db55477796fa7efe84312c242ffccd"
+          }
+        },
+        {
+          "uri": "file:docs/quality/evidence-registry.yaml",
+          "digest": {
+            "sha256": "85760b07102fea4c9a2f49324f5fc0de9fce6ac18679c8f24cddedf4476226ee"
+          }
+        },
+        {
+          "uri": "file:tools/check_release_evidence.py",
+          "digest": {
+            "sha256": "81a60dc0466fbb684cad84f92e1c62f23c81063dd5234028d6e7ba1af0dae056"
+          }
+        }
+      ]
+    },
+    "runDetails": {
+      "builder": {
+        "id": "claude-code/bash"
+      },
+      "metadata": {
+        "invocationId": "ca9a5bff0adf7acd5e4aa1ba9689dd74f86a911f",
+        "completed": "2026-07-27T11:13:05+05:30",
+        "environment": {
+          "python": "Python 3.14.4",
+          "go": "go version go1.26.4 windows/amd64",
+          "os": "Windows 11 Pro",
+          "architecture": "amd64"
+        }
+      }
+    }
+  }
+}
