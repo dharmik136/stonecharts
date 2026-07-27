@@ -308,3 +308,26 @@ requirements:
     contracts: []
     verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE, REVIEW-BAR-ACCESSIBILITY-SECURITY, BENCH-BAR-BASELINE]
     implementation: [libs/python/stonecharts/charts/bar.py, libs/go/bar.go, charts/bar/golden, charts/bar/invalid-fixtures.json, runtime/bar-browser-qualification.test.js]
+
+  - id: REQ-CHART-002
+    title: Admit scatter as a certified 0.0.0.3 chart type
+    statement: Scatter MUST be admitted through the full chart admission checklist (SC-ARCH-011) and reach Certified status per the renderer constitution before 0.0.0.3 documentation may describe it as supported. Because scatter lands the shared point model and numeric x-scale, every existing golden (line, column, area, bar) MUST remain byte-identical after the change, proven by diff, not asserted.
+    rationale: DEC-015 authorizes scatter as the next expansion target; scatter is rank 3 in the roadmap's own build order and the first sibling to force a shared-frame generalization rather than an isolated marks function, so its admission carries a stricter no-regression bar than bar's.
+    kind: functional
+    priority: must
+    status: approved
+    owner: maintainer
+    target: 0.0.0.3
+    source: SC-ARCH-011
+    acceptance:
+      - The point-model data element type (object {x,y}, positional [x,y], and the pinned bare-number fast path x=index) is registered identically in the schema, Python validator, and Go validator (mirrors REQ-VAL-001's contract, extended with a new element shape).
+      - The numeric linear x-scale (nice_ticks + fmt_num reused with include_zero=False, degenerate single-value domain pinned before any divide) is implemented identically in both languages.
+      - Byte-identity gate - after the point model and numeric x-scale land, every existing golden fixture (line, column, area, bar) is unchanged (git diff empty) and every one cross-renders Py==Go with zero diff. This is verified before any scatter-specific golden is added, not alongside it.
+      - Scatter output byte-matches its golden corpus in both languages, and the direct cross-render sweep includes scatter with zero diff (mirrors REQ-DET-001).
+      - Scatter's accessible data table is generalized to render (x,y) pairs rather than a coerced single number, in lockstep in both languages, and scatter's XSS/injection coverage matches the standard already proven for line, column, area, and bar (mirrors REQ-A11Y-001, REQ-SEC-001).
+      - Scatter is added to the benchmark workload matrix across all four approved profiles (mirrors REQ-PERF-001).
+      - Chart-admission-checklist.md phases 1-9 (design through release-evidence-adjacent documentation) are closed before this requirement moves to verified. Phase 10 (the immutable release evidence pack) is GATE-S10's concern, not this requirement's, mirroring the 0.0.0.2 cycle's REQ-CHART-001/GATE-S7 split.
+    decisions: []
+    contracts: []
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
+    implementation: [charts/scatter/design.md]

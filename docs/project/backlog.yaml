@@ -59,7 +59,10 @@ workflow:
     - S6 Qualification 0.0.0.2
     - S7 Release Candidate 0.0.0.2
     - S8 Release 0.0.0.2
-  targets: [0.0.0.1, 0.0.0.2, Post-0.0.0.1, Unscheduled]
+    - S9 Qualification 0.0.0.3
+    - S10 Release Candidate 0.0.0.3
+    - S11 Release 0.0.0.3
+  targets: [0.0.0.1, 0.0.0.2, 0.0.0.3, Post-0.0.0.1, Unscheduled]
   item_types: [Decision, Requirement, Work Package, Defect, Release Gate]
 
 items:
@@ -845,4 +848,115 @@ items:
       - Release tag 0.0.0.2 and artifacts are published from the qualified commit only.
       - Evidence manifest and hashes are archived immutably for 0.0.0.2.
       - Support, vulnerability, and feedback channels remain operational (unchanged from 0.0.0.1's disclosed posture).
+    verification: [Published-artifact hash recomputation and release-record audit]
+
+  - id: DEC-015
+    title: Post-0.0.0.2 expansion order
+    item_type: Decision
+    status: Done
+    priority: P1
+    workstream: WS-08 Expansion
+    stage: S5 Expansion
+    target: 0.0.0.3
+    outcome: Scatter is admitted as the next chart type, targeting release 0.0.0.3; no other chart type or language is admitted by this decision.
+    traceability: [SC-ARCH-011, SC-ARCH-006]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [GATE-S8]
+    compatibility: Opens REQ-CHART-002; does not change any 0.0.0.1 or 0.0.0.2 guarantee or shipped behavior.
+    areas: [docs, release]
+    acceptance:
+      - The specific chart type and target release are named, not left open-ended.
+      - The decision cites the technical basis (roadmap reuse analysis and build-rank order), not an unsupported preference.
+      - No implementation work is authorized beyond Phase 0 of the chart admission checklist by this decision alone.
+    verification: [Approved decision record in docs/project/decisions.md]
+
+  - id: REQ-CHART-002
+    title: Admit scatter as a certified 0.0.0.3 chart type
+    item_type: Requirement
+    status: Ready
+    priority: P1
+    workstream: WS-08 Expansion
+    stage: S5 Expansion
+    target: 0.0.0.3
+    outcome: Scatter reaches Certified status per the renderer constitution before 0.0.0.3 documentation describes it as supported.
+    traceability: [REQ-CHART-002, SC-ARCH-011]
+    risks: []
+    evidence: []
+    dependencies: [DEC-015]
+    compatibility: Adds a new certified chart type and a shared point-model/numeric-x-scale generalization; must not change any existing 0.0.0.1/0.0.0.2 golden, schema behavior, or guarantee.
+    areas: [spec, python, go, docs, release]
+    acceptance:
+      - Chart-admission-checklist.md phases 1 through 9 are complete (phase 10 is GATE-S10's concern).
+      - Schema, Python, and Go accept and reject scatter specs identically, including the new point-model element type.
+      - Byte-identity gate passes before any scatter golden is added - every existing golden (line, column, area, bar) is unchanged and cross-renders Py==Go with zero diff.
+      - Scatter byte-matches its golden corpus in both languages; direct cross-render sweep includes scatter with zero diff.
+      - Scatter's accessible data table renders (x,y) pairs (not a coerced single number) identically in both languages, and its XSS coverage matches the standard already proven for line, column, area, and bar.
+      - Scatter is added to the benchmark workload matrix across all four approved profiles.
+      - Scatter's interactive runtime behavior (tooltip, keyboard nav, legend toggle, ARIA state) is directly verified in a live browser, not inferred from an existing chart's passing test.
+    verification: [python tools/check_direct_cross_render.py, python -m pytest libs/python/tests, go test ./..., python tools/check_docs.py]
+
+  - id: GATE-S9
+    title: Pass 0.0.0.3 qualification gate
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-08 Expansion
+    stage: S9 Qualification 0.0.0.3
+    target: 0.0.0.3
+    outcome: Scatter's admission evidence is formally reviewed as release-quality qualification, not just passing checks during implementation.
+    traceability: [SC-ARCH-011]
+    risks: []
+    evidence: []
+    dependencies: [REQ-CHART-002]
+    compatibility: Qualification gate only; line/column/area/bar are not requalified, only scatter is newly reviewed.
+    areas: [python, go, release]
+    acceptance:
+      - Cross-language, golden, and invalid-fixture qualification passes for scatter specifically, re-run fresh, not inferred from REQ-CHART-002's implementation-time passes.
+      - Scatter's accessibility and security coverage is reviewed against the same standard as line/column/area/bar, with a recorded review artifact.
+      - Scatter's benchmark results are reviewed as a baseline, not just recorded.
+      - No known P0 correctness or runtime defect remains for scatter.
+    verification: [Fresh re-run of the full qualification suite against the exact commit under review]
+
+  - id: GATE-S10
+    title: Pass 0.0.0.3 release-candidate gate
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-08 Expansion
+    stage: S10 Release Candidate 0.0.0.3
+    target: 0.0.0.3
+    outcome: One immutable commit can reproducibly produce installable artifacts, documentation, and a complete evidence pack for 0.0.0.3.
+    traceability: [SC-REL-013]
+    risks: []
+    evidence: []
+    dependencies: [GATE-S9]
+    compatibility: Freezes the 0.0.0.3 candidate source, versions, artifacts, and known limits; does not touch the already-tagged 0.0.0.1/0.0.0.2 evidence packs.
+    areas: [python, go, docs, release, security]
+    acceptance:
+      - A 0.0.0.3-specific evidence pack (manifest, SBOM, provenance, hashes, package install matrix) is built - not a reuse or overwrite of 0.0.0.1's or 0.0.0.2's rc.1 packs.
+      - Built artifacts install and execute scatter in every supported profile.
+      - Evidence manifest validates and references immutable results for the 0.0.0.3 candidate commit.
+    verification: [python tools/check_docs.py, release evidence validator against the 0.0.0.3 pack, package installation matrix]
+
+  - id: GATE-S11
+    title: Authorize and publish release 0.0.0.3
+    item_type: Release Gate
+    status: Inbox
+    priority: P0
+    workstream: WS-08 Expansion
+    stage: S11 Release 0.0.0.3
+    target: 0.0.0.3
+    outcome: 0.0.0.3 is published only after explicit product and technical authorization, exactly as 0.0.0.1 and 0.0.0.2 were.
+    traceability: [SC-REL-013]
+    risks: []
+    evidence: []
+    dependencies: [GATE-S10]
+    compatibility: Creates the third governed release baseline; does not alter the 0.0.0.1 or 0.0.0.2 tags or their evidence.
+    areas: [release, docs, security]
+    acceptance:
+      - Product owner and maintainer sign-off are recorded for 0.0.0.3 specifically.
+      - Release tag 0.0.0.3 and artifacts are published from the qualified commit only.
+      - Evidence manifest and hashes are archived immutably for 0.0.0.3.
+      - Support, vulnerability, and feedback channels remain operational (unchanged from 0.0.0.1/0.0.0.2's disclosed posture).
     verification: [Published-artifact hash recomputation and release-record audit]
