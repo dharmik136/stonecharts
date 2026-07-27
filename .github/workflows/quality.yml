@@ -66,9 +66,13 @@ jobs:
           bar_spec = ChartSpec(type='bar', title='Bar Smoke Test', x_axis=Axis(categories=['Jan','Feb','Mar']), series=[Series(name='S', data=[1.0,2.0,3.0])])
           bar_svg = render_svg(bar_spec)
           assert bar_svg.startswith('<svg'), 'bar render failed'
+          from stonecharts.charts import scatter
+          scatter_spec = ChartSpec(type='scatter', title='Scatter Smoke Test', x_axis=Axis(title='X'), series=[Series(name='S', data=[[1.0,2.0],[3.0,4.0]])])
+          scatter_svg = render_svg(scatter_spec)
+          assert scatter_svg.startswith('<svg'), 'scatter render failed'
           try:
-              from stonecharts.charts import scatter
-              raise AssertionError('unapproved scatter module present in installed package')
+              from stonecharts.charts import boxplot
+              raise AssertionError('unapproved boxplot module present in installed package')
           except ImportError:
               pass
           print('installed-wheel smoke test OK,', len(svg), 'bytes')
