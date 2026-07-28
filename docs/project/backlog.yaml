@@ -1056,15 +1056,15 @@ items:
   - id: GATE-S14
     title: Authorize and publish release 0.0.0.4
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S14 Release 0.0.0.4
     target: 0.0.0.4
     outcome: 0.0.0.4 is published only after explicit product and technical authorization, exactly as 0.0.0.1/0.0.0.2/0.0.0.3 were.
-    traceability: [SC-REL-013]
+    traceability: [SC-REL-013, SC-REL-024]
     risks: []
-    evidence: []
+    evidence: [TEST-RELEASE-EVIDENCE]
     dependencies: [GATE-S13]
     compatibility: Creates the fourth governed release baseline; does not alter any prior tag or its evidence.
     areas: [release, docs, security]

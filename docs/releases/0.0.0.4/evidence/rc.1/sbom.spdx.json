@@ -3,9 +3,9 @@
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
   "name": "StoneCharts 0.0.0.4 rc.1 evidence-pack sbom",
-  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.4/rc.1/70a40aef96069b1df3e044f46e87c162f43a8c24",
+  "documentNamespace": "https://stonecharts.dev/spdx/releases/0.0.0.4/rc.1/3d5f84db51ea2a2a3e5b2818e06ff9bfe6595ba1",
   "creationInfo": {
-    "created": "2026-07-28T11:02:18+05:30",
+    "created": "2026-07-28T12:23:49+05:30",
     "creators": [
       "Tool: Claude Code",
       "Person: Dharmik Shingala"
@@ -30,7 +30,7 @@
       ],
       "annotations": [
         {
-          "annotationDate": "2026-07-28T11:02:18+05:30",
+          "annotationDate": "2026-07-28T12:23:49+05:30",
           "annotationType": "OTHER",
           "annotator": "Tool: Claude Code",
           "comment": "Python release package metadata is pinned to 0.0.0.4 (bumped from 0.0.0.3); runtime dependencies remain declared as empty in pyproject.toml. The active chart-type module set now additionally includes bubble, and Datum gained an optional z field (point-model, bubble-only)."
@@ -55,7 +55,7 @@
       ],
       "annotations": [
         {
-          "annotationDate": "2026-07-28T11:02:18+05:30",
+          "annotationDate": "2026-07-28T12:23:49+05:30",
           "annotationType": "OTHER",
           "annotator": "Tool: Claude Code",
           "comment": "Go module uses local source validation and no third-party module dependencies in go.mod; no Go module tag exists (ADR 0007), unchanged from prior releases."

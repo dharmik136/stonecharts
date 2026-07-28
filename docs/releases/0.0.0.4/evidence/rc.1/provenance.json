@@ -4,7 +4,7 @@
     {
       "name": "docs/releases/0.0.0.4/evidence/rc.1",
       "digest": {
-        "sha256": "d3a4e57c93784731f6c6375b3e663c4f8835f2cc6adea51f287fbb7767431f51"
+        "sha256": "056052e7d01b19663233da3be9f014de0c1109bc8c87461068ff1baeceb46a51"
       }
     }
   ],
@@ -18,13 +18,13 @@
         "branch": "main"
       },
       "internalParameters": {
-        "status": "M .github/workflows/quality.yml\n M libs/python/pyproject.toml\n M libs/python/stonecharts/__init__.py\n?? .claude/\n?? docs/product-antigravity/\n?? docs/releases/0.0.0.4/evidence/manifest.schema.json\n?? tools/build_release_evidence_0004.py"
+        "status": "M docs/project/backlog.yaml\n M tools/build_release_evidence_0004.py\n?? .claude/\n?? docs/product-antigravity/"
       },
       "resolvedDependencies": [
         {
           "uri": "git+https://github.com/dharmik136/stonecharts.git",
           "digest": {
-            "sha1": "70a40aef96069b1df3e044f46e87c162f43a8c24"
+            "sha1": "3d5f84db51ea2a2a3e5b2818e06ff9bfe6595ba1"
           }
         },
         {
@@ -52,8 +52,8 @@
         "id": "claude-code/bash"
       },
       "metadata": {
-        "invocationId": "70a40aef96069b1df3e044f46e87c162f43a8c24",
-        "completed": "2026-07-28T11:02:18+05:30",
+        "invocationId": "3d5f84db51ea2a2a3e5b2818e06ff9bfe6595ba1",
+        "completed": "2026-07-28T12:23:49+05:30",
         "environment": {
           "python": "Python 3.14.4",
           "go": "go version go1.26.4 windows/amd64",
