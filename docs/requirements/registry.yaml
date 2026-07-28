@@ -331,3 +331,26 @@ requirements:
     contracts: []
     verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE, REVIEW-SCATTER-ACCESSIBILITY-SECURITY, BENCH-SCATTER-BASELINE]
     implementation: [libs/python/stonecharts/charts/scatter.py, libs/go/scatter.go, charts/scatter/golden, charts/scatter/invalid-fixtures.json, runtime/scatter-browser-qualification.test.js]
+
+  - id: REQ-CHART-003
+    title: Admit bubble as a certified 0.0.0.4 chart type
+    statement: Bubble MUST be admitted through the full chart admission checklist (SC-ARCH-011) and reach Certified status per the renderer constitution before 0.0.0.4 documentation may describe it as supported.
+    rationale: DEC-016 authorizes bubble as the next expansion target; bubble is rank 4 in the roadmap's own build order and rides scatter's numeric x-scale and point model verbatim, adding exactly one net-new generalization (the size-scale) rather than a shared-frame change, so its admission is comparable in shape to bar's, not scatter's.
+    kind: functional
+    priority: must
+    status: approved
+    owner: maintainer
+    target: 0.0.0.4
+    source: SC-ARCH-011
+    acceptance:
+      - The point model is extended with an optional z field (Datum gains z, unused/nil for every existing chart type including scatter) and registered identically in the schema, Python validator, and Go validator for bubble's {x,y,z} object and [x,y,z] positional forms.
+      - The size-scale (global z-domain reduction across all series, r = RMIN + (RMAX-RMIN)*sqrt(clamp01((z-zmin)/(zmax-zmin))), degenerate zmax<=zmin pinned to the fixed (RMIN+RMAX)/2 before any divide) is implemented identically in both languages.
+      - Byte-identity gate - after the Datum.z field addition, every existing golden fixture (line, column, area, bar, scatter) is unchanged (git diff empty) and every one cross-renders Py==Go with zero diff. This is verified before any bubble-specific golden is added, not alongside it.
+      - Bubble output byte-matches its golden corpus in both languages, and the direct cross-render sweep includes bubble with zero diff (mirrors REQ-DET-001).
+      - Bubble's accessible data table is generalized to render (x,y,z) triples rather than a coerced single number or (x,y) pair, in lockstep in both languages, and bubble's XSS/injection coverage matches the standard already proven for line, column, area, bar, and scatter (mirrors REQ-A11Y-001, REQ-SEC-001).
+      - Bubble is added to the benchmark workload matrix across all four approved profiles (mirrors REQ-PERF-001).
+      - Chart-admission-checklist.md phases 1-9 (design through release-evidence-adjacent documentation) are closed before this requirement moves to verified. Phase 10 (the immutable release evidence pack) is GATE-S13's concern, not this requirement's, mirroring the 0.0.0.2/0.0.0.3 cycles.
+    decisions: []
+    contracts: []
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
+    implementation: [charts/bubble/design.md]

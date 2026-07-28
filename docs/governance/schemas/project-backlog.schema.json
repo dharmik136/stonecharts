@@ -94,10 +94,11 @@
             "S0 Foundation", "S1 Contract Closure", "S2 Qualification",
             "S3 Release Candidate", "S4 Release", "S5 Expansion",
             "S6 Qualification 0.0.0.2", "S7 Release Candidate 0.0.0.2", "S8 Release 0.0.0.2",
-            "S9 Qualification 0.0.0.3", "S10 Release Candidate 0.0.0.3", "S11 Release 0.0.0.3"
+            "S9 Qualification 0.0.0.3", "S10 Release Candidate 0.0.0.3", "S11 Release 0.0.0.3",
+            "S12 Qualification 0.0.0.4", "S13 Release Candidate 0.0.0.4", "S14 Release 0.0.0.4"
           ]
         },
-        "target": { "enum": ["0.0.0.1", "0.0.0.2", "0.0.0.3", "Post-0.0.0.1", "Unscheduled"] },
+        "target": { "enum": ["0.0.0.1", "0.0.0.2", "0.0.0.3", "0.0.0.4", "Post-0.0.0.1", "Unscheduled"] },
         "outcome": { "type": "string", "minLength": 15 },
         "traceability": { "$ref": "#/$defs/uniqueStrings" },
         "risks": { "$ref": "#/$defs/uniqueStrings" },
