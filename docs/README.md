@@ -26,6 +26,8 @@ Document status and classification are authoritative in each file's metadata.
 - [Controlled glossary](governance/glossary.md)
 - [Product thesis](product/thesis.md)
 - [Positioning and first-release scope](product/positioning-and-scope.md)
+- [Visual integrity strategy](product/visual-integrity-strategy.md)
+- [Capability matrix](product/capability-matrix.md)
 - [Requirements registry](requirements/registry.yaml)
 - [Requirements and traceability guide](requirements/README.md)
 - [Risk register](governance/risk-register.yaml)
@@ -39,6 +41,7 @@ Document status and classification are authoritative in each file's metadata.
 - [Workstreams](project/workstreams.md)
 - [Milestone map](project/milestones.md)
 - [Open decision backlog](project/decisions.md)
+- [DEC-017 visual integrity repositioning brief](project/decision-briefs/dec-017-visual-integrity.md)
 
 ## Architecture and contracts
 

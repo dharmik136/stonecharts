@@ -1,8 +1,8 @@
 # StoneCharts
 
-An original, proprietary charting library. One shared chart-spec model, a
-standalone renderer per language, and a shared interaction runtime — so the same
-chart "recipe" produces the same interactive chart in Python, Go, and beyond.
+StoneCharts is Visual Integrity Infrastructure for deterministic reporting charts:
+one governed chart specification, certified Python and Go renderers, and evidence
+that supported visuals stay consistent across language and release boundaries.
 
 StoneCharts is currently entering a governed Alpha qualification phase. Product scope,
 guarantees, requirements, architecture decisions, risks, evidence, and release gates
@@ -91,6 +91,75 @@ spec, _ := stonecharts.FromJSON(specJSON)   // matches spec/chart-spec.schema.js
 stonecharts.SaveHTML(spec, "chart.html", "")
 ```
 
+## StoneVerify Proof
+
+The first Visual Integrity proof is a local evidence-bundle command:
+
+```bash
+python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
+  --runtime python \
+  --runtime go \
+  --evidence .tmp-stoneverify-bubble
+```
+
+It writes `manifest.json`, `input-spec.json`, runtime SVG outputs,
+`comparison.json`, `report.html`, and `checksums.txt`. This is a local
+conformance proof, not hosted storage or a PDF/document-generation system.
+
+To demonstrate a CI failure without corrupting a renderer, apply an explicit
+demo-only drift to the last runtime output:
+
+```bash
+python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
+  --runtime python \
+  --runtime go \
+  --demo-drift text \
+  --evidence .tmp-stoneverify-drift
+```
+
+To compare a new run against a previously approved local evidence bundle:
+
+```bash
+python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
+  --runtime python \
+  --runtime go \
+  --baseline-evidence .tmp-stoneverify-bubble \
+  --evidence .tmp-stoneverify-baseline-check
+```
+
+To validate that an existing evidence bundle still matches its recorded checksums:
+
+```bash
+python tools/stonecharts_verify.py --check-evidence .tmp-stoneverify-bubble
+```
+
+To compare two stored evidence bundles directly:
+
+```bash
+python tools/stonecharts_verify.py --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-check
+```
+
+The comparison reports each runtime separately, and it separates a changed input
+spec from a changed rendering of the same spec. Only the second is renderer drift:
+
+```text
+StoneVerify compare FAIL: Evidence bundles differ: the same input spec produced different output.
+input spec: match
+  go: FAIL - same input spec rendered differently: attribute, numeric formatting, ordering, or text-content drift
+  python: PASS - hash match
+```
+
+Bundles that cover different runtimes are reported as a mismatch rather than
+compared on the runtimes they happen to share.
+
+To write that comparison to a reviewable HTML report:
+
+```bash
+python tools/stonecharts_verify.py \
+  --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-drift \
+  --compare-report .tmp-stoneverify-compare/report.html
+```
+
 ## Status
 
 | Chart | Spec | Python | Go | Interactivity |
@@ -100,16 +169,16 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 | Area (`area`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 | Bar (`bar`) | ✅ certified (0.0.0.2) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 | Scatter (`scatter`) | ✅ certified (0.0.0.3) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Bubble (`bubble`) | implementation complete, targeting 0.0.0.4 (DEC-016) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Bubble (`bubble`) | ✅ certified (0.0.0.4) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
 tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
-The released scope is line, column, and area (0.0.0.1), bar (0.0.0.2), and scatter
-(0.0.0.3) - see `docs/architecture/chart-admission-checklist.md` for what "certified"
-requires. Bubble is implemented and byte-parity verified but has not shipped in a
-tagged release yet. Other chart designs remain roadmap material until the schema,
-capability, conformance, packaging, and release gates for each type are complete.
+The released scope is line, column, and area (0.0.0.1), bar (0.0.0.2), scatter
+(0.0.0.3), and bubble (0.0.0.4). See
+[`docs/product/capability-matrix.md`](docs/product/capability-matrix.md) for the
+authoritative distinction between certified technical capability, commercial pilot
+scope, and design-only roadmap material.
 
 ## License
 
