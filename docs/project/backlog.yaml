@@ -1,6 +1,6 @@
 id: SC-OPS-BACKLOG
 version: 1
-updated: "2026-07-19"
+updated: "2026-07-28"
 project:
   owner: dharmik136
   number: 2
@@ -1074,3 +1074,199 @@ items:
       - Evidence manifest and hashes are archived immutably for 0.0.0.4.
       - Support, vulnerability, and feedback channels remain operational (unchanged from prior releases' disclosed posture).
     verification: [Published-artifact hash recomputation and release-record audit]
+
+  - id: DEC-017
+    title: Post-0.0.0.4 product direction
+    item_type: Decision
+    status: Done
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneCharts pauses broad chart expansion and redirects the next phase toward Visual Integrity Infrastructure, insurance-market validation, conformance evidence, and competitive benchmarking.
+    traceability: [SC-PROD-003, SC-OPS-018]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [GATE-S14]
+    compatibility: Decision only; does not change released 0.0.0.1 through 0.0.0.4 behavior, tags, guarantees, or evidence.
+    areas: [docs]
+    acceptance:
+      - Visual Integrity Infrastructure is accepted as the post-0.0.0.4 category hypothesis.
+      - New chart-family admissions are frozen until market validation supplies a paying workflow requirement or explicit approval records the chart as necessary validation infrastructure.
+      - The next bounded work package is market validation in insurance reporting and a StoneVerify-style conformance proof, not a 0.0.0.5 chart admission.
+    verification: [Approved decision record in docs/project/decisions.md]
+
+  - id: DEC-018
+    title: Near-term licensing boundary for Visual Integrity validation
+    item_type: Decision
+    status: Done
+    priority: P0
+    workstream: WS-01 Governance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: Keep the repository, current specification, fixtures, renderers, verification tooling, and pilot materials proprietary while deferring any public specification, open-core, public-fixture, or community-runtime model to a later explicit licensing decision.
+    traceability: [SC-CON-020, SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-017]
+    compatibility: Decision only; preserves the existing proprietary LICENSE and does not grant public commercial, non-commercial, open-source, or open-core rights.
+    areas: [docs]
+    acceptance:
+      - The current repository license remains the only active access grant until a later approved licensing decision changes it.
+      - Public specification, public fixtures, open-core packaging, and community runtimes are described only as future hypotheses, not current availability.
+      - Pilot and market documents must not promise open source, open core, public access, or support rights that conflict with the active LICENSE.
+    verification: [Approved decision record in docs/project/decisions.md]
+
+  - id: WORK-VERIFY-001
+    title: Build first StoneVerify evidence-bundle proof
+    item_type: Work Package
+    status: Done
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A local CLI can render one chart specification through Python and Go, compare the artifacts, and generate a customer-storable evidence bundle with manifest, input spec, runtime SVG outputs, comparison JSON, checksums, and an HTML report.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-017, DEC-018]
+    compatibility: Adds a developer tool only; does not change renderer output, schemas, release tags, or certified chart behavior.
+    areas: [docs, python, go]
+    acceptance:
+      - The command supports repeated --runtime arguments for python and go and returns a CI-compatible exit code.
+      - The evidence directory contains manifest.json, input-spec.json, python-output.svg, go-output.svg, comparison.json, report.html, and checksums.txt for a two-runtime run.
+      - A certified bubble example passes with byte-identical Python and Go SVG hashes.
+      - Visual raster diff, hosted storage, approvals, retention, and PDF/document-generation behavior are explicitly outside this first proof.
+    verification: [python tools/stonecharts_verify.py charts/bubble/examples/basic.json --runtime python --runtime go --evidence .tmp-stoneverify-bubble]
+
+  - id: WORK-VERIFY-002
+    title: Add deliberate-drift StoneVerify demo
+    item_type: Work Package
+    status: Done
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify can intentionally mutate the final runtime output in a clearly labeled demo mode, proving that the evidence bundle, report, and CI-compatible exit code fail when chart output drifts.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-001]
+    compatibility: Adds a demo-only verifier option; does not mutate source renderers, schemas, certified output, release tags, or golden fixtures.
+    areas: [docs, python]
+    acceptance:
+      - The command exposes --demo-drift with explicit choices and records the selected mode in manifest.json.
+      - Drift is applied only to the final runtime output and is labeled per-runtime as demoDriftApplied.
+      - A text drift produces a failing comparison and non-zero exit code without changing the renderer implementation.
+      - Unit tests cover equal output, structural drift, attribute drift, report escaping, and canonical input hashing.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py charts/bubble/examples/basic.json --runtime python --runtime go --demo-drift text --evidence .tmp-stoneverify-drift]
+
+  - id: WORK-VERIFY-003
+    title: Add local baseline evidence comparison
+    item_type: Work Package
+    status: Done
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify can compare a current render against a prior local evidence bundle so customers can detect whether a spec or runtime output changed from an approved baseline.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-002]
+    compatibility: Adds local evidence comparison only; does not introduce hosted storage, approvals, identity, retention controls, or release-manifest mutation.
+    areas: [docs, python]
+    acceptance:
+      - The command accepts --baseline-evidence pointing at a prior StoneVerify evidence directory with manifest.json.
+      - manifest.json records baseline comparison status, input hash equality, and per-runtime hash equality.
+      - A current run matching the prior evidence bundle exits successfully.
+      - A drifted run against the prior evidence bundle exits non-zero and records the failed baseline comparison.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py charts/bubble/examples/basic.json --runtime python --runtime go --baseline-evidence .tmp-stoneverify-bubble --evidence .tmp-stoneverify-baseline-check]
+
+  - id: WORK-VERIFY-004
+    title: Add StoneVerify evidence-bundle self-check
+    item_type: Work Package
+    status: Done
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify can validate an existing local evidence bundle against its recorded checksums without re-rendering, giving customers a lightweight tamper-detection check for stored artifacts.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-003]
+    compatibility: Adds bundle validation only; does not introduce signing, hosted storage, identity, retention, or release-manifest changes.
+    areas: [docs, python]
+    acceptance:
+      - The command accepts --check-evidence and exits without requiring a spec argument.
+      - The check validates required files, runtime output files listed by manifest.json, and checksums.txt entries.
+      - A valid StoneVerify evidence bundle exits successfully.
+      - A tampered artifact produces a non-zero exit and a named checksum mismatch.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py --check-evidence .tmp-stoneverify-bubble]
+
+  - id: WORK-VERIFY-005
+    title: Validate StoneVerify evidence manifest shape
+    item_type: Work Package
+    status: Done
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify evidence self-check rejects malformed manifest.json files instead of trusting checksums alone, making stored evidence bundles structurally auditable.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-004]
+    compatibility: Adds manifest validation to the local evidence checker only; it does not change renderer output, release evidence, or the proprietary licensing boundary.
+    areas: [docs, python]
+    acceptance:
+      - The evidence checker validates manifest tool identity, tool version, status, timestamp, input hash metadata, runtime output metadata, drift labels, and baseline status.
+      - Malformed manifest.json input produces a non-zero evidence-check result with named manifest errors.
+      - Valid bundles produced by the current StoneVerify CLI still pass self-check.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py --check-evidence .tmp-stoneverify-bubble]
+
+  - id: WORK-VERIFY-006
+    title: Compare StoneVerify evidence bundles directly
+    item_type: Work Package
+    status: Done
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify can compare two already-generated local evidence bundles without re-rendering, letting a user audit whether two approved bundles match exactly.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-005]
+    compatibility: Adds bundle-to-bundle comparison only; does not change renderers, schemas, signing, hosted storage, or the proprietary licensing boundary.
+    areas: [docs, python]
+    acceptance:
+      - The command accepts --compare-evidence with two evidence directories.
+      - Matching bundles exit successfully and report pass.
+      - Non-matching bundles exit non-zero and report fail.
+      - The compare path operates without a spec file or rendering step.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-check]
+
+  - id: WORK-VERIFY-007
+    title: Explain evidence-bundle differences runtime by runtime
+    item_type: Work Package
+    status: Done
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify bundle comparison reports each runtime separately with a named likely cause, and separates a changed input spec from a changed rendering of the same spec, so a reviewer can tell renderer drift from an expected chart change.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-006]
+    compatibility: Extends local comparison reporting only; does not change renderers, schemas, golden fixtures, released evidence, signing, hosted storage, or the proprietary licensing boundary.
+    areas: [docs, python]
+    acceptance:
+      - Cross-runtime and bundle-to-bundle comparison share one difference vocabulary via a common classifier.
+      - Each compared runtime records byte sizes, element inventory, first byte difference, line diff, and a named likely cause.
+      - A runtime present in only one bundle is reported as a coverage mismatch and fails instead of being skipped.
+      - Input-spec hashes are compared so a spec change is distinguished from same-spec renderer drift.
+      - The optional --compare-report flag writes the comparison to an HTML report and requires --compare-evidence.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-drift --compare-report .tmp-stoneverify-compare/report.html]
