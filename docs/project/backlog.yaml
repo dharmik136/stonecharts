@@ -1035,15 +1035,15 @@ items:
   - id: GATE-S13
     title: Pass 0.0.0.4 release-candidate gate
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S13 Release Candidate 0.0.0.4
     target: 0.0.0.4
     outcome: One immutable commit can reproducibly produce installable artifacts, documentation, and a complete evidence pack for 0.0.0.4.
-    traceability: [SC-REL-013]
+    traceability: [SC-REL-013, SC-REL-024, SC-REL-025]
     risks: []
-    evidence: []
+    evidence: [TEST-RELEASE-EVIDENCE]
     dependencies: [GATE-S12]
     compatibility: Freezes the 0.0.0.4 candidate source, versions, artifacts, and known limits; does not touch the already-tagged 0.0.0.1/0.0.0.2/0.0.0.3 evidence packs.
     areas: [python, go, docs, release, security]
