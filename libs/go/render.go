@@ -25,8 +25,8 @@ const cssBlock = `.sc-chart-wrap{position:relative;display:inline-block;line-hei
 // dataTable mirrors render.py _data_table: a visually-hidden HTML data table, the
 // accessible alternative to the SVG (which is role="img").
 func dataTable(spec *ChartSpec) string {
-	if spec.Type == "scatter" {
-		return scatterDataTable(spec)
+	if spec.Type == "scatter" || spec.Type == "bubble" {
+		return pointModelDataTable(spec, spec.Type == "bubble")
 	}
 	n := 0
 	for _, s := range spec.Series {
@@ -67,17 +67,32 @@ func dataTable(spec *ChartSpec) string {
 // scatterDataTable mirrors render.py's _data_table scatter branch (§3.3
 // Rank 3 / §5.4b-DT): a long-format table (one row per point) is the only
 // lossless shape for (x, y) point-model data.
-func scatterDataTable(spec *ChartSpec) string {
+// pointModelDataTable mirrors render.py's _data_table point-model branch
+// (scatter §3.3 Rank 3 / bubble §3.3 Rank 4, §5.4b-DT): a long-format table
+// (one row per point) is the only lossless shape for (x,y) or (x,y,z) data.
+func pointModelDataTable(spec *ChartSpec, hasZ bool) string {
 	var b strings.Builder
 	b.WriteString(`<table class="sc-visually-hidden">`)
 	if spec.Title != "" {
 		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
 	}
-	b.WriteString(`<thead><tr><th scope="col">Series</th><th scope="col">X</th><th scope="col">Y</th></tr></thead><tbody>`)
+	b.WriteString(`<thead><tr><th scope="col">Series</th><th scope="col">X</th><th scope="col">Y</th>`)
+	if hasZ {
+		b.WriteString(`<th scope="col">Z</th>`)
+	}
+	b.WriteString(`</tr></thead><tbody>`)
 	for _, s := range spec.Series {
 		for _, d := range s.DataPoints {
 			b.WriteString(`<tr><th scope="row">` + esc(s.Name) + `</th><td>` +
-				esc(fmtNum(d.X)) + `</td><td>` + esc(fmtNum(d.Y)) + `</td></tr>`)
+				esc(fmtNum(d.X)) + `</td><td>` + esc(fmtNum(d.Y)) + `</td>`)
+			if hasZ {
+				z := 0.0
+				if d.Z != nil {
+					z = *d.Z
+				}
+				b.WriteString(`<td>` + esc(fmtNum(z)) + `</td>`)
+			}
+			b.WriteString(`</tr>`)
 		}
 	}
 	b.WriteString("</tbody></table>")
@@ -113,6 +128,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		return renderLineSVG(spec), nil
 	case "scatter":
 		return renderScatterSVG(spec), nil
+	case "bubble":
+		return renderBubbleSVG(spec), nil
 	default:
 		return "", capabilityError(typ)
 	}

@@ -21,6 +21,7 @@ func TestGolden(t *testing.T) {
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
 		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
 		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
+		"bubble":     {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -158,6 +159,40 @@ func TestScatterEdgeCases(t *testing.T) {
 		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in scatter render for %s", specJSON)
+		}
+	}
+}
+
+func TestBubbleEdgeCases(t *testing.T) {
+	cases := []string{
+		// Degenerate z-domain: every point shares the same z (size_scale must
+		// pin to the fixed (RMIN+RMAX)/2 before the divide, not divide by zero).
+		`{"type":"bubble","series":[{"name":"s","data":[[1,1,5],[2,2,5],[3,3,5]]}]}`,
+		// Single point (degenerate z-domain by construction too).
+		`{"type":"bubble","series":[{"name":"s","data":[[7,9,42]]}]}`,
+		// Empty series.
+		`{"type":"bubble","series":[{"name":"s","data":[]}]}`,
+		// Negative x/y (free domain) with z spanning a real range.
+		`{"type":"bubble","series":[{"name":"s","data":[[-10,-20,1],[-5,-8,50],[-1,-30,100]]}]}`,
+		// z = 0 for some points (valid lower bound, not degenerate by itself).
+		`{"type":"bubble","series":[{"name":"s","data":[[1,2,0],[3,4,100]]}]}`,
+		// Manual xAxis/yAxis min/max clamp.
+		`{"type":"bubble","xAxis":{"min":0,"max":100},"yAxis":{"min":-50,"max":50},"series":[{"name":"s","data":[[10,5,20],[90,-40,80]]}]}`,
+		// Mixed element shapes within one series (bare number, positional, object).
+		`{"type":"bubble","series":[{"name":"s","data":[3,[10,20,30],{"x":40,"y":50,"z":60}]}]}`,
+		// Global z-domain spans multiple series.
+		`{"type":"bubble","series":[{"name":"a","data":[[1,1,1]]},{"name":"b","data":[[2,2,1000]]}]}`,
+		// fillOpacity explicitly 0 must still render a fully opaque bubble (NN#2).
+		`{"type":"bubble","series":[{"name":"s","data":[[1,2,3]],"fillOpacity":0}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+		low := strings.ToLower(mustSVG(t, spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in bubble render for %s", specJSON)
 		}
 	}
 }
@@ -351,6 +386,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 		"area":       {"basic", "stacked", "percent", "themed-dark"},
 		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
 		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
+		"bubble":     {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
 	}
 	if len(cases) == 0 {
 		t.Fatal("no active release examples")
@@ -417,7 +453,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "bar", "column", "line", "scatter"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "bar", "bubble", "column", "line", "scatter"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}

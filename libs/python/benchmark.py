@@ -2,7 +2,7 @@
 
 Implements the workload matrix from docs/quality/benchmark-spec.md (SC-QUAL-002):
 Small/Business/Dense/Stress profiles, each with line, grouped-column,
-stacked-column, bar, and scatter variants. Records cold and warm timing (p50/p95/p99/
+stacked-column, bar, scatter, and bubble variants. Records cold and warm timing (p50/p95/p99/
 min/max/stddev/count), peak memory, output bytes, an approximate DOM element
 count, and the exact input spec bytes/SHA-256 alongside every result.
 
@@ -44,7 +44,7 @@ WORKLOADS = [
     ("dense", 20, 1000),
     ("stress", 20, 5000),
 ]
-VARIANTS = ["line", "grouped-column", "stacked-column", "bar", "scatter"]
+VARIANTS = ["line", "grouped-column", "stacked-column", "bar", "scatter", "bubble"]
 MODES = ["svg", "html"]
 
 _DOM_TAG_RE = re.compile(r"<(rect|circle|ellipse|line|polyline|polygon|path|text|g)\b")
@@ -72,6 +72,19 @@ def generate_spec(n_series: int, n_categories: int, variant: str) -> tuple[Chart
             }
             for s in range(n_series)
         ]
+    elif variant == "bubble":
+        # Point-model data (positional [x,y,z] triples), exercising the
+        # size-scale path (§3.3 Rank 4).
+        series = [
+            {
+                "name": f"Series {s}",
+                "data": [
+                    [round(rng.uniform(0, 1000), 2), round(rng.uniform(0, 100), 2), round(rng.uniform(1, 5000), 2)]
+                    for _ in range(n_categories)
+                ],
+            }
+            for s in range(n_series)
+        ]
     else:
         series = [
             {
@@ -87,6 +100,8 @@ def generate_spec(n_series: int, n_categories: int, variant: str) -> tuple[Chart
         chart_type = "bar"
     elif variant == "scatter":
         chart_type = "scatter"
+    elif variant == "bubble":
+        chart_type = "bubble"
     else:
         chart_type = "line"
     spec_dict = {
@@ -96,7 +111,7 @@ def generate_spec(n_series: int, n_categories: int, variant: str) -> tuple[Chart
         "yAxis": {"title": "Y Axis"},
         "series": series,
     }
-    if variant != "scatter":
+    if variant not in ("scatter", "bubble"):
         spec_dict["xAxis"]["categories"] = categories
     if variant == "stacked-column":
         spec_dict["stacking"] = "normal"

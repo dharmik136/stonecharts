@@ -338,7 +338,7 @@ requirements:
     rationale: DEC-016 authorizes bubble as the next expansion target; bubble is rank 4 in the roadmap's own build order and rides scatter's numeric x-scale and point model verbatim, adding exactly one net-new generalization (the size-scale) rather than a shared-frame change, so its admission is comparable in shape to bar's, not scatter's.
     kind: functional
     priority: must
-    status: approved
+    status: verified
     owner: maintainer
     target: 0.0.0.4
     source: SC-ARCH-011
@@ -352,5 +352,5 @@ requirements:
       - Chart-admission-checklist.md phases 1-9 (design through release-evidence-adjacent documentation) are closed before this requirement moves to verified. Phase 10 (the immutable release evidence pack) is GATE-S13's concern, not this requirement's, mirroring the 0.0.0.2/0.0.0.3 cycles.
     decisions: []
     contracts: []
-    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
-    implementation: [charts/bubble/design.md]
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE, REVIEW-BUBBLE-ACCESSIBILITY-SECURITY, BENCH-BUBBLE-BASELINE]
+    implementation: [libs/python/stonecharts/charts/bubble.py, libs/go/bubble.go, charts/bubble/golden, charts/bubble/invalid-fixtures.json, runtime/bubble-browser-qualification.test.js]

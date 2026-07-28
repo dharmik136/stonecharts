@@ -2,7 +2,7 @@
 //
 // Implements the workload matrix from docs/quality/benchmark-spec.md
 // (SC-QUAL-002): Small/Business/Dense/Stress profiles, each with line,
-// grouped-column, stacked-column, bar, and scatter variants. Records cold and warm
+// grouped-column, stacked-column, bar, scatter, and bubble variants. Records cold and warm
 // timing (p50/p95/p99/min/max/stddev/count), peak allocation, output bytes,
 // an approximate DOM element count, and the exact input spec bytes/SHA-256
 // alongside every result.
@@ -54,7 +54,7 @@ var workloads = []workload{
 	{"stress", 20, 5000},
 }
 
-var variants = []string{"line", "grouped-column", "stacked-column", "bar", "scatter"}
+var variants = []string{"line", "grouped-column", "stacked-column", "bar", "scatter", "bubble"}
 var modes = []string{"svg", "html"}
 
 var domTagRE = regexp.MustCompile(`<(rect|circle|ellipse|line|polyline|polygon|path|text|g)\b`)
@@ -82,6 +82,20 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 			}
 			series[s] = map[string]interface{}{"name": fmt.Sprintf("Series %d", s), "data": data}
 		}
+	} else if variant == "bubble" {
+		// Point-model data (positional [x,y,z] triples), exercising the
+		// size-scale path (§3.3 Rank 4).
+		for s := 0; s < nSeries; s++ {
+			data := make([][3]float64, nCategories)
+			for i := range data {
+				data[i] = [3]float64{
+					math.Round(rng.Float64()*1000*100) / 100,
+					math.Round(rng.Float64()*100*100) / 100,
+					math.Round((rng.Float64()*4999+1)*100) / 100,
+				}
+			}
+			series[s] = map[string]interface{}{"name": fmt.Sprintf("Series %d", s), "data": data}
+		}
 	} else {
 		for s := 0; s < nSeries; s++ {
 			data := make([]float64, nCategories)
@@ -99,10 +113,12 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 		chartType = "bar"
 	} else if variant == "scatter" {
 		chartType = "scatter"
+	} else if variant == "bubble" {
+		chartType = "bubble"
 	}
 
 	xAxis := map[string]interface{}{"title": "X Axis"}
-	if variant != "scatter" {
+	if variant != "scatter" && variant != "bubble" {
 		xAxis["categories"] = categories
 	}
 	specMap := map[string]interface{}{

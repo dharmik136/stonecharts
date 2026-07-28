@@ -1,0 +1,85 @@
+[
+  {
+    "spec": {
+      "type": "bubble",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            { "x": 1, "y": 2 }
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0].z: required"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bubble",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            { "x": 1, "y": 2, "z": 3, "w": 4 }
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0].w: unknown field"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bubble",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            [1, 2]
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0]: expected a 3-element [x,y,z] array, received 2 elements"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bubble",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            ["a", 2, 3]
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0][0]: expected number, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "bubble",
+      "layout": {
+        "margin": {
+          "left": -1
+        }
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [1]
+        }
+      ]
+    },
+    "errors": [
+      "$.layout.margin.left: expected non-negative number, received -1"
+    ]
+  }
+]

@@ -11,11 +11,12 @@
 - **Chart id:** `bubble`
 - **Spec `type`:** `"bubble"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 4** · **Src:** HC
-- **Status:** design-complete + examples validated · renderers deferred (only
-  `line` has a live renderer today; bubble rides the shared cartesian frame once
-  scatter's numeric-x-axis + point-model land — see
-  [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 4, §4, §5)
-- **Renderers (planned):** `libs/python/stonecharts/charts/bubble.py` · `libs/go/bubble.go`
+- **Status:** implemented and byte-parity verified in both languages (Python and
+  Go), riding scatter's already-landed numeric linear x-scale and point model
+  verbatim, extended with `z` and the size-scale — targeting release `0.0.0.4`
+  per DEC-016. See
+  [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 4, §4, §5.
+- **Renderers:** `libs/python/stonecharts/charts/bubble.py` · `libs/go/bubble.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
   [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3–§5
@@ -60,22 +61,14 @@ Do **not** use it for: an x/y correlation with **no** third variable (use
   **every** series (see [Size scale](#size-scale--the-pinned-geometry)) so a given
   `z` maps to the **same** radius everywhere and bubbles are comparable across
   series.
-- **Transitional representation (what the examples carry today).** The canonical
-  `{x,y,z}` datum (and its positional `[x,y,z]` sugar) is the **point model** that
-  scatter/bubble introduce (§3.2, §3.3 Rank 3–4); it is **not yet accepted by the
-  current validator**, which still requires `series[].data` to be `number[]`
-  (the "bare number stays valid" fast path — a bare number is `y`, `x = index`).
-  So until the point model lands, an example bubble carries:
-  - `series[].data` — the **`y`** values, `number[]` (validated today);
-  - `series[].x` — the **`x`** values, `number[]` (forward-compatible, ignored by
-    the validator);
-  - `series[].z` — the **`z`** magnitudes, `number[]` (forward-compatible).
-
-  These three parallel arrays are the transitional bridge to the future datum
-  `{x: x[i], y: data[i], z: z[i]}`; when the point-model normalization lands, they
-  fold into `data: [{x,y,z}, …]` (or `[[x,y,z], …]`) with **no change to the
-  rendered bytes**, and the bare-number path keeps line/column goldens frozen
-  (§3.3 Rank 3 byte-identity gate).
+- **Point-model element type.** The canonical `{x,y,z}` datum (and its positional
+  `[x,y,z]` sugar) is registered identically in the schema, Python validator, and
+  Go validator — a `series[].data` element is one of: a bare number (fast path,
+  `x = index`, `z` absent/0, degenerating to a plain scatter point), a
+  positional `[x,y,z]` triple, or an object `{x,y,z}` (all three keys required).
+  The parallel `series[].x`/`series[].z` array form described in earlier drafts
+  of this document was never shipped — it is superseded by the real point
+  model landed with this admission.
 
 ## Spec fields
 
@@ -95,11 +88,9 @@ Do **not** use it for: an x/y correlation with **no** third variable (use
 | `yAxis.title` | string | — | axis label |
 | `yAxis.min` / `yAxis.max` | number | auto (nice ticks, **no** forced 0) | clamp the numeric y range; the free numeric y-axis is likewise **not** zero-anchored |
 | `yAxis.gridLine` | object | `{enabled:true, color:#e8e8ee, dashStyle:solid}` | horizontal gridline styling; `dashStyle` ∈ solid/dashed/dotted |
-| **`sizeLegend`** | bool \| object | `false` | **NEW field.** `true` renders a **size legend** — a small stack of sample bubbles at bucketed z values (`zmin`, `zmid`, `zmax`) with numeric labels, so a reader can decode area→magnitude. An object form (`{buckets:int, title:string}`) is accepted forward-compatibly. Ignored by today's validator (unknown key) |
+| **`sizeLegend`** | bool \| object | `false` | Accepted (forward-compatible, unknown key) but **not yet rendered** — see "Not yet supported" below. Intended to render a **size legend**: a small stack of sample bubbles at bucketed z values (`zmin`, `zmid`, `zmax`) with numeric labels, so a reader can decode area→magnitude. An object form (`{buckets:int, title:string}`) is accepted the same way |
 | `series[].name` | string | `Series i` | legend + tooltip name |
-| `series[].data` | number[] | — | the **`y`** values, length `N` (see [Data shape](#data-shape)) |
-| **`series[].x`** | number[] | index `0..N-1` | **the `x` values**, length `N`, aligned to `data` by index. Forward-compatible parallel array (folds into the `{x,y,z}` datum). Absent → `x = index` |
-| **`series[].z`** | number[] | — | **the `z` magnitudes**, length `N`, aligned to `data` by index. Non-negative; drives the radius via the size-scale. Forward-compatible parallel array |
+| `series[].data` | point[] | — | the `(x, y, z)` points — object `{x,y,z}` / positional `[x,y,z]` / bare-number fast path (`x = index`, degenerates to a plain scatter point). See [Data shape](#data-shape) |
 | `series[].color` | string \| gradient | palette by index | the **bubble fill**: hex `#2f7ed8`, or a `{type:linearGradient, x1,y1,x2,y2, stops:[{offset,color,opacity}]}` object (fills every circle; legend swatch + `data-color` use stop 0) |
 | `series[].fillOpacity` | number | `0.65` (bubble default) | **overlap opacity** of the circle fill. Line's default is `0` (no area fill); bubble **reinterprets** this field as the circle fill-opacity and defaults it to a pinned `0.65` so overlapping bubbles read through one another. Set `1` for opaque bubbles |
 | `series[].pattern` | object | — | hatch fill for the circle: `{type:hatch, color, background, size, angle, strokeWidth}` (resolves to `url(#pat)`) |
@@ -364,17 +355,14 @@ See [`examples/basic.json`](examples/basic.json):
   "series": [
     {
       "name": "Checkout API",
-      "x":    [2, 8, 15, 30, 55, 90],
-      "data": [45, 62, 78, 120, 180, 260],
-      "z":    [1200, 3400, 800, 5600, 2100, 900]
+      "data": [[2, 45, 1200], [8, 62, 3400], [15, 78, 800], [30, 120, 5600], [55, 180, 2100], [90, 260, 900]]
     }
   ]
 }
 ```
 
-`data` is the `y` array; `x` and `z` are the forward-compatible parallel arrays
-(see [Data shape](#data-shape)). The spec passes `validate() == []` today and folds
-into the `{x,y,z}` datum with no byte change when the point model lands.
+Each `data` element is a positional `[x, y, z]` triple (see [Data shape](#data-shape));
+the equivalent object form `{"x":2,"y":45,"z":1200}` is also accepted.
 
 ## Examples
 
@@ -412,8 +400,8 @@ save_html(ChartSpec(
     x_axis=Axis(title="Payload size (KB)"),
     y_axis=Axis(title="p95 latency (ms)"),
     series=[
-        Series("Checkout API", [45, 62, 78, 120, 180, 260],
-               x=[2, 8, 15, 30, 55, 90], z=[1200, 3400, 800, 5600, 2100, 900]),
+        Series("Checkout API", [[2, 45, 1200], [8, 62, 3400], [15, 78, 800],
+                                 [30, 120, 5600], [55, 180, 2100], [90, 260, 900]]),
     ],
 ), "out.html")
 ```
@@ -450,12 +438,13 @@ A self-contained interactive HTML file: inline SVG + CSS + the shared runtime.
 
 ## Not yet supported (roadmap)
 
-- Live renderers (`bubble.py` / `bubble.go`) — deferred; design + examples +
-  validation are complete. Only `line` renders today. Bubble lands **after**
-  scatter (rank 3) supplies the numeric-x-axis + point model it reuses.
-- The `{x,y,z}` datum in `data` (objects / positional `[x,y,z]`) — accepted once the
-  point-model normalization + validator update land (§3.3 Rank 3); until then the
-  parallel-array transitional form is used.
+- **Size legend rendering** (`sizeLegend`) — the field is accepted
+  (forward-compatible) but no visual legend is drawn yet; a bubble spec with
+  `sizeLegend: true` renders identically to one without it. REQ-CHART-003's
+  acceptance contract does not require it.
+- **Gap handling for a missing/null `y` or `z`** — deliberately deferred, same
+  as scatter's admission; the schema requires all three of `x`/`y`/`z` on the
+  object form.
 - **3D bubble**, explicit `zMin`/`zMax` domain override, per-series size-scale, and
   a categorical x variant — variants layered on this base.
 </content>

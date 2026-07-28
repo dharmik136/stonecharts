@@ -149,3 +149,17 @@ evidence:
     command: py -3 libs/python/benchmark.py && cd libs/go && go run ./cmd/benchmark
     location: docs/releases/0.0.0.3/evidence/scatter-performance-baseline-review.md
     requirements: [REQ-CHART-002, REQ-PERF-001]
+  - id: REVIEW-BUBBLE-ACCESSIBILITY-SECURITY
+    kind: manual-review
+    status: implemented
+    description: Records a fresh, bubble-specific accessibility (live ARIA tree, browser qualification, size-scale honored live, generalized data table) and security (XSS/injection corpus, {x,y,z} validation grammar) review for GATE-S12.
+    command: null
+    location: docs/releases/0.0.0.4/evidence/bubble-accessibility-security-review.md
+    requirements: [REQ-CHART-003, REQ-A11Y-001, REQ-SEC-001]
+  - id: BENCH-BUBBLE-BASELINE
+    kind: benchmark
+    status: implemented
+    description: Records a fresh review of bubble's benchmark results (point-model data with the size-scale) against the existing line/column/area/bar/scatter baseline for GATE-S12.
+    command: py -3 libs/python/benchmark.py && cd libs/go && go run ./cmd/benchmark
+    location: docs/releases/0.0.0.4/evidence/bubble-performance-baseline-review.md
+    requirements: [REQ-CHART-003, REQ-PERF-001]

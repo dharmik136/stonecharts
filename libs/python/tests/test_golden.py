@@ -25,12 +25,14 @@ COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversari
 AREA_CASES = ["basic", "stacked", "percent", "themed-dark"]
 BAR_CASES = ["basic", "grouped", "stacked", "themed-dark", "adversarial"]
 SCATTER_CASES = ["basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"]
+BUBBLE_CASES = ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
     "area": AREA_CASES,
     "bar": BAR_CASES,
     "scatter": SCATTER_CASES,
+    "bubble": BUBBLE_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -97,6 +99,11 @@ def test_bar_goldens():
 def test_scatter_goldens():
     for name in SCATTER_CASES:
         _check("scatter", name)
+
+
+def test_bubble_goldens():
+    for name in BUBBLE_CASES:
+        _check("bubble", name)
 
 
 def test_column_edge_cases():
@@ -175,6 +182,38 @@ def test_scatter_edge_cases():
          "series": [{"name": "s", "data": [[1, 2], [3, 4], [5, 6]]}]},
         # fillOpacity explicitly 0 must still render a fully opaque point (NN#2).
         {"type": "scatter", "series": [{"name": "s", "data": [[1, 2]], "fillOpacity": 0}]},
+    ]:
+        low = render_svg(ChartSpec.from_dict(spec)).lower()
+        assert "nan" not in low and "inf" not in low, spec
+
+
+def test_bubble_edge_cases():
+    for spec in [
+        # Degenerate z-domain: every point shares the same z (size_scale must
+        # pin to the fixed (RMIN+RMAX)/2 before the divide, not divide by zero).
+        {"type": "bubble", "series": [{"name": "s", "data": [[1, 1, 5], [2, 2, 5], [3, 3, 5]]}]},
+        # Single point (degenerate z-domain by construction too).
+        {"type": "bubble", "series": [{"name": "s", "data": [[7, 9, 42]]}]},
+        # Empty series.
+        {"type": "bubble", "series": [{"name": "s", "data": []}]},
+        # Negative x/y (free domain) with z spanning a real range.
+        {"type": "bubble", "series": [{"name": "s", "data": [[-10, -20, 1], [-5, -8, 50], [-1, -30, 100]]}]},
+        # z = 0 for some points (valid lower bound, not degenerate by itself).
+        {"type": "bubble", "series": [{"name": "s", "data": [[1, 2, 0], [3, 4, 100]]}]},
+        # Manual xAxis/yAxis min/max clamp.
+        {"type": "bubble", "xAxis": {"min": 0, "max": 100}, "yAxis": {"min": -50, "max": 50},
+         "series": [{"name": "s", "data": [[10, 5, 20], [90, -40, 80]]}]},
+        # Mixed element shapes within one series (bare number, positional, object).
+        {"type": "bubble", "series": [{"name": "s", "data": [3, [10, 20, 30], {"x": 40, "y": 50, "z": 60}]}]},
+        # Global z-domain spans multiple series — a series with only the min
+        # or only the max z must still size correctly against the shared domain.
+        {"type": "bubble", "series": [
+            {"name": "a", "data": [[1, 1, 1]]},
+            {"name": "b", "data": [[2, 2, 1000]]},
+        ]},
+        # fillOpacity explicitly 0 must still render a fully opaque bubble (NN#2);
+        # bubble's pinned default (0.65) differs from line's (0).
+        {"type": "bubble", "series": [{"name": "s", "data": [[1, 2, 3]], "fillOpacity": 0}]},
     ]:
         low = render_svg(ChartSpec.from_dict(spec)).lower()
         assert "nan" not in low and "inf" not in low, spec
@@ -299,7 +338,7 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == ["area", "bar", "column", "line", "scatter"]
+    assert caps["chartTypes"] == ["area", "bar", "bubble", "column", "line", "scatter"]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
@@ -372,6 +411,9 @@ if __name__ == "__main__":
     for _n in SCATTER_CASES:
         _check("scatter", _n)
         print(f"PASS: python scatter-{_n} golden")
+    for _n in BUBBLE_CASES:
+        _check("bubble", _n)
+        print(f"PASS: python bubble-{_n} golden")
     test_spline_edge_cases()
     print("PASS: python spline edge cases")
 

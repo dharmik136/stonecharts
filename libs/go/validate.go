@@ -411,6 +411,45 @@ func vdatum(v interface{}, path string, errs *[]string) {
 	}
 }
 
+// vdatumXYZ validates a point-model element (bubble only, §3.3 Rank 4):
+// number | [x,y,z] | {x,y,z}. Mirrors _datum_xyz in validate.py.
+func vdatumXYZ(v interface{}, path string, errs *[]string) {
+	switch e := v.(type) {
+	case bool:
+		*errs = append(*errs, path+": expected number, [x,y,z], or {x,y,z}, received boolean")
+	case float64:
+		vnum(v, path, errs)
+	case []interface{}:
+		if len(e) != 3 {
+			*errs = append(*errs, path+": expected a 3-element [x,y,z] array, received "+itoa(len(e))+" elements")
+		} else {
+			vnum(e[0], path+"[0]", errs)
+			vnum(e[1], path+"[1]", errs)
+			vnum(e[2], path+"[2]", errs)
+		}
+	case map[string]interface{}:
+		for _, key := range []string{"x", "y", "z"} {
+			if val, ok := has(e, key); !ok {
+				*errs = append(*errs, path+"."+key+": required")
+			} else {
+				vnum(val, path+"."+key, errs)
+			}
+		}
+		extra := []string{}
+		for k := range e {
+			if k != "x" && k != "y" && k != "z" {
+				extra = append(extra, k)
+			}
+		}
+		sort.Strings(extra)
+		for _, k := range extra {
+			*errs = append(*errs, path+"."+k+": unknown field")
+		}
+	default:
+		*errs = append(*errs, path+": expected number, [x,y,z], or {x,y,z}, received "+jtype(v))
+	}
+}
+
 func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	m, ok := v.(map[string]interface{})
 	if !ok {
@@ -436,6 +475,10 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	} else if chartType == "scatter" {
 		for i, e := range arr {
 			vdatum(e, path+".data["+itoa(i)+"]", errs)
+		}
+	} else if chartType == "bubble" {
+		for i, e := range arr {
+			vdatumXYZ(e, path+".data["+itoa(i)+"]", errs)
 		}
 	} else {
 		for i, e := range arr {
@@ -495,6 +538,7 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 var knownTypes = map[string]bool{
 	"area":    true,
 	"bar":     true,
+	"bubble":  true,
 	"column":  true,
 	"line":    true,
 	"scatter": true,

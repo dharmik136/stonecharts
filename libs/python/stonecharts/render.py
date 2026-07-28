@@ -15,6 +15,7 @@ from .charts import bar as _bar
 from .charts import column as _column
 from .charts import line as _line
 from .charts import scatter as _scatter
+from .charts import bubble as _bubble
 from .capabilities import CapabilityError, capabilities
 from .spec import ChartSpec
 from .util import esc, fmt_num
@@ -30,6 +31,7 @@ _RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
     "column": _column.render_svg,
     "line": _line.render_svg,
     "scatter": _scatter.render_svg,
+    "bubble": _bubble.render_svg,
 }
 _CAPABILITIES = capabilities()
 
@@ -54,21 +56,25 @@ def _data_table(spec: ChartSpec) -> str:
     """A visually-hidden HTML data table: the accessible, keyboard-navigable
     alternative to the SVG (which is role="img"). Screen readers read this."""
     caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
-    if spec.type == "scatter":
-        # Point-model data (§3.3 Rank 3 / §5.4b-DT): data is (x, y) pairs, not
-        # a coerced single number per shared category — a long-format table
-        # (one row per point) is the only lossless shape.
+    if spec.type in ("scatter", "bubble"):
+        # Point-model data (scatter §3.3 Rank 3 / bubble §3.3 Rank 4, §5.4b-DT):
+        # data is (x, y) or (x, y, z), not a coerced single number per shared
+        # category — a long-format table (one row per point) is the only
+        # lossless shape.
+        has_z = spec.type == "bubble"
         rows = []
         for s in spec.series:
             for d in s.data_points or []:
+                z_cell = f"<td>{esc(fmt_num(d.z if d.z is not None else 0.0))}</td>" if has_z else ""
                 rows.append(
                     f"<tr><th scope=\"row\">{esc(s.name)}</th>"
-                    f"<td>{esc(fmt_num(d.x))}</td><td>{esc(fmt_num(d.y))}</td></tr>"
+                    f"<td>{esc(fmt_num(d.x))}</td><td>{esc(fmt_num(d.y))}</td>{z_cell}</tr>"
                 )
+        z_head = '<th scope="col">Z</th>' if has_z else ""
         return (
             f'<table class="sc-visually-hidden">{caption}'
             '<thead><tr><th scope="col">Series</th><th scope="col">X</th>'
-            '<th scope="col">Y</th></tr></thead>'
+            f'<th scope="col">Y</th>{z_head}</tr></thead>'
             f'<tbody>{"".join(rows)}</tbody></table>'
         )
     n = max((len(s.data) for s in spec.series), default=0)

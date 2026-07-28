@@ -16,9 +16,10 @@
         "column",
         "area",
         "bar",
-        "scatter"
+        "scatter",
+        "bubble"
       ],
-      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015); maps to the released chart design and renderer pair."
+      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016); maps to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",
@@ -155,7 +156,7 @@
         "not": {
           "required": ["type"],
           "properties": {
-            "type": { "const": "scatter" }
+            "type": { "enum": ["scatter", "bubble"] }
           }
         }
       },
@@ -167,6 +168,77 @@
                 "data": {
                   "items": {
                     "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "scatter" }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "oneOf": [
+                      { "type": "number" },
+                      { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                      {
+                        "type": "object",
+                        "required": ["x", "y"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "x": { "type": "number" },
+                          "y": { "type": "number" }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "bubble" }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "oneOf": [
+                      { "type": "number" },
+                      { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+                      {
+                        "type": "object",
+                        "required": ["x", "y", "z"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "x": { "type": "number" },
+                          "y": { "type": "number" },
+                          "z": { "type": "number" }
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -401,10 +473,21 @@
                   "x": { "type": "number" },
                   "y": { "type": "number" }
                 }
+              },
+              { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+              {
+                "type": "object",
+                "required": ["x", "y", "z"],
+                "additionalProperties": false,
+                "properties": {
+                  "x": { "type": "number" },
+                  "y": { "type": "number" },
+                  "z": { "type": "number" }
+                }
               }
             ]
           },
-          "description": "y-values; x comes from xAxis.categories (or 0..n-1). scatter (0.0.0.3, DEC-015) additionally accepts the point model: a positional [x,y] pair or an {x,y} object; every other chart type is restricted back to a plain number by the type-conditional rule below."
+          "description": "y-values; x comes from xAxis.categories (or 0..n-1). scatter (0.0.0.3, DEC-015) additionally accepts the point model: a positional [x,y] pair or an {x,y} object. bubble (0.0.0.4, DEC-016) additionally accepts [x,y,z] / {x,y,z}. Every other chart type is restricted back to a plain number, and scatter/bubble are each restricted to their own shape, by the type-conditional rules below."
         },
         "color": {
           "description": "Series color: a hex string, or a linear-gradient object (fades between stops). Gradient applies to the stroke and area fill; markers/legend use the first stop's color.",

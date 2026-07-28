@@ -282,6 +282,32 @@ def _datum(v: Any, path: str, errs: List[str]) -> None:
         errs.append(f"{path}: expected number, [x,y], or {{x,y}}, received {_jtype(v)}")
 
 
+def _datum_xyz(v: Any, path: str, errs: List[str]) -> None:
+    """Point-model element (bubble only, §3.3 Rank 4): number | [x,y,z] | {x,y,z}."""
+    if isinstance(v, bool):
+        errs.append(f"{path}: expected number, [x,y,z], or {{x,y,z}}, received boolean")
+    elif isinstance(v, (int, float)):
+        _num(v, path, errs)
+    elif isinstance(v, list):
+        if len(v) != 3:
+            errs.append(f"{path}: expected a 3-element [x,y,z] array, received {len(v)} elements")
+        else:
+            _num(v[0], f"{path}[0]", errs)
+            _num(v[1], f"{path}[1]", errs)
+            _num(v[2], f"{path}[2]", errs)
+    elif isinstance(v, dict):
+        for key in ("x", "y", "z"):
+            if key not in v:
+                errs.append(f"{path}.{key}: required")
+            else:
+                _num(v[key], f"{path}.{key}", errs)
+        extra = sorted(set(v.keys()) - {"x", "y", "z"})
+        for k in extra:
+            errs.append(f"{path}.{k}: unknown field")
+    else:
+        errs.append(f"{path}: expected number, [x,y,z], or {{x,y,z}}, received {_jtype(v)}")
+
+
 def _series(v: Any, path: str, errs: List[str], chart_type: Any = None) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
@@ -299,6 +325,9 @@ def _series(v: Any, path: str, errs: List[str], chart_type: Any = None) -> None:
     elif chart_type == "scatter":
         for i, e in enumerate(v["data"]):
             _datum(e, f"{path}.data[{i}]", errs)
+    elif chart_type == "bubble":
+        for i, e in enumerate(v["data"]):
+            _datum_xyz(e, f"{path}.data[{i}]", errs)
     else:
         for i, e in enumerate(v["data"]):
             _num(e, f"{path}.data[{i}]", errs)
@@ -327,10 +356,12 @@ def _series(v: Any, path: str, errs: List[str], chart_type: Any = None) -> None:
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
-# 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015).
+# 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4
+# admits bubble per DEC-016).
 _KNOWN_TYPES = {
     "area",
     "bar",
+    "bubble",
     "column",
     "line",
     "scatter",

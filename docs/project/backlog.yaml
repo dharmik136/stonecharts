@@ -988,7 +988,7 @@ items:
   - id: REQ-CHART-003
     title: Admit bubble as a certified 0.0.0.4 chart type
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P1
     workstream: WS-08 Expansion
     stage: S5 Expansion
@@ -996,7 +996,7 @@ items:
     outcome: Bubble reaches Certified status per the renderer constitution before 0.0.0.4 documentation describes it as supported.
     traceability: [REQ-CHART-003, SC-ARCH-011]
     risks: []
-    evidence: []
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
     dependencies: [DEC-016]
     compatibility: Adds a new certified chart type and extends the point model with an optional z field; must not change any existing 0.0.0.1/0.0.0.2/0.0.0.3 golden, schema behavior, or guarantee.
     areas: [spec, python, go, docs, release]
@@ -1013,15 +1013,15 @@ items:
   - id: GATE-S12
     title: Pass 0.0.0.4 qualification gate
     item_type: Release Gate
-    status: Inbox
+    status: Done
     priority: P0
     workstream: WS-08 Expansion
     stage: S12 Qualification 0.0.0.4
     target: 0.0.0.4
     outcome: Bubble's admission evidence is formally reviewed as release-quality qualification, not just passing checks during implementation.
-    traceability: [SC-ARCH-011]
+    traceability: [SC-ARCH-011, SC-REL-022, SC-REL-023]
     risks: []
-    evidence: []
+    evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, BENCH-RENDER-BASELINE, REVIEW-BUBBLE-ACCESSIBILITY-SECURITY, BENCH-BUBBLE-BASELINE]
     dependencies: [REQ-CHART-003]
     compatibility: Qualification gate only; line/column/area/bar/scatter are not requalified, only bubble is newly reviewed.
     areas: [python, go, release]

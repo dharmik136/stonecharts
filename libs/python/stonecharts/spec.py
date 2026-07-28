@@ -23,16 +23,21 @@ def _opt_float(d: dict, key: str) -> Optional[float]:
 
 
 def _normalize_datum(v: object, index: int) -> "Datum":
-    """Point-model normalization (scatter only, §3.3 Rank 3 / §5.4b lockstep).
+    """Point-model normalization (scatter §3.3 Rank 3 / bubble §3.3 Rank 4,
+    §5.4b lockstep).
 
     Bare number -> Datum(x=index, y=v) (the pinned fast path — must match Go's
-    UnmarshalJSON byte-for-byte). Positional [x, y] and object {x, y} are sugar
-    over the same datum. validate() already rejected any other shape.
+    UnmarshalJSON byte-for-byte). Positional [x, y] / [x, y, z] and object
+    {x, y} / {x, y, z} are sugar over the same datum; z stays None unless
+    present (scatter never supplies it). validate() already rejected any
+    other shape for the active chart type.
     """
     if isinstance(v, dict):
-        return Datum(x=float(v["x"]), y=float(v["y"]))
+        z = float(v["z"]) if "z" in v else None
+        return Datum(x=float(v["x"]), y=float(v["y"]), z=z)
     if isinstance(v, list):
-        return Datum(x=float(v[0]), y=float(v[1]))
+        z = float(v[2]) if len(v) > 2 else None
+        return Datum(x=float(v[0]), y=float(v[1]), z=z)
     return Datum(x=float(index), y=float(v))
 
 
@@ -77,16 +82,19 @@ class Binning:
 
 @dataclass
 class Datum:
-    """One (x, y) observation — the scatter point model (§3.3 Rank 3).
+    """One (x, y) or (x, y, z) observation — the scatter (§3.3 Rank 3) / bubble
+    (§3.3 Rank 4) point model.
 
-    Populated ONLY on Series.data_points, and only for chart type "scatter";
-    every other chart type continues to use Series.data (plain float y-values,
-    x = category index) completely unchanged, so this addition carries zero
-    byte-parity risk for line/column/area/bar.
+    Populated ONLY on Series.data_points, and only for chart type "scatter" or
+    "bubble"; every other chart type continues to use Series.data (plain
+    float y-values, x = category index) completely unchanged, so this
+    addition carries zero byte-parity risk for line/column/area/bar. `z` is
+    None for scatter (never supplied) and always set for bubble.
     """
 
     x: float
     y: float
+    z: Optional[float] = None
 
 
 @dataclass
@@ -238,15 +246,15 @@ class ChartSpec:
     pre_binned: bool = False
 
     def __post_init__(self) -> None:
-        """Point-model normalization for the typed-construction path (§3.3
-        Rank 3): from_dict() normalizes scatter's data_points itself before
-        the Series objects exist, but a caller building ChartSpec/Series
-        directly (see charts/scatter/design.md "Generate it - typed") never
-        goes through from_dict, so it lands here instead. Guarded by
-        `data_points is None` so from_dict's own already-normalized series
-        are never touched twice.
+        """Point-model normalization for the typed-construction path (scatter
+        §3.3 Rank 3 / bubble §3.3 Rank 4): from_dict() normalizes
+        data_points itself before the Series objects exist, but a caller
+        building ChartSpec/Series directly (see charts/scatter/design.md
+        "Generate it - typed") never goes through from_dict, so it lands
+        here instead. Guarded by `data_points is None` so from_dict's own
+        already-normalized series are never touched twice.
         """
-        if self.type == "scatter":
+        if self.type in ("scatter", "bubble"):
             for s in self.series:
                 if s.data_points is None:
                     s.data_points = [_normalize_datum(v, i) for i, v in enumerate(s.data)]
@@ -319,7 +327,7 @@ class ChartSpec:
                     angle=float(p.get("angle", 45.0)),
                     stroke_width=float(p.get("strokeWidth", 1.5)),
                 )
-            if chart_type == "scatter":
+            if chart_type in ("scatter", "bubble"):
                 data_points = [_normalize_datum(v, j) for j, v in enumerate(s["data"])]
                 data_field: List[float] = []
             else:

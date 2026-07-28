@@ -32,6 +32,7 @@ ACTIVE = {
     "area": ["basic", "stacked", "percent", "themed-dark"],
     "bar": ["basic", "grouped", "stacked", "themed-dark", "adversarial"],
     "scatter": ["basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"],
+    "bubble": ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"],
 }
 
 

@@ -72,14 +72,16 @@ func (p *Pattern) hatchColor() string {
 	return "#333333"
 }
 
-// Datum is one (x, y) observation — the scatter point model (§3.3 Rank 3).
-// Populated on every Series (see Series.UnmarshalJSON) but read ONLY by the
-// scatter renderer; every other chart type continues to read Series.Data
-// (plain float y-values, x = category index) completely unchanged, so this
-// addition carries zero byte-parity risk for line/column/area/bar.
+// Datum is one (x, y) or (x, y, z) observation — the scatter (§3.3 Rank 3) /
+// bubble (§3.3 Rank 4) point model. Populated on every Series (see
+// Series.UnmarshalJSON) but read ONLY by the scatter/bubble renderers; every
+// other chart type continues to read Series.Data (plain float y-values, x =
+// category index) completely unchanged, so this addition carries zero
+// byte-parity risk for line/column/area/bar.
 type Datum struct {
 	X float64
 	Y float64
+	Z *float64 // bubble only (§3.3 Rank 4); nil for scatter, always set for bubble
 }
 
 type Series struct {
@@ -124,20 +126,26 @@ func (s *Series) UnmarshalJSON(b []byte) error {
 		switch {
 		case len(trimmed) > 0 && trimmed[0] == '{':
 			var obj struct {
-				X float64 `json:"x"`
-				Y float64 `json:"y"`
+				X float64  `json:"x"`
+				Y float64  `json:"y"`
+				Z *float64 `json:"z"`
 			}
 			if err := json.Unmarshal(raw, &obj); err != nil {
 				return err
 			}
-			points = append(points, Datum{X: obj.X, Y: obj.Y})
+			points = append(points, Datum{X: obj.X, Y: obj.Y, Z: obj.Z})
 			allNumeric = false
 		case len(trimmed) > 0 && trimmed[0] == '[':
-			var pair [2]float64
-			if err := json.Unmarshal(raw, &pair); err != nil {
+			var tuple []float64
+			if err := json.Unmarshal(raw, &tuple); err != nil {
 				return err
 			}
-			points = append(points, Datum{X: pair[0], Y: pair[1]})
+			d := Datum{X: tuple[0], Y: tuple[1]}
+			if len(tuple) > 2 {
+				z := tuple[2]
+				d.Z = &z
+			}
+			points = append(points, d)
 			allNumeric = false
 		default:
 			var v float64
