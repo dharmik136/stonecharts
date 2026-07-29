@@ -1,18 +1,18 @@
 ---
 id: SC-PROD-002-ANTIGRAVITY
 title: StoneCharts Positioning and Alpha Scope (Antigravity Version)
-status: proposed
-classification: normative
+status: superseded
+classification: informative
 owner: product-owner
 approver: maintainer
 review_mode: self
 applies_to: 0.0.0.1
 requirements: [REQ-SCOPE-001]
 evidence: [TEST-CAPABILITY-MATRIX]
-last_reviewed: "2026-07-21"
-review_due: "2026-09-18"
+last_reviewed: "2026-07-30"
+review_due: "2027-07-30"
 supersedes: null
-superseded_by: null
+superseded_by: SC-PROD-002
 ---
 
 # Positioning and Alpha Scope

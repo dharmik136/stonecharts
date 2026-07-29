@@ -1,18 +1,18 @@
 ---
 id: SC-PROD-001-ANTIGRAVITY
 title: StoneCharts Product Thesis (Antigravity Version)
-status: approved
-classification: normative
+status: superseded
+classification: informative
 owner: product-owner
 approver: maintainer
 review_mode: self
 applies_to: all
 requirements: [REQ-PROD-001]
 evidence: []
-last_reviewed: "2026-07-21"
-review_due: "2026-10-18"
+last_reviewed: "2026-07-30"
+review_due: "2027-07-30"
 supersedes: null
-superseded_by: null
+superseded_by: SC-PROD-001
 ---
 
 # Product Thesis

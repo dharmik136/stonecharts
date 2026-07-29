@@ -1,7 +1,7 @@
 ---
 id: SC-PROD-003-ANTIGRAVITY
 title: StoneCharts Market Validation Plan
-status: proposed
+status: superseded
 classification: informative
 owner: product-owner
 approver: maintainer
@@ -9,10 +9,10 @@ review_mode: self
 applies_to: Post-0.0.0.1
 requirements: []
 evidence: []
-last_reviewed: "2026-07-21"
-review_due: "2026-10-21"
+last_reviewed: "2026-07-30"
+review_due: "2027-07-30"
 supersedes: null
-superseded_by: null
+superseded_by: SC-PROD-003
 ---
 
 # Market Validation Plan
