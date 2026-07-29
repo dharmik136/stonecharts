@@ -1,6 +1,6 @@
 id: SC-OPS-BACKLOG
 version: 1
-updated: "2026-07-28"
+updated: "2026-07-29"
 project:
   owner: dharmik136
   number: 2
@@ -1270,3 +1270,67 @@ items:
       - Input-spec hashes are compared so a spec change is distinguished from same-spec renderer drift.
       - The optional --compare-report flag writes the comparison to an HTML report and requires --compare-evidence.
     verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-drift --compare-report .tmp-stoneverify-compare/report.html]
+
+  - id: WORK-GTM-001
+    title: Rewrite market-facing product docs around visual integrity outcomes
+    item_type: Work Package
+    status: Done
+    priority: P1
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: SC-PROD-001 and SC-PROD-002 reflect the certified 0.0.0.1-0.0.0.4 chart set and the DEC-017 chart-expansion freeze instead of stale 0.0.0.1-only alpha scope, and point to SC-PROD-003/SC-PROD-004 as the canonical source for go-to-market category and capability claims rather than duplicating them.
+    traceability: [SC-PROD-001, SC-PROD-002, SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-017]
+    compatibility: Documentation content and frontmatter only; does not change renderer output, schemas, released evidence, or the proprietary licensing boundary.
+    areas: [docs]
+    acceptance:
+      - SC-PROD-001 names the certified 0.0.0.1-0.0.0.4 chart set and the DEC-017 expansion freeze instead of the stale line/column-only baseline.
+      - SC-PROD-002 status moves from proposed to approved, applies_to widens beyond 0.0.0.1, and chart-type/scope claims link to SC-PROD-004 instead of restating a stale list.
+      - Neither document restates the go-to-market category, validation segment, or validation-gate criteria owned by SC-PROD-003.
+      - docs/README.md and check_docs.py remain consistent after the edit.
+    verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-002
+    title: Create reproducible competitor benchmark methodology
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A governed methodology document defines how to run a fair, reproducible comparison against Highcharts Export Server, QuickChart, and Vega/Vega-Lite, so future comparisons are measured rather than asserted, per the DEC-017 brief and the SC-PROD-003 constraint against unverified benchmark claims.
+    traceability: [SC-PROD-003, SC-PROD-005]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-017]
+    compatibility: Adds a new informative documentation asset only; contains no performance, cost, or security claims and does not change renderer output, schemas, or released evidence.
+    areas: [docs]
+    acceptance:
+      - The document names the DEC-017 brief's comparison targets and defines a measurable, falsifiable axis and method for each.
+      - The document contains no invented performance, cost-savings, or security percentages.
+      - The document defines the evidence-registry output format for a completed benchmark run without asserting any run has occurred.
+    verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-003
+    title: Build prospect qualification scorecard and interview script
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A governed interview script and scoring rubric operationalizes the SC-PROD-003 validation gate for the insurance-reporting and actuarial-platforms segment named in DEC-017, so discovery interviews are run and scored consistently without asking a leading "would you use this" question.
+    traceability: [SC-PROD-003, SC-PROD-006]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [DEC-017]
+    compatibility: Adds a new informative documentation asset only; explicitly excludes real interview records from source control and does not change renderer output, schemas, or released evidence.
+    areas: [docs]
+    acceptance:
+      - The script targets the insurance-reporting and actuarial-platforms segment only and names the three target interview roles.
+      - The scoring rubric maps directly to each of SC-PROD-003's validation-gate counts (interviews, problems, quantified costs, fixtures, proofs, paid pilots, conversions).
+      - The document instructs that real interview records are kept outside source control.
+    verification: [python tools/check_docs.py]
