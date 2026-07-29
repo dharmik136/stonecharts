@@ -1420,3 +1420,25 @@ items:
       - The case-study template's bracketed fields contain no example or placeholder numbers that could be mistaken for real ones.
       - The cost-quantification worksheet maps directly to SC-PROD-003's validation-gate cost criterion and instructs against estimating on the prospect's behalf.
     verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-008
+    title: Complete the deliberately-scoped-down benchmark items - shapes, competitors, Docker, concurrency
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: Closed all four items explicitly deferred when WORK-GTM-006 narrowed benchmark scope. Extended cold-start and cross-invocation measurement to area/column/bar (StoneCharts/Vega/Highcharts/QuickChart), added ECharts and Plotly/Kaleido as two more competitors on the line-chart shape (finding Plotly shares Highcharts' random-ID non-determinism defect, independently), added a genuine concurrent-load test (16 simultaneous requests/processes) finding Highcharts Export Server rejects 10 of 16 requests when a burst hits a just-started pool, and attempted the official Docker image for Highcharts (blocked by a diagnosed local Docker Desktop installation defect, not silently skipped).
+    traceability: [SC-PROD-003, SC-PROD-005, SC-QUAL-003]
+    risks: []
+    evidence: [BENCH-COMPETITOR-HIGHCHARTS-20260729, BENCH-COMPETITOR-VEGA-20260729, BENCH-COMPETITOR-QUICKCHART-20260729, BENCH-COMPETITOR-ECHARTS-20260729, BENCH-COMPETITOR-PLOTLY-20260729]
+    dependencies: [WORK-GTM-006]
+    compatibility: Extends the existing results document and evidence registry only; does not change renderer output, schemas, released evidence, or the proprietary licensing boundary.
+    areas: [docs]
+    acceptance:
+      - The document discloses that ECharts/Plotly coverage is line-chart-only, not a claim of full six-shape parity with the original three targets.
+      - The Docker attempt's specific failure (a diagnosed local installation defect) is documented rather than silently omitted.
+      - The concurrent-load finding reports both the failing first burst and the succeeding second burst, not only the favorable number.
+      - The Plotly/Kaleido dependency audit runs in an isolated environment, not the general machine Python environment, and the document says so.
+    verification: [python tools/check_docs.py]
