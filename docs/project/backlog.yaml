@@ -1271,6 +1271,140 @@ items:
       - The optional --compare-report flag writes the comparison to an HTML report and requires --compare-evidence.
     verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-drift --compare-report .tmp-stoneverify-compare/report.html]
 
+  - id: WORK-VERIFY-008
+    title: Package stoneverify as an installable, repo-independent command
+    item_type: Work Package
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: The stoneverify CLI runs against installed Python and Go artifacts instead of the current repo-relative sys.path insert and go run against the checked-out Go module, so it can be installed and run without cloning the stonecharts source tree, and its reported tool/runtime version metadata reflects the actual installed package instead of a hardcoded string.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Repackages the existing CLI's install and invocation path only; does not change renderer output, the chart spec, golden fixtures, or the proprietary licensing boundary. Distribution to any external party remains gated by DEC-018, which this item does not resolve.
+    areas: [python, go, docs]
+    acceptance:
+      - stoneverify installs as a console-script entry point from a built Python wheel, with no sys.path manipulation and no dependency on the stonecharts repository's directory layout at runtime.
+      - The Go render path invokes a prebuilt stoneverify-go-render binary (resolved via --go-binary or an environment variable) instead of go run against a temp file inside the repository's Go module; go run remains available as an explicit --from-source developer fallback.
+      - manifest.json's stonechartsVersion and module fields are read from the installed package/binary at runtime, not the hardcoded "0.0.0.4" literal currently in render_go().
+      - The packaged CLI produces the same manifest/comparison/report/checksums output as today's repo-relative script for the existing bubble example, verified by diffing evidence bundles.
+      - No outbound network calls occur during any stoneverify invocation.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, a from-wheel install run compared byte-for-byte against the current repo-relative run on charts/bubble/examples/basic.json]
+
+  - id: WORK-VERIFY-009
+    title: Build a real semantic difference classification model
+    item_type: Work Package
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify classifies a detected difference into a named category (input-data, geometry, scale-domain, label-text, theme-style, accessibility-metadata, serialization-only, chart-type-capability, or unknown-structural) with a human-readable description of what changed, replacing the current single likelyCause string derived only from byte/tag-count/line-diff heuristics.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Extends comparison.json and report.html with new structured fields; keeps the existing likelyCause string for backward compatibility with anything already consuming it.
+    areas: [python, docs]
+    acceptance:
+      - classify_difference() walks the compared SVGs' element/attribute structure per spec/svg-contract.md instead of relying only on tag counts and a line diff.
+      - Geometry-affecting attributes (d, cx, cy, r, x, y, points, transform) are classified separately from style/theme attributes (fill, stroke, font-*, class) and from text-content changes.
+      - Accessibility metadata changes (role, aria-*, the screen-reader summary) are classified separately from visual changes.
+      - A whitespace-only or attribute-ordering-only difference is classified as serialization-only, not left under the generic "attribute, numeric formatting, ordering, or text-content drift" bucket.
+      - Each classified difference includes a plain-language description naming the changed element/attribute, not just a byte offset.
+      - Existing golden/parity tests and the WORK-VERIFY-002 demo-drift tests still pass unchanged.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, a demo-drift run for each of text/attribute drift modes shows the new category in comparison.json]
+
+  - id: WORK-VERIFY-010
+    title: Fold the interaction-runtime test into CI and stabilize StoneVerify exit codes
+    item_type: Work Package
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: The interaction-runtime test that currently runs standalone is included in the project's normal test/CI command, and stoneverify's exit codes distinguish a failed comparison from a usage or setup error instead of collapsing both to a generic non-zero result.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Testing and exit-code clarity only; does not change renderer output, comparison logic, or evidence bundle contents.
+    areas: [runtime, python, docs]
+    acceptance:
+      - The standalone interaction-runtime test is invoked from the same command documented in .claude/project-brief.md's baseline checks, or that document is updated to list it explicitly, so it can't silently stop running.
+      - stoneverify returns a distinct exit code for a failed comparison versus a CLI usage error versus a missing/invalid input file.
+      - The distinct exit codes are documented in README.md's StoneVerify section.
+    verification: [node --check runtime/chart-interactions.js and the standalone interaction test both run from one documented command, python -m pytest libs/python/tests -q]
+
+  - id: WORK-VERIFY-011
+    title: Make cross-release comparison the default StoneVerify workflow
+    item_type: Work Package
+    status: Triage
+    priority: P1
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: stoneverify's primary documented workflow is comparing a candidate render against an approved baseline across a software release or dependency upgrade, with cross-runtime Python-vs-Go comparison kept as an available advanced proof rather than the lead framing, matching the positioning shift SC-PROD-007 already uses.
+    traceability: [SC-PROD-003, SC-PROD-004, SC-PROD-007]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-008, WORK-VERIFY-009]
+    compatibility: Reframes CLI defaults, help text, and documentation; the underlying --baseline-evidence comparison already exists from WORK-VERIFY-003 and is not being replaced.
+    areas: [python, docs]
+    acceptance:
+      - Running stoneverify without a second --runtime defaults to a single-runtime render compared against --baseline-evidence when supplied, rather than requiring both runtimes to get useful output.
+      - README.md and docs/quality/stoneverify-quickstart.md lead with the cross-release/baseline workflow before the cross-runtime workflow.
+      - Existing cross-runtime behavior and tests are unchanged when both --runtime flags are passed explicitly.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, docs/quality/stoneverify-quickstart.md reviewed against the new default ordering]
+
+  - id: WORK-VERIFY-012
+    title: Close StoneVerify and renderer testing gaps for external fixtures
+    item_type: Work Package
+    status: Ready
+    priority: P1
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify and the certified renderers hold up against inputs an external customer might actually supply - cross-language invalid-input parity, randomized property tests across all six certified chart types, resource limits on adversarial specs, malformed Unicode and escaping, and deterministic output verified across more than one OS or container profile - closing gaps the current test suite does not cover.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Adds test coverage and defensive limits only; does not change certified renderer output for any currently-valid spec.
+    areas: [python, go, docs]
+    acceptance:
+      - Every certified chart type (line, column, area, bar, scatter, bubble) has a randomized property test in both Python and Go asserting the shared invariants, including valid SVG output and byte-parity where applicable.
+      - Cross-language invalid-input parity tests exist for every documented validation error class in docs/contracts/validation-and-capabilities.md.
+      - A specification with pathological size or nesting is rejected with a stable, documented error rather than unbounded resource consumption or a crash.
+      - Malformed Unicode and unescaped text in labels, titles, and tooltips render safely in both runtimes with matching behavior.
+      - A documented coverage threshold is enforced in CI for libs/python and libs/go.
+    verification: [python -m pytest libs/python/tests -q --cov, go test ./... -cover, a documented adversarial-input fixture set runs clean in CI]
+
+  - id: WORK-VERIFY-013
+    title: Build a clean StoneVerify evaluation kit for prospects
+    item_type: Work Package
+    status: Triage
+    priority: P1
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A prospect can be handed a self-contained evaluation kit - signed or hashed packages from WORK-VERIFY-008, a quickstart, sample specs, an intentional-drift demo, the evidence-bundle schema, a security-architecture note, supported environments, and known limits - with no cache files, build cruft, or duplicated build trees. The kit is built and internally reviewable only; who it may be sent to and under what terms stays gated by DEC-018, which this item does not resolve.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-008]
+    compatibility: Packaging and documentation only; does not itself authorize external distribution.
+    areas: [python, go, docs]
+    acceptance:
+      - A single archive or directory contains exactly the files needed for a prospect evaluation, built via a repeatable script, with no __pycache__, build/, egg-info, or duplicated package copies.
+      - The kit includes a quickstart that runs the demo-drift example end to end using only the packaged artifacts from WORK-VERIFY-008, with no repo checkout.
+      - The kit documents supported environments and known limits pulled from docs/contracts/guarantees-and-limits.md and docs/robustness.md rather than restating them by hand.
+      - The kit is explicitly marked internal/build-only in its own README until a distribution decision is recorded.
+    verification: [a fresh temp directory extraction of the kit runs the quickstart successfully with no reference back to the source repository]
+
   - id: WORK-GTM-001
     title: Rewrite market-facing product docs around visual integrity outcomes
     item_type: Work Package
@@ -1485,4 +1619,25 @@ items:
       - Outreach templates ask for a conversation about a cost, not pitch the product, consistent with SC-PROD-003's key interview question.
       - The tracking spreadsheet's Gate Tracker sheet computes each SC-PROD-003 criterion's current count via formula from the Interview Log sheet, not manual re-tallying, for the criteria derivable from interview data.
       - The spreadsheet lives outside the git-tracked repository and contains zero real prospect names or data at creation time.
+    verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-011
+    title: Draft the paid StoneVerify pilot pricing hypothesis
+    item_type: Work Package
+    status: Triage
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A short, explicitly-labeled pricing hypothesis document - a fixed-scope $5,000-$15,000 paid pilot covering one report workflow, one or two runtimes, a bounded fixture set, baseline creation, CI integration, and evidence-report delivery - exists to test budget ownership during prospect conversations, alongside the existing one-pager and cost-quantification worksheet.
+    traceability: [SC-PROD-003, SC-PROD-007, SC-PROD-009]
+    risks: []
+    evidence: []
+    dependencies: [WORK-VERIFY-013, WORK-GTM-010]
+    compatibility: Adds one informative document; does not commit to a price, term, or licensing model. SC-CON-020 still governs actual commercial terms.
+    areas: [docs]
+    acceptance:
+      - The document is explicitly labeled a pricing hypothesis to be revised from real conversation data, not an approved price list.
+      - It names the fixed scope boundaries (one workflow, one or two runtimes, bounded fixtures) so it can be used as a conversation anchor without over-promising.
+      - It cross-references SC-CON-020 rather than restating or contradicting the commercial-terms policy.
     verification: [python tools/check_docs.py]
