@@ -106,6 +106,36 @@ automatically by the export server's own worker pool; it succeeded on that retry
 on every subsequent measured run, and is reported here as an observed real-world
 cold-start characteristic rather than excluded as an anomaly.
 
+## Sustained (warm) throughput
+
+Cold-start is the fairest number for "spawn a fresh process per chart," but it is not
+the only real deployment shape. A production report-rendering service typically stays
+warm. This section measures per-render latency **inside one already-running process**
+for the line chart, after one untimed warm-up render, so process-start and (for
+Highcharts) browser-launch cost are excluded:
+
+| Target | Warm median latency | Renders/second (median) | How it was kept warm |
+|---|---:|---:|---|
+| StoneCharts (Python) | 0.000152 s | 6,570 | 200 in-process renders, same `ChartSpec`, no restart. |
+| StoneCharts (Go) | 0.000190 s | 5,274 | 20,000 in-process renders (batched for timer resolution), no restart. |
+| Vega/Vega-Lite (Node, no browser) | 0.00576 s | 173 | 200 renders in one Node process; each still re-parses the Vega-Lite spec and builds a fresh `View`, matching a stateless per-request service rather than caching a compiled view. |
+| Highcharts Export Server | 0.052 s | ~19 | Ran with `--enableServer 1` (its own persistent HTTP server mode, pool of 4-8 warm browser workers) instead of the one-shot CLI; 10 sequential HTTP requests to the already-warm server, first request excluded as pool warm-up. |
+
+This changes the picture materially from the cold-start table above: once warm,
+Highcharts Export Server serves a request in ~52 ms, not ~13.6 s — the 13.6 s number
+is specific to spawning a fresh process (and browser) per render, not to the
+product's actual recommended deployment shape. **Even so**, StoneCharts remains
+roughly 30x faster than Vega and roughly 270x faster than a warm Highcharts server on
+this measure, and does so with a request path that never launches a browser process
+at all. Both framings are reported because a naive "13.6 s vs 0.07 s" comparison would
+overstate the gap for anyone who deploys Highcharts Export Server correctly (as a
+long-lived server), and it is more defensible to disclose that than to leave it for a
+skeptical reader to find.
+
+This section measures one connection at a time, sequentially. It does not measure
+concurrent/parallel request throughput, which depends on worker-pool sizing and is a
+different and unmeasured question.
+
 ## Cross-invocation consistency
 
 Each target rendered the same input twice through its own supported path, for all
@@ -124,6 +154,19 @@ regeneration, even with no configuration change, and it reproduces identically a
 three unrelated chart types rather than being specific to one chart's geometry. This
 was not evaluated for whether the drawn geometry is otherwise pixel-identical beyond
 the ID strings; only the raw SVG bytes were diffed.
+
+**Tested and ruled out:** Highcharts core exposes `Highcharts.useSerialIds(flag)`, an
+internal API used in Highcharts' own test suite to make generated IDs deterministic.
+This was tested directly — injected via the export server's own `--customCode`
+option (`Highcharts.useSerialIds(true);`, with `--allowCodeExecution true`) — before
+two repeat renders of the line chart. The ID stayed consistent **within** a single
+render (used identically at every reference point in that one SVG), but a fresh
+process invocation still produced a different ID than the previous one
+(`highcharts-44tomdw-21-` vs. `highcharts-p3zp66k-21-`). `useSerialIds` does not
+appear to fix cross-invocation determinism for this ID as exercised through the
+export server; no other configuration option was found in the export server's own
+README that addresses it. This should be read as "not fixed by the option tested," not
+as a claim that no fix exists anywhere in Highcharts' full configuration surface.
 
 ## Data egress
 
@@ -167,14 +210,20 @@ This is three chart shapes (line, scatter, bubble), on one host, on one day, run
 the vendor whose product is being compared favorably. It establishes real,
 reproducible orders-of-magnitude gaps in cold-start time, memory, and
 dependency-surface size that hold consistently across all three shapes rather than
-being an artifact of picking an easy chart, and one concrete,
-previously-unquantified non-determinism finding in Highcharts Export Server's raw
-output that also reproduces across all three shapes. It does **not** establish
-results for chart types outside these three, a production Linux/container
-measurement, sustained-load or concurrent-request behavior, or an assessment of
-Highcharts' or Vega's actual security posture beyond the specific advisories listed.
-None of the recurring-cost or willingness-to-pay claims in `SC-PROD-003`'s validation
-gate are addressed by this document; only real interviews close that gate.
+being an artifact of picking an easy chart; a serial warm-throughput gap that
+persists (though narrower) even after removing cold-start and browser-launch cost
+from the comparison entirely; one concrete, previously-unquantified
+non-determinism finding in Highcharts Export Server's raw output that also
+reproduces across all three shapes and survives the one documented mitigation
+tested; and, favorably for the competitors, that the "13.6 s" Highcharts number is
+specific to a one-process-per-render deployment and does not represent the product
+run as its own documentation recommends. It does **not** establish results for chart
+types outside these three, a production Linux/container measurement, concurrent
+or parallel-request throughput (only serial warm requests were measured), or an
+assessment of Highcharts' or Vega's actual security posture beyond the specific
+advisories listed. None of the recurring-cost or willingness-to-pay claims in
+`SC-PROD-003`'s validation gate are addressed by this document; only real interviews
+close that gate.
 
 ## Reproduction
 
@@ -209,8 +258,33 @@ Scatter and bubble repeat the same commands against
 `highcharts-scatter-config.json` / `highcharts-bubble-config.json`, and
 `chartjs-scatter-config.json` / `chartjs-bubble-config.json` respectively.
 
+Sustained-throughput and `useSerialIds` reproduction:
+
+```bash
+# StoneCharts (Python) - 200 in-process renders after 1 untimed warm-up
+python stonecharts_throughput.py stonecharts-spec.json 200
+
+# StoneCharts (Go) - 20,000 in-process renders, batched for timer resolution
+go run throughput.go stonecharts-spec.json 20000
+
+# Vega/Vega-Lite - 200 in-process renders, fresh View per render
+node throughput.js vega-lite-spec.json 200
+
+# Highcharts Export Server - persistent server mode, then 10 warm HTTP requests
+node node_modules/highcharts-export-server/bin/cli.js --enableServer 1 --host 127.0.0.1 --port 7801 &
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"infile": <highcharts-config.json contents>, "type": "svg"}' \
+  http://127.0.0.1:7801
+
+# useSerialIds test (does not fix cross-invocation determinism - see above)
+echo "Highcharts.useSerialIds(true);" > highcharts-customcode.js
+node node_modules/highcharts-export-server/bin/cli.js \
+  --infile highcharts-config.json --outfile out.svg --type svg \
+  --customCode highcharts-customcode.js --allowCodeExecution true
+```
+
 The `measure.py` harness, the twelve equivalent chart specs (three shapes across four
-targets), the raw per-run JSON output, `npm audit --json` captures, and all rendered
-artifacts from this run are retained locally alongside this document's evidence
-entries; they are not committed to source control (they are throwaway measurement
-artifacts, not release fixtures).
+targets), the throughput scripts, the raw per-run JSON output, `npm audit --json`
+captures, and all rendered artifacts from this run are retained locally alongside
+this document's evidence entries; they are not committed to source control (they are
+throwaway measurement artifacts, not release fixtures).

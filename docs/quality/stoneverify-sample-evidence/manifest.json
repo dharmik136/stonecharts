@@ -1,0 +1,43 @@
+{
+  "baseline": {
+    "inputEqual": null,
+    "message": "No baseline evidence directory was provided.",
+    "runtimes": [],
+    "status": "not-checked"
+  },
+  "comparison": "comparison.json",
+  "demoDrift": "none",
+  "generatedAt": "2026-07-29T10:33:01.903097+00:00",
+  "input": {
+    "bytes": 317,
+    "file": "input-spec.json",
+    "sha256": "10a399ed3e390eb3a848364c18692a21070184cf244360a1048588dab3457f49",
+    "source": "C:\\Users\\Dharmik Shingala\\stonecharts\\charts\\bubble\\examples\\basic.json"
+  },
+  "report": "report.html",
+  "runtimes": [
+    {
+      "bytes": 4152,
+      "demoDriftApplied": "none",
+      "implementation": "CPython",
+      "output": "python-output.svg",
+      "pythonVersion": "3.14.4",
+      "runtime": "python",
+      "sha256": "5cc99ebb28ab37c9297875c6997617db7daf53fc2d9aee217052135a8897d242",
+      "stonechartsVersion": "0.0.0.4"
+    },
+    {
+      "bytes": 4152,
+      "demoDriftApplied": "none",
+      "goVersion": "go version go1.26.4 windows/amd64",
+      "module": "stonecharts",
+      "output": "go-output.svg",
+      "runtime": "go",
+      "sha256": "5cc99ebb28ab37c9297875c6997617db7daf53fc2d9aee217052135a8897d242",
+      "stonechartsVersion": "0.0.0.4"
+    }
+  ],
+  "status": "pass",
+  "tool": "stonecharts_verify",
+  "toolVersion": 1
+}

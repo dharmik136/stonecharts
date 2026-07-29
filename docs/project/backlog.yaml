@@ -1377,3 +1377,46 @@ items:
       - Cross-invocation consistency is re-checked for scatter and bubble on all four systems.
       - The results document states explicitly whether the line-chart findings held, changed, or were chart-shape-specific.
     verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-006
+    title: Test Highcharts determinism mitigation and measure warm/sustained throughput
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: Directly tested whether Highcharts.useSerialIds(true) (an internal Highcharts API for deterministic IDs) fixes the WORK-GTM-004 non-determinism finding - it does not, across process invocations. Also measured serial warm-process throughput (not just cold start) for all four targets, including running Highcharts Export Server in its own persistent server mode, to fairly represent how each system is actually deployed rather than only the one-shot CLI case.
+    traceability: [SC-PROD-003, SC-PROD-005, SC-QUAL-003]
+    risks: []
+    evidence: [BENCH-COMPETITOR-VEGA-20260729, BENCH-COMPETITOR-HIGHCHARTS-20260729]
+    dependencies: [WORK-GTM-005]
+    compatibility: Extends the existing results document only; does not change renderer output, schemas, released evidence, or the proprietary licensing boundary.
+    areas: [docs]
+    acceptance:
+      - The useSerialIds test is run via the export server's own --customCode option and the result (fixed or not fixed) is reported plainly either way.
+      - Highcharts Export Server's warm-throughput number uses its own documented persistent server mode (--enableServer), not the one-shot CLI, so the comparison is not unfairly stacked against its recommended deployment shape.
+      - The results document states plainly that only serial warm throughput was measured, not concurrent/parallel request throughput.
+    verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-007
+    title: Build GTM leave-behind materials for the insurance-reporting pilot
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A one-pager grounded strictly in the approved SC-PROD-003 pitch language and the measured SC-QUAL-003 benchmark numbers, a blank pilot case-study template that forbids filling in invented figures, and an interview cost-quantification worksheet operationalizing SC-PROD-003's "6 quantified costs" validation-gate criterion, all scoped to the DEC-017 insurance-reporting segment.
+    traceability: [SC-PROD-003, SC-PROD-006, SC-QUAL-003, SC-QUAL-004]
+    risks: []
+    evidence: []
+    dependencies: [WORK-GTM-004, WORK-GTM-006]
+    compatibility: Adds three new informative documentation assets only; does not change renderer output, schemas, released evidence, or the proprietary licensing boundary. Explicitly states the product is not open source.
+    areas: [docs]
+    acceptance:
+      - Every number in the one-pager is traceable to SC-QUAL-003; no invented metric appears.
+      - The one-pager explicitly states what StoneCharts is not (open source, a completed sale, a claim beyond the measured scope).
+      - The case-study template's bracketed fields contain no example or placeholder numbers that could be mistaken for real ones.
+      - The cost-quantification worksheet maps directly to SC-PROD-003's validation-gate cost criterion and instructs against estimating on the prospect's behalf.
+    verification: [python tools/check_docs.py]
