@@ -9,8 +9,8 @@ review_mode: independent
 applies_to: 0.0.0.4 and later
 requirements: []
 evidence: [TEST-DOCS-CONTROL]
-last_reviewed: "2026-07-28"
-review_due: "2026-08-28"
+last_reviewed: "2026-07-29"
+review_due: "2026-08-29"
 supersedes: null
 superseded_by: null
 ---
@@ -167,6 +167,93 @@ Supporting proof points:
 Avoid leading with "another charting library", "interactive chart library", "many
 chart types", or "native chart renderer". Lead with intentional, testable, and
 attributable report changes.
+
+## Market segment fit judgment
+
+The segments below are ranked by strategic judgment, not measured market data - no
+interview or sales evidence yet supports any of these scores. They exist to guide
+where to look after the insurance validation segment, not to expand scope now;
+`DEC-017`'s freeze and the validation gate below still govern what gets built.
+
+| Segment | Judged fit | Why |
+|---|---:|---|
+| Insurance reporting and actuarial platforms (current) | 8-8.5/10 | Recurring regulated reporting cycles; the segment already named in `DEC-017`. |
+| Financial-risk and regulatory reporting | 8/10 | Same drift-control value proposition; likely the larger market long-term but a wider, less focused starting point. |
+| Pharmaceutical and clinical reporting | 7.5/10 | The conformance/provenance model fits, but needs domain-specific policies and validation expectations StoneCharts does not have yet. |
+| Government, defense, air-gapped reporting | 7.5/10 | Native/offline execution fits well; procurement and certification barriers are real and unaddressed. |
+| Embedded reporting and document-generation vendors | 7/10 | Value is measurable (fewer support incidents, faster release review); likely the easiest non-regulated expansion. |
+
+Poor fit - do not pursue without a specific reason to revisit:
+
+| Segment | Judged fit | Why |
+|---|---:|---|
+| Front-end interactive dashboards | 2-3/10 | Competes on interaction breadth against mature libraries StoneCharts is not built to match. |
+| Exploratory data science | 2/10 | Matplotlib/Plotly/Altair already serve this; speed and notebook integration beat cross-runtime certification here. |
+| Small-business/email chart generation | 2/10 | QuickChart and similar are cheaper and easier for this job. |
+| General open-source developer adoption | 3/10 under the current license | The proprietary license and small ecosystem block this until a licensing decision changes it (see Licensing boundary below). |
+
+## Land-and-expand model
+
+If the validation gate is met and a segment converts, the expected sales motion is
+sequential, not a single sale:
+
+```text
+one report workflow -> one paid StoneVerify pilot -> one reporting platform ->
+all reports in that business unit -> central policy and baseline management ->
+additional runtimes and business units
+```
+
+StoneVerify is the initial sale. StoneVault and StonePolicy are the expansion
+products once a customer already trusts StoneVerify's evidence. StoneMigrate is the
+adoption accelerator that lowers the cost of bringing a customer's existing chart
+configurations under the governed contract. This ordering is a judgment about
+sequencing, not a commitment to build Vault, Policy, or Migrate - each still requires
+its own `DEC` and `REQ` under the expansion rule once, and if, a paying workflow asks
+for it.
+
+## Platform completion judgment (deferred)
+
+This section records a strategic judgment about what completing the full platform
+direction - StoneSpec, StoneRender, StoneVerify, StoneVault, StonePolicy, and
+StoneMigrate, plus broader chart-family coverage - could be worth, and what it could
+not prove by itself. It does not authorize any of that work; `DEC-017`'s freeze and
+the expansion rule still govern what actually gets built, and StoneVault, StonePolicy,
+and StoneMigrate remain later product surfaces per Product direction above.
+
+| Dimension | Current repository (judgment) | Completed suite (judgment) |
+|---|---:|---:|
+| Technical product quality | 8/10 | 9/10 |
+| General chart-library competitiveness | 3/10 | 5/10 |
+| Regulated-reporting fit | 6/10 | 8.5/10 |
+| Competitive differentiation | 6.5/10 | 8/10 |
+| Ease of adoption | 3.5/10 | 7.5/10 |
+| Proven market demand | 2/10 | Still requires customers |
+| Overall PMF potential | 4.5/10 today | 7.5-8/10 potential |
+
+These are strategic judgment scores, not measured market statistics. "PMF potential"
+means a completed suite could fit the market, not that it would be bought. Chart
+breadth alone - more chart types, without Verify, Vault, Policy, or Migrate - is
+judged to reach only 5-6/10: mainstream libraries (Highcharts 40+ types, Plotly 70+,
+ECharts 20+) already win on catalog size, and StoneCharts cannot out-catalog them.
+The differentiated position is the integrated system - spec, certified renderers,
+semantic verification, policy evaluation, baseline approval, evidence retention,
+migration and release history - not any single component.
+
+A further-out hypothesis, explicitly not part of any current scope: the ceiling could
+rise substantially if the category eventually widens from chart integrity to
+report-wide integrity (charts, tables, document sections, versioned calculations,
+approval workflows, evidence packages). This is a future hypothesis, not a
+validation-gate target.
+
+Three assumptions the validation gate below must still resolve before any of this
+judgment can be acted on:
+
+1. Do customers experience costly, recurring visual drift, not a one-off annoyance?
+2. Is chart-aware semantic verification materially better than the visual-regression
+   tools they could already use, such as Chromatic, Applitools, or a manual
+   screenshot review?
+3. Will the economic buyer fund a dedicated platform, or absorb the problem inside
+   existing QA and reporting tooling?
 
 ## Validation gate
 
