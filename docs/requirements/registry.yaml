@@ -431,8 +431,8 @@ requirements:
 
   - id: REQ-VERIFY-005
     title: Semantic StoneVerify difference classification
-    statement: StoneVerify MUST classify a detected SVG difference into a named category grounded in the governed chart and SVG contracts, using an explicit unknown category when the cause cannot be determined confidently, rather than only reporting byte or tag-count differences.
-    rationale: A product sold on explaining chart drift must classify what changed, not only that something changed.
+    statement: StoneVerify MUST classify a detected SVG difference into a named category grounded in the governed chart and SVG contracts, using an explicit unknown category when the cause cannot be determined confidently, rather than only reporting byte or tag-count differences. Every comparison MUST additionally report one of three equality levels - byte equal, structurally equal, or semantically equal - so a serialization-only change is distinguishable from a real content change without weakening the existing byte-parity guarantee for certified Python-Go fixtures (REQ-DET-001). A fourth level, perceptual equality under a controlled export profile, is an explicitly out-of-scope future extension, not part of this requirement.
+    rationale: A product sold on explaining chart drift must classify what changed, not only that something changed, and must be able to say a change was cosmetic without implying the underlying content is unverified.
     kind: functional
     priority: must
     status: proposed
@@ -441,7 +441,8 @@ requirements:
     source: SC-PROD-003
     acceptance:
       - Each finding is classified as one of input-data, geometry, scale-domain, label-text, theme-style, accessibility-metadata, serialization-only, chart-type-capability, or unknown-structural.
-      - The unknown-structural category is used explicitly when classification confidence is low, rather than forcing a difference into an incorrect specific category.
+      - Each finding also reports an equality level (byte, structural, or semantic) and a confidence level (high, medium, or low) with the specific evidence (basis) that produced the classification.
+      - The unknown-structural category is used, with confidence low, when classification confidence is low, rather than forcing a difference into an incorrect specific category.
       - Classification is grounded in spec/svg-contract.md's element and attribute contract, not ad hoc heuristics.
     decisions: []
     contracts: []
