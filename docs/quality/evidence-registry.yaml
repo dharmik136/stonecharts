@@ -184,3 +184,17 @@ evidence:
     command: 'curl -X POST -H "Content-Type: application/json" -d @quickchart-request.json https://quickchart.io/chart'
     location: docs/quality/competitor-benchmark-results-2026-07.md
     requirements: []
+  - id: BENCH-COMPETITOR-ECHARTS-20260729
+    kind: benchmark
+    status: implemented
+    description: Measured competitor-benchmark run under SC-PROD-005 against ECharts' server-side SVG SSR mode (no browser) - cold-start time, peak memory, cross-invocation consistency, egress, and dependency/CVE surface for the line-chart shape.
+    command: npm install echarts && node render.js echarts-line-config.json out-echarts.svg
+    location: docs/quality/competitor-benchmark-results-2026-07.md
+    requirements: []
+  - id: BENCH-COMPETITOR-PLOTLY-20260729
+    kind: benchmark
+    status: implemented
+    description: Measured competitor-benchmark run under SC-PROD-005 against Plotly's Kaleido static-export path (drives a real headless browser via choreographer) - cold-start time, peak memory, cross-invocation consistency (found non-deterministic, same class of defect as Highcharts), egress, and dependency/CVE surface (audited in an isolated venv) for the line-chart shape.
+    command: pip install plotly kaleido && python plotly_render.py out-plotly.svg
+    location: docs/quality/competitor-benchmark-results-2026-07.md
+    requirements: []
