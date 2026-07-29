@@ -99,6 +99,19 @@ anywhere else in this repository.
 | Overall PMF potential | 4.5/10 today | 7.5-8/10 potential |
 | Chart breadth alone (no Verify/Vault/Policy/Migrate) | - | 5-6/10 |
 
-These are strategic judgment scores from an external market-fit analysis, not
+| Segment | Judged fit |
+|---|---:|
+| Insurance reporting and actuarial platforms (current) | 8-8.5/10 |
+| Financial-risk and regulatory reporting | 8/10 |
+| Pharmaceutical and clinical reporting | 7.5/10 |
+| Government, defense, air-gapped reporting | 7.5/10 |
+| Embedded reporting and document-generation vendors | 7/10 |
+| Front-end interactive dashboards | 2-3/10 |
+| Exploratory data science | 2/10 |
+| Small-business/email chart generation | 2/10 |
+| General open-source developer adoption (current license) | 3/10 |
+
+Historical internal heuristic - non-normative and not based on measured customer
+data. These are strategic judgment scores from an external market-fit analysis, not
 measured market statistics, and do not supersede or restate SC-PROD-003's normative
-qualitative table.
+qualitative tables.

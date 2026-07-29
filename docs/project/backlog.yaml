@@ -1382,21 +1382,23 @@ items:
     workstream: WS-03 Conformance
     stage: S5 Expansion
     target: Unscheduled
-    outcome: StoneVerify classifies a detected difference into a named category (input-data, geometry, scale-domain, label-text, theme-style, accessibility-metadata, serialization-only, chart-type-capability, or unknown-structural) with a human-readable description of what changed, replacing the current single likelyCause string derived only from byte/tag-count/line-diff heuristics.
+    outcome: StoneVerify classifies a detected difference into a named category (input-data, geometry, scale-domain, label-text, theme-style, accessibility-metadata, serialization-only, chart-type-capability, or unknown-structural) with a human-readable description of what changed and an explicit equality-level verdict, replacing the current single likelyCause string derived only from byte/tag-count/line-diff heuristics.
     traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-005]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-007]
-    compatibility: Extends comparison.json and report.html with new structured fields; keeps the existing likelyCause string for backward compatibility with anything already consuming it.
+    compatibility: Extends comparison.json and report.html with new structured fields; keeps the existing likelyCause string for backward compatibility with anything already consuming it. Does not weaken the existing byte-parity guarantee for certified Python-Go golden fixtures (REQ-DET-001) - equality levels add finer-grained reporting on top of that guarantee, they do not replace it.
     areas: [python, docs]
     acceptance:
       - classify_difference() walks the compared SVGs' element/attribute structure per spec/svg-contract.md instead of relying only on tag counts and a line diff.
+      - Every comparison reports an explicit equality level - byte equal, structurally equal, semantically equal, or none of those - alongside the category, so a serialization-only change (structurally and semantically equal, not byte equal) is visibly distinct from a real content change. Perceptual equality (no material visible difference under a controlled export profile) is documented as an explicitly out-of-scope future level for this item, not silently implied.
       - Geometry-affecting attributes (d, cx, cy, r, x, y, points, transform) are classified separately from style/theme attributes (fill, stroke, font-*, class) and from text-content changes.
       - Accessibility metadata changes (role, aria-*, the screen-reader summary) are classified separately from visual changes.
       - A whitespace-only or attribute-ordering-only difference is classified as serialization-only, not left under the generic "attribute, numeric formatting, ordering, or text-content drift" bucket.
-      - Each classified difference includes a plain-language description naming the changed element/attribute, not just a byte offset.
+      - Each classified difference includes a plain-language description naming the changed element/attribute, not just a byte offset, plus a confidence level (high, medium, or low) and the specific evidence (basis) that produced the classification.
+      - unknown-structural is used, with confidence low, when the classifier cannot ground a difference in a specific category rather than guessing.
       - Existing golden/parity tests and the WORK-VERIFY-002 demo-drift tests still pass unchanged.
-    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, a demo-drift run for each of text/attribute drift modes shows the new category in comparison.json]
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, a demo-drift run for each of text/attribute drift modes shows the new category, equality level, and confidence in comparison.json]
 
   - id: WORK-VERIFY-010
     title: Fold the interaction-runtime test into CI and stabilize StoneVerify exit codes
@@ -1427,15 +1429,16 @@ items:
     workstream: WS-03 Conformance
     stage: S5 Expansion
     target: Unscheduled
-    outcome: stoneverify's primary documented workflow is comparing a candidate render against an approved baseline across a software release or dependency upgrade, with cross-runtime Python-vs-Go comparison kept as an available advanced proof rather than the lead framing, matching the positioning shift SC-PROD-007 already uses.
+    outcome: stoneverify's primary documented workflow is comparing a candidate render against an approved baseline across a software release or dependency upgrade, with cross-runtime Python-vs-Go comparison kept as an available advanced proof rather than the lead framing, matching the positioning shift SC-PROD-007 already uses. The baseline itself carries enough identity to say what it is and what it replaced.
     traceability: [SC-PROD-003, SC-PROD-004, SC-PROD-007, REQ-VERIFY-003]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-008, WORK-VERIFY-009, WORK-VERIFY-014A]
-    compatibility: Reframes CLI defaults, help text, and documentation; the underlying --baseline-evidence comparison already exists from WORK-VERIFY-003 and is not being replaced.
+    compatibility: Reframes CLI defaults, help text, and documentation; the underlying --baseline-evidence comparison already exists from WORK-VERIFY-003 and is not being replaced. Deliberately excludes approval workflow, waiver tracking, and external ticket references - that is StoneVault-shaped functionality this item does not build; see the Product direction note in SC-PROD-003 that StoneVault remains a later product surface.
     areas: [python, docs]
     acceptance:
       - Running stoneverify without a second --runtime defaults to a single-runtime render compared against --baseline-evidence when supplied, rather than requiring both runtimes to get useful output.
+      - The baseline result records its own identity (evidence directory, manifest hash, tool version, generation timestamp) and, when the caller supplies a prior baseline being replaced, which one it supersedes.
       - README.md and docs/quality/stoneverify-quickstart.md lead with the cross-release/baseline workflow before the cross-runtime workflow.
       - Existing cross-runtime behavior and tests are unchanged when both --runtime flags are passed explicitly.
     verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, docs/quality/stoneverify-quickstart.md reviewed against the new default ordering]
@@ -1459,6 +1462,8 @@ items:
       - Every certified chart type (line, column, area, bar, scatter, bubble) has a randomized property test in both Python and Go asserting the shared invariants, including valid SVG output and byte-parity where applicable.
       - Cross-language invalid-input parity tests exist for every documented validation error class in docs/contracts/validation-and-capabilities.md.
       - A specification with pathological size or nesting is rejected with a stable, documented error rather than unbounded resource consumption or a crash.
+      - Concrete limits are documented and enforced for maximum series count, maximum points per series, maximum total points, maximum label length, and a render timeout, identically in both languages.
+      - A limit-exceeded input produces a stable, documented machine-readable error code and a non-zero exit, not a partial evidence bundle and not a silent truncation.
       - Malformed Unicode and unescaped text in labels, titles, and tooltips render safely in both runtimes with matching behavior.
       - A documented coverage threshold is enforced in CI for libs/python and libs/go.
     verification: [python -m pytest libs/python/tests -q --cov, go test ./... -cover, a documented adversarial-input fixture set runs clean in CI]
@@ -1493,7 +1498,7 @@ items:
     workstream: WS-03 Conformance
     stage: S5 Expansion
     target: Unscheduled
-    outcome: One schema-versioned internal result structure (schemaVersion, status, comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, environment) becomes the single source every output adapter is built from, replacing the current pattern of separately constructed dictionaries for runtime comparison, baseline comparison, and evidence-bundle comparison.
+    outcome: One schema-versioned internal result structure (schemaVersion, status, comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, environment) becomes the single source every output adapter is built from, replacing the current pattern of separately constructed dictionaries for runtime comparison, baseline comparison, and evidence-bundle comparison. Defines the result envelope and its extension points; does not freeze the semantic taxonomy WORK-VERIFY-009 is still defining.
     traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-002]
     risks: []
     evidence: [TEST-STONEVERIFY-RESULT-SCHEMA]
@@ -1503,6 +1508,10 @@ items:
     acceptance:
       - A single VerificationResult structure carries schemaVersion, status, comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, and environment.
       - compare_outputs(), compare_baseline(), and compare_evidence_bundles() all populate the same structure instead of three separately shaped dictionaries.
+      - The result declares its JSON Schema dialect explicitly (schemaVersion is StoneVerify's own result-shape version, independent of and in addition to the dialect declaration).
+      - The environment field records, at minimum, OS and architecture, Python and Go versions, stoneverify and stonecharts package versions, the result schemaVersion, and locale/timezone - so a difference can be attributed to environment rather than misread as renderer drift. Font identity and toolchain fingerprinting are explicitly out of scope for this item, since the certified visual profile is host-font semantic SVG (DEC-010), not an embedded-font profile.
+      - Every finding carries a stable machine-readable code (for example VERIFY.SCALE.DOMAIN_CHANGED) distinct from its human-readable message, so automation and future CI adapters key on the code, not on English text that may be reworded later.
+      - "Content hashes (evidence file digests, spec digest, result digest) are represented as an algorithm-qualified object with separate algorithm and value fields, not a bare sha256 key, so a future stronger digest algorithm does not require a breaking schema change."
       - manifest.json and comparison.json are unchanged in their existing fields for current consumers; schemaVersion is the only new top-level field.
       - Existing golden, parity, and demo-drift tests pass unchanged.
     verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q]

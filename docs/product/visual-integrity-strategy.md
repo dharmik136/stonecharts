@@ -171,26 +171,31 @@ attributable report changes.
 ## Market segment fit judgment
 
 The segments below are ranked by strategic judgment, not measured market data - no
-interview or sales evidence yet supports any of these scores. They exist to guide
+interview or sales evidence yet supports any of these hypotheses. They exist to guide
 where to look after the insurance validation segment, not to expand scope now;
-`DEC-017`'s freeze and the validation gate below still govern what gets built.
+`DEC-017`'s freeze and the validation gate below still govern what gets built. An
+earlier draft scored these segments with precise decimals (for example "8-8.5/10");
+those numbers are retired here for the same reason the platform-completion table's
+were - see that section below - and kept, unaltered, in the internal research
+appendix of
+[`decision-briefs/dec-017-visual-integrity.md`](../project/decision-briefs/dec-017-visual-integrity.md).
 
-| Segment | Judged fit | Why |
-|---|---:|---|
-| Insurance reporting and actuarial platforms (current) | 8-8.5/10 | Recurring regulated reporting cycles; the segment already named in `DEC-017`. |
-| Financial-risk and regulatory reporting | 8/10 | Same drift-control value proposition; likely the larger market long-term but a wider, less focused starting point. |
-| Pharmaceutical and clinical reporting | 7.5/10 | The conformance/provenance model fits, but needs domain-specific policies and validation expectations StoneCharts does not have yet. |
-| Government, defense, air-gapped reporting | 7.5/10 | Native/offline execution fits well; procurement and certification barriers are real and unaddressed. |
-| Embedded reporting and document-generation vendors | 7/10 | Value is measurable (fewer support incidents, faster release review); likely the easiest non-regulated expansion. |
+| Segment | Fit hypothesis | Evidence confidence |
+|---|---|---|
+| Insurance reporting and actuarial platforms (current) | Strong potential fit | Low-medium |
+| Financial-risk and regulatory reporting | Strong adjacent fit | Low |
+| Pharmaceutical and clinical reporting | Plausible but domain-intensive | Low |
+| Government, defense, air-gapped reporting | Plausible but procurement-heavy | Low |
+| Embedded reporting and document-generation vendors | Promising operational fit | Low |
 
 Poor fit - do not pursue without a specific reason to revisit:
 
-| Segment | Judged fit | Why |
-|---|---:|---|
-| Front-end interactive dashboards | 2-3/10 | Competes on interaction breadth against mature libraries StoneCharts is not built to match. |
-| Exploratory data science | 2/10 | Matplotlib/Plotly/Altair already serve this; speed and notebook integration beat cross-runtime certification here. |
-| Small-business/email chart generation | 2/10 | QuickChart and similar are cheaper and easier for this job. |
-| General open-source developer adoption | 3/10 under the current license | The proprietary license and small ecosystem block this until a licensing decision changes it (see Licensing boundary below). |
+| Segment | Fit hypothesis | Evidence confidence |
+|---|---|---|
+| Front-end interactive dashboards | Poor fit | Medium |
+| Exploratory data science | Poor fit | Medium |
+| Small-business/email chart generation | Poor fit | Medium |
+| General open-source developer adoption | Poor fit under the current license | Medium |
 
 ## Land-and-expand model
 
