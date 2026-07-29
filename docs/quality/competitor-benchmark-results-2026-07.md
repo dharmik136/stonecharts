@@ -31,13 +31,21 @@ toward validating it.
   machine. No other CPU-intensive process was running during timed measurement,
   following the same clean-run discipline used for StoneCharts' own release
   benchmarks (see [benchmark-spec.md](benchmark-spec.md)).
-- **Chart under test:** one two-series, twelve-category line chart (`Monthly Average
-  Temperature`, Tokyo vs. London), expressed as the equivalent native config for each
-  target. Source specs are in the evidence bundle (see
-  [Reproduction](#reproduction)).
+- **Charts under test:** three chart shapes, each expressed as the equivalent native
+  config for every target: a two-series, twelve-category **line** chart (`Monthly
+  Average Temperature`, Tokyo vs. London); a 15-point single-series **scatter** chart
+  (`Response Latency by Sample`); and a 6-point single-series **bubble** chart
+  (`Endpoint Latency vs Payload`, `[x, y, z]` triples). Scatter and bubble mirror
+  StoneCharts' own `charts/scatter/examples/basic.json` and
+  `charts/bubble/examples/basic.json` fixtures. For Chart.js's bubble dataset, which
+  takes a literal pixel radius rather than a size value, the six radii were
+  precomputed with StoneCharts' own published size-scale formula
+  (`r = 4 + 28 * sqrt(clamp01((z - zmin) / (zmax - zmin)))`, `RMIN=4`, `RMAX=32`) so
+  the rendered bubble areas are comparable, not just the raw data. Source specs are
+  in the evidence bundle (see [Reproduction](#reproduction)).
 - **Harness:** a fresh child process per run, wall-clock timed from spawn to exit,
   peak resident-set size sampled by polling the process and all of its descendants
-  (`psutil`) every 20 ms. This matters for the headless-browser targets, whose
+  (`psutil`) every 5 ms. This matters for the headless-browser targets, whose
   renderer runs as a child process the parent alone does not account for.
 - **Versions measured:** StoneCharts `4eff89a` (this repository, Python 3.14.4 / Go
   1.26.4); `vega@5.33.1` + `vega-lite@5.23.0` on Node v24.15.0; `highcharts-export-server@5.1.0`
@@ -47,11 +55,13 @@ toward validating it.
 ## Operational footprint
 
 Cold-start wall-clock time and peak memory for one fresh-process render of the
-equivalent chart. StoneCharts and Vega ran 10 timed invocations; the Highcharts
-Export Server ran 5 (at ~13-14 s per run, 5 gave a stable median without an
-excessive total run time). QuickChart is a hosted call, not a local process — its
-number is network request latency, reported separately below, not merged into this
-table.
+equivalent chart. StoneCharts and Vega ran 10 timed invocations per chart type; the
+Highcharts Export Server ran 5 per chart type (at ~13-15 s per run, 5 gave a stable
+median without an excessive total run time). QuickChart is a hosted call, not a local
+process — its numbers are network request latency, reported separately below, not
+merged into these tables.
+
+### Line chart
 
 | Target | Median cold-start | Min-max | Median peak RSS (process tree) |
 |---|---:|---:|---:|
@@ -62,6 +72,27 @@ table.
 
 The Go outlier at 0.336 s was the first run in the batch (cold OS file-cache); the
 remaining 9 runs were 0.070-0.078 s.
+
+### Scatter chart
+
+| Target | Median cold-start | Min-max | Median peak RSS (process tree) |
+|---|---:|---:|---:|
+| StoneCharts (Go) | 0.088 s | 0.084-0.090 s | 10.4 MB |
+| StoneCharts (Python) | 0.132 s | 0.123-0.149 s | 20.9 MB |
+| Vega-Lite (`point` mark, no browser) | 1.038 s | 1.010-1.057 s | 70.4 MB |
+| Highcharts Export Server | 13.707 s | 12.906-13.992 s | 550.7 MB |
+
+### Bubble chart
+
+| Target | Median cold-start | Min-max | Median peak RSS (process tree) |
+|---|---:|---:|---:|
+| StoneCharts (Go) | 0.089 s | 0.082-0.093 s | 10.2 MB |
+| StoneCharts (Python) | 0.139 s | 0.126-0.160 s | 20.8 MB |
+| Vega-Lite (`circle` mark, sqrt size scale) | 1.038 s | 1.008-1.101 s | 73.6 MB |
+| Highcharts Export Server (bubble series) | 14.519 s | 14.131-15.298 s | 541.2 MB |
+
+The orders-of-magnitude gaps hold consistently across all three chart shapes: they are
+not an artifact of the line chart being an easy case for any one target.
 
 Highcharts Export Server was run via its npm CLI directly
 (`node bin/cli.js --infile ... --outfile ... --type svg`), not the official Docker
@@ -77,21 +108,22 @@ cold-start characteristic rather than excluded as an anomaly.
 
 ## Cross-invocation consistency
 
-Each target rendered the same input twice through its own supported path; outputs
-were compared byte-for-byte.
+Each target rendered the same input twice through its own supported path, for all
+three chart shapes; outputs were compared byte-for-byte.
 
-| Target | Result | Detail |
-|---|---|---|
-| StoneCharts | Byte-identical | Also byte-identical **across** the Python and Go renderers, not just across two runs of one renderer — this is the product's core contract, not a benchmark finding. |
-| Vega/Vega-Lite | Byte-identical | Two `node render.js` invocations of the same spec produced identical SVG bytes. |
-| QuickChart | Byte-identical | Two hosted requests with the same Chart.js config produced identical PNG bytes (66,631 bytes both times). |
-| Highcharts Export Server | **Differs** | Two invocations of the identical input config produced same-length (25,338 bytes) but byte-different SVG. The diff is confined to a randomly generated per-render instance ID string (e.g. `highcharts-8sa4j9f-21-` vs. `highcharts-ats9qkf-21-`) embedded in `clipPath`/`id` attributes and their references, repeated at every point that ID is used. |
+| Target | Line | Scatter | Bubble | Detail |
+|---|---|---|---|---|
+| StoneCharts | Identical | Identical | Identical | Also byte-identical **across** the Python and Go renderers on every chart shape, not just across two runs of one renderer — this is the product's core contract, not a benchmark finding. |
+| Vega/Vega-Lite | Identical | Identical | Identical | Every `node render.js` invocation of a given spec produced identical SVG bytes, across all three chart shapes. |
+| QuickChart | Identical | Identical | Identical | Every pair of hosted requests with the same Chart.js config produced identical PNG bytes (line: 66,631 B; scatter: 36,743 B; bubble: 46,633 B). |
+| Highcharts Export Server | **Differs** | **Differs** | **Differs** | Every chart shape reproduced the same finding: same-length output (line 25,338 B; scatter 19,478 B; bubble 15,011 B), byte-different at the same offset (char 4211, line 79) every time. The diff is confined to a randomly generated per-render instance ID string (e.g. `highcharts-8sa4j9f-21-` vs. `highcharts-ats9qkf-21-`) embedded in `clipPath`/`id` attributes and their references, repeated at every point that ID is used. |
 
 The Highcharts finding means a naive byte-diff or content-hash conformance check
 against raw Highcharts Export Server SVG output will report a false change on every
-regeneration, even with no configuration change. This was not evaluated for whether
-the drawn geometry is otherwise pixel-identical beyond the ID strings; only the raw
-SVG bytes were diffed.
+regeneration, even with no configuration change, and it reproduces identically across
+three unrelated chart types rather than being specific to one chart's geometry. This
+was not evaluated for whether the drawn geometry is otherwise pixel-identical beyond
+the ID strings; only the raw SVG bytes were diffed.
 
 ## Data egress
 
@@ -131,12 +163,15 @@ as a surprise finding.
 
 ## What this does and does not establish
 
-This is one chart, on one host, on one day, run by the vendor whose product is being
-compared favorably. It establishes real, reproducible orders-of-magnitude gaps in
-cold-start time, memory, and dependency-surface size, and one concrete,
+This is three chart shapes (line, scatter, bubble), on one host, on one day, run by
+the vendor whose product is being compared favorably. It establishes real,
+reproducible orders-of-magnitude gaps in cold-start time, memory, and
+dependency-surface size that hold consistently across all three shapes rather than
+being an artifact of picking an easy chart, and one concrete,
 previously-unquantified non-determinism finding in Highcharts Export Server's raw
-output. It does **not** establish a controlled multi-chart-type comparison, a
-production Linux/container measurement, sustained-load behavior, or an assessment of
+output that also reproduces across all three shapes. It does **not** establish
+results for chart types outside these three, a production Linux/container
+measurement, sustained-load or concurrent-request behavior, or an assessment of
 Highcharts' or Vega's actual security posture beyond the specific advisories listed.
 None of the recurring-cost or willingness-to-pay claims in `SC-PROD-003`'s validation
 gate are addressed by this document; only real interviews close that gate.
@@ -168,7 +203,14 @@ python measure.py highcharts-export-server-cli 5 -- \
 # POST chartjs-config.json as {"chart": <config>} to https://quickchart.io/chart
 ```
 
-The `measure.py` harness, the four equivalent chart specs, the raw per-run JSON
-output, `npm audit --json` captures, and all rendered artifacts from this run are
-retained locally alongside this document's evidence entries; they are not committed
-to source control (they are throwaway measurement artifacts, not release fixtures).
+Scatter and bubble repeat the same commands against
+`stonecharts-scatter-spec.json` / `stonecharts-bubble-spec.json`,
+`vega-lite-scatter-spec.json` / `vega-lite-bubble-spec.json`,
+`highcharts-scatter-config.json` / `highcharts-bubble-config.json`, and
+`chartjs-scatter-config.json` / `chartjs-bubble-config.json` respectively.
+
+The `measure.py` harness, the twelve equivalent chart specs (three shapes across four
+targets), the raw per-run JSON output, `npm audit --json` captures, and all rendered
+artifacts from this run are retained locally alongside this document's evidence
+entries; they are not committed to source control (they are throwaway measurement
+artifacts, not release fixtures).

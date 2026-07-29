@@ -1356,3 +1356,24 @@ items:
       - The dependency/CVE table cites exact installed versions and the exact npm audit or registry finding, with no invented percentages.
       - The results document explicitly states what it does and does not establish, including that no interview or paid-pilot validation-gate criteria are addressed by a technical benchmark.
     verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-005
+    title: Extend the competitor benchmark to scatter and bubble chart shapes
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: The WORK-GTM-004 benchmark run is repeated for scatter and bubble equivalents (mirroring StoneCharts' own certified scatter/bubble example fixtures) against the same three targets, confirming the operational-footprint gaps and the Highcharts Export Server non-determinism finding hold across three chart shapes rather than being specific to the original line-chart case.
+    traceability: [SC-PROD-003, SC-PROD-005, SC-QUAL-003]
+    risks: []
+    evidence: [BENCH-COMPETITOR-VEGA-20260729, BENCH-COMPETITOR-HIGHCHARTS-20260729, BENCH-COMPETITOR-QUICKCHART-20260729]
+    dependencies: [WORK-GTM-004]
+    compatibility: Extends the existing results document and measurement harness only; does not change renderer output, schemas, released evidence, or the proprietary licensing boundary.
+    areas: [docs]
+    acceptance:
+      - Scatter and bubble equivalents are measured for cold-start time and peak memory against all applicable targets, using the same harness and clean-run discipline as the line-chart baseline.
+      - Cross-invocation consistency is re-checked for scatter and bubble on all four systems.
+      - The results document states explicitly whether the line-chart findings held, changed, or were chart-shape-specific.
+    verification: [python tools/check_docs.py]
