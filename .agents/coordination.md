@@ -13,7 +13,18 @@ from the repo owner, the current checkout, and the handoff notes in this reposit
 They communicate by writing the current state into the coordination files, not by
 waiting for a fresh human directive at every transition.
 
-## Preferred topology
+## Observed practice as of 2026-07-29
+
+In practice, work on this repository has run as a single active agent at a time,
+committing directly to `main` in small, sequential commits rather than through the
+branch-per-worker topology below. `main` was also swept clean of every other local
+and remote branch (2026-07-29; see `.agents/state/inventory.md`), so there is
+currently exactly one branch. Treat the topology below as what to reach for **when
+two or more agents are genuinely working concurrently**; it is not a description of
+the routine single-agent case, and it should not be read as license to open
+speculative branches when only one agent is active.
+
+## Preferred topology (for genuinely concurrent multi-agent work)
 
 1. One coordinator agent owns the integration branch.
 2. Each worker agent uses its own branch or git worktree.
