@@ -1,6 +1,6 @@
 id: SC-QUAL-EVIDENCE
 version: 1
-updated: "2026-07-19"
+updated: "2026-07-29"
 evidence:
   - id: TEST-DOCS-CONTROL
     kind: test
@@ -163,3 +163,24 @@ evidence:
     command: py -3 libs/python/benchmark.py && cd libs/go && go run ./cmd/benchmark
     location: docs/releases/0.0.0.4/evidence/bubble-performance-baseline-review.md
     requirements: [REQ-CHART-003, REQ-PERF-001]
+  - id: BENCH-COMPETITOR-VEGA-20260729
+    kind: benchmark
+    status: implemented
+    description: First measured competitor-benchmark run under SC-PROD-005 against Vega/Vega-Lite server-side rendering - cold-start time, peak memory, cross-invocation consistency, egress, and dependency/CVE surface for one equivalent chart.
+    command: npm install vega@5 vega-lite@5 && node render.js vega-lite-spec.json out-vega.svg
+    location: docs/quality/competitor-benchmark-results-2026-07.md
+    requirements: []
+  - id: BENCH-COMPETITOR-HIGHCHARTS-20260729
+    kind: benchmark
+    status: implemented
+    description: First measured competitor-benchmark run under SC-PROD-005 against Highcharts Export Server (Puppeteer/Chromium) - cold-start time, peak memory, cross-invocation consistency, egress, and dependency/CVE surface for one equivalent chart.
+    command: npm install highcharts-export-server && node node_modules/highcharts-export-server/bin/cli.js --infile highcharts-config.json --outfile out-highcharts.svg --type svg
+    location: docs/quality/competitor-benchmark-results-2026-07.md
+    requirements: []
+  - id: BENCH-COMPETITOR-QUICKCHART-20260729
+    kind: benchmark
+    status: implemented
+    description: First measured competitor-benchmark run under SC-PROD-005 against QuickChart's hosted API - request latency, cross-invocation consistency, and the inherent data-egress property for one equivalent chart.
+    command: 'curl -X POST -H "Content-Type: application/json" -d @quickchart-request.json https://quickchart.io/chart'
+    location: docs/quality/competitor-benchmark-results-2026-07.md
+    requirements: []

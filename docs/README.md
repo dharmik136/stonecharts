@@ -75,6 +75,7 @@ Document status and classification are authoritative in each file's metadata.
 - [Scatter performance baseline review](releases/0.0.0.3/evidence/scatter-performance-baseline-review.md)
 - [Bubble accessibility and security review](releases/0.0.0.4/evidence/bubble-accessibility-security-review.md)
 - [Bubble performance baseline review](releases/0.0.0.4/evidence/bubble-performance-baseline-review.md)
+- [Competitor benchmark results (2026-07)](quality/competitor-benchmark-results-2026-07.md)
 
 Research and long-range roadmaps remain under `docs/research` and `docs/roadmap`.
 They inform decisions but do not override approved requirements, ADRs, or contracts.
