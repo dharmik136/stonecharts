@@ -28,6 +28,8 @@ Document status and classification are authoritative in each file's metadata.
 - [Positioning and first-release scope](product/positioning-and-scope.md)
 - [Visual integrity strategy](product/visual-integrity-strategy.md)
 - [Capability matrix](product/capability-matrix.md)
+- [Competitor benchmark methodology](product/competitor-benchmark-methodology.md)
+- [Prospect qualification scorecard and interview script](product/prospect-qualification-scorecard.md)
 - [Requirements registry](requirements/registry.yaml)
 - [Requirements and traceability guide](requirements/README.md)
 - [Risk register](governance/risk-register.yaml)

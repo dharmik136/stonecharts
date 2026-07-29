@@ -9,8 +9,8 @@ review_mode: self
 applies_to: all
 requirements: [REQ-PROD-001]
 evidence: []
-last_reviewed: "2026-07-17"
-review_due: "2026-10-18"
+last_reviewed: "2026-07-29"
+review_due: "2026-10-29"
 supersedes: null
 superseded_by: null
 ---
@@ -50,9 +50,15 @@ The exact boundary of each promise is defined by
 [`SC-CON-001`](../contracts/guarantees-and-limits.md). Product language MUST NOT turn
 an internal byte-parity oracle into an unsupported claim of universal pixel identity.
 
-The thesis is intentionally aligned with the current baseline: `line` and `column`
-are the only active 0.0.0.1 chart types, and all other chart recipes remain
-informative until their contracts and renderers are admitted.
+The thesis is intentionally aligned with the current baseline: `line`, `column`,
+`area`, `bar`, `scatter`, and `bubble` are certified across releases `0.0.0.1`
+through `0.0.0.4` (see [`SC-PROD-004`](capability-matrix.md) for the authoritative
+capability table). All other chart recipes under `charts/<id>/design.md` remain
+informative until each passes the chart admission checklist. Per
+[`DEC-017`](../project/decisions.md), broad chart-family expansion is paused after
+`0.0.0.4`; new chart types, languages, hosted services, or document-generation
+capabilities require paid customer evidence or explicit approval as necessary
+validation infrastructure.
 
 ## Primary users
 
@@ -64,6 +70,16 @@ informative until their contracts and renderers are admitted.
   deterministic artifacts, traceable decisions, and reproducible release evidence.
 - Product teams that need brand and domain customization without maintaining separate
   chart implementations in every stack.
+
+## Current validation focus
+
+The thesis above is the enduring technical contract. The active go-to-market
+category, initial validation segment, and product-surface roadmap
+(StoneSpec/StoneRender/StoneVerify/StoneVault/StonePolicy/StoneMigrate) are governed
+separately by [`SC-PROD-003`](visual-integrity-strategy.md), since that framing is
+subject to market validation and may change faster than this technical thesis. Do
+not restate the go-to-market category or validation-gate criteria here; link to
+`SC-PROD-003` instead.
 
 ## Product principles
 
