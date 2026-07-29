@@ -1364,11 +1364,12 @@ items:
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-007]
-    compatibility: Repackages the existing CLI's install and invocation path only; does not change renderer output, the chart spec, golden fixtures, or the proprietary licensing boundary. Distribution to any external party remains gated by DEC-018, which this item does not resolve.
+    compatibility: Repackages the existing CLI's install and invocation path only; does not change renderer output, the chart spec, golden fixtures, or the proprietary licensing boundary. Distribution to any external party remains gated by DEC-018, which this item does not resolve. If a third runtime is ever admitted under DEC-017's expansion rule, the CLI-to-binary interface this item documents should be revisited as its own decision before generalizing into a negotiated protocol - this item deliberately documents the existing simple contract, not a new one.
     areas: [python, go, docs]
     acceptance:
       - stoneverify installs as a console-script entry point from a built Python wheel, with no sys.path manipulation and no dependency on the stonecharts repository's directory layout at runtime.
       - The Go render path invokes a prebuilt stoneverify-go-render binary (resolved via --go-binary or an environment variable) instead of go run against a temp file inside the repository's Go module; go run remains available as an explicit --from-source developer fallback.
+      - The renderer-adapter interface this introduces is documented - invocation arguments, expected stdout (the rendered SVG), version-reporting behavior, and non-zero exit plus stderr on failure - so it is a written contract, not an undocumented one-off. This is documentation of the interface WORK-VERIFY-008 already builds, not a new negotiation protocol or capability-discovery system.
       - manifest.json's stonechartsVersion and module fields are read from the installed package/binary at runtime, not the hardcoded "0.0.0.4" literal currently in render_go().
       - The packaged CLI produces the same manifest/comparison/report/checksums output as today's repo-relative script for the existing bubble example, verified by diffing evidence bundles.
       - No outbound network calls occur during any stoneverify invocation.
@@ -1408,7 +1409,7 @@ items:
     workstream: WS-03 Conformance
     stage: S5 Expansion
     target: Unscheduled
-    outcome: The interaction-runtime test that currently runs standalone is included in the project's normal test/CI command, and stoneverify's exit codes distinguish a failed comparison from a usage or setup error instead of collapsing both to a generic non-zero result.
+    outcome: The interaction-runtime test that currently runs standalone is included in the project's normal test/CI command, and stoneverify's exit codes distinguish a failed comparison from a CLI usage error, an invalid or unsupported specification, a renderer-adapter execution failure, a resource-limit or timeout failure, and an internal StoneVerify failure - instead of collapsing all of them to one generic non-zero result. A CI user must be able to tell "the report changed" apart from "verification itself broke."
     traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-004]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
@@ -1417,8 +1418,8 @@ items:
     areas: [runtime, python, docs]
     acceptance:
       - The standalone interaction-runtime test is invoked from the same command documented in .claude/project-brief.md's baseline checks, or that document is updated to list it explicitly, so it can't silently stop running.
-      - stoneverify returns a distinct exit code for a failed comparison versus a CLI usage error versus a missing/invalid input file.
-      - The distinct exit codes are documented in README.md's StoneVerify section.
+      - stoneverify returns distinct, stable exit codes for at minimum - verification passed, verification completed with differences, CLI usage error, invalid or unsupported specification, renderer or adapter execution failure, resource-limit or timeout failure, and an internal StoneVerify failure. A renderer crash or a comparison timeout is not reported as the same code as a malformed input file.
+      - The exit-code table is documented in README.md's StoneVerify section, with the meaning of each code stated in one sentence.
     verification: [node --check runtime/chart-interactions.js and the standalone interaction test both run from one documented command, python -m pytest libs/python/tests -q]
 
   - id: WORK-VERIFY-011
@@ -1434,11 +1435,12 @@ items:
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-008, WORK-VERIFY-009, WORK-VERIFY-014A]
-    compatibility: Reframes CLI defaults, help text, and documentation; the underlying --baseline-evidence comparison already exists from WORK-VERIFY-003 and is not being replaced. Deliberately excludes approval workflow, waiver tracking, and external ticket references - that is StoneVault-shaped functionality this item does not build; see the Product direction note in SC-PROD-003 that StoneVault remains a later product surface.
+    compatibility: Reframes CLI defaults, help text, and documentation; the underlying --baseline-evidence comparison already exists from WORK-VERIFY-003 and is not being replaced. Deliberately excludes a structured approval workflow (status, policy version, waiver expiration, external ticket reference) - that models a review process that does not exist yet in how this tool is actually used, and building it now would mean either dead fields or new UX beyond this item's scope. A single optional free-text note is included instead, since it captures the same "why this baseline is authoritative" context for a human reader without inventing an approval state machine. See the Product direction note in SC-PROD-003 that StoneVault, which would own that workflow, remains a later product surface.
     areas: [python, docs]
     acceptance:
       - Running stoneverify without a second --runtime defaults to a single-runtime render compared against --baseline-evidence when supplied, rather than requiring both runtimes to get useful output.
       - The baseline result records its own identity (evidence directory, manifest hash, tool version, generation timestamp) and, when the caller supplies a prior baseline being replaced, which one it supersedes.
+      - The CLI accepts an optional free-text --baseline-note (or equivalent) that is stored verbatim on the baseline record, for a human reason such as an approval note or ticket reference - stored as plain text, not parsed into a structured approval object.
       - README.md and docs/quality/stoneverify-quickstart.md lead with the cross-release/baseline workflow before the cross-runtime workflow.
       - Existing cross-runtime behavior and tests are unchanged when both --runtime flags are passed explicitly.
     verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, docs/quality/stoneverify-quickstart.md reviewed against the new default ordering]
@@ -1462,8 +1464,9 @@ items:
       - Every certified chart type (line, column, area, bar, scatter, bubble) has a randomized property test in both Python and Go asserting the shared invariants, including valid SVG output and byte-parity where applicable.
       - Cross-language invalid-input parity tests exist for every documented validation error class in docs/contracts/validation-and-capabilities.md.
       - A specification with pathological size or nesting is rejected with a stable, documented error rather than unbounded resource consumption or a crash.
-      - Concrete limits are documented and enforced for maximum series count, maximum points per series, maximum total points, maximum label length, and a render timeout, identically in both languages.
-      - A limit-exceeded input produces a stable, documented machine-readable error code and a non-zero exit, not a partial evidence bundle and not a silent truncation.
+      - Concrete limits are documented and enforced for maximum series count, maximum points per series, maximum total points, maximum input specification size, maximum label length, maximum generated SVG size, and a render timeout, identically in both languages.
+      - Concrete limits are also documented and enforced for maximum evidence-bundle size, maximum number of reported findings, and a separate comparison timeout distinct from the render timeout.
+      - A limit-exceeded input produces a stable, documented machine-readable error code naming which specific limit was exceeded, and a non-zero exit - not a partial evidence bundle and not a silent truncation. An interrupted or limit-triggered run leaves no orphaned temporary artifacts behind.
       - Malformed Unicode and unescaped text in labels, titles, and tooltips render safely in both runtimes with matching behavior.
       - A documented coverage threshold is enforced in CI for libs/python and libs/go.
     verification: [python -m pytest libs/python/tests -q --cov, go test ./... -cover, a documented adversarial-input fixture set runs clean in CI]
@@ -1560,9 +1563,10 @@ items:
       - Baseline-versus-candidate comparison works in Python-only, Go-only, and Python-and-Go modes.
       - Deliberate data, geometry, text, theme, and serialization drift are each correctly classified by the semantic model, with an unknown-structural fallback demonstrated for an unclassifiable case.
       - JSON output validates against the WORK-VERIFY-014A schema; JUnit output is successfully ingested by at least one real CI environment.
+      - For one and the same verification run, the JSON result, the JUnit report, the HTML report, the terminal output, any GitHub Actions annotations, and the process exit code all represent the same outcome and the same finding set - proving REQ-VERIFY-002's single-source-of-truth guarantee is actually met, not just declared. A build where JSON says failed but JUnit reports all tests passing, or where the exit code is 0 while any adapter reports a difference, fails this gate.
       - The evaluation kit runs its quickstart end to end against at least one fixture not shipped in the repository's examples.
       - No StoneVerify claim in any GTM or evaluation-kit document exceeds what is actually measured or tested.
-    verification: [python -m pytest libs/python/tests -q, go test ./... -cover, a fresh temp-directory run of the WORK-VERIFY-013 evaluation kit against an external fixture]
+    verification: [python -m pytest libs/python/tests -q, go test ./... -cover, a fresh temp-directory run of the WORK-VERIFY-013 evaluation kit against an external fixture, a single demo-drift run compared field-by-field across every emitted output format]
 
   - id: WORK-GTM-001
     title: Rewrite market-facing product docs around visual integrity outcomes
@@ -1783,7 +1787,7 @@ items:
   - id: WORK-GTM-011
     title: Define and test the paid StoneVerify pilot offer
     item_type: Work Package
-    status: Triage
+    status: Ready
     priority: P2
     workstream: WS-07 Docs & DX
     stage: S5 Expansion
