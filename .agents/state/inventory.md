@@ -31,3 +31,10 @@ staggered offsets in `Asia/Calcutta`:
 - stakeholder: minute 30
 - notetaker: minute 35
 - design partner: minute 40
+
+## 2026-07-29 - repository and coordination-state cleanup
+
+| Time | Role | Branch or worktree | Owner | Launch note |
+|---|---|---|---|---|
+| 2026-07-29 | notetaker | main | coordinator | Reviewed every local and remote branch for unmerged work before deleting: `pmf-positioning-alignment` (local, 0 unique commits vs `main`), `stage0-stage1-approved-scope` (local, 0 unique commits, remote already gone, merged via PR #36), `origin/master` (0 unique commits vs `main`, superseded default branch; `origin/HEAD` now correctly points to `main`). All three confirmed fully-merged ancestors of `main` via `git merge-base --is-ancestor` before deletion; nothing was lost. Repository now has exactly one branch, `main`, locally and on `origin`. |
+| 2026-07-29 | notetaker | main | coordinator | Reset `.agents/state/branch-lock.md` and `.agents/state/handoff.md` off a stale, never-closed 2026-07-19 draft-agent-roster handoff to a clean idle state, so the next agent (Codex, Antigravity, or otherwise) does not read a dangling lock/handoff that no longer matches reality. Current ground truth: single branch `main`; `docs/project/backlog.yaml` 62/62 items `Done`; GATE-S0 through GATE-S14 closed; releases `0.0.0.1`-`0.0.0.4` tagged; DEC-017 pauses further chart/language expansion pending paid validation evidence. |

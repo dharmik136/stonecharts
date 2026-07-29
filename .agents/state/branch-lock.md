@@ -1,9 +1,13 @@
 # Branch Lock
 
-- Owner: coordinator
-- Branch or worktree: 
-- Claim time: 2026-07-19 13:10:55 +05:30
-- Files in scope: .agents/state/inventory.md, .agents/state/queue.md, .agents/state/handoff.md
-- Stop point: sync the live coordination state with the drafted agent roster, execution order, and published schedules
-- Required checks before handoff: review the updated agent roster, coordination files, and live schedule notes for consistency
-- Handoff target: notetaker
+- Owner: none
+- Branch or worktree: main (only branch; local and remote topic branches cleared 2026-07-29)
+- Claim time: -
+- Files in scope: -
+- Stop point: -
+- Required checks before handoff: -
+- Handoff target: -
+
+No lock is currently held. The repository has a single branch, `main`, on both the
+local checkout and `origin`. Claim this file before writing if you intend to work on a
+dedicated branch or worktree; clear it back to this idle state on handoff.
