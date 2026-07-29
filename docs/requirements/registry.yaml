@@ -1,6 +1,6 @@
 id: SC-REQ-REGISTRY
-version: 1
-updated: "2026-07-19"
+version: 2
+updated: "2026-07-30"
 requirements:
   - id: REQ-PROD-001
     title: One language-neutral chart specification
@@ -354,3 +354,96 @@ requirements:
     contracts: []
     verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE, REVIEW-BUBBLE-ACCESSIBILITY-SECURITY, BENCH-BUBBLE-BASELINE]
     implementation: [libs/python/stonecharts/charts/bubble.py, libs/go/bubble.go, charts/bubble/golden, charts/bubble/invalid-fixtures.json, runtime/bubble-browser-qualification.test.js]
+
+  - id: REQ-VERIFY-001
+    title: Repository-independent StoneVerify execution
+    statement: StoneVerify MUST install and execute without requiring the StoneCharts repository's source-tree layout, without runtime source compilation via go run, and without any outbound network access.
+    rationale: A verification tool a customer cannot install without cloning proprietary source cannot be used in an external evaluation or pilot.
+    kind: constraint
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: StoneVerify Pilot-Ready v1
+    source: SC-PROD-003
+    acceptance:
+      - stoneverify installs as a package with a console-script entry point, independent of the stonecharts repository's directory layout at runtime.
+      - The Go render path uses a prebuilt binary instead of go run against a temporary file inside the repository's Go module.
+      - No stoneverify invocation makes an outbound network call.
+    decisions: []
+    contracts: []
+    verification: [TEST-STONEVERIFY-INSTALL]
+    implementation: [tools/stonecharts_verify.py, libs/python/stonecharts]
+
+  - id: REQ-VERIFY-002
+    title: Versioned StoneVerify result contract
+    statement: Every StoneVerify comparison MUST emit one schema-versioned result object describing comparison status, inputs, runtimes, evidence identities, semantic findings, and failure reason, consumed identically by every output format.
+    rationale: Without one canonical internal result model, JSON, JUnit, HTML, and terminal output can drift into inconsistent interpretations of the same comparison.
+    kind: functional
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: StoneVerify Pilot-Ready v1
+    source: SC-PROD-003
+    acceptance:
+      - A single internal result structure carries schemaVersion, status, comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, and environment.
+      - Every output adapter (JSON, JUnit, HTML, terminal) is built from that one structure, not from separately constructed dictionaries.
+      - The schema version is recorded in every emitted manifest so a consumer can detect a future breaking change.
+    decisions: []
+    contracts: []
+    verification: [TEST-STONEVERIFY-RESULT-SCHEMA]
+    implementation: [tools/stonecharts_verify.py]
+
+  - id: REQ-VERIFY-003
+    title: StoneVerify baseline and candidate integrity
+    statement: A baseline-versus-candidate comparison MUST identify exactly which approved baseline and candidate evidence bundles were used, including their content hashes and tool and runtime versions.
+    rationale: A comparison result is not auditable evidence unless it names precisely which two artifacts were compared and with which tool version.
+    kind: quality
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: StoneVerify Pilot-Ready v1
+    source: SC-PROD-003
+    acceptance:
+      - Every comparison result records the baseline and candidate evidence directory, their manifest hashes, and the stoneverify tool version used for each side.
+      - A baseline produced by a different stoneverify tool version is flagged, not silently compared.
+    decisions: []
+    contracts: []
+    verification: [TEST-STONEVERIFY-BASELINE-INTEGRITY]
+    implementation: [tools/stonecharts_verify.py]
+
+  - id: REQ-VERIFY-004
+    title: Stable StoneVerify automation behavior
+    statement: StoneVerify's documented exit codes and machine-readable output formats MUST remain backward-compatible within a supported release line, with any breaking change requiring a new major schema version.
+    rationale: CI systems and scripts depend on exit codes and output shape; silently changing them breaks every existing integration.
+    kind: constraint
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: StoneVerify Pilot-Ready v1
+    source: SC-PROD-003
+    acceptance:
+      - Exit codes for comparison-fail, usage-error, and bad-input are documented and covered by tests that fail if the mapping changes unintentionally.
+      - A change to the JSON or JUnit output shape bumps schemaVersion rather than silently altering the existing shape.
+    decisions: []
+    contracts: []
+    verification: [TEST-STONEVERIFY-EXIT-CODES]
+    implementation: [tools/stonecharts_verify.py, README.md]
+
+  - id: REQ-VERIFY-005
+    title: Semantic StoneVerify difference classification
+    statement: StoneVerify MUST classify a detected SVG difference into a named category grounded in the governed chart and SVG contracts, using an explicit unknown category when the cause cannot be determined confidently, rather than only reporting byte or tag-count differences.
+    rationale: A product sold on explaining chart drift must classify what changed, not only that something changed.
+    kind: functional
+    priority: must
+    status: proposed
+    owner: maintainer
+    target: StoneVerify Pilot-Ready v1
+    source: SC-PROD-003
+    acceptance:
+      - Each finding is classified as one of input-data, geometry, scale-domain, label-text, theme-style, accessibility-metadata, serialization-only, chart-type-capability, or unknown-structural.
+      - The unknown-structural category is used explicitly when classification confidence is low, rather than forcing a difference into an incorrect specific category.
+      - Classification is grounded in spec/svg-contract.md's element and attribute contract, not ad hoc heuristics.
+    decisions: []
+    contracts: []
+    verification: [TEST-STONEVERIFY-SEMANTIC-DIFF]
+    implementation: [tools/stonecharts_verify.py, spec/svg-contract.md]

@@ -1271,6 +1271,86 @@ items:
       - The optional --compare-report flag writes the comparison to an HTML report and requires --compare-evidence.
     verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, python tools/stonecharts_verify.py --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-drift --compare-report .tmp-stoneverify-compare/report.html]
 
+  - id: REQ-VERIFY-001
+    title: Repository-independent StoneVerify execution
+    item_type: Requirement
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify installs and executes without the StoneCharts repository's source-tree layout, without runtime source compilation via go run, and without outbound network access.
+    traceability: [REQ-VERIFY-001, SC-PROD-003]
+    risks: []
+    evidence: [TEST-STONEVERIFY-INSTALL]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Defines a normative guarantee that WORK-VERIFY-008 implements; does not itself change any file.
+    areas: [python, go, docs]
+
+  - id: REQ-VERIFY-002
+    title: Versioned StoneVerify result contract
+    item_type: Requirement
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: Every StoneVerify comparison emits one schema-versioned result object that every output format is built from, so JSON, JUnit, HTML, and terminal output cannot silently diverge.
+    traceability: [REQ-VERIFY-002, SC-PROD-003]
+    risks: []
+    evidence: [TEST-STONEVERIFY-RESULT-SCHEMA]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Defines a normative guarantee that WORK-VERIFY-014A implements; does not itself change any file.
+    areas: [python, docs]
+
+  - id: REQ-VERIFY-003
+    title: StoneVerify baseline and candidate integrity
+    item_type: Requirement
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A baseline-versus-candidate comparison names exactly which approved baseline and candidate evidence bundles, hashes, and tool/runtime versions were used.
+    traceability: [REQ-VERIFY-003, SC-PROD-003]
+    risks: []
+    evidence: [TEST-STONEVERIFY-BASELINE-INTEGRITY]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Defines a normative guarantee that WORK-VERIFY-011 implements; does not itself change any file.
+    areas: [python, docs]
+
+  - id: REQ-VERIFY-004
+    title: Stable StoneVerify automation behavior
+    item_type: Requirement
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify's documented exit codes and machine-readable output formats stay backward-compatible within a supported release line; a breaking change bumps a major schema version instead of silently altering existing shape.
+    traceability: [REQ-VERIFY-004, SC-PROD-003]
+    risks: []
+    evidence: [TEST-STONEVERIFY-EXIT-CODES]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Defines a normative guarantee that WORK-VERIFY-010 and WORK-VERIFY-014B implement; does not itself change any file.
+    areas: [python, docs]
+
+  - id: REQ-VERIFY-005
+    title: Semantic StoneVerify difference classification
+    item_type: Requirement
+    status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify classifies a detected SVG difference into a named category grounded in the governed chart and SVG contracts, with an explicit unknown category when classification confidence is low.
+    traceability: [REQ-VERIFY-005, SC-PROD-003]
+    risks: []
+    evidence: [TEST-STONEVERIFY-SEMANTIC-DIFF]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Defines a normative guarantee that WORK-VERIFY-009 implements; does not itself change any file.
+    areas: [python, docs]
+
   - id: WORK-VERIFY-008
     title: Package stoneverify as an installable, repo-independent command
     item_type: Work Package
@@ -1280,7 +1360,7 @@ items:
     stage: S5 Expansion
     target: Unscheduled
     outcome: The stoneverify CLI runs against installed Python and Go artifacts instead of the current repo-relative sys.path insert and go run against the checked-out Go module, so it can be installed and run without cloning the stonecharts source tree, and its reported tool/runtime version metadata reflects the actual installed package instead of a hardcoded string.
-    traceability: [SC-PROD-003, SC-PROD-004]
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-001]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-007]
@@ -1303,7 +1383,7 @@ items:
     stage: S5 Expansion
     target: Unscheduled
     outcome: StoneVerify classifies a detected difference into a named category (input-data, geometry, scale-domain, label-text, theme-style, accessibility-metadata, serialization-only, chart-type-capability, or unknown-structural) with a human-readable description of what changed, replacing the current single likelyCause string derived only from byte/tag-count/line-diff heuristics.
-    traceability: [SC-PROD-003, SC-PROD-004]
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-005]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-007]
@@ -1327,7 +1407,7 @@ items:
     stage: S5 Expansion
     target: Unscheduled
     outcome: The interaction-runtime test that currently runs standalone is included in the project's normal test/CI command, and stoneverify's exit codes distinguish a failed comparison from a usage or setup error instead of collapsing both to a generic non-zero result.
-    traceability: [SC-PROD-003, SC-PROD-004]
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-004]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-007]
@@ -1348,10 +1428,10 @@ items:
     stage: S5 Expansion
     target: Unscheduled
     outcome: stoneverify's primary documented workflow is comparing a candidate render against an approved baseline across a software release or dependency upgrade, with cross-runtime Python-vs-Go comparison kept as an available advanced proof rather than the lead framing, matching the positioning shift SC-PROD-007 already uses.
-    traceability: [SC-PROD-003, SC-PROD-004, SC-PROD-007]
+    traceability: [SC-PROD-003, SC-PROD-004, SC-PROD-007, REQ-VERIFY-003]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
-    dependencies: [WORK-VERIFY-008, WORK-VERIFY-009]
+    dependencies: [WORK-VERIFY-008, WORK-VERIFY-009, WORK-VERIFY-014A]
     compatibility: Reframes CLI defaults, help text, and documentation; the underlying --baseline-evidence comparison already exists from WORK-VERIFY-003 and is not being replaced.
     areas: [python, docs]
     acceptance:
@@ -1369,7 +1449,7 @@ items:
     stage: S5 Expansion
     target: Unscheduled
     outcome: StoneVerify and the certified renderers hold up against inputs an external customer might actually supply - cross-language invalid-input parity, randomized property tests across all six certified chart types, resource limits on adversarial specs, malformed Unicode and escaping, and deterministic output verified across more than one OS or container profile - closing gaps the current test suite does not cover.
-    traceability: [SC-PROD-003, SC-PROD-004]
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-004]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-007]
@@ -1392,7 +1472,7 @@ items:
     stage: S5 Expansion
     target: Unscheduled
     outcome: A prospect can be handed a self-contained evaluation kit - signed or hashed packages from WORK-VERIFY-008, a quickstart, sample specs, an intentional-drift demo, the evidence-bundle schema, a security-architecture note, supported environments, and known limits - with no cache files, build cruft, or duplicated build trees. The kit is built and internally reviewable only; who it may be sent to and under what terms stays gated by DEC-018, which this item does not resolve.
-    traceability: [SC-PROD-003, SC-PROD-004]
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-001]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
     dependencies: [WORK-VERIFY-008]
@@ -1405,28 +1485,75 @@ items:
       - The kit is explicitly marked internal/build-only in its own README until a distribution decision is recorded.
     verification: [a fresh temp directory extraction of the kit runs the quickstart successfully with no reference back to the source repository]
 
-  - id: WORK-VERIFY-014
-    title: Add JUnit-compatible and richer machine-readable StoneVerify output
+  - id: WORK-VERIFY-014A
+    title: Define the canonical StoneVerify result schema and JSON output
     item_type: Work Package
     status: Ready
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: One schema-versioned internal result structure (schemaVersion, status, comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, environment) becomes the single source every output adapter is built from, replacing the current pattern of separately constructed dictionaries for runtime comparison, baseline comparison, and evidence-bundle comparison.
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-002]
+    risks: []
+    evidence: [TEST-STONEVERIFY-RESULT-SCHEMA]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Introduces an internal result model and a canonical JSON output derived from it; existing manifest.json and comparison.json fields are preserved so nothing already consuming them breaks, with schemaVersion added as a new field.
+    areas: [python, docs]
+    acceptance:
+      - A single VerificationResult structure carries schemaVersion, status, comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, and environment.
+      - compare_outputs(), compare_baseline(), and compare_evidence_bundles() all populate the same structure instead of three separately shaped dictionaries.
+      - manifest.json and comparison.json are unchanged in their existing fields for current consumers; schemaVersion is the only new top-level field.
+      - Existing golden, parity, and demo-drift tests pass unchanged.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q]
+
+  - id: WORK-VERIFY-014B
+    title: Add JUnit and CI-native adapters on top of the canonical result
+    item_type: Work Package
+    status: Triage
     priority: P1
     workstream: WS-03 Conformance
     stage: S5 Expansion
     target: Unscheduled
-    outcome: stoneverify emits a JUnit-compatible XML report alongside the existing JSON (manifest.json, comparison.json) and HTML report, so CI systems that already parse JUnit (GitHub Actions, GitLab, Jenkins) can surface StoneVerify results as native test cases instead of only a shell exit code.
-    traceability: [SC-PROD-003, SC-PROD-004]
+    outcome: stoneverify emits a JUnit-compatible XML report and GitHub Actions-compatible annotations/job-summary output, both derived from the WORK-VERIFY-014A result model, so CI systems that already parse JUnit (GitLab, Azure Pipelines, Jenkins) or GitHub's native workflow commands can surface StoneVerify results as native test cases instead of only a shell exit code.
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-002, REQ-VERIFY-004]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
-    dependencies: [WORK-VERIFY-007]
-    compatibility: Adds one new output artifact (junit.xml) and a --junit-report flag; does not change manifest.json, comparison.json, checksums.txt, or existing exit-code behavior.
+    dependencies: [WORK-VERIFY-009, WORK-VERIFY-010, WORK-VERIFY-014A]
+    compatibility: Adds new output artifacts (junit.xml, GitHub annotations) and a --junit-report flag; does not change manifest.json, comparison.json, checksums.txt, or existing exit-code behavior. JUnit does not determine job status by itself - stoneverify's own exit code (from WORK-VERIFY-010) remains what actually fails a CI job.
     areas: [python, docs]
     acceptance:
-      - stoneverify accepts --junit-report <path> and writes a JUnit-compatible XML file with one testcase element per compared runtime pair, or per runtime in cross-release baseline mode.
-      - A passing comparison produces a JUnit report with zero failures; a failing comparison produces a failure element containing the same likelyCause or reason text already present in comparison.json.
+      - stoneverify accepts --junit-report <path> and writes a JUnit-compatible XML file with one testcase element per compared runtime pair, or per runtime in cross-release baseline mode, built from the WORK-VERIFY-014A result model.
+      - A passing comparison produces a JUnit report with zero failures; a failing comparison produces a failure element containing the semantic finding text from WORK-VERIFY-009's classification, not just likelyCause.
       - The JUnit file validates against a standard JUnit XML schema.
-      - Once WORK-VERIFY-009 lands, testcase names and failure messages incorporate the new semantic difference categories instead of the current likelyCause string; this item does not block on that landing first.
-      - README.md documents --junit-report next to the existing StoneVerify usage examples.
+      - Running inside GitHub Actions (detected via the GITHUB_ACTIONS environment variable) emits GitHub-compatible error/warning/notice workflow commands or a job-summary write for failures, without requiring the --junit-report flag.
+      - README.md documents --junit-report and the GitHub Actions behavior next to the existing StoneVerify usage examples.
     verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, a --demo-drift text run with --junit-report produces a JUnit file with exactly one failure element]
+
+  - id: GATE-VERIFY-PILOT-001
+    title: Authorize StoneVerify Pilot-Ready v1 as complete
+    item_type: Release Gate
+    status: Triage
+    priority: P0
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: StoneVerify is certified pilot-ready - installable outside the repository, semantically explaining drift, defaulting to cross-release comparison, robust against external fixtures, packaged into a reviewable evaluation kit, and integrated into CI - as one gate rather than an assumption that finishing several separate work packages automatically produces an integrated product.
+    traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-001, REQ-VERIFY-002, REQ-VERIFY-003, REQ-VERIFY-004, REQ-VERIFY-005]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-008, WORK-VERIFY-009, WORK-VERIFY-010, WORK-VERIFY-011, WORK-VERIFY-012, WORK-VERIFY-013, WORK-VERIFY-014A, WORK-VERIFY-014B]
+    compatibility: A certification checkpoint only; does not itself change renderer output, schemas, or the proprietary licensing boundary. Passing this gate does not authorize external distribution or a paid pilot by itself - DEC-018 and SC-CON-020 still govern that separately.
+    areas: [python, go, docs]
+    acceptance:
+      - Clean install and execution on a machine without the stonecharts repository present.
+      - Zero outbound network calls during any verification run.
+      - Baseline-versus-candidate comparison works in Python-only, Go-only, and Python-and-Go modes.
+      - Deliberate data, geometry, text, theme, and serialization drift are each correctly classified by the semantic model, with an unknown-structural fallback demonstrated for an unclassifiable case.
+      - JSON output validates against the WORK-VERIFY-014A schema; JUnit output is successfully ingested by at least one real CI environment.
+      - The evaluation kit runs its quickstart end to end against at least one fixture not shipped in the repository's examples.
+      - No StoneVerify claim in any GTM or evaluation-kit document exceeds what is actually measured or tested.
+    verification: [python -m pytest libs/python/tests -q, go test ./... -cover, a fresh temp-directory run of the WORK-VERIFY-013 evaluation kit against an external fixture]
 
   - id: WORK-GTM-001
     title: Rewrite market-facing product docs around visual integrity outcomes
@@ -1645,22 +1772,46 @@ items:
     verification: [python tools/check_docs.py]
 
   - id: WORK-GTM-011
-    title: Draft the paid StoneVerify pilot pricing hypothesis
+    title: Define and test the paid StoneVerify pilot offer
     item_type: Work Package
     status: Triage
     priority: P2
     workstream: WS-07 Docs & DX
     stage: S5 Expansion
     target: Unscheduled
-    outcome: A short, explicitly-labeled pricing hypothesis document - a fixed-scope $5,000-$15,000 paid pilot covering one report workflow, one or two runtimes, a bounded fixture set, baseline creation, CI integration, and evidence-report delivery - exists to test budget ownership during prospect conversations, alongside the existing one-pager and cost-quantification worksheet.
+    outcome: A short, explicitly-labeled pilot-offer hypothesis document - at least three candidate structures (a low-friction paid assessment, a fixed-scope technical proof, and a higher-priced implementation pilot, each covering one report workflow, one or two runtimes, a bounded fixture set, baseline creation, CI integration, and evidence-report delivery) - exists to test budget ownership and pricing sensitivity during prospect conversations, alongside the existing one-pager and cost-quantification worksheet. Discovery and objection-testing may start as soon as WORK-GTM-010's pipeline is producing conversations; the offer itself may not be contracted or distributed until GATE-VERIFY-PILOT-001 passes and commercial terms are approved.
     traceability: [SC-PROD-003, SC-PROD-007, SC-PROD-009]
     risks: []
     evidence: []
-    dependencies: [WORK-VERIFY-013, WORK-GTM-010]
-    compatibility: Adds one informative document; does not commit to a price, term, or licensing model. SC-CON-020 still governs actual commercial terms.
+    dependencies: [WORK-GTM-010]
+    compatibility: Adds one informative document; does not commit to a price, term, or licensing model, and does not itself authorize contracting or distributing a pilot. SC-CON-020 still governs actual commercial terms; GATE-VERIFY-PILOT-001 still governs whether the underlying product is ready to sell.
     areas: [docs]
     acceptance:
-      - The document is explicitly labeled a pricing hypothesis to be revised from real conversation data, not an approved price list.
-      - It names the fixed scope boundaries (one workflow, one or two runtimes, bounded fixtures) so it can be used as a conversation anchor without over-promising.
-      - It cross-references SC-CON-020 rather than restating or contradicting the commercial-terms policy.
+      - The document is explicitly labeled a pilot-offer hypothesis to be revised from real conversation data, not an approved price list.
+      - At least three candidate structures are named, each with its own scope boundary, so pricing conversations can test which framing (software, technical proof, or services) converts rather than assuming one band in advance.
+      - No specific dollar figure appears in this item's own title; figures live only inside the hypothesis document and are explicitly marked as untested.
+      - It cross-references SC-CON-020 rather than restating or contradicting the commercial-terms policy, and states plainly that GATE-VERIFY-PILOT-001 gates actually contracting a pilot.
+      - It names what to learn from each conversation - who can authorize the purchase, which budget it comes from, and whether verification, migration, or compliance evidence is valued most.
     verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-012
+    title: Execute and measure the first paid StoneVerify pilot
+    item_type: Work Package
+    status: Triage
+    priority: P1
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: The first paid pilot is run against a real customer fixture and its outcome is captured as reusable market evidence - not just revenue - so the result determines whether to continue hardening StoneVerify, admit a new chart or runtime, or change market position, rather than being eyeballed after the fact.
+    traceability: [SC-PROD-003, SC-PROD-009]
+    risks: []
+    evidence: []
+    dependencies: [GATE-VERIFY-PILOT-001, WORK-GTM-011]
+    compatibility: Adds one pilot record and its measurement data, kept outside source control per the existing rule for real customer/prospect data (see WORK-GTM-010); does not change renderer output, schemas, or the proprietary licensing boundary. Actually charging for or contracting the pilot additionally requires the written commercial-terms approval SC-CON-020 requires - this item does not substitute for that approval.
+    areas: [docs]
+    acceptance:
+      - The pilot record captures charts or fixtures evaluated, baseline setup time, review time before StoneVerify, review time with StoneVerify, true differences detected, false-positive count, and unexplained-difference count.
+      - The record captures the buyer, the budget owner, stated willingness to renew, the strongest objection raised, and whether the customer requested another chart or runtime.
+      - The record lives outside the git-tracked repository, matching WORK-GTM-010's rule for real prospect and customer data.
+      - A short internal summary states which of the three assumptions in SC-PROD-003's platform-completion judgment section this pilot resolved or left open.
+    verification: [manual review of the pilot record against this item's acceptance criteria]

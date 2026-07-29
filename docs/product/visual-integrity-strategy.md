@@ -220,24 +220,31 @@ not prove by itself. It does not authorize any of that work; `DEC-017`'s freeze 
 the expansion rule still govern what actually gets built, and StoneVault, StonePolicy,
 and StoneMigrate remain later product surfaces per Product direction above.
 
-| Dimension | Current repository (judgment) | Completed suite (judgment) |
-|---|---:|---:|
-| Technical product quality | 8/10 | 9/10 |
-| General chart-library competitiveness | 3/10 | 5/10 |
-| Regulated-reporting fit | 6/10 | 8.5/10 |
-| Competitive differentiation | 6.5/10 | 8/10 |
-| Ease of adoption | 3.5/10 | 7.5/10 |
-| Proven market demand | 2/10 | Still requires customers |
-| Overall PMF potential | 4.5/10 today | 7.5-8/10 potential |
+| State | Market-fit hypothesis | Evidence confidence |
+|---|---|---|
+| Current product | Early technical wedge; market demand unproven | Low |
+| Full chart breadth only | Better eligibility, limited differentiation | Medium |
+| Complete Verify/Policy/Vault/Migrate platform | Strong specialized-enterprise potential | Low-medium |
+| Report-wide integrity | Larger long-term category hypothesis | Low |
 
-These are strategic judgment scores, not measured market statistics. "PMF potential"
-means a completed suite could fit the market, not that it would be bought. Chart
-breadth alone - more chart types, without Verify, Vault, Policy, or Migrate - is
-judged to reach only 5-6/10: mainstream libraries (Highcharts 40+ types, Plotly 70+,
-ECharts 20+) already win on catalog size, and StoneCharts cannot out-catalog them.
-The differentiated position is the integrated system - spec, certified renderers,
-semantic verification, policy evaluation, baseline approval, evidence retention,
-migration and release history - not any single component.
+"Evidence confidence" describes how much this document's own reasoning (competitive
+comparison, segment characteristics, structural argument) supports the hypothesis in
+each row - it is not a market-research or customer-validation score, and none of
+these rows should be read as measured. "Full chart breadth only" is rated ahead of
+the current product on eligibility but is explicitly the weakest differentiator:
+mainstream libraries (Highcharts 40+ types, Plotly 70+, ECharts 20+) already win on
+catalog size, and StoneCharts cannot out-catalog them. The differentiated position is
+the integrated system - spec, certified renderers, semantic verification, policy
+evaluation, baseline approval, evidence retention, migration and release history -
+not any single component.
+
+A prior draft of this section carried precise decimal scores (for example, "4.5/10
+today" and "7.5-8/10 potential"). Those numbers are retired from the normative
+judgment above because their precision implied measurement this document does not
+have; the underlying reasoning is preserved, unaltered, in the internal research
+appendix of
+[`decision-briefs/dec-017-visual-integrity.md`](../project/decision-briefs/dec-017-visual-integrity.md),
+not restated here as approved figures.
 
 A further-out hypothesis, explicitly not part of any current scope: the ceiling could
 rise substantially if the category eventually widens from chart integrity to

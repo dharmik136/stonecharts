@@ -9,8 +9,8 @@ review_mode: independent
 applies_to: 0.0.0.4 and later
 requirements: []
 evidence: [TEST-DOCS-CONTROL]
-last_reviewed: "2026-07-28"
-review_due: "2026-08-28"
+last_reviewed: "2026-07-30"
+review_due: "2026-08-30"
 supersedes: null
 superseded_by: null
 ---
@@ -77,3 +77,28 @@ DEC-017 is accepted with these constraints:
 3. Build the end-to-end deliberate-drift demo.
 4. Create a reproducible competitor benchmark methodology.
 5. Build a prospect qualification scorecard and interview script.
+
+## Internal research appendix (not normative)
+
+[`SC-PROD-003`](../../product/visual-integrity-strategy.md)'s "Platform completion
+judgment" section states its market-fit hypothesis qualitatively (evidence-confidence
+bands, not scores) after an earlier draft's precise decimal PMF scores were retired
+for implying a measurement precision the underlying research does not have. That
+earlier scoring is kept here, unaltered, as the internal reasoning trail behind the
+qualitative bands - useful for discussion, not for citation as an approved figure
+anywhere else in this repository.
+
+| Dimension | Current repository (judgment) | Completed suite (judgment) |
+|---|---:|---:|
+| Technical product quality | 8/10 | 9/10 |
+| General chart-library competitiveness | 3/10 | 5/10 |
+| Regulated-reporting fit | 6/10 | 8.5/10 |
+| Competitive differentiation | 6.5/10 | 8/10 |
+| Ease of adoption | 3.5/10 | 7.5/10 |
+| Proven market demand | 2/10 | Still requires customers |
+| Overall PMF potential | 4.5/10 today | 7.5-8/10 potential |
+| Chart breadth alone (no Verify/Vault/Policy/Migrate) | - | 5-6/10 |
+
+These are strategic judgment scores from an external market-fit analysis, not
+measured market statistics, and do not supersede or restate SC-PROD-003's normative
+qualitative table.
