@@ -1334,3 +1334,25 @@ items:
       - The scoring rubric maps directly to each of SC-PROD-003's validation-gate counts (interviews, problems, quantified costs, fixtures, proofs, paid pilots, conversions).
       - The document instructs that real interview records are kept outside source control.
     verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-004
+    title: Execute the first real competitor benchmark run
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: The first real measurement run under SC-PROD-005 against Vega/Vega-Lite, Highcharts Export Server, and QuickChart is complete for one equivalent chart, replacing the methodology's placeholder "no run yet" status with measured cold-start time, peak memory, cross-invocation consistency, data-egress facts, and dependency/CVE surface for all three named targets, cited with exact versions, commands, and host spec.
+    traceability: [SC-PROD-003, SC-PROD-005, SC-QUAL-003]
+    risks: []
+    evidence: [BENCH-COMPETITOR-VEGA-20260729, BENCH-COMPETITOR-HIGHCHARTS-20260729, BENCH-COMPETITOR-QUICKCHART-20260729]
+    dependencies: [WORK-GTM-002]
+    compatibility: Adds a measured results document and evidence-registry entries only; does not change renderer output, schemas, released evidence, or the proprietary licensing boundary.
+    areas: [docs]
+    acceptance:
+      - Each of the three named DEC-017 comparison targets has a measured cold-start time and peak memory figure for one equivalent chart, or an explicit reason why that axis does not apply (QuickChart is hosted, not a local process).
+      - Cross-invocation consistency is checked for all four systems (including StoneCharts as the baseline) by rendering the same input twice and diffing output bytes.
+      - The dependency/CVE table cites exact installed versions and the exact npm audit or registry finding, with no invented percentages.
+      - The results document explicitly states what it does and does not establish, including that no interview or paid-pilot validation-gate criteria are addressed by a technical benchmark.
+    verification: [python tools/check_docs.py]
