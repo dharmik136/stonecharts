@@ -1405,6 +1405,29 @@ items:
       - The kit is explicitly marked internal/build-only in its own README until a distribution decision is recorded.
     verification: [a fresh temp directory extraction of the kit runs the quickstart successfully with no reference back to the source repository]
 
+  - id: WORK-VERIFY-014
+    title: Add JUnit-compatible and richer machine-readable StoneVerify output
+    item_type: Work Package
+    status: Ready
+    priority: P1
+    workstream: WS-03 Conformance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: stoneverify emits a JUnit-compatible XML report alongside the existing JSON (manifest.json, comparison.json) and HTML report, so CI systems that already parse JUnit (GitHub Actions, GitLab, Jenkins) can surface StoneVerify results as native test cases instead of only a shell exit code.
+    traceability: [SC-PROD-003, SC-PROD-004]
+    risks: []
+    evidence: [TEST-DOCS-CONTROL]
+    dependencies: [WORK-VERIFY-007]
+    compatibility: Adds one new output artifact (junit.xml) and a --junit-report flag; does not change manifest.json, comparison.json, checksums.txt, or existing exit-code behavior.
+    areas: [python, docs]
+    acceptance:
+      - stoneverify accepts --junit-report <path> and writes a JUnit-compatible XML file with one testcase element per compared runtime pair, or per runtime in cross-release baseline mode.
+      - A passing comparison produces a JUnit report with zero failures; a failing comparison produces a failure element containing the same likelyCause or reason text already present in comparison.json.
+      - The JUnit file validates against a standard JUnit XML schema.
+      - Once WORK-VERIFY-009 lands, testcase names and failure messages incorporate the new semantic difference categories instead of the current likelyCause string; this item does not block on that landing first.
+      - README.md documents --junit-report next to the existing StoneVerify usage examples.
+    verification: [python -m pytest libs/python/tests/test_stonecharts_verify.py -q, a --demo-drift text run with --junit-report produces a JUnit file with exactly one failure element]
+
   - id: WORK-GTM-001
     title: Rewrite market-facing product docs around visual integrity outcomes
     item_type: Work Package
