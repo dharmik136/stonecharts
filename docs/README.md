@@ -34,6 +34,7 @@ Document status and classification are authoritative in each file's metadata.
 - [One-pager (insurance reporting pilot)](product/one-pager.md)
 - [Pilot case-study template](product/case-study-template.md)
 - [Interview cost-quantification worksheet](product/cost-quantification-worksheet.md)
+- [Prospect sourcing and outreach plan](product/prospect-outreach-plan.md)
 - [Requirements registry](requirements/registry.yaml)
 - [Requirements and traceability guide](requirements/README.md)
 - [Risk register](governance/risk-register.yaml)

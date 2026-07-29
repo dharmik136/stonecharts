@@ -1464,3 +1464,25 @@ items:
       - The built image's own size (2.79 GB) is reported as a new data point, not folded into an existing claim it wasn't measured for.
       - Coverage remains explicitly scoped to the line chart only for the Docker path; this is stated, not implied.
     verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-010
+    title: Build the prospect sourcing/outreach plan and an external pipeline tracker
+    item_type: Work Package
+    status: Done
+    priority: P1
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A governed sourcing-and-outreach method (target criteria, channels ranked by expected response quality, outreach message templates) that operationalizes how to actually reach the DEC-017 insurance-reporting segment, phased against the SC-PROD-003 validation gate. Also built a working (not templated-only) local spreadsheet outside source control with live formulas tallying the gate criteria directly from an interview log, so progress is measured automatically rather than eyeballed.
+    traceability: [SC-PROD-003, SC-PROD-006, SC-PROD-009]
+    risks: []
+    evidence: []
+    dependencies: [WORK-GTM-007]
+    compatibility: Adds one new informative documentation asset in the repository only; the actual tracking spreadsheet is deliberately kept outside source control per the same rule as real interview records, and contains no real prospect data.
+    areas: [docs]
+    acceptance:
+      - The plan explicitly sequences sourcing, outreach, interviews, technical proofs, and paid-pilot conversations as overlapping phases, not a strict waterfall.
+      - Outreach templates ask for a conversation about a cost, not pitch the product, consistent with SC-PROD-003's key interview question.
+      - The tracking spreadsheet's Gate Tracker sheet computes each SC-PROD-003 criterion's current count via formula from the Interview Log sheet, not manual re-tallying, for the criteria derivable from interview data.
+      - The spreadsheet lives outside the git-tracked repository and contains zero real prospect names or data at creation time.
+    verification: [python tools/check_docs.py]
