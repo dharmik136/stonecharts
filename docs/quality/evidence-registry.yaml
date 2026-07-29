@@ -173,7 +173,7 @@ evidence:
   - id: BENCH-COMPETITOR-HIGHCHARTS-20260729
     kind: benchmark
     status: implemented
-    description: First measured competitor-benchmark run under SC-PROD-005 against Highcharts Export Server (Puppeteer/Chromium) - cold-start time, peak memory, cross-invocation consistency, egress, and dependency/CVE surface for one equivalent chart.
+    description: First measured competitor-benchmark run under SC-PROD-005 against Highcharts Export Server (Puppeteer/Chromium) - cold-start time, peak memory, cross-invocation consistency, egress, and dependency/CVE surface for one equivalent chart. Extended to the official Docker image (built from source; no pre-built image exists) once a pre-existing local Docker Desktop registry defect was diagnosed and fixed - the Docker cold-start-to-first-render (~6.9s) is faster than the npm-CLI path (~13.6s), correcting this document's earlier unverified guess that Docker would be slower.
     command: npm install highcharts-export-server && node node_modules/highcharts-export-server/bin/cli.js --infile highcharts-config.json --outfile out-highcharts.svg --type svg
     location: docs/quality/competitor-benchmark-results-2026-07.md
     requirements: []

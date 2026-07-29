@@ -1442,3 +1442,25 @@ items:
       - The concurrent-load finding reports both the failing first burst and the succeeding second burst, not only the favorable number.
       - The Plotly/Kaleido dependency audit runs in an isolated environment, not the general machine Python environment, and the document says so.
     verification: [python tools/check_docs.py]
+
+  - id: WORK-GTM-009
+    title: Fix the local Docker Desktop defect and measure Highcharts' official Docker image
+    item_type: Work Package
+    status: Done
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: Diagnosed and fixed a pre-existing local Docker Desktop installation defect (a missing registry key dated back to 2026-07-10, unrelated to this project) via an elevated repair install. Built Highcharts Export Server's official Docker image from source (no pre-built image exists under an obvious name) and measured docker-run-to-first-render cold start, finding it faster (~6.9s) than the npm-CLI path (~13.6s) - correcting an earlier unverified guess in SC-QUAL-003 that Docker would be slower. Confirmed the same cross-invocation non-determinism reproduces in the Docker image.
+    traceability: [SC-PROD-003, SC-PROD-005, SC-QUAL-003]
+    risks: []
+    evidence: [BENCH-COMPETITOR-HIGHCHARTS-20260729]
+    dependencies: [WORK-GTM-008]
+    compatibility: Extends the existing results document and evidence-registry entry only; does not change renderer output, schemas, released evidence, or the proprietary licensing boundary. Docker Desktop is host tooling, not a project dependency.
+    areas: [docs]
+    acceptance:
+      - The document's earlier unverified guess about Docker being slower is explicitly corrected, not silently replaced, once real measurement contradicted it.
+      - The Docker measurement compares cold-start to an actual completed chart export, not merely an HTTP health check.
+      - The built image's own size (2.79 GB) is reported as a new data point, not folded into an existing claim it wasn't measured for.
+      - Coverage remains explicitly scoped to the line chart only for the Docker path; this is stated, not implied.
+    verification: [python tools/check_docs.py]

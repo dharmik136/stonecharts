@@ -29,8 +29,10 @@ it is the first evidence toward validating it.
 smoothed over:** Highcharts Export Server, Vega/Vega-Lite, and QuickChart were
 measured across six chart shapes (line, scatter, bubble, area, column, bar).
 ECharts and Plotly/Kaleido were added later and measured on the line chart only.
-Do not read a blank cell elsewhere in this document as "not applicable" — it means
-"not yet measured for that target."
+Highcharts Export Server's official Docker image was added later still, also
+measured on the line chart only (its npm-CLI path is still what backs the six-shape
+tables). Do not read a blank cell elsewhere in this document as "not applicable" — it
+means "not yet measured for that target."
 
 ## Method summary
 
@@ -78,16 +80,22 @@ Do not read a blank cell elsewhere in this document as "not applicable" — it m
   QuickChart's public hosted endpoint at `https://quickchart.io/chart` as served on
   the measurement date; `echarts@6.1.0` on Node v24.15.0 (server-side SVG SSR mode,
   no browser); `plotly@6.9.0` + `kaleido@1.3.0` on Python 3.14.4.
-- **Docker for Highcharts:** an attempt was made to start Docker Desktop
-  (`v29.6.1` CLI installed) specifically to re-measure Highcharts Export Server via
-  its official container image instead of the npm-CLI fallback. It failed with a
-  concrete, diagnosed error: `getting backend binary path: cannot find registry key
-  "SOFTWARE\Docker Inc.\Docker Desktop"` — the Desktop application itself is not
-  fully installed/initialized on this host, distinct from the CLI tooling being
-  present. This was not worked around (fixing a local Docker Desktop installation is
-  outside a benchmark measurement's scope); the npm-CLI measurement remains in use
-  and the same "this likely understates Highcharts' real containerized cost"
-  caveat from the original run still applies.
+- **Docker for Highcharts:** a first attempt to start Docker Desktop
+  (`v29.6.1` CLI installed) failed with `getting backend binary path: cannot find
+  registry key "SOFTWARE\Docker Inc.\Docker Desktop"` — a genuine, pre-existing local
+  installation defect (the install log showed Docker Desktop working normally through
+  2026-07-04, then failing with this exact error on every launch starting 2026-07-10,
+  roughly three weeks before this measurement). This was a real environment problem,
+  not something to route around in a benchmark: it was fixed with an elevated repair
+  install (`Docker Desktop Installer.exe install`), confirmed working (`docker info`,
+  `docker version`, `docker ps` all healthy), and the official image was then built
+  from source per the project's own documented instructions (there is no
+  official pre-built image on Docker Hub or GHCR under an obvious name — `docker
+  build -t highcharts-export-server .` against a shallow clone of
+  `github.com/highcharts/node-export-server`, per its README's "Running with Docker"
+  section) and used for the measurement below. This replaced an earlier, unverified
+  guess in this document ("Docker likely adds overhead") with an actual measurement,
+  which turned out to contradict that guess.
 
 ## Operational footprint
 
@@ -176,14 +184,44 @@ but it was not isolated further.
 The orders-of-magnitude gaps hold consistently across all six chart shapes measured:
 they are not an artifact of the line chart being an easy case for any one target.
 
-Highcharts Export Server was run via its npm CLI directly
-(`node bin/cli.js --infile ... --outfile ... --type svg`), not the official Docker
-image, because the sandbox this measurement ran in did not have a running Docker
-daemon available. This is disclosed as a methodology deviation and, if anything,
-understates Highcharts' real operational cost in a containerized deployment: a
-`docker run` cold start adds image-pull and container-init overhead on top of the
-in-process numbers measured here. The first pool-worker creation attempt in this
-run's very first invocation of the session failed with a timeout and was retried
+### Highcharts Export Server: official Docker image vs. the npm CLI
+
+The tables above all use the npm CLI (`node bin/cli.js --infile ... --outfile ...
+--type svg`). Docker was later fixed on this host (see
+[Method summary](#method-summary)) and the official image was built from source per
+the project's own README and measured directly, container-run to first successful
+render, line chart:
+
+| Measurement | Median | Min-max |
+|---|---:|---:|
+| `docker run` to `/health` returning 200 | 6.298 s | 5.309-8.036 s |
+| `docker run` to first successful chart export | 6.902 s | 5.911-8.600 s |
+
+This **contradicts** what this document originally guessed before Docker was fixed
+("this likely understates Highcharts' real operational cost in a containerized
+deployment"). The measured Docker cold-start (~6.9 s to a real rendered chart) is
+**faster** than the npm-CLI cold-start (~13.6 s on the line chart), not slower. The
+most likely reason, based on the respective startup logs: the npm-CLI path's very
+first pool-worker creation attempt failed with a timeout and was retried (see below),
+costing several seconds, while the containerized image's baked-in Chromium launched
+cleanly on every measured run with no retry. This is reported as a genuine
+correction, not smoothed into the surrounding narrative — the original guess was
+wrong, and leaving it uncorrected after being able to actually measure it would be
+dishonest. Cross-invocation consistency was re-checked against the Docker image too:
+it shows the same non-determinism (a random per-render ID, differing at a nearby
+byte offset), confirming the defect is in Highcharts core / the export server logic
+itself, not an artifact of the npm-CLI packaging specifically.
+
+Separately, and favorable to none of the JS-based targets: the built image is
+**2.79 GB** (content size; ~9.16 GB including build-cache layers on disk), because it
+bundles Chromium, `fonts-liberation`/`fonts-noto`/`fonts-noto-cjk`, and a full
+`texlive-fonts-recommended` + `texlive-fonts-extra` install for PDF export support.
+This was not a documented earlier hypothesis — it fell out of actually doing the
+build — and no equivalent image-size figure exists for any other target in this
+document, since none of them ship as a container image.
+
+The npm-CLI path's first pool-worker creation attempt, in this run's very first
+invocation of the whole measurement session, failed with a timeout and was retried
 automatically by the export server's own worker pool; it succeeded on that retry and
 on every subsequent measured run, and is reported here as an observed real-world
 cold-start characteristic rather than excluded as an anomaly.
@@ -353,11 +391,15 @@ non-determinism defect (a random ID baked into output) in both Highcharts Export
 Server and Plotly/Kaleido that survives the one documented Highcharts mitigation
 tested and was not found in StoneCharts, Vega, ECharts, or QuickChart. It also
 establishes, favorably for the competitors, that the "13.6 s" Highcharts number is
-specific to a one-process-per-render deployment and does not represent the product
-run as its own documentation recommends. It does **not** establish results for chart
-shapes beyond line/scatter/bubble/area/column/bar, results for ECharts or Plotly on
-any shape besides line, a production Linux/container measurement (the Docker
-comparison was attempted and blocked by a local installation issue, not run), an
+specific to a one-process-per-render deployment, does not represent the product run
+as its own documentation recommends, and — once Docker was fixed on this host and
+the official image was actually built and measured — that Highcharts' own
+containerized path is faster to a first real render (~6.9 s) than its npm-CLI path,
+contradicting this document's own earlier unverified guess to the contrary. It does
+**not** establish results for chart shapes beyond line/scatter/bubble/area/column/bar,
+results for ECharts or Plotly on any shape besides line, results for the Docker image
+on any shape besides line, sustained-throughput or concurrent-load numbers for the
+Docker image specifically (only cold-start-to-first-render was measured for it), an
 assessment of any target's actual security posture beyond the specific advisories
 listed, or release-provenance findings for ECharts/Plotly checked with the same rigor
 as the original three targets. None of the recurring-cost or willingness-to-pay
@@ -447,6 +489,23 @@ echo "Highcharts.useSerialIds(true);" > highcharts-customcode.js
 node node_modules/highcharts-export-server/bin/cli.js \
   --infile highcharts-config.json --outfile out.svg --type svg \
   --customCode highcharts-customcode.js --allowCodeExecution true
+```
+
+Highcharts Export Server, official Docker image (built from source; no pre-built
+image exists on Docker Hub or GHCR under an obvious name):
+
+```bash
+git clone --depth 1 https://github.com/highcharts/node-export-server.git
+cd node-export-server
+docker build -t highcharts-export-server .
+
+# Cold-start: docker run -> /health 200 -> first successful chart export
+python docker_coldstart.py 5 highcharts-config.json
+
+# Cross-invocation consistency
+docker run -d --rm -p 7801:7801 --name hc-consistency highcharts-export-server
+# ... POST highcharts-config.json to http://localhost:7801 twice, diff the output ...
+docker rm -f hc-consistency
 ```
 
 The `measure.py` harness, the concurrent-load harness, the equivalent chart specs
