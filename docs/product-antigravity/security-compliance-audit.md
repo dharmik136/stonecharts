@@ -1,18 +1,18 @@
 ---
 id: SC-PROD-007-ANTIGRAVITY
 title: StoneCharts Security & Compliance Audit (Antigravity Version)
-status: proposed
-classification: normative
+status: superseded
+classification: informative
 owner: product-owner
 approver: maintainer
 review_mode: self
 applies_to: 0.0.0.1
 requirements: [REQ-SEC-001, REQ-VAL-001, REQ-CAP-001]
 evidence: []
-last_reviewed: "2026-07-21"
-review_due: "2026-09-18"
+last_reviewed: "2026-07-30"
+review_due: "2027-07-30"
 supersedes: null
-superseded_by: null
+superseded_by: SC-SEC-001
 ---
 
 # Security & Compliance Audit
