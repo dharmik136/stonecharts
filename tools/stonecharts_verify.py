@@ -26,6 +26,7 @@ sys.path.insert(0, str(PY_LIB))
 
 from stonecharts import ChartSpec, __version__ as PY_STONECHARTS_VERSION  # noqa: E402
 from stonecharts.render import render_svg  # noqa: E402
+from stonecharts.verify.result import SCHEMA_VERSION, capture_environment, sha256_digest  # noqa: E402
 
 
 GO_HELPER = """package main
@@ -325,6 +326,7 @@ def compare_outputs(outputs: dict[str, bytes]) -> dict[str, Any]:
     names = sorted(outputs)
     if len(names) < 2:
         return {
+            "schemaVersion": SCHEMA_VERSION,
             "status": "pass",
             "equal": True,
             "message": "Only one runtime was requested; no cross-runtime comparison was performed.",
@@ -358,6 +360,7 @@ def compare_outputs(outputs: dict[str, bytes]) -> dict[str, Any]:
             }
         )
     return {
+        "schemaVersion": SCHEMA_VERSION,
         "status": "pass" if overall_equal else "fail",
         "equal": overall_equal,
         "message": "All requested runtime outputs are byte-identical." if overall_equal else "Runtime outputs differ.",
@@ -382,6 +385,7 @@ def compare_baseline(
 ) -> dict[str, Any]:
     if baseline_manifest is None:
         return {
+            "schemaVersion": SCHEMA_VERSION,
             "status": "not-checked",
             "message": "No baseline evidence directory was provided.",
             "inputEqual": None,
@@ -423,6 +427,7 @@ def compare_baseline(
     all_equal = all_equal and input_equal
 
     return {
+        "schemaVersion": SCHEMA_VERSION,
         "status": "pass" if all_equal else "fail",
         "message": "Current evidence matches baseline." if all_equal else "Current evidence differs from baseline.",
         "inputEqual": input_equal,
@@ -526,6 +531,7 @@ def compare_evidence_bundles(left_evidence: pathlib.Path, right_evidence: pathli
         message = "Evidence bundles differ: the same input spec produced different output."
 
     return {
+        "schemaVersion": SCHEMA_VERSION,
         "status": "pass" if all_equal else "fail",
         "message": message,
         "left": {
@@ -836,8 +842,13 @@ def main() -> int:
         outputs[runtime] = svg
         runtime_metadata.append(metadata)
 
+    go_version = next(
+        (item.get("goVersion") for item in runtime_metadata if item.get("runtime") == "go"),
+        None,
+    )
     comparison = compare_outputs(outputs)
     manifest = {
+        "schemaVersion": SCHEMA_VERSION,
         "tool": "stonecharts_verify",
         "toolVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -852,6 +863,11 @@ def main() -> int:
         "runtimes": runtime_metadata,
         "comparison": "comparison.json",
         "report": "report.html",
+        "environment": capture_environment(
+            stonecharts_version=PY_STONECHARTS_VERSION,
+            stoneverify_version="1.0.0",
+            go_version=go_version,
+        ),
     }
     baseline_manifest = load_baseline(args.baseline_evidence.resolve()) if args.baseline_evidence else None
     baseline = compare_baseline(manifest, outputs, baseline_manifest)
@@ -865,8 +881,15 @@ def main() -> int:
     manifest["baseline"] = baseline
 
     (evidence / "comparison.json").write_text(json.dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (evidence / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     write_report(evidence / "report.html", manifest, comparison)
+
+    manifest["evidence"] = {
+        "inputSpec": sha256_digest(manifest["input"]["sha256"]),
+        "artifacts": {
+            runtime["output"]: sha256_digest(runtime["sha256"]) for runtime in runtime_metadata
+        },
+    }
+    (evidence / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     checksum_paths = ["manifest.json", "input-spec.json", "comparison.json", "report.html"]
     checksum_paths.extend(runtime["output"] for runtime in runtime_metadata)
