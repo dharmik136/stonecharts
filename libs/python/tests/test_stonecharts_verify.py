@@ -503,3 +503,23 @@ def test_manifest_includes_schema_version_and_environment(tmp_path):
     assert manifest["tool"] == "stonecharts_verify"
     assert manifest["toolVersion"] == 1
     assert "input" in manifest and "runtimes" in manifest
+
+
+def test_manifest_evidence_block_is_algorithm_qualified(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+    )
+    assert proc.returncode == 0, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    evidence = manifest["evidence"]
+    assert evidence["inputSpec"]["algorithm"] == "sha-256"
+    assert evidence["inputSpec"]["value"] == manifest["input"]["sha256"]
+    assert "python-output.svg" in evidence["artifacts"]
+    assert evidence["artifacts"]["python-output.svg"]["algorithm"] == "sha-256"
+    # checksums.txt format is untouched (still plain sha256sum-compatible text)
+    checksums_text = (evidence_dir / "checksums.txt").read_text(encoding="utf-8")
+    assert "  manifest.json" in checksums_text

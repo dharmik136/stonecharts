@@ -881,8 +881,15 @@ def main() -> int:
     manifest["baseline"] = baseline
 
     (evidence / "comparison.json").write_text(json.dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (evidence / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     write_report(evidence / "report.html", manifest, comparison)
+
+    manifest["evidence"] = {
+        "inputSpec": sha256_digest(manifest["input"]["sha256"]),
+        "artifacts": {
+            runtime["output"]: sha256_digest(runtime["sha256"]) for runtime in runtime_metadata
+        },
+    }
+    (evidence / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     checksum_paths = ["manifest.json", "input-spec.json", "comparison.json", "report.html"]
     checksum_paths.extend(runtime["output"] for runtime in runtime_metadata)
