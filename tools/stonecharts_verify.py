@@ -842,8 +842,13 @@ def main() -> int:
         outputs[runtime] = svg
         runtime_metadata.append(metadata)
 
+    go_version = next(
+        (item.get("goVersion") for item in runtime_metadata if item.get("runtime") == "go"),
+        None,
+    )
     comparison = compare_outputs(outputs)
     manifest = {
+        "schemaVersion": SCHEMA_VERSION,
         "tool": "stonecharts_verify",
         "toolVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -858,6 +863,11 @@ def main() -> int:
         "runtimes": runtime_metadata,
         "comparison": "comparison.json",
         "report": "report.html",
+        "environment": capture_environment(
+            stonecharts_version=PY_STONECHARTS_VERSION,
+            stoneverify_version="1.0.0",
+            go_version=go_version,
+        ),
     }
     baseline_manifest = load_baseline(args.baseline_evidence.resolve()) if args.baseline_evidence else None
     baseline = compare_baseline(manifest, outputs, baseline_manifest)
