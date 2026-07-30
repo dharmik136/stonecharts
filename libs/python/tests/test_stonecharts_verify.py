@@ -6,6 +6,8 @@ import importlib.util
 import json
 import pathlib
 
+from stonecharts.verify.result import SCHEMA_VERSION
+
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 VERIFY_PATH = ROOT / "tools" / "stonecharts_verify.py"
@@ -455,3 +457,27 @@ def test_classify_difference_is_shared_by_both_comparison_paths(tmp_path):
     python_result = next(item for item in stored["runtimes"] if item["runtime"] == "python")
     assert rendered["pairs"][0]["likelyCause"] == python_result["likelyCause"]
     assert python_result["structural"]["equalTagInventory"] is True
+
+
+def test_compare_outputs_includes_schema_version():
+    result = stonecharts_verify.compare_outputs({"python": b"<svg>a</svg>", "go": b"<svg>a</svg>"})
+
+    assert result["schemaVersion"] == SCHEMA_VERSION
+    # existing fields untouched
+    assert result["status"] == "pass"
+    assert result["equal"] is True
+    assert "pairs" in result
+
+
+def test_compare_outputs_single_runtime_includes_schema_version():
+    result = stonecharts_verify.compare_outputs({"python": b"<svg>a</svg>"})
+
+    assert result["schemaVersion"] == SCHEMA_VERSION
+    assert result["pairs"] == []
+
+
+def test_compare_baseline_not_checked_includes_schema_version():
+    result = stonecharts_verify.compare_baseline({"input": {"sha256": "x"}, "runtimes": []}, {}, None)
+
+    assert result["schemaVersion"] == SCHEMA_VERSION
+    assert result["status"] == "not-checked"

@@ -26,6 +26,7 @@ sys.path.insert(0, str(PY_LIB))
 
 from stonecharts import ChartSpec, __version__ as PY_STONECHARTS_VERSION  # noqa: E402
 from stonecharts.render import render_svg  # noqa: E402
+from stonecharts.verify.result import SCHEMA_VERSION, capture_environment, sha256_digest  # noqa: E402
 
 
 GO_HELPER = """package main
@@ -325,6 +326,7 @@ def compare_outputs(outputs: dict[str, bytes]) -> dict[str, Any]:
     names = sorted(outputs)
     if len(names) < 2:
         return {
+            "schemaVersion": SCHEMA_VERSION,
             "status": "pass",
             "equal": True,
             "message": "Only one runtime was requested; no cross-runtime comparison was performed.",
@@ -358,6 +360,7 @@ def compare_outputs(outputs: dict[str, bytes]) -> dict[str, Any]:
             }
         )
     return {
+        "schemaVersion": SCHEMA_VERSION,
         "status": "pass" if overall_equal else "fail",
         "equal": overall_equal,
         "message": "All requested runtime outputs are byte-identical." if overall_equal else "Runtime outputs differ.",
@@ -382,6 +385,7 @@ def compare_baseline(
 ) -> dict[str, Any]:
     if baseline_manifest is None:
         return {
+            "schemaVersion": SCHEMA_VERSION,
             "status": "not-checked",
             "message": "No baseline evidence directory was provided.",
             "inputEqual": None,
@@ -423,6 +427,7 @@ def compare_baseline(
     all_equal = all_equal and input_equal
 
     return {
+        "schemaVersion": SCHEMA_VERSION,
         "status": "pass" if all_equal else "fail",
         "message": "Current evidence matches baseline." if all_equal else "Current evidence differs from baseline.",
         "inputEqual": input_equal,
@@ -526,6 +531,7 @@ def compare_evidence_bundles(left_evidence: pathlib.Path, right_evidence: pathli
         message = "Evidence bundles differ: the same input spec produced different output."
 
     return {
+        "schemaVersion": SCHEMA_VERSION,
         "status": "pass" if all_equal else "fail",
         "message": message,
         "left": {
