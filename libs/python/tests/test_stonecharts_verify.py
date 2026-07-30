@@ -523,3 +523,44 @@ def test_manifest_evidence_block_is_algorithm_qualified(tmp_path):
     # checksums.txt format is untouched (still plain sha256sum-compatible text)
     checksums_text = (evidence_dir / "checksums.txt").read_text(encoding="utf-8")
     assert "  manifest.json" in checksums_text
+
+
+def test_manifest_only_adds_schema_version_environment_and_evidence(tmp_path):
+    """Pins WORK-VERIFY-014A's compatibility promise: no existing manifest.json
+    key changed shape, and exactly three new top-level keys were added.
+
+    ``baseline`` is included in ``pre_014a_keys`` (not ``new_keys``) because
+    ``main()`` calls ``compare_baseline()`` and assigns ``manifest["baseline"]``
+    unconditionally, regardless of whether ``--baseline-evidence`` was passed
+    (see tools/stonecharts_verify.py, compare_baseline's ``if baseline_manifest
+    is None`` branch still returns a dict with status "not-checked" rather than
+    omitting the key).
+    """
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+        check=True,
+    )
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    pre_014a_keys = {
+        "tool", "toolVersion", "generatedAt", "status", "demoDrift",
+        "input", "runtimes", "comparison", "report", "baseline",
+    }
+    new_keys = {"schemaVersion", "environment", "evidence"}
+    assert set(manifest.keys()) == pre_014a_keys | new_keys
+
+
+def test_comparison_json_only_adds_schema_version(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--runtime", "go", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+        check=True,
+    )
+    comparison = json.loads((evidence_dir / "comparison.json").read_text(encoding="utf-8"))
+    assert set(comparison.keys()) == {"schemaVersion", "status", "equal", "message", "pairs"}
