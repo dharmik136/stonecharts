@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stonecharts.dev/schemas/stoneverify-result.schema.json",
+  "title": "StoneVerify canonical result envelope",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "status",
+    "comparisonMode",
+    "baseline",
+    "candidate",
+    "inputs",
+    "runtimeCoverage",
+    "findings",
+    "evidence",
+    "environment"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "resultSchema": { "type": "string" },
+    "status": { "enum": ["pass", "fail"] },
+    "comparisonMode": { "enum": ["cross-runtime", "baseline", "bundle-compare"] },
+    "baseline": { "type": ["object", "null"] },
+    "candidate": { "type": ["object", "null"] },
+    "inputs": { "type": "object" },
+    "runtimeCoverage": { "type": "object" },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "evidence": { "type": "object" },
+    "environment": { "$ref": "#/$defs/environment" }
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": { "type": "string" },
+        "value": { "type": "string" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["code", "category", "message", "equality", "confidence", "basis"],
+      "properties": {
+        "code": { "type": "string" },
+        "category": { "type": "string" },
+        "message": { "type": "string" },
+        "equality": { "enum": ["byte", "structural", "semantic", "unknown"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "basis": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "os",
+        "arch",
+        "pythonVersion",
+        "goVersion",
+        "stonechartsVersion",
+        "stoneverifyVersion",
+        "schemaVersion",
+        "locale",
+        "timezone"
+      ],
+      "properties": {
+        "os": { "type": "string" },
+        "arch": { "type": "string" },
+        "pythonVersion": { "type": "string" },
+        "goVersion": { "type": ["string", "null"] },
+        "stonechartsVersion": { "type": "string" },
+        "stoneverifyVersion": { "type": "string" },
+        "schemaVersion": { "const": 1 },
+        "locale": { "type": "string" },
+        "timezone": { "type": "string" }
+      }
+    }
+  }
+}
