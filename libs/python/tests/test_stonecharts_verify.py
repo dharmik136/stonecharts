@@ -5,6 +5,10 @@ from __future__ import annotations
 import importlib.util
 import json
 import pathlib
+import subprocess
+import sys
+
+from stonecharts.verify.result import SCHEMA_VERSION
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
@@ -455,3 +459,108 @@ def test_classify_difference_is_shared_by_both_comparison_paths(tmp_path):
     python_result = next(item for item in stored["runtimes"] if item["runtime"] == "python")
     assert rendered["pairs"][0]["likelyCause"] == python_result["likelyCause"]
     assert python_result["structural"]["equalTagInventory"] is True
+
+
+def test_compare_outputs_includes_schema_version():
+    result = stonecharts_verify.compare_outputs({"python": b"<svg>a</svg>", "go": b"<svg>a</svg>"})
+
+    assert result["schemaVersion"] == SCHEMA_VERSION
+    # existing fields untouched
+    assert result["status"] == "pass"
+    assert result["equal"] is True
+    assert "pairs" in result
+
+
+def test_compare_outputs_single_runtime_includes_schema_version():
+    result = stonecharts_verify.compare_outputs({"python": b"<svg>a</svg>"})
+
+    assert result["schemaVersion"] == SCHEMA_VERSION
+    assert result["pairs"] == []
+
+
+def test_compare_baseline_not_checked_includes_schema_version():
+    result = stonecharts_verify.compare_baseline({"input": {"sha256": "x"}, "runtimes": []}, {}, None)
+
+    assert result["schemaVersion"] == SCHEMA_VERSION
+    assert result["status"] == "not-checked"
+
+
+def test_manifest_includes_schema_version_and_environment(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+    )
+    assert proc.returncode == 0, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["schemaVersion"] == 1
+    env = manifest["environment"]
+    for key in ("os", "arch", "pythonVersion", "stonechartsVersion", "stoneverifyVersion", "schemaVersion", "locale", "timezone"):
+        assert key in env
+    # existing fields untouched
+    assert manifest["tool"] == "stonecharts_verify"
+    assert manifest["toolVersion"] == 1
+    assert "input" in manifest and "runtimes" in manifest
+
+
+def test_manifest_evidence_block_is_algorithm_qualified(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+    )
+    assert proc.returncode == 0, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    evidence = manifest["evidence"]
+    assert evidence["inputSpec"]["algorithm"] == "sha-256"
+    assert evidence["inputSpec"]["value"] == manifest["input"]["sha256"]
+    assert "python-output.svg" in evidence["artifacts"]
+    assert evidence["artifacts"]["python-output.svg"]["algorithm"] == "sha-256"
+    # checksums.txt format is untouched (still plain sha256sum-compatible text)
+    checksums_text = (evidence_dir / "checksums.txt").read_text(encoding="utf-8")
+    assert "  manifest.json" in checksums_text
+
+
+def test_manifest_only_adds_schema_version_environment_and_evidence(tmp_path):
+    """Pins WORK-VERIFY-014A's compatibility promise: no existing manifest.json
+    key changed shape, and exactly three new top-level keys were added.
+
+    ``baseline`` is included in ``pre_014a_keys`` (not ``new_keys``) because
+    ``main()`` calls ``compare_baseline()`` and assigns ``manifest["baseline"]``
+    unconditionally, regardless of whether ``--baseline-evidence`` was passed
+    (see tools/stonecharts_verify.py, compare_baseline's ``if baseline_manifest
+    is None`` branch still returns a dict with status "not-checked" rather than
+    omitting the key).
+    """
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+        check=True,
+    )
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    pre_014a_keys = {
+        "tool", "toolVersion", "generatedAt", "status", "demoDrift",
+        "input", "runtimes", "comparison", "report", "baseline",
+    }
+    new_keys = {"schemaVersion", "environment", "evidence"}
+    assert set(manifest.keys()) == pre_014a_keys | new_keys
+
+
+def test_comparison_json_only_adds_schema_version(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--runtime", "go", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+        check=True,
+    )
+    comparison = json.loads((evidence_dir / "comparison.json").read_text(encoding="utf-8"))
+    assert set(comparison.keys()) == {"schemaVersion", "status", "equal", "message", "pairs"}

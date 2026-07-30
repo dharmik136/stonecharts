@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stonecharts.dev/schemas/stoneverify-result.schema.json",
+  "title": "StoneVerify canonical result envelope",
+  "description": "The full envelope below (comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, and environment all present and required) is the target shape a follow-on unification effort will populate (see docs/superpowers/plans/2026-07-30-stoneverify-canonical-result-model.md, 'What this plan deliberately does not do'). Documents that validate under schemaVersion: 1 today are a subset of this envelope: only schemaVersion and status are guaranteed present on every emitted document (manifest.json and comparison.json both stamp these two; the remaining properties below are defined for forward compatibility but are not yet emitted and are therefore not required).",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "status"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "resultSchema": { "type": "string" },
+    "status": { "enum": ["pass", "fail", "not-checked"] },
+    "comparisonMode": { "enum": ["cross-runtime", "baseline", "bundle-compare"] },
+    "baseline": { "type": ["object", "null"] },
+    "candidate": { "type": ["object", "null"] },
+    "inputs": { "type": "object" },
+    "runtimeCoverage": { "type": "object" },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "evidence": { "type": "object" },
+    "environment": { "$ref": "#/$defs/environment" }
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": { "type": "string" },
+        "value": { "type": "string" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["code", "category", "message", "equality", "confidence", "basis"],
+      "properties": {
+        "code": { "type": "string" },
+        "category": { "type": "string" },
+        "message": { "type": "string" },
+        "equality": { "enum": ["byte", "structural", "semantic", "unknown"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "basis": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "os",
+        "arch",
+        "pythonVersion",
+        "goVersion",
+        "stonechartsVersion",
+        "stoneverifyVersion",
+        "schemaVersion",
+        "locale",
+        "timezone"
+      ],
+      "properties": {
+        "os": { "type": "string" },
+        "arch": { "type": "string" },
+        "pythonVersion": { "type": "string" },
+        "goVersion": { "type": ["string", "null"] },
+        "stonechartsVersion": { "type": "string" },
+        "stoneverifyVersion": { "type": "string" },
+        "schemaVersion": { "const": 1 },
+        "locale": { "type": "string" },
+        "timezone": { "type": "string" }
+      }
+    }
+  }
+}
