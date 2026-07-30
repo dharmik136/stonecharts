@@ -19,6 +19,8 @@ node_modules/
 .idea/
 .DS_Store
 Thumbs.db
+.claude/worktrees/
+.superpowers/
 
 # temp render artifacts
 .tmp-*
