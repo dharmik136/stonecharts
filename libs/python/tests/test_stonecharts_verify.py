@@ -5,6 +5,8 @@ from __future__ import annotations
 import importlib.util
 import json
 import pathlib
+import subprocess
+import sys
 
 from stonecharts.verify.result import SCHEMA_VERSION
 
@@ -481,3 +483,23 @@ def test_compare_baseline_not_checked_includes_schema_version():
 
     assert result["schemaVersion"] == SCHEMA_VERSION
     assert result["status"] == "not-checked"
+
+
+def test_manifest_includes_schema_version_and_environment(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(evidence_dir)],
+        capture_output=True,
+        cwd=ROOT,
+    )
+    assert proc.returncode == 0, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["schemaVersion"] == 1
+    env = manifest["environment"]
+    for key in ("os", "arch", "pythonVersion", "stonechartsVersion", "stoneverifyVersion", "schemaVersion", "locale", "timezone"):
+        assert key in env
+    # existing fields untouched
+    assert manifest["tool"] == "stonecharts_verify"
+    assert manifest["toolVersion"] == 1
+    assert "input" in manifest and "runtimes" in manifest
