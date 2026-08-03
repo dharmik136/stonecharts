@@ -117,22 +117,27 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 	if typ == "" {
 		typ = "line"
 	}
+	var svg string
 	switch typ {
 	case "area":
-		return renderAreaSVG(spec), nil
+		svg = renderAreaSVG(spec)
 	case "bar":
-		return renderBarSVG(spec), nil
+		svg = renderBarSVG(spec)
 	case "column":
-		return renderColumnSVG(spec), nil
+		svg = renderColumnSVG(spec)
 	case "line":
-		return renderLineSVG(spec), nil
+		svg = renderLineSVG(spec)
 	case "scatter":
-		return renderScatterSVG(spec), nil
+		svg = renderScatterSVG(spec)
 	case "bubble":
-		return renderBubbleSVG(spec), nil
+		svg = renderBubbleSVG(spec)
 	default:
 		return "", capabilityError(typ)
 	}
+	if err := enforceSVGLimit(svg); err != nil {
+		return "", err
+	}
+	return svg, nil
 }
 
 // runtimeJS loads the shared interaction runtime. Canonical source is

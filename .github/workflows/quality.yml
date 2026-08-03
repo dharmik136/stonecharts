@@ -1,6 +1,7 @@
 name: quality
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [main]
@@ -21,10 +22,11 @@ jobs:
       - run: python tools/check_docs.py
 
   python:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
         python-version: ["3.9", "3.14"]
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -32,8 +34,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - run: python -m pip install "pytest>=8,<10" "jsonschema>=4.23,<5"
-      - run: python -m pytest libs/python/tests
+      - run: python -m pip install "pytest>=8,<10" "pytest-cov>=5,<8" "jsonschema>=4.23,<5"
+      - run: python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80
 
   python-wheel-install:
     runs-on: ubuntu-latest
@@ -81,9 +83,20 @@ jobs:
               pass
           print('installed-wheel smoke test OK,', len(svg), 'bytes')
           "
+      - name: Smoke-test installed stoneverify console script
+        working-directory: /tmp
+        run: |
+          /tmp/install-test-venv/bin/stoneverify "$GITHUB_WORKSPACE/charts/bubble/examples/basic.json" \
+            --runtime python \
+            --evidence /tmp/stoneverify-wheel-evidence
+          test -f /tmp/stoneverify-wheel-evidence/manifest.json
 
   go:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     defaults:
       run:
         working-directory: libs/go
@@ -93,7 +106,78 @@ jobs:
         with:
           go-version-file: libs/go/go.mod
           cache-dependency-path: libs/go/go.mod
-      - run: go test ./...
+      - run: go test . -cover -covermode=atomic
+      - run: go build ./cmd/stoneverify-go-render
+
+  stoneverify-pilot-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.14"
+          cache: pip
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: libs/go/go.mod
+          cache-dependency-path: libs/go/go.mod
+      - run: python -m pip install "build>=1,<2"
+      - run: python -m build --wheel --outdir dist libs/python
+      - run: go build -o /tmp/stoneverify-go-render ./cmd/stoneverify-go-render
+        working-directory: libs/go
+      - run: python -m venv /tmp/stoneverify-pilot-venv
+      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.4
+      - name: Create external pilot fixture
+        run: |
+          cat > /tmp/stoneverify-external-fixture.json <<'JSON'
+          {
+            "type": "bubble",
+            "title": "External Pilot Fixture",
+            "xAxis": { "title": "Risk score" },
+            "yAxis": { "title": "Reserve delta" },
+            "series": [
+              {
+                "name": "Portfolio A",
+                "data": [[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 2.5, 4.0]]
+              }
+            ]
+          }
+          JSON
+      - name: Run StoneVerify pilot gate demo
+        id: stoneverify_demo
+        env:
+          STONEVERIFY_GO_BINARY: /tmp/stoneverify-go-render
+        run: |
+          set +e
+          /tmp/stoneverify-pilot-venv/bin/stoneverify /tmp/stoneverify-external-fixture.json \
+            --runtime python \
+            --runtime go \
+            --demo-drift text \
+            --evidence /tmp/stoneverify-pilot-evidence \
+            --junit-report /tmp/stoneverify-pilot-evidence/junit.xml
+          code=$?
+          set -e
+          test "$code" -eq 1
+          test -f /tmp/stoneverify-pilot-evidence/manifest.json
+          test -f /tmp/stoneverify-pilot-evidence/comparison.json
+          test -f /tmp/stoneverify-pilot-evidence/report.html
+          test -f /tmp/stoneverify-pilot-evidence/junit.xml
+          python - <<'PY'
+          import json
+          import xml.etree.ElementTree as ET
+          comparison = json.load(open('/tmp/stoneverify-pilot-evidence/comparison.json', encoding='utf-8'))
+          root = ET.parse('/tmp/stoneverify-pilot-evidence/junit.xml').getroot()
+          failures = root.findall('testcase/failure')
+          assert comparison['status'] == 'fail', comparison
+          assert root.attrib['failures'] == '1', ET.tostring(root, encoding='unicode')
+          assert len(failures) == 1
+          assert 'VERIFY.' in (failures[0].text or '')
+          PY
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: stoneverify-pilot-gate-evidence
+          path: /tmp/stoneverify-pilot-evidence
 
   runtime-browser:
     runs-on: ubuntu-latest
@@ -107,4 +191,4 @@ jobs:
           python-version: "3.14"
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:runtime-browser
+      - run: npm test

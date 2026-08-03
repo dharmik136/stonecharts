@@ -100,6 +100,7 @@ Initial command shape:
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
   --runtime python \
   --runtime go \
+  --from-source \
   --evidence .tmp-stoneverify
 ```
 
@@ -109,6 +110,7 @@ Deliberate-drift demonstration:
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
   --runtime python \
   --runtime go \
+  --from-source \
   --demo-drift text \
   --evidence .tmp-stoneverify-drift
 ```
@@ -119,6 +121,7 @@ Baseline comparison:
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
   --runtime python \
   --runtime go \
+  --from-source \
   --baseline-evidence .tmp-stoneverify-bubble \
   --evidence .tmp-stoneverify-baseline-check
 ```

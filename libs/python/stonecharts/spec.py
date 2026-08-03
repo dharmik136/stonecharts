@@ -10,6 +10,7 @@ from dataclasses import dataclass, field, fields
 from typing import List, Optional, Union
 
 from .util import esc
+from .limits import enforce_spec_limits
 from .validate import SpecError, validate
 
 
@@ -274,13 +275,14 @@ class ChartSpec:
     grouping: bool = True              # True = grouped side-by-side; False = overlaid
 
     @staticmethod
-    def from_dict(d: dict) -> "ChartSpec":
+    def from_dict(d: dict, *, raw_size_hint: int | None = None) -> "ChartSpec":
         """Build a ChartSpec from a plain dict (parsed JSON).
 
         The dict is validated first (same rules as the Go renderer); a malformed
         spec raises SpecError. Unknown keys are ignored. Values are trusted after
         validation, so parsing does no coercion — defaults apply only on absence.
         """
+        enforce_spec_limits(d, raw_size_hint=raw_size_hint)
         errs = validate(d)
         if errs:
             raise SpecError(errs)

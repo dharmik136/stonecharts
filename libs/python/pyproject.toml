@@ -14,12 +14,16 @@ keywords = ["charts", "svg", "visualization", "plotting"]
 classifiers = ["License :: Other/Proprietary License", "Private :: Do Not Upload"]
 dependencies = []
 
+[project.scripts]
+stoneverify = "stonecharts.verify.cli:main"
+
 [project.optional-dependencies]
 dev = [
   "jsonschema>=4.23,<5",
   "markdown-it-py>=3,<5",
   "PyYAML>=6,<7",
   "pytest>=8,<10",
+  "pytest-cov>=5,<8",
 ]
 
 [project.urls]

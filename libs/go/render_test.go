@@ -2,6 +2,8 @@ package stonecharts
 
 import (
 	"encoding/json"
+	"fmt"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -444,6 +446,113 @@ func TestSplineEdgeCases(t *testing.T) {
 		low := strings.ToLower(mustSVG(t, spec))
 		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
 			t.Errorf("NaN/Inf in spline for %v", data)
+		}
+	}
+}
+
+func TestResourceLimitErrors(t *testing.T) {
+	cases := []struct {
+		name string
+		spec string
+		code string
+	}{
+		{
+			name: "series count",
+			spec: `{"type":"line","series":[` + strings.TrimRight(strings.Repeat(`{"name":"s","data":[1]},`, MaxSeries+1), ",") + `]}`,
+			code: "LIMIT.SERIES_COUNT",
+		},
+		{
+			name: "points per series",
+			spec: `{"type":"line","series":[{"name":"s","data":[` + strings.TrimRight(strings.Repeat("1,", MaxPointsPerSeries+1), ",") + `]}]}`,
+			code: "LIMIT.POINTS_PER_SERIES",
+		},
+		{
+			name: "label length",
+			spec: `{"type":"line","title":"` + strings.Repeat("x", MaxLabelLength+1) + `","series":[{"name":"s","data":[1]}]}`,
+			code: "LIMIT.LABEL_LENGTH",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := FromJSON([]byte(tc.spec))
+			if err == nil {
+				t.Fatal("expected resource limit error")
+			}
+			if !strings.Contains(err.Error(), tc.code) {
+				t.Fatalf("expected %s in %q", tc.code, err.Error())
+			}
+		})
+	}
+}
+
+func TestSpecByteLimitError(t *testing.T) {
+	_, err := FromJSON([]byte(strings.Repeat(" ", MaxSpecBytes+1)))
+	if err == nil {
+		t.Fatal("expected resource limit error")
+	}
+	if !strings.Contains(err.Error(), "LIMIT.SPEC_BYTES") {
+		t.Fatalf("expected LIMIT.SPEC_BYTES in %q", err.Error())
+	}
+}
+
+func TestRandomizedSpecsRenderValidSVG(t *testing.T) {
+	rng := rand.New(rand.NewSource(20260803))
+	chartTypes := []string{"line", "column", "area", "bar", "scatter", "bubble"}
+	for _, chartType := range chartTypes {
+		for caseIndex := 0; caseIndex < 8; caseIndex++ {
+			spec := map[string]interface{}{
+				"type":  chartType,
+				"title": fmt.Sprintf("%s property %d", chartType, caseIndex),
+			}
+			pointCount := rng.Intn(12) + 1
+			switch chartType {
+			case "scatter", "bubble":
+				data := make([][]float64, pointCount)
+				for i := 0; i < pointCount; i++ {
+					x := float64(rng.Intn(100000)-50000) / 1000
+					y := float64(rng.Intn(100000)-50000) / 1000
+					if chartType == "bubble" {
+						data[i] = []float64{x, y, float64(rng.Intn(100000)) / 1000}
+					} else {
+						data[i] = []float64{x, y}
+					}
+				}
+				spec["series"] = []map[string]interface{}{{"name": "S0", "data": data}}
+			default:
+				categories := make([]string, pointCount)
+				for i := 0; i < pointCount; i++ {
+					categories[i] = fmt.Sprintf("C%d", i)
+				}
+				seriesCount := rng.Intn(4) + 1
+				series := make([]map[string]interface{}, seriesCount)
+				for s := 0; s < seriesCount; s++ {
+					data := make([]float64, pointCount)
+					for i := 0; i < pointCount; i++ {
+						data[i] = float64(rng.Intn(200000)-100000) / 1000
+					}
+					series[s] = map[string]interface{}{"name": fmt.Sprintf("S%d", s), "data": data}
+				}
+				spec["xAxis"] = map[string]interface{}{"categories": categories}
+				spec["series"] = series
+			}
+			payload, err := json.Marshal(spec)
+			if err != nil {
+				t.Fatal(err)
+			}
+			parsed, err := FromJSON(payload)
+			if err != nil {
+				t.Fatalf("%s case %d failed parse: %v", chartType, caseIndex, err)
+			}
+			svg, err := RenderSVG(parsed)
+			if err != nil {
+				t.Fatalf("%s case %d failed render: %v", chartType, caseIndex, err)
+			}
+			if !strings.HasPrefix(svg, "<svg") || !strings.Contains(svg, `role="img"`) {
+				t.Fatalf("%s case %d did not render a chart SVG", chartType, caseIndex)
+			}
+			if strings.Contains(svg, "NaN") || strings.Contains(svg, "Infinity") {
+				t.Fatalf("%s case %d rendered non-finite output", chartType, caseIndex)
+			}
 		}
 	}
 }

@@ -64,3 +64,12 @@ unless noted.
   global styles (verified). Host CSS using `!important` on `table`/`svg` can still
   interfere — for fully hostile environments, embed in an `<iframe>` or a Shadow-DOM
   container. (Web-Component/Shadow-DOM embedding is a separate planned track.)
+
+## Active resource limits
+
+The current renderers and StoneVerify now enforce the concrete resource limits
+documented in [`SC-CON-001`](contracts/guarantees-and-limits.md): specification
+bytes, series count, points per series, total points, label length, generated SVG
+bytes, render timeout, evidence-bundle bytes, finding count, and comparison
+timeout. A limit failure uses a stable `LIMIT.*` code rather than a partial
+evidence bundle or an unbounded render attempt.

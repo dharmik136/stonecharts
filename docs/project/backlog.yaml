@@ -1,6 +1,6 @@
 id: SC-OPS-BACKLOG
 version: 1
-updated: "2026-07-29"
+updated: "2026-08-03"
 project:
   owner: dharmik136
   number: 2
@@ -1354,7 +1354,7 @@ items:
   - id: WORK-VERIFY-008
     title: Package stoneverify as an installable, repo-independent command
     item_type: Work Package
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1378,7 +1378,7 @@ items:
   - id: WORK-VERIFY-009
     title: Build a real semantic difference classification model
     item_type: Work Package
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1404,7 +1404,7 @@ items:
   - id: WORK-VERIFY-010
     title: Fold the interaction-runtime test into CI and stabilize StoneVerify exit codes
     item_type: Work Package
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1425,7 +1425,7 @@ items:
   - id: WORK-VERIFY-011
     title: Make cross-release comparison the default StoneVerify workflow
     item_type: Work Package
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1448,7 +1448,7 @@ items:
   - id: WORK-VERIFY-012
     title: Close StoneVerify and renderer testing gaps for external fixtures
     item_type: Work Package
-    status: Ready
+    status: Done
     priority: P1
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1474,7 +1474,7 @@ items:
   - id: WORK-VERIFY-013
     title: Build a clean StoneVerify evaluation kit for prospects
     item_type: Work Package
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1496,7 +1496,7 @@ items:
   - id: WORK-VERIFY-014A
     title: Define the canonical StoneVerify result schema and JSON output
     item_type: Work Package
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1522,7 +1522,7 @@ items:
   - id: WORK-VERIFY-014B
     title: Add JUnit and CI-native adapters on top of the canonical result
     item_type: Work Package
-    status: Triage
+    status: Done
     priority: P1
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1545,7 +1545,7 @@ items:
   - id: GATE-VERIFY-PILOT-001
     title: Authorize StoneVerify Pilot-Ready v1 as complete
     item_type: Release Gate
-    status: Triage
+    status: Qualification
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1553,7 +1553,7 @@ items:
     outcome: StoneVerify is certified pilot-ready - installable outside the repository, semantically explaining drift, defaulting to cross-release comparison, robust against external fixtures, packaged into a reviewable evaluation kit, and integrated into CI - as one gate rather than an assumption that finishing several separate work packages automatically produces an integrated product.
     traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-001, REQ-VERIFY-002, REQ-VERIFY-003, REQ-VERIFY-004, REQ-VERIFY-005]
     risks: []
-    evidence: [TEST-DOCS-CONTROL]
+    evidence: [TEST-DOCS-CONTROL, TEST-STONEVERIFY-INSTALL, TEST-STONEVERIFY-RESULT-SCHEMA, TEST-STONEVERIFY-BASELINE-INTEGRITY, TEST-STONEVERIFY-EXIT-CODES, TEST-STONEVERIFY-SEMANTIC-DIFF]
     dependencies: [WORK-VERIFY-008, WORK-VERIFY-009, WORK-VERIFY-010, WORK-VERIFY-011, WORK-VERIFY-012, WORK-VERIFY-013, WORK-VERIFY-014A, WORK-VERIFY-014B]
     compatibility: A certification checkpoint only; does not itself change renderer output, schemas, or the proprietary licensing boundary. Passing this gate does not authorize external distribution or a paid pilot by itself - DEC-018 and SC-CON-020 still govern that separately.
     areas: [python, go, docs]
@@ -1787,7 +1787,7 @@ items:
   - id: WORK-GTM-011
     title: Define and test the paid StoneVerify pilot offer
     item_type: Work Package
-    status: Ready
+    status: Done
     priority: P2
     workstream: WS-07 Docs & DX
     stage: S5 Expansion

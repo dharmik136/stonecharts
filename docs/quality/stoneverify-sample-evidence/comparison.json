@@ -3,7 +3,14 @@
   "message": "All requested runtime outputs are byte-identical.",
   "pairs": [
     {
+      "basis": [
+        "byte-identical"
+      ],
+      "category": "unknown-structural",
+      "confidence": "high",
       "equal": true,
+      "equality": "byte",
+      "findings": [],
       "firstDifference": null,
       "left": "go",
       "leftBytes": 4152,
@@ -40,5 +47,6 @@
       }
     }
   ],
+  "schemaVersion": 1,
   "status": "pass"
 }

@@ -200,35 +200,35 @@ evidence:
     requirements: []
   - id: TEST-STONEVERIFY-INSTALL
     kind: test
-    status: planned
+    status: implemented
     description: Verifies stoneverify installs and runs from a built wheel and a prebuilt Go binary without the repository source tree or any outbound network access.
     command: py -3 -m pytest libs/python/tests/test_stonecharts_verify.py -q
     location: libs/python/tests/test_stonecharts_verify.py
     requirements: [REQ-VERIFY-001]
   - id: TEST-STONEVERIFY-RESULT-SCHEMA
     kind: test
-    status: planned
-    description: Validates that every stoneverify output format (JSON, JUnit, HTML, terminal) is derived from one schema-versioned internal result structure.
+    status: implemented
+    description: Validates that every stoneverify output format (JSON, JUnit, HTML, terminal, GitHub Actions annotations/summary, and process exit code) is derived from one schema-versioned internal result structure and reports the same finding set for one demo-drift run.
     command: py -3 -m pytest libs/python/tests/test_stonecharts_verify.py -q
     location: tools/stonecharts_verify.py
     requirements: [REQ-VERIFY-002]
   - id: TEST-STONEVERIFY-BASELINE-INTEGRITY
     kind: test
-    status: planned
+    status: implemented
     description: Verifies baseline comparisons record evidence hashes and tool versions for both sides and flag a tool-version mismatch instead of silently comparing.
     command: py -3 -m pytest libs/python/tests/test_stonecharts_verify.py -q
     location: libs/python/tests/test_stonecharts_verify.py
     requirements: [REQ-VERIFY-003]
   - id: TEST-STONEVERIFY-EXIT-CODES
     kind: test
-    status: planned
+    status: implemented
     description: Verifies stoneverify returns distinct, documented exit codes for comparison failure, usage error, and bad input, and fails the test if the mapping changes unintentionally.
     command: py -3 -m pytest libs/python/tests/test_stonecharts_verify.py -q
     location: libs/python/tests/test_stonecharts_verify.py
     requirements: [REQ-VERIFY-004]
   - id: TEST-STONEVERIFY-SEMANTIC-DIFF
     kind: test
-    status: planned
+    status: implemented
     description: Verifies each demo-drift mode is classified into its correct semantic category, grounded in spec/svg-contract.md, with an explicit unknown-structural fallback.
     command: py -3 -m pytest libs/python/tests/test_stonecharts_verify.py -q
     location: libs/python/tests/test_stonecharts_verify.py

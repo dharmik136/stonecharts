@@ -66,3 +66,34 @@ def build_finding(
         "confidence": confidence,
         "basis": list(basis or []),
     }
+
+
+def build_verification_result(
+    *,
+    status: str,
+    comparison_mode: str,
+    baseline: dict[str, Any] | None = None,
+    candidate: dict[str, Any] | None = None,
+    inputs: dict[str, Any] | None = None,
+    runtime_coverage: dict[str, Any] | None = None,
+    findings: list[dict[str, Any]] | None = None,
+    evidence: dict[str, Any] | None = None,
+    environment: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    if status not in {"pass", "fail", "not-checked"}:
+        raise ValueError(f"unsupported status: {status!r}")
+    if comparison_mode not in {"cross-runtime", "baseline", "bundle-compare"}:
+        raise ValueError(f"unsupported comparison mode: {comparison_mode!r}")
+    return {
+        "schemaVersion": SCHEMA_VERSION,
+        "resultSchema": RESULT_SCHEMA_URI,
+        "status": status,
+        "comparisonMode": comparison_mode,
+        "baseline": baseline,
+        "candidate": candidate,
+        "inputs": dict(inputs or {}),
+        "runtimeCoverage": dict(runtime_coverage or {}),
+        "findings": list(findings or []),
+        "evidence": dict(evidence or {}),
+        "environment": environment,
+    }

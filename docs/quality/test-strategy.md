@@ -76,6 +76,22 @@ every `must` requirement has at least one implemented verification ID, and every
 required verification has a passing immutable result. Skips, quarantines, flaky
 reruns, and manual exceptions are visible in the release manifest.
 
+CI still enforces minimum code coverage as a regression tripwire for actively
+maintained renderer and verification code. The Python job runs:
+
+```bash
+python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80
+```
+
+The Go job runs:
+
+```bash
+go test . -cover -covermode=atomic
+```
+
+Both coverage gates run on Ubuntu and Windows for the supported toolchain matrix.
+The threshold prevents silent erosion of the test surface; it does not by itself
+prove release qualification.
+
 No failing test is converted into a new golden without a requirement or ADR explaining
 why the previous behavior was wrong.
-
