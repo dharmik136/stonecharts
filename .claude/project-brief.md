@@ -167,13 +167,14 @@ python tools/check_docs.py
 python tools/check_github_project.py
 
 # Python tests
-python -m pytest libs/python/tests -q
+python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80
 
 # Go tests (from libs/go/)
 go test ./...
+go test . -cover -covermode=atomic
 
-# Runtime syntax check
-node --check runtime/chart-interactions.js
+# Runtime syntax + browser qualification
+npm test
 ```
 
 ### Multi-Agent Coordination (If Used)
@@ -286,7 +287,7 @@ You are operating as a **development + documentation assistant** under this gove
 
 ---
 
-**Last Updated:** 2026-07-29
+**Last Updated:** 2026-08-03
 **Written for:** Claude (Claude Code Agent)
 **Status:** Reference guide (informative). This file duplicates ground already covered
 by `AGENTS.md`; if the two ever disagree, `AGENTS.md` and the actual governed docs win

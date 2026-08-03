@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import pathlib
+import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
+
+import pytest
 
 from stonecharts.verify.result import SCHEMA_VERSION
 
@@ -18,6 +23,143 @@ spec = importlib.util.spec_from_file_location("stonecharts_verify", VERIFY_PATH)
 stonecharts_verify = importlib.util.module_from_spec(spec)
 assert spec.loader is not None
 spec.loader.exec_module(stonecharts_verify)
+
+SVG_BASIC = (
+    b'<svg class="sc-chart" role="img">'
+    b'<g class="sc-series" data-series="0">'
+    b'<path class="sc-series-line" data-series="0" d="M0,0 L10,10" stroke="#ff0000"/>'
+    b'<circle class="sc-point" data-series="0" cx="10" cy="10" r="3.5"/>'
+    b'</g></svg>'
+)
+
+
+def test_classify_semantic_byte_equal():
+    result = stonecharts_verify.classify_semantic(SVG_BASIC, SVG_BASIC)
+
+    assert result["equality"] == "byte"
+    assert result["category"] == "unknown-structural"
+    assert result["confidence"] == "high"
+    assert result["basis"] == ["byte-identical"]
+
+
+def test_classify_semantic_geometry_change():
+    changed = SVG_BASIC.replace(b'd="M0,0 L10,10"', b'd="M0,0 L20,20"')
+
+    result = stonecharts_verify.classify_semantic(SVG_BASIC, changed)
+
+    assert result["category"] == "geometry"
+    assert result["equality"] == "unknown"
+    assert result["confidence"] == "high"
+    assert any("d" in basis for basis in result["basis"])
+
+
+def test_classify_semantic_theme_change():
+    changed = SVG_BASIC.replace(b'stroke="#ff0000"', b'stroke="#00ff00"')
+
+    result = stonecharts_verify.classify_semantic(SVG_BASIC, changed)
+
+    assert result["category"] == "theme-style"
+    assert result["equality"] == "semantic"
+    assert result["confidence"] == "high"
+    assert any("stroke" in basis for basis in result["basis"])
+
+
+def test_classify_semantic_accessibility_change():
+    changed = SVG_BASIC.replace(b'role="img"', b'role="figure"')
+
+    result = stonecharts_verify.classify_semantic(SVG_BASIC, changed)
+
+    assert result["category"] == "accessibility-metadata"
+    assert result["equality"] == "semantic"
+    assert result["confidence"] == "high"
+
+
+def test_classify_semantic_label_text_change():
+    left = b'<svg role="img"><text class="sc-tt-title">Jan</text></svg>'
+    right = b'<svg role="img"><text class="sc-tt-title">Feb</text></svg>'
+
+    result = stonecharts_verify.classify_semantic(left, right)
+
+    assert result["category"] == "label-text"
+    assert result["equality"] == "unknown"
+    assert result["confidence"] == "high"
+
+
+def test_classify_semantic_input_data_change():
+    left = b'<svg role="img"><circle class="sc-point" data-x="Jan" data-y="10" cx="10" cy="80" r="3.5"/></svg>'
+    right = b'<svg role="img"><circle class="sc-point" data-x="Jan" data-y="12" cx="10" cy="70" r="3.5"/></svg>'
+
+    result = stonecharts_verify.classify_semantic(left, right)
+
+    assert result["category"] == "input-data"
+    assert result["equality"] == "unknown"
+    assert result["confidence"] == "high"
+    assert any("data-y" in basis for basis in result["basis"])
+
+
+def test_classify_semantic_scale_domain_change_when_data_is_stable():
+    left = b'<svg role="img"><g class="sc-axis sc-axis-y"><text x="42" y="80">10</text></g><circle class="sc-point" data-y="10" cx="10" cy="80" r="3.5"/></svg>'
+    right = b'<svg role="img"><g class="sc-axis sc-axis-y"><text x="42" y="60">10</text></g><circle class="sc-point" data-y="10" cx="10" cy="60" r="3.5"/></svg>'
+
+    result = stonecharts_verify.classify_semantic(left, right)
+
+    assert result["category"] == "scale-domain"
+    assert result["equality"] == "unknown"
+    assert result["confidence"] == "medium"
+    assert any("cy" in basis or "[y]" in basis for basis in result["basis"])
+
+
+def test_classify_semantic_malformed_input_falls_back_safely():
+    result = stonecharts_verify.classify_semantic(b"<svg><unterminated", b"<svg><also-unterminated")
+
+    assert result["category"] == "unknown-structural"
+    assert result["equality"] == "unknown"
+    assert result["confidence"] == "low"
+
+
+def test_classify_semantic_whitespace_only_is_serialization_only():
+    left = b'<svg role="img"><g class="sc-series"><path d="M0,0 L1,1"/></g></svg>'
+    right = b'<svg role="img"><g class="sc-series"><path d="M0,0 L1,1"/></g></svg>\n'
+
+    result = stonecharts_verify.classify_semantic(left, right)
+
+    assert result["category"] == "serialization-only"
+    assert result["equality"] == "structural"
+
+
+def test_classify_semantic_attribute_ordering_is_serialization_only():
+    left = b'<svg role="img" class="sc-chart"></svg>'
+    right = b'<svg class="sc-chart" role="img"></svg>'
+
+    result = stonecharts_verify.classify_semantic(left, right)
+
+    assert result["category"] == "serialization-only"
+    assert result["equality"] == "structural"
+
+
+def test_classify_difference_includes_semantic_fields():
+    left = b'<svg role="img"><g class="sc-series"><path d="M0,0 L1,1" stroke="#111"/></g></svg>'
+    right = b'<svg role="img"><g class="sc-series"><path d="M0,0 L2,2" stroke="#111"/></g></svg>'
+
+    result = stonecharts_verify.classify_difference(left, right, "left.svg", "right.svg")
+
+    assert result["equal"] is False
+    assert "likelyCause" in result
+    assert "structural" in result
+    assert result["category"] == "geometry"
+    assert result["equality"] == "unknown"
+    assert result["confidence"] == "high"
+    assert isinstance(result["basis"], list) and result["basis"]
+
+
+def test_classify_difference_equal_case_includes_semantic_fields():
+    svg = b'<svg role="img"></svg>'
+
+    result = stonecharts_verify.classify_difference(svg, svg, "left.svg", "right.svg")
+
+    assert result["equal"] is True
+    assert result["likelyCause"] == "none"
+    assert result["equality"] == "byte"
 
 
 def test_compare_outputs_passes_on_equal_svg():
@@ -252,6 +394,19 @@ def test_check_evidence_bundle_fails_on_tampered_file(tmp_path):
     assert result["checksumErrors"] == ["checksum mismatch for python-output.svg"]
 
 
+def test_check_evidence_bundle_enforces_bundle_size_limit(tmp_path, monkeypatch):
+    evidence = tmp_path / "evidence"
+    _write_valid_bundle(evidence)
+    monkeypatch.setitem(stonecharts_verify.evidence_bundle_size.__globals__, "MAX_EVIDENCE_BUNDLE_BYTES", 10)
+
+    try:
+        stonecharts_verify.check_evidence_bundle(evidence)
+    except stonecharts_verify.ResourceLimitError as exc:
+        assert exc.code == "LIMIT.EVIDENCE_BUNDLE_BYTES"
+    else:
+        raise AssertionError("expected evidence bundle size limit")
+
+
 def test_validate_manifest_shape_reports_missing_and_invalid_fields():
     manifest = {
         "tool": "wrong",
@@ -428,6 +583,43 @@ def test_compare_evidence_bundles_fails_when_runtime_coverage_differs(tmp_path):
     assert go_result["rightSha256"] is None
 
 
+def test_compare_evidence_bundles_enforces_finding_limit(tmp_path, monkeypatch):
+    left = tmp_path / "left"
+    right = tmp_path / "right"
+    _write_valid_bundle(left, "<svg>left</svg>")
+    _write_valid_bundle(right, "<svg>right</svg>")
+    monkeypatch.setitem(stonecharts_verify.enforce_finding_limit.__globals__, "MAX_FINDINGS", 0)
+
+    try:
+        stonecharts_verify.compare_evidence_bundles(left, right)
+    except stonecharts_verify.ResourceLimitError as exc:
+        assert exc.code == "LIMIT.FINDING_COUNT"
+    else:
+        raise AssertionError("expected finding-count limit")
+
+
+def test_compare_outputs_enforces_comparison_timeout(monkeypatch):
+    monkeypatch.setitem(stonecharts_verify.comparison_deadline.__globals__, "COMPARISON_TIMEOUT_SECONDS", -1.0)
+
+    try:
+        stonecharts_verify.compare_outputs({"python": b"<svg>a</svg>", "go": b"<svg>b</svg>"})
+    except stonecharts_verify.ResourceLimitError as exc:
+        assert exc.code == "LIMIT.COMPARISON_TIMEOUT"
+    else:
+        raise AssertionError("expected comparison timeout")
+
+
+def test_render_python_enforces_render_timeout(monkeypatch):
+    monkeypatch.setitem(stonecharts_verify.render_python.__globals__, "RENDER_TIMEOUT_SECONDS", -1.0)
+
+    try:
+        stonecharts_verify.render_python({"type": "line", "series": [{"name": "s", "data": [1]}]})
+    except stonecharts_verify.ResourceLimitError as exc:
+        assert exc.code == "LIMIT.RENDER_TIMEOUT"
+    else:
+        raise AssertionError("expected render timeout")
+
+
 def test_write_compare_report_escapes_and_reports_status(tmp_path):
     left = tmp_path / "left"
     right = tmp_path / "right"
@@ -485,6 +677,35 @@ def test_compare_baseline_not_checked_includes_schema_version():
     assert result["status"] == "not-checked"
 
 
+def test_baseline_identity_includes_manifest_hash_tool_version_and_timestamp(tmp_path):
+    baseline = tmp_path / "baseline"
+    baseline.mkdir()
+    manifest = {
+        "toolVersion": 1,
+        "generatedAt": "2026-08-03T00:00:00+00:00",
+        "input": {"sha256": "input-a"},
+        "runtimes": [{"runtime": "python", "sha256": "svg-a"}],
+    }
+    (baseline / "manifest.json").write_text(json.dumps(manifest, sort_keys=True), encoding="utf-8")
+
+    result = stonecharts_verify.compare_baseline(
+        manifest,
+        {"python": b"<svg></svg>"},
+        manifest,
+        baseline_dir=baseline,
+        supersedes_baseline_dir=baseline,
+        supersedes_baseline_manifest=manifest,
+        note="approved in ticket SC-123",
+    )
+
+    assert result["identity"]["evidence"] == str(baseline)
+    assert result["identity"]["manifestSha256"] == stonecharts_verify.sha256_file(baseline / "manifest.json")
+    assert result["identity"]["toolVersion"] == 1
+    assert result["identity"]["generatedAt"] == "2026-08-03T00:00:00+00:00"
+    assert result["supersedes"]["manifestSha256"] == result["identity"]["manifestSha256"]
+    assert result["note"] == "approved in ticket SC-123"
+
+
 def test_manifest_includes_schema_version_and_environment(tmp_path):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
@@ -505,6 +726,57 @@ def test_manifest_includes_schema_version_and_environment(tmp_path):
     assert "input" in manifest and "runtimes" in manifest
 
 
+def test_baseline_workflow_defaults_to_single_python_runtime(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    baseline_dir = tmp_path / "baseline"
+    candidate_dir = tmp_path / "candidate"
+    superseded_dir = tmp_path / "superseded"
+    env = {**os.environ, "STONEVERIFY_GENERATED_AT": "2026-08-03T00:00:00+00:00"}
+
+    subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(superseded_dir)],
+        capture_output=True,
+        cwd=ROOT,
+        env=env,
+        check=True,
+    )
+    subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(baseline_dir)],
+        capture_output=True,
+        cwd=ROOT,
+        env=env,
+        check=True,
+    )
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--baseline-evidence",
+            str(baseline_dir),
+            "--supersedes-baseline",
+            str(superseded_dir),
+            "--baseline-note",
+            "approved baseline SC-123",
+            "--evidence",
+            str(candidate_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+        env=env,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((candidate_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert [runtime["runtime"] for runtime in manifest["runtimes"]] == ["python"]
+    baseline = manifest["baseline"]
+    assert baseline["status"] == "pass"
+    assert baseline["identity"]["evidence"] == str(baseline_dir.resolve())
+    assert baseline["identity"]["manifestSha256"] == stonecharts_verify.sha256_file(baseline_dir / "manifest.json")
+    assert baseline["supersedes"]["evidence"] == str(superseded_dir.resolve())
+    assert baseline["note"] == "approved baseline SC-123"
+
+
 def test_manifest_evidence_block_is_algorithm_qualified(tmp_path):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
@@ -523,6 +795,74 @@ def test_manifest_evidence_block_is_algorithm_qualified(tmp_path):
     # checksums.txt format is untouched (still plain sha256sum-compatible text)
     checksums_text = (evidence_dir / "checksums.txt").read_text(encoding="utf-8")
     assert "  manifest.json" in checksums_text
+
+
+def test_demo_drift_text_reports_semantic_fields(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    junit_report = tmp_path / "junit.xml"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--runtime",
+            "go",
+            "--from-source",
+            "--demo-drift",
+            "text",
+            "--evidence",
+            str(evidence_dir),
+            "--junit-report",
+            str(junit_report),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == 1, proc.stdout.decode()
+    comparison = json.loads((evidence_dir / "comparison.json").read_text(encoding="utf-8"))
+    pair = comparison["pairs"][0]
+    assert pair["category"] in {"chart-type-capability", "label-text", "unknown-structural"}
+    assert pair["equality"] in {"structural", "semantic", "unknown"}
+    assert pair["confidence"] in {"high", "medium", "low"}
+    assert pair["basis"]
+    root = ET.parse(junit_report).getroot()
+    assert root.attrib["failures"] == "1"
+    assert len(root.findall("testcase/failure")) == 1
+
+
+def test_demo_drift_attribute_reports_accessibility_category(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--runtime",
+            "go",
+            "--from-source",
+            "--demo-drift",
+            "attribute",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == 1, proc.stdout.decode()
+    comparison = json.loads((evidence_dir / "comparison.json").read_text(encoding="utf-8"))
+    pair = comparison["pairs"][0]
+    assert pair["category"] == "accessibility-metadata"
+    assert pair["equality"] == "semantic"
+    assert pair["confidence"] == "high"
+    assert pair["findings"][0]["code"] == "VERIFY.ACCESSIBILITY.METADATA_CHANGED"
 
 
 def test_manifest_only_adds_schema_version_environment_and_evidence(tmp_path):
@@ -557,10 +897,321 @@ def test_comparison_json_only_adds_schema_version(tmp_path):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     subprocess.run(
-        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--runtime", "go", "--evidence", str(evidence_dir)],
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--runtime",
+            "go",
+            "--from-source",
+            "--evidence",
+            str(evidence_dir),
+        ],
         capture_output=True,
         cwd=ROOT,
         check=True,
     )
     comparison = json.loads((evidence_dir / "comparison.json").read_text(encoding="utf-8"))
     assert set(comparison.keys()) == {"schemaVersion", "status", "equal", "message", "pairs"}
+
+
+def test_compare_outputs_adds_stable_finding_codes():
+    result = stonecharts_verify.compare_outputs(
+        {
+            "python": b'<svg role="img"><text>a</text></svg>',
+            "go": b'<svg role="img"><text>b</text></svg>',
+        }
+    )
+
+    finding = result["pairs"][0]["findings"][0]
+    assert finding["code"] == "VERIFY.LABEL.TEXT_CHANGED"
+    assert finding["category"] == "label-text"
+
+
+def test_junit_report_pass_has_zero_failures(tmp_path):
+    report = tmp_path / "junit.xml"
+    comparison = stonecharts_verify.compare_outputs({"python": b"<svg/>", "go": b"<svg/>"})
+
+    stonecharts_verify.write_junit_report(report, None, comparison)
+    stonecharts_verify.validate_junit_report(report)
+
+    root = ET.parse(report).getroot()
+    assert root.tag == "testsuite"
+    assert root.attrib["tests"] == "1"
+    assert root.attrib["failures"] == "0"
+
+
+def test_junit_report_failure_contains_semantic_finding_text(tmp_path):
+    report = tmp_path / "junit.xml"
+    comparison = stonecharts_verify.compare_outputs(
+        {
+            "python": b'<svg role="img"><text>a</text></svg>',
+            "go": b'<svg role="img"><text>b</text></svg>',
+        }
+    )
+
+    stonecharts_verify.write_junit_report(report, None, comparison)
+    stonecharts_verify.validate_junit_report(report)
+
+    root = ET.parse(report).getroot()
+    failure = root.find("testcase/failure")
+    assert failure is not None
+    assert root.attrib["failures"] == "1"
+    assert "VERIFY.LABEL.TEXT_CHANGED" in (failure.text or "")
+    assert "category=label-text" in (failure.text or "")
+
+
+def test_github_actions_output_writes_annotation_and_summary(tmp_path, monkeypatch, capsys):
+    summary = tmp_path / "summary.md"
+    comparison = stonecharts_verify.compare_outputs(
+        {
+            "python": b'<svg role="img"><text>a</text></svg>',
+            "go": b'<svg role="img"><text>b</text></svg>',
+        }
+    )
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+
+    stonecharts_verify.emit_github_actions_output(None, comparison)
+
+    captured = capsys.readouterr()
+    assert "::error title=StoneVerify " in captured.out
+    assert "VERIFY.LABEL.TEXT_CHANGED" in captured.out
+    assert "Status: **FAIL**" in summary.read_text(encoding="utf-8")
+
+
+def test_single_demo_drift_run_keeps_all_output_formats_aligned(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    junit_report = evidence_dir / "junit.xml"
+    summary = tmp_path / "summary.md"
+    env = os.environ.copy()
+    env["GITHUB_ACTIONS"] = "true"
+    env["GITHUB_STEP_SUMMARY"] = str(summary)
+
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--runtime",
+            "go",
+            "--from-source",
+            "--demo-drift",
+            "text",
+            "--evidence",
+            str(evidence_dir),
+            "--junit-report",
+            str(junit_report),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+        env=env,
+        text=True,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_DIFFERENCES
+    assert "StoneVerify FAIL:" in proc.stdout
+    assert "::error title=StoneVerify " in proc.stdout
+    assert "VERIFY." in proc.stdout
+
+    comparison = json.loads((evidence_dir / "comparison.json").read_text(encoding="utf-8"))
+    assert comparison["status"] == "fail"
+    finding = comparison["pairs"][0]["findings"][0]
+    assert finding["code"].startswith("VERIFY.")
+
+    root = ET.parse(junit_report).getroot()
+    failure = root.find("testcase/failure")
+    assert root.attrib["failures"] == "1"
+    assert failure is not None
+    assert finding["code"] in (failure.text or "")
+
+    report_html = (evidence_dir / "report.html").read_text(encoding="utf-8")
+    assert "StoneVerify Report: FAIL" in report_html
+    assert finding["category"] in report_html
+
+    summary_text = summary.read_text(encoding="utf-8")
+    assert "Status: **FAIL**" in summary_text
+    assert "Failures: 1" in summary_text
+
+
+def test_stoneverify_exit_codes_are_stable(tmp_path):
+    assert stonecharts_verify.EXIT_PASS == 0
+    assert stonecharts_verify.EXIT_DIFFERENCES == 1
+    assert stonecharts_verify.EXIT_USAGE == 2
+    assert stonecharts_verify.EXIT_INVALID_SPEC == 3
+    assert stonecharts_verify.EXIT_ADAPTER == 4
+    assert stonecharts_verify.EXIT_RESOURCE_LIMIT == 5
+    assert stonecharts_verify.EXIT_INTERNAL == 70
+
+
+def test_generated_at_can_be_pinned_for_reproducible_evidence(monkeypatch):
+    monkeypatch.setenv("STONEVERIFY_GENERATED_AT", "2026-08-03T00:00:00+00:00")
+    assert stonecharts_verify.generated_at() == "2026-08-03T00:00:00+00:00"
+
+
+def test_stoneverify_exit_code_pass(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(tmp_path / "evidence")],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS
+
+
+def test_stoneverify_exit_code_differences(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--runtime",
+            "go",
+            "--from-source",
+            "--demo-drift",
+            "text",
+            "--evidence",
+            str(tmp_path / "evidence"),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_DIFFERENCES
+
+
+def test_stoneverify_exit_code_usage_error(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python"],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_USAGE
+
+
+def test_stoneverify_exit_code_invalid_spec(tmp_path):
+    spec_path = tmp_path / "bad.json"
+    spec_path.write_text('{"type": "line", "series": [{"name": "broken", "data": ["not numeric"]}]}', encoding="utf-8")
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(tmp_path / "evidence")],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_INVALID_SPEC
+    assert b"INVALID_SPEC" in proc.stderr
+
+
+def test_stoneverify_exit_code_resource_limit(tmp_path):
+    spec_path = tmp_path / "too-large.json"
+    spec_path.write_text('{"type":"line","series":[{"name":"s","data":[' + ",".join(["1"] * 10001) + "]}]}", encoding="utf-8")
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(tmp_path / "evidence")],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_RESOURCE_LIMIT
+    assert b"RESOURCE_LIMIT" in proc.stderr
+    assert b"LIMIT.POINTS_PER_SERIES" in proc.stderr
+
+
+def test_stoneverify_resource_limit_leaves_existing_evidence_untouched(tmp_path, monkeypatch):
+    spec_path = tmp_path / "spec.json"
+    spec_path.write_text('{"type":"line","series":[{"name":"s","data":[1]}]}', encoding="utf-8")
+    evidence = tmp_path / "evidence"
+    evidence.mkdir()
+    marker = evidence / "keep.txt"
+    marker.write_text("original", encoding="utf-8")
+
+    monkeypatch.setitem(stonecharts_verify.comparison_deadline.__globals__, "COMPARISON_TIMEOUT_SECONDS", -1.0)
+    monkeypatch.setitem(stonecharts_verify.main.__globals__, "render_go", lambda spec_path, **kwargs: (b"<svg>go</svg>", {"runtime": "go"}))
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "stoneverify",
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--runtime",
+            "go",
+            "--evidence",
+            str(evidence),
+        ],
+    )
+
+    assert stonecharts_verify.main() == stonecharts_verify.EXIT_RESOURCE_LIMIT
+    assert marker.read_text(encoding="utf-8") == "original"
+    assert not list(tmp_path.glob(".evidence.tmp-*"))
+
+
+def test_stoneverify_exit_code_adapter_failure_when_go_is_unavailable(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    env = {**os.environ, "PATH": ""}
+    proc = subprocess.run(
+        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "go", "--evidence", str(tmp_path / "evidence")],
+        capture_output=True,
+        cwd=ROOT,
+        env=env,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_ADAPTER
+    assert b"ADAPTER_FAILURE" in proc.stderr
+
+
+def test_pyproject_installs_stoneverify_console_script():
+    pyproject = (ROOT / "libs/python/pyproject.toml").read_text(encoding="utf-8")
+    assert '[project.scripts]' in pyproject
+    assert 'stoneverify = "stonecharts.verify.cli:main"' in pyproject
+
+
+def test_go_runtime_uses_explicit_adapter_binary(tmp_path):
+    if shutil.which("go") is None:
+        pytest.skip("Go toolchain is not available")
+
+    binary = tmp_path / ("stoneverify-go-render.exe" if os.name == "nt" else "stoneverify-go-render")
+    build = subprocess.run(
+        ["go", "build", "-o", str(binary), "./cmd/stoneverify-go-render"],
+        cwd=ROOT / "libs/go",
+        capture_output=True,
+    )
+    assert build.returncode == 0, build.stderr.decode()
+
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "go",
+            "--go-binary",
+            str(binary),
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=tmp_path,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    go_runtime = manifest["runtimes"][0]
+    assert go_runtime["runtime"] == "go"
+    assert go_runtime["module"] == "stonecharts"
+    assert go_runtime["stonechartsVersion"] == "0.0.0.4"
+    assert go_runtime["goAdapterVersion"] == "1.0.0"
+    assert go_runtime["goBinary"] == str(binary)

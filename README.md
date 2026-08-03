@@ -93,12 +93,31 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 
 ## StoneVerify Proof
 
-The first Visual Integrity proof is a local evidence-bundle command:
+The primary Visual Integrity proof compares a candidate render against an
+approved local evidence bundle:
+
+```bash
+python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
+  --runtime python \
+  --evidence .tmp-stoneverify-baseline
+```
+
+```bash
+python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
+  --baseline-evidence .tmp-stoneverify-baseline \
+  --baseline-note "approved baseline for release review" \
+  --evidence .tmp-stoneverify-candidate
+```
+
+When `--baseline-evidence` is supplied and no runtime is specified, StoneVerify
+defaults to one Python render. Use explicit repeated `--runtime` flags for a
+cross-runtime proof:
 
 ```bash
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
   --runtime python \
   --runtime go \
+  --from-source \
   --evidence .tmp-stoneverify-bubble
 ```
 
@@ -113,18 +132,19 @@ demo-only drift to the last runtime output:
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
   --runtime python \
   --runtime go \
+  --from-source \
   --demo-drift text \
   --evidence .tmp-stoneverify-drift
 ```
 
-To compare a new run against a previously approved local evidence bundle:
+To record that a new approved baseline replaces an older one:
 
 ```bash
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
-  --runtime python \
-  --runtime go \
-  --baseline-evidence .tmp-stoneverify-bubble \
-  --evidence .tmp-stoneverify-baseline-check
+  --baseline-evidence .tmp-stoneverify-baseline \
+  --supersedes-baseline .tmp-stoneverify-older-baseline \
+  --baseline-note "replaces baseline after dependency upgrade review" \
+  --evidence .tmp-stoneverify-candidate
 ```
 
 To validate that an existing evidence bundle still matches its recorded checksums:
@@ -159,6 +179,49 @@ python tools/stonecharts_verify.py \
   --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-drift \
   --compare-report .tmp-stoneverify-compare/report.html
 ```
+
+For CI systems that ingest test reports, add a JUnit XML report:
+
+```bash
+python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
+  --runtime python \
+  --runtime go \
+  --from-source \
+  --demo-drift text \
+  --evidence .tmp-stoneverify-drift \
+  --junit-report .tmp-stoneverify-drift/junit.xml
+```
+
+The XML report has one testcase per compared runtime pair, or one testcase per
+runtime in baseline mode. A passing comparison writes zero failures; a failing
+comparison writes failure text from StoneVerify's semantic findings. The XML
+does not decide job status by itself: StoneVerify's exit code remains the source
+of pass/fail behavior.
+
+When `GITHUB_ACTIONS=true`, StoneVerify also emits GitHub workflow annotations
+and appends a concise job summary if `GITHUB_STEP_SUMMARY` is available. This
+happens without requiring `--junit-report`.
+
+StoneVerify uses stable exit codes for automation:
+
+| Code | Meaning |
+|------|---------|
+| 0 | Verification completed and passed. |
+| 1 | Verification completed, but differences or invalid evidence were found. |
+| 2 | CLI usage error, such as missing required arguments. |
+| 3 | Invalid or unsupported chart specification. |
+| 4 | Renderer or adapter execution failure. |
+| 5 | Reserved for resource-limit or timeout failure. |
+| 70 | Reserved for internal StoneVerify failure. |
+
+When installed from the Python wheel, StoneVerify is available as `stoneverify`.
+For `--runtime go`, it invokes a prebuilt `stoneverify-go-render` adapter
+resolved from `--go-binary`, `STONEVERIFY_GO_BINARY`, or `PATH`. The adapter
+contract is intentionally small: `stoneverify-go-render <spec.json>` writes SVG
+to stdout, `stoneverify-go-render --version` reports `adapter=`,
+`stonecharts=`, and `module=` fields, and failures write stderr with a non-zero
+exit. `--from-source` is only the development fallback for running against this
+checkout with `go run`.
 
 ## Status
 

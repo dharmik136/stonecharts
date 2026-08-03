@@ -82,6 +82,31 @@ compatibility policy and its evidence requirements.
 - PDF, PNG, and email conversion are downstream until a certified export profile is
   published.
 
+## StoneVerify and renderer resource limits
+
+The Python and Go renderers reject inputs that exceed these concrete limits with a
+stable `LIMIT.*` code before producing output:
+
+| Limit | Value | Code |
+|-------|-------|------|
+| Input specification size | 1,000,000 bytes | `LIMIT.SPEC_BYTES` |
+| Series count | 50 series | `LIMIT.SERIES_COUNT` |
+| Points per series | 10,000 points | `LIMIT.POINTS_PER_SERIES` |
+| Total points | 50,000 points | `LIMIT.TOTAL_POINTS` |
+| Label length | 512 Unicode code points | `LIMIT.LABEL_LENGTH` |
+| Generated SVG size | 5,000,000 UTF-8 bytes | `LIMIT.SVG_BYTES` |
+| Render time per runtime inside StoneVerify | 10 seconds | `LIMIT.RENDER_TIMEOUT` |
+| Evidence bundle size | 10,000,000 bytes | `LIMIT.EVIDENCE_BUNDLE_BYTES` |
+| Reported finding count | 100 findings | `LIMIT.FINDING_COUNT` |
+| Evidence comparison time | 10 seconds | `LIMIT.COMPARISON_TIMEOUT` |
+
+StoneVerify reports resource-limit and timeout failures with exit code `5`.
+Python-side renderer limits, Go adapter runtime timeouts, evidence-bundle size
+limits, finding-count limits, and comparison timeouts all use stable `LIMIT.*`
+codes. A Go adapter process can still report renderer-side `LIMIT.*` text on
+stderr; StoneVerify classifies adapter-process failures separately unless and
+until the adapter protocol gains a structured error channel.
+
 ## Legal boundary
 
 These are engineering conformance statements. License rights, warranties, liability,

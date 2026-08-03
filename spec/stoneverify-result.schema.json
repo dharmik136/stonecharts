@@ -2,11 +2,20 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://stonecharts.dev/schemas/stoneverify-result.schema.json",
   "title": "StoneVerify canonical result envelope",
-  "description": "The full envelope below (comparisonMode, baseline, candidate, inputs, runtimeCoverage, findings, evidence, and environment all present and required) is the target shape a follow-on unification effort will populate (see docs/superpowers/plans/2026-07-30-stoneverify-canonical-result-model.md, 'What this plan deliberately does not do'). Documents that validate under schemaVersion: 1 today are a subset of this envelope: only schemaVersion and status are guaranteed present on every emitted document (manifest.json and comparison.json both stamp these two; the remaining properties below are defined for forward compatibility but are not yet emitted and are therefore not required).",
+  "description": "Canonical StoneVerify result envelope used internally to derive legacy-compatible manifest, comparison, HTML, terminal, and future CI adapter output. Public manifest.json and comparison.json documents preserve their existing top-level fields; this schema describes the shared result model those adapters are built from.",
   "type": "object",
   "required": [
     "schemaVersion",
-    "status"
+    "resultSchema",
+    "status",
+    "comparisonMode",
+    "baseline",
+    "candidate",
+    "inputs",
+    "runtimeCoverage",
+    "findings",
+    "evidence",
+    "environment"
   ],
   "properties": {
     "schemaVersion": { "const": 1 },

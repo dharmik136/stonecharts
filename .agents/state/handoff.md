@@ -1,15 +1,60 @@
 # Handoff
 
-- From: coordinator
-- To: -
-- Branch or worktree: main
-- Commit or state: `docs/project/backlog.yaml` has 62 governed items, all `Done`; no open decisions in `docs/project/decisions.md`; GitHub Project sync (`tools/check_github_project.py`) is conformant
-- Files changed: repository-wide cleanup; see git log on `main` for the actual change history
-- Verification completed: `python tools/check_docs.py`, `python -m pytest libs/python/tests`, `go build ./... && go test ./...`, `python tools/check_github_project.py` all pass as of 2026-07-29
-- Remaining checks: none outstanding; next work is gated by DEC-017 (chart-family/language expansion paused pending paid validation evidence or explicit approval) - read `docs/product/visual-integrity-strategy.md` before proposing new engineering scope
-- Risks or blockers: none open
-
-No handoff is currently pending. This file no longer reflects the stale 2026-07-19
-draft-agent-roster handoff; that thread was superseded by real release work (GATE-S6
-through GATE-S14, 0.0.0.2-0.0.0.4) long since merged to `main`. Overwrite this file
-with your own handoff when you finish a unit of work.
+- From: Codex
+- To: next worker
+- Branch or worktree: `main`
+- Commit or state: uncommitted local StoneVerify pipeline work on 2026-08-03
+- Local pipeline status:
+  - `WORK-VERIFY-008` marked `Done`: installable `stoneverify` console script, packaged CLI module, source wrapper, and prebuilt Go adapter path are implemented.
+  - `WORK-VERIFY-009` marked `Done`: semantic difference category/equality/confidence/basis fields are implemented.
+  - `WORK-VERIFY-010` marked `Done`: stable StoneVerify exit codes and `npm test` CI folding are implemented.
+  - `WORK-VERIFY-011` marked `Done`: baseline comparison is now the primary/default workflow; with `--baseline-evidence` and no runtime flags, StoneVerify renders Python only, records baseline identity, accepts `--baseline-note`, and records `--supersedes-baseline`.
+  - `WORK-VERIFY-014A` marked `Done`: canonical result-envelope helper and stable `VERIFY.*` finding codes are implemented while preserving legacy output fields.
+  - `WORK-VERIFY-012` marked `Done`: concrete Python/Go resource limits, StoneVerify resource-limit/timeout exit code `5`, deterministic randomized render property tests for all six certified chart types in both languages, evidence-bundle/finding/comparison limits, staged evidence writes, and CI coverage gates are implemented.
+  - `WORK-VERIFY-013` marked `Done`: repeatable internal StoneVerify evaluation-kit builder creates a clean kit directory and zip with wheel, Go adapter, sample spec, schemas, governed docs, and a repo-independent demo runner.
+  - `WORK-VERIFY-014B` marked `Done`: StoneVerify writes JUnit-compatible XML via `--junit-report`, emits GitHub Actions annotations/summary when `GITHUB_ACTIONS=true`, and preserves existing manifest/comparison/checksum behavior.
+  - `GATE-VERIFY-PILOT-001` moved to `Qualification`: all listed implementation dependencies are done, the kit has passed an external-fixture run locally, and `.github/workflows/quality.yml` now contains a `stoneverify-pilot-gate` job. The gate is not `Done` until that CI path has actually run remotely and its artifact/annotation behavior is reviewed.
+- Files changed:
+  - `libs/python/stonecharts/verify/cli.py`, `tools/stonecharts_verify.py`
+  - `libs/python/stonecharts/verify/result.py`, `spec/stoneverify-result.schema.json`
+  - `libs/python/stonecharts/limits.py`, `libs/python/stonecharts/spec.py`, `libs/python/stonecharts/render.py`
+  - `libs/go/version.go`, `libs/go/limits.go`, `libs/go/spec.go`, `libs/go/render.go`, `libs/go/cmd/stoneverify-go-render/main.go`
+  - `libs/python/pyproject.toml`, `.github/workflows/quality.yml`, `.github/PULL_REQUEST_TEMPLATE.md`, `package.json`
+  - `libs/python/tests/test_stonecharts_verify.py`, `libs/python/tests/test_verify_result.py`, `libs/python/tests/test_limits.py`, `libs/python/tests/test_property_rendering.py`, `libs/go/render_test.go`
+  - `README.md`, `docs/quality/stoneverify-quickstart.md`, `docs/product/visual-integrity-strategy.md`, `docs/contracts/guarantees-and-limits.md`, `docs/robustness.md`, `docs/project/backlog.yaml`
+  - `docs/quality/stoneverify-sample-evidence/*`
+  - `tools/build_stoneverify_eval_kit.py`
+- Verification completed:
+  - `python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80 -q` -> 117 passed; total coverage 84.90%, required 80% reached.
+  - `go test ./...` from `libs/go` -> pass.
+  - `go test . -cover -covermode=atomic` from `libs/go` -> pass; coverage 85.1%.
+  - `go build ./cmd/stoneverify-go-render` from `libs/go` -> pass; generated `libs/go/stoneverify-go-render.exe` was removed afterward.
+  - `npm test` -> pass, 4 browser qualification tests.
+  - `python tools/check_docs.py` -> pass.
+  - `python tools/check_github_project.py --apply` -> pass after the earlier long remote sync run: 85 governed items, 8 statuses, 11 governed fields, 6 saved views.
+  - After `WORK-VERIFY-012` moved to `Done`, a full `--apply` retry hit a GitHub HTTP 504; a targeted governed sync updated issue #76 (`WORK-VERIFY-012`) and issue #87 (`GATE-VERIFY-PILOT-001`) using `tools/check_github_project.py`'s own body/field functions.
+  - `python tools/check_github_project.py` -> pass after targeted sync: 85 governed items, 8 statuses, 11 governed fields, 6 saved views.
+  - `python tools/build_stoneverify_eval_kit.py` -> pass; wrote ignored `dist/stoneverify-evaluation-kit/` and `dist/stoneverify-evaluation-kit.zip`.
+  - Fresh extracted-kit demo -> pass; `python scripts/run_demo.py` installed from kit-local wheel with `--no-index`, used the kit-local Go adapter, and produced intentional-drift evidence with expected StoneVerify exit code `1`.
+  - Fresh extracted-kit external-fixture demo -> pass; generated a fixture outside repo examples and ran `python scripts/run_demo.py --spec <external-fixture>`, using only kit-local wheel/adapter artifacts.
+  - After `WORK-VERIFY-013` moved to `Done`, targeted governed sync updated issue #77 (`WORK-VERIFY-013`) and issue #87 (`GATE-VERIFY-PILOT-001`).
+  - `python -m pytest libs/python/tests/test_stonecharts_verify.py -q` -> 62 passed after adding JUnit/GitHub Actions adapter coverage.
+  - `python tools/stonecharts_verify.py charts/bubble/examples/basic.json --runtime python --runtime go --from-source --demo-drift text --evidence .tmp-stoneverify-junit-check --junit-report .tmp-stoneverify-junit-check\junit.xml` -> expected StoneVerify exit code `1`; JUnit XML validated with exactly one failure element and semantic `VERIFY.*` text.
+  - `python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80 -q` -> 120 passed; total coverage 83.69%, required 80% reached.
+  - `go test ./...` from `libs/go` -> pass after the JUnit/GitHub Actions adapter changes.
+  - After `WORK-VERIFY-014B` moved to `Done`, targeted governed sync updated issue #86 (`WORK-VERIFY-014B`) and issue #87 (`GATE-VERIFY-PILOT-001`).
+  - Added `stoneverify-pilot-gate` to `.github/workflows/quality.yml`: builds wheel/Go adapter, installs with `--no-index`, creates an external fixture, runs demo drift with `--junit-report`, checks JSON/JUnit agreement, and uploads the evidence bundle.
+  - `python - <<'PY' ... yaml.safe_load('.github/workflows/quality.yml') ... PY` -> pass; confirms `stoneverify-pilot-gate` is present.
+  - Updated the new artifact upload step and quickstart template to `actions/upload-artifact@v7` after checking the current upstream action examples/release state; the workflow itself pins the resolved `v7` tag SHA (`043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`) to match this repo's pinned-action style.
+  - Added `workflow_dispatch` to `.github/workflows/quality.yml` so the `stoneverify-pilot-gate` job can be manually run from GitHub Actions after the workflow change is pushed.
+  - Added `test_single_demo_drift_run_keeps_all_output_formats_aligned`: one subprocess run with `GITHUB_ACTIONS=true`, `GITHUB_STEP_SUMMARY`, `--junit-report`, and demo drift asserts terminal output, JSON, JUnit, HTML, GitHub annotation, summary, and exit code all report the same failing outcome and a `VERIFY.*` finding.
+  - `python -m pytest libs/python/tests/test_stonecharts_verify.py -q` -> 63 passed after the integrated output-alignment proof.
+  - `python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80 -q` -> 121 passed; total coverage 83.69%, required 80% reached.
+  - `git diff --check` -> pass, with existing line-ending normalization warnings only.
+  - `git ls-remote https://github.com/actions/upload-artifact refs/tags/v7` -> `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`.
+  - Workflow YAML parse check -> pass; confirms `stoneverify-pilot-gate` uses the pinned `actions/upload-artifact` v7 tag SHA.
+  - Final `python tools/check_docs.py` -> pass.
+  - Final `python tools/check_github_project.py` -> pass: 85 governed items, 8 statuses, 11 governed fields, 6 saved views.
+  - Wheel verification earlier in this workstream: built `stonecharts-0.0.0.4-py3-none-any.whl`, installed into `.tmp-stoneverify-wheel-venv`, ran installed `stoneverify`, and confirmed evidence files matched the source-wrapper run byte-for-byte with `STONEVERIFY_GENERATED_AT` pinned.
+- Remaining checks:
+  - None for the current pipeline slice.

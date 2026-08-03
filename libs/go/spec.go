@@ -87,7 +87,7 @@ type Datum struct {
 type Series struct {
 	Name        string          `json:"name"`
 	Data        []float64       `json:"data"`
-	DataPoints  []Datum         `json:"-"` // scatter only — see Datum; built by UnmarshalJSON
+	DataPoints  []Datum         `json:"-"`                     // scatter only — see Datum; built by UnmarshalJSON
 	Type        string          `json:"type,omitempty"`        // line | column (combo per-series mark kind)
 	YAxis       int             `json:"yAxis,omitempty"`       // 0 -> primary yAxis; 1 -> secondaryYAxis
 	Color       json.RawMessage `json:"color,omitempty"`       // hex string OR gradient object
@@ -448,8 +448,14 @@ func (a *Axis) gridDashStyle() string {
 // The spec is strictly validated first (same rules + error text as the Python
 // renderer); a malformed spec returns a *SpecError. Unknown keys are ignored.
 func FromJSON(b []byte) (*ChartSpec, error) {
+	if len(b) > MaxSpecBytes {
+		return nil, &ResourceLimitError{Code: "LIMIT.SPEC_BYTES", Path: "$", Limit: MaxSpecBytes, Received: len(b)}
+	}
 	var raw interface{}
 	if err := json.Unmarshal(b, &raw); err != nil {
+		return nil, err
+	}
+	if err := enforceSpecLimits(raw, len(b)); err != nil {
 		return nil, err
 	}
 	if errs := validate(raw); len(errs) > 0 {

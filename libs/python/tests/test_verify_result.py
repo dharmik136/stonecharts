@@ -5,6 +5,7 @@ import pytest
 from stonecharts.verify.result import (
     SCHEMA_VERSION,
     build_finding,
+    build_verification_result,
     capture_environment,
     digest,
     sha256_digest,
@@ -76,3 +77,42 @@ def test_build_finding_rejects_unknown_equality(bad_equality):
 def test_build_finding_rejects_unknown_confidence(bad_confidence):
     with pytest.raises(ValueError):
         build_finding(code="X.Y", category="theme-style", message="m", confidence=bad_confidence)
+
+
+def test_build_verification_result_has_canonical_envelope_shape():
+    finding = build_finding(
+        code="VERIFY.LABEL.TEXT_CHANGED",
+        category="label-text",
+        message="label changed",
+        equality="unknown",
+        confidence="high",
+        basis=["text node changed"],
+    )
+    result = build_verification_result(
+        status="fail",
+        comparison_mode="cross-runtime",
+        baseline=None,
+        candidate={"runtimes": ["python", "go"]},
+        inputs={"specSha256": "abc"},
+        runtime_coverage={"shared": ["python", "go"], "onlyLeft": [], "onlyRight": []},
+        findings=[finding],
+        evidence={"inputSpec": {"algorithm": "sha-256", "value": "abc"}},
+        environment={"schemaVersion": SCHEMA_VERSION},
+    )
+
+    assert result["schemaVersion"] == SCHEMA_VERSION
+    assert result["comparisonMode"] == "cross-runtime"
+    assert result["findings"] == [finding]
+    assert result["evidence"]["inputSpec"]["algorithm"] == "sha-256"
+
+
+@pytest.mark.parametrize("bad_status", ["", "passed", "error"])
+def test_build_verification_result_rejects_unknown_status(bad_status):
+    with pytest.raises(ValueError):
+        build_verification_result(status=bad_status, comparison_mode="cross-runtime")
+
+
+@pytest.mark.parametrize("bad_mode", ["", "runtime", "baseline-compare"])
+def test_build_verification_result_rejects_unknown_mode(bad_mode):
+    with pytest.raises(ValueError):
+        build_verification_result(status="pass", comparison_mode=bad_mode)

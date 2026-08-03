@@ -17,6 +17,7 @@ from .charts import line as _line
 from .charts import scatter as _scatter
 from .charts import bubble as _bubble
 from .capabilities import CapabilityError, capabilities
+from .limits import enforce_svg_limit
 from .spec import ChartSpec
 from .util import esc, fmt_num
 
@@ -114,7 +115,9 @@ def render_svg(spec: ChartSpec) -> str:
             f'unsupported chart type "{resolved_type}"',
             {"expected": list(_CAPABILITIES["chartTypes"]), "received": resolved_type},
         )
-    return renderer(spec)
+    svg = renderer(spec)
+    enforce_svg_limit(svg)
+    return svg
 
 
 def _runtime_js() -> str:
@@ -153,7 +156,6 @@ def save_html(spec: ChartSpec, path: str | Path, page_title: str | None = None) 
     out = Path(path)
     out.write_text(render_html(spec, page_title), encoding="utf-8")
     return out
-
 
 
 
