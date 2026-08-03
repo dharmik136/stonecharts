@@ -33,6 +33,23 @@ SVG_BASIC = (
 )
 
 
+@pytest.fixture(scope="session")
+def stoneverify_go_binary(tmp_path_factory):
+    if shutil.which("go") is None:
+        pytest.skip("Go toolchain is not available")
+
+    binary = tmp_path_factory.mktemp("go-adapter") / (
+        "stoneverify-go-render.exe" if os.name == "nt" else "stoneverify-go-render"
+    )
+    build = subprocess.run(
+        ["go", "build", "-o", str(binary), "./cmd/stoneverify-go-render"],
+        cwd=ROOT / "libs/go",
+        capture_output=True,
+    )
+    assert build.returncode == 0, build.stderr.decode()
+    return binary
+
+
 def test_classify_semantic_byte_equal():
     result = stonecharts_verify.classify_semantic(SVG_BASIC, SVG_BASIC)
 
@@ -797,7 +814,7 @@ def test_manifest_evidence_block_is_algorithm_qualified(tmp_path):
     assert "  manifest.json" in checksums_text
 
 
-def test_demo_drift_text_reports_semantic_fields(tmp_path):
+def test_demo_drift_text_reports_semantic_fields(tmp_path, stoneverify_go_binary):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     junit_report = tmp_path / "junit.xml"
@@ -810,7 +827,8 @@ def test_demo_drift_text_reports_semantic_fields(tmp_path):
             "python",
             "--runtime",
             "go",
-            "--from-source",
+            "--go-binary",
+            str(stoneverify_go_binary),
             "--demo-drift",
             "text",
             "--evidence",
@@ -834,7 +852,7 @@ def test_demo_drift_text_reports_semantic_fields(tmp_path):
     assert len(root.findall("testcase/failure")) == 1
 
 
-def test_demo_drift_attribute_reports_accessibility_category(tmp_path):
+def test_demo_drift_attribute_reports_accessibility_category(tmp_path, stoneverify_go_binary):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     proc = subprocess.run(
@@ -846,7 +864,8 @@ def test_demo_drift_attribute_reports_accessibility_category(tmp_path):
             "python",
             "--runtime",
             "go",
-            "--from-source",
+            "--go-binary",
+            str(stoneverify_go_binary),
             "--demo-drift",
             "attribute",
             "--evidence",
@@ -893,7 +912,7 @@ def test_manifest_only_adds_schema_version_environment_and_evidence(tmp_path):
     assert set(manifest.keys()) == pre_014a_keys | new_keys
 
 
-def test_comparison_json_only_adds_schema_version(tmp_path):
+def test_comparison_json_only_adds_schema_version(tmp_path, stoneverify_go_binary):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     subprocess.run(
@@ -905,7 +924,8 @@ def test_comparison_json_only_adds_schema_version(tmp_path):
             "python",
             "--runtime",
             "go",
-            "--from-source",
+            "--go-binary",
+            str(stoneverify_go_binary),
             "--evidence",
             str(evidence_dir),
         ],
@@ -982,7 +1002,7 @@ def test_github_actions_output_writes_annotation_and_summary(tmp_path, monkeypat
     assert "Status: **FAIL**" in summary.read_text(encoding="utf-8")
 
 
-def test_single_demo_drift_run_keeps_all_output_formats_aligned(tmp_path):
+def test_single_demo_drift_run_keeps_all_output_formats_aligned(tmp_path, stoneverify_go_binary):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     junit_report = evidence_dir / "junit.xml"
@@ -1000,7 +1020,8 @@ def test_single_demo_drift_run_keeps_all_output_formats_aligned(tmp_path):
             "python",
             "--runtime",
             "go",
-            "--from-source",
+            "--go-binary",
+            str(stoneverify_go_binary),
             "--demo-drift",
             "text",
             "--evidence",
@@ -1065,7 +1086,7 @@ def test_stoneverify_exit_code_pass(tmp_path):
     assert proc.returncode == stonecharts_verify.EXIT_PASS
 
 
-def test_stoneverify_exit_code_differences(tmp_path):
+def test_stoneverify_exit_code_differences(tmp_path, stoneverify_go_binary):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     proc = subprocess.run(
         [
@@ -1076,7 +1097,8 @@ def test_stoneverify_exit_code_differences(tmp_path):
             "python",
             "--runtime",
             "go",
-            "--from-source",
+            "--go-binary",
+            str(stoneverify_go_binary),
             "--demo-drift",
             "text",
             "--evidence",
@@ -1177,18 +1199,7 @@ def test_pyproject_installs_stoneverify_console_script():
     assert 'stoneverify = "stonecharts.verify.cli:main"' in pyproject
 
 
-def test_go_runtime_uses_explicit_adapter_binary(tmp_path):
-    if shutil.which("go") is None:
-        pytest.skip("Go toolchain is not available")
-
-    binary = tmp_path / ("stoneverify-go-render.exe" if os.name == "nt" else "stoneverify-go-render")
-    build = subprocess.run(
-        ["go", "build", "-o", str(binary), "./cmd/stoneverify-go-render"],
-        cwd=ROOT / "libs/go",
-        capture_output=True,
-    )
-    assert build.returncode == 0, build.stderr.decode()
-
+def test_go_runtime_uses_explicit_adapter_binary(tmp_path, stoneverify_go_binary):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     proc = subprocess.run(
@@ -1199,7 +1210,7 @@ def test_go_runtime_uses_explicit_adapter_binary(tmp_path):
             "--runtime",
             "go",
             "--go-binary",
-            str(binary),
+            str(stoneverify_go_binary),
             "--evidence",
             str(evidence_dir),
         ],
@@ -1214,4 +1225,4 @@ def test_go_runtime_uses_explicit_adapter_binary(tmp_path):
     assert go_runtime["module"] == "stonecharts"
     assert go_runtime["stonechartsVersion"] == "0.0.0.4"
     assert go_runtime["goAdapterVersion"] == "1.0.0"
-    assert go_runtime["goBinary"] == str(binary)
+    assert go_runtime["goBinary"] == str(stoneverify_go_binary)

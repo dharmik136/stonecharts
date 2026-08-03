@@ -3,7 +3,7 @@
 - From: Codex
 - To: next worker
 - Branch or worktree: `main`
-- Commit or state: uncommitted local StoneVerify pipeline work on 2026-08-03
+- Commit or state: `e9c8a72` pushed StoneVerify pilot-readiness pipeline; follow-up local fix pending for remote Python CI timeout
 - Local pipeline status:
   - `WORK-VERIFY-008` marked `Done`: installable `stoneverify` console script, packaged CLI module, source wrapper, and prebuilt Go adapter path are implemented.
   - `WORK-VERIFY-009` marked `Done`: semantic difference category/equality/confidence/basis fields are implemented.
@@ -13,7 +13,7 @@
   - `WORK-VERIFY-012` marked `Done`: concrete Python/Go resource limits, StoneVerify resource-limit/timeout exit code `5`, deterministic randomized render property tests for all six certified chart types in both languages, evidence-bundle/finding/comparison limits, staged evidence writes, and CI coverage gates are implemented.
   - `WORK-VERIFY-013` marked `Done`: repeatable internal StoneVerify evaluation-kit builder creates a clean kit directory and zip with wheel, Go adapter, sample spec, schemas, governed docs, and a repo-independent demo runner.
   - `WORK-VERIFY-014B` marked `Done`: StoneVerify writes JUnit-compatible XML via `--junit-report`, emits GitHub Actions annotations/summary when `GITHUB_ACTIONS=true`, and preserves existing manifest/comparison/checksum behavior.
-  - `GATE-VERIFY-PILOT-001` moved to `Qualification`: all listed implementation dependencies are done, the kit has passed an external-fixture run locally, and `.github/workflows/quality.yml` now contains a `stoneverify-pilot-gate` job. The gate is not `Done` until that CI path has actually run remotely and its artifact/annotation behavior is reviewed.
+  - `GATE-VERIFY-PILOT-001` remains in `Qualification`: all listed implementation dependencies are done, the kit has passed an external-fixture run locally, and `.github/workflows/quality.yml` contains a `stoneverify-pilot-gate` job. Remote run `30816523785` proved the pilot-gate job path itself passed and uploaded the artifact, but the overall quality workflow failed in the Python matrix before the gate can be moved to `Done`.
 - Files changed:
   - `libs/python/stonecharts/verify/cli.py`, `tools/stonecharts_verify.py`
   - `libs/python/stonecharts/verify/result.py`, `spec/stoneverify-result.schema.json`
@@ -56,5 +56,13 @@
   - Final `python tools/check_docs.py` -> pass.
   - Final `python tools/check_github_project.py` -> pass: 85 governed items, 8 statuses, 11 governed fields, 6 saved views.
   - Wheel verification earlier in this workstream: built `stonecharts-0.0.0.4-py3-none-any.whl`, installed into `.tmp-stoneverify-wheel-venv`, ran installed `stoneverify`, and confirmed evidence files matched the source-wrapper run byte-for-byte with `STONEVERIFY_GENERATED_AT` pinned.
+  - Pushed commit `e9c8a72fd34fc9fb18df4842fd7b74ecb62294e5` (`Complete StoneVerify pilot-readiness pipeline`) to `origin/main`.
+  - GitHub Actions run `30816523785` (`quality`) result: `stoneverify-pilot-gate` passed, but the overall workflow failed because Python matrix tests invoked `stoneverify --from-source`; hosted runners counted `go run` compilation against the 10s StoneVerify render timeout and returned resource-limit exit code `5` instead of the expected comparison exit code `1`.
+  - Local follow-up fix: `libs/python/tests/test_stonecharts_verify.py` now builds a session-scoped Go adapter binary once and uses `--go-binary` for normal CLI integration tests, preserving the 10s render timeout while avoiding repeated `go run` compilation in CI.
+  - `python -m pytest libs/python/tests/test_stonecharts_verify.py -q` -> 63 passed after the CI-timeout fix.
+  - `python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80 -q` -> 121 passed; total coverage 83.69%, required 80% reached.
+  - `go test ./...` from `libs/go` -> pass after the CI-timeout fix.
+  - `python tools/check_docs.py` -> pass after the CI-timeout fix.
+  - `python tools/check_github_project.py` -> pass after the CI-timeout fix: 85 governed items, 8 statuses, 11 governed fields, 6 saved views.
 - Remaining checks:
-  - None for the current pipeline slice.
+  - Commit and push the CI-timeout fix, then watch the new remote `quality` workflow. Only move `GATE-VERIFY-PILOT-001` to `Done` after the full workflow is green and the pilot artifact/annotation behavior is reviewed on the passing run.
