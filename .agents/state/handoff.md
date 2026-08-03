@@ -3,7 +3,7 @@
 - From: Codex
 - To: next worker
 - Branch or worktree: `main`
-- Commit or state: `e9c8a72` pushed StoneVerify pilot-readiness pipeline; follow-up local fix pending for remote Python CI timeout
+- Commit or state: current branch includes `a826dfd` and this gate-close governance update
 - Local pipeline status:
   - `WORK-VERIFY-008` marked `Done`: installable `stoneverify` console script, packaged CLI module, source wrapper, and prebuilt Go adapter path are implemented.
   - `WORK-VERIFY-009` marked `Done`: semantic difference category/equality/confidence/basis fields are implemented.
@@ -13,7 +13,7 @@
   - `WORK-VERIFY-012` marked `Done`: concrete Python/Go resource limits, StoneVerify resource-limit/timeout exit code `5`, deterministic randomized render property tests for all six certified chart types in both languages, evidence-bundle/finding/comparison limits, staged evidence writes, and CI coverage gates are implemented.
   - `WORK-VERIFY-013` marked `Done`: repeatable internal StoneVerify evaluation-kit builder creates a clean kit directory and zip with wheel, Go adapter, sample spec, schemas, governed docs, and a repo-independent demo runner.
   - `WORK-VERIFY-014B` marked `Done`: StoneVerify writes JUnit-compatible XML via `--junit-report`, emits GitHub Actions annotations/summary when `GITHUB_ACTIONS=true`, and preserves existing manifest/comparison/checksum behavior.
-  - `GATE-VERIFY-PILOT-001` remains in `Qualification`: all listed implementation dependencies are done, the kit has passed an external-fixture run locally, and `.github/workflows/quality.yml` contains a `stoneverify-pilot-gate` job. Remote run `30816523785` proved the pilot-gate job path itself passed and uploaded the artifact, but the overall quality workflow failed in the Python matrix before the gate can be moved to `Done`.
+  - `GATE-VERIFY-PILOT-001` moved to `Done`: all implementation dependencies are done, the kit passed an external-fixture run locally, `.github/workflows/quality.yml` contains a passing `stoneverify-pilot-gate` job, and remote run `30817013151` passed the full quality workflow with the pilot artifact and GitHub annotation behavior reviewed.
 - Files changed:
   - `libs/python/stonecharts/verify/cli.py`, `tools/stonecharts_verify.py`
   - `libs/python/stonecharts/verify/result.py`, `spec/stoneverify-result.schema.json`
@@ -64,5 +64,14 @@
   - `go test ./...` from `libs/go` -> pass after the CI-timeout fix.
   - `python tools/check_docs.py` -> pass after the CI-timeout fix.
   - `python tools/check_github_project.py` -> pass after the CI-timeout fix: 85 governed items, 8 statuses, 11 governed fields, 6 saved views.
+  - Pushed commit `a826dfd80e6400be0817c7a35ab1e82690073d8c` (`Use prebuilt Go adapter in StoneVerify tests`) to `origin/main`.
+  - GitHub Actions run `30817013151` (`quality`) passed across runtime-browser, python-wheel-install, stoneverify-pilot-gate, Python matrix, Go matrix, and documentation jobs.
+  - Reviewed `stoneverify-pilot-gate` job `91697146920`: it emitted the expected GitHub Actions error annotation `VERIFY.CAPABILITY.CHART_TYPE_CHANGED`, then uploaded `stoneverify-pilot-gate-evidence` using pinned `actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`.
+  - Reviewed downloaded artifact `stoneverify-pilot-gate-evidence`: contains `checksums.txt`, `comparison.json`, `go-output.svg`, `input-spec.json`, `junit.xml`, `manifest.json`, `python-output.svg`, and `report.html`; manifest/comparison status is `fail` for the intentional demo drift, JUnit has one failure, and the finding code is `VERIFY.CAPABILITY.CHART_TYPE_CHANGED`.
+  - Moved `GATE-VERIFY-PILOT-001` to `Done` in `docs/project/backlog.yaml`.
+  - A full `python tools/check_github_project.py --apply` retry timed out again before changing remote state.
+  - Targeted governed sync updated `GATE-VERIFY-PILOT-001` issue #87 to closed/Done and refreshed `WORK-GTM-012` issue #88 body drift.
+  - Final `python tools/check_github_project.py` -> pass after targeted sync: 85 governed items, 8 statuses, 11 governed fields, 6 saved views.
+  - Final `python tools/check_docs.py` -> pass after gate closeout: 93 documents, 23 requirements, 33 evidence definitions, 14 risks, 85 project items.
 - Remaining checks:
-  - Commit and push the CI-timeout fix, then watch the new remote `quality` workflow. Only move `GATE-VERIFY-PILOT-001` to `Done` after the full workflow is green and the pilot artifact/annotation behavior is reviewed on the passing run.
+  - None for the StoneVerify pilot-readiness gate.
