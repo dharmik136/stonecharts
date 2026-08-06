@@ -1,6 +1,6 @@
 id: SC-REQ-REGISTRY
-version: 2
-updated: "2026-07-30"
+version: 3
+updated: "2026-08-06"
 requirements:
   - id: REQ-PROD-001
     title: One language-neutral chart specification
@@ -361,7 +361,7 @@ requirements:
     rationale: A verification tool a customer cannot install without cloning proprietary source cannot be used in an external evaluation or pilot.
     kind: constraint
     priority: must
-    status: proposed
+    status: verified
     owner: maintainer
     target: StoneVerify Pilot-Ready v1
     source: SC-PROD-003
@@ -380,7 +380,7 @@ requirements:
     rationale: Without one canonical internal result model, JSON, JUnit, HTML, and terminal output can drift into inconsistent interpretations of the same comparison.
     kind: functional
     priority: must
-    status: proposed
+    status: verified
     owner: maintainer
     target: StoneVerify Pilot-Ready v1
     source: SC-PROD-003
@@ -399,7 +399,7 @@ requirements:
     rationale: A comparison result is not auditable evidence unless it names precisely which two artifacts were compared and with which tool version.
     kind: quality
     priority: must
-    status: proposed
+    status: verified
     owner: maintainer
     target: StoneVerify Pilot-Ready v1
     source: SC-PROD-003
@@ -417,7 +417,7 @@ requirements:
     rationale: CI systems and scripts depend on exit codes and output shape; silently changing them breaks every existing integration.
     kind: constraint
     priority: must
-    status: proposed
+    status: verified
     owner: maintainer
     target: StoneVerify Pilot-Ready v1
     source: SC-PROD-003
@@ -435,7 +435,7 @@ requirements:
     rationale: A product sold on explaining chart drift must classify what changed, not only that something changed, and must be able to say a change was cosmetic without implying the underlying content is unverified.
     kind: functional
     priority: must
-    status: proposed
+    status: verified
     owner: maintainer
     target: StoneVerify Pilot-Ready v1
     source: SC-PROD-003

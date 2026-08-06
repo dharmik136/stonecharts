@@ -1274,7 +1274,7 @@ items:
   - id: REQ-VERIFY-001
     title: Repository-independent StoneVerify execution
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1290,7 +1290,7 @@ items:
   - id: REQ-VERIFY-002
     title: Versioned StoneVerify result contract
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1306,7 +1306,7 @@ items:
   - id: REQ-VERIFY-003
     title: StoneVerify baseline and candidate integrity
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1322,7 +1322,7 @@ items:
   - id: REQ-VERIFY-004
     title: Stable StoneVerify automation behavior
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion
@@ -1338,7 +1338,7 @@ items:
   - id: REQ-VERIFY-005
     title: Semantic StoneVerify difference classification
     item_type: Requirement
-    status: Ready
+    status: Done
     priority: P0
     workstream: WS-03 Conformance
     stage: S5 Expansion

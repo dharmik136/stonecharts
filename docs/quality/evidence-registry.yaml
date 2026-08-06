@@ -1,6 +1,6 @@
 id: SC-QUAL-EVIDENCE
 version: 2
-updated: "2026-07-30"
+updated: "2026-08-06"
 evidence:
   - id: TEST-DOCS-CONTROL
     kind: test
