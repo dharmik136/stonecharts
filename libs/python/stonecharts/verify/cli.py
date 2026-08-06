@@ -43,8 +43,23 @@ SOURCE_GO_DIR = pathlib.Path(__file__).resolve().parents[4] / "libs" / "go"
 GENERATED_AT_ENV = "STONEVERIFY_GENERATED_AT"
 MAX_EVIDENCE_BUNDLE_BYTES = 10_000_000
 MAX_FINDINGS = 100
-RENDER_TIMEOUT_SECONDS = 10.0
-COMPARISON_TIMEOUT_SECONDS = 10.0
+RENDER_TIMEOUT_ENV = "STONEVERIFY_RENDER_TIMEOUT"
+COMPARISON_TIMEOUT_ENV = "STONEVERIFY_COMPARISON_TIMEOUT"
+
+
+def _timeout_env(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    try:
+        val = float(raw)
+        return val if val > 0 else default
+    except ValueError:
+        return default
+
+
+RENDER_TIMEOUT_SECONDS = _timeout_env(RENDER_TIMEOUT_ENV, 10.0)
+COMPARISON_TIMEOUT_SECONDS = _timeout_env(COMPARISON_TIMEOUT_ENV, 10.0)
 
 
 GO_HELPER = """package main

@@ -36,6 +36,8 @@ jobs:
           cache: pip
       - run: python -m pip install "pytest>=8,<10" "pytest-cov>=5,<8" "jsonschema>=4.23,<5"
       - run: python -m pytest libs/python/tests --cov=stonecharts --cov-fail-under=80
+        env:
+          STONEVERIFY_RENDER_TIMEOUT: "30"
 
   python-wheel-install:
     runs-on: ubuntu-latest

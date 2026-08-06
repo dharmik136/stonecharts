@@ -107,6 +107,13 @@ codes. A Go adapter process can still report renderer-side `LIMIT.*` text on
 stderr; StoneVerify classifies adapter-process failures separately unless and
 until the adapter protocol gains a structured error channel.
 
+The render and comparison timeouts can be overridden via the
+`STONEVERIFY_RENDER_TIMEOUT` and `STONEVERIFY_COMPARISON_TIMEOUT` environment
+variables (positive float, in seconds). The normative default is 10 seconds;
+the override exists for deployment environments with known higher
+process-startup latency (e.g. Windows hosts where antivirus scanning delays
+the first execution of a freshly built adapter binary).
+
 ## Legal boundary
 
 These are engineering conformance statements. License rights, warranties, liability,
