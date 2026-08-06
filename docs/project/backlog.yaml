@@ -1810,7 +1810,7 @@ items:
   - id: WORK-GTM-012
     title: Execute and measure the first paid StoneVerify pilot
     item_type: Work Package
-    status: Triage
+    status: Ready
     priority: P1
     workstream: WS-07 Docs & DX
     stage: S5 Expansion
