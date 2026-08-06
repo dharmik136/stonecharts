@@ -53,3 +53,11 @@ def test_randomized_specs_render_valid_svg_without_nonfinite_output():
         assert "Infinity" not in svg
         if spec_dict["series"][0]["data"]:
             assert 'class="sc-' in svg
+
+
+def test_render_determinism():
+    for spec_dict in _specs():
+        spec = ChartSpec.from_dict(spec_dict)
+        first = render_svg(spec)
+        for _ in range(4):
+            assert render_svg(spec) == first, f"non-deterministic render for {spec_dict['type']}"
