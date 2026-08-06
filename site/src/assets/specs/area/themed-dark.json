@@ -1,0 +1,29 @@
+{
+  "type": "area",
+  "theme": "dark",
+  "title": "Disk Throughput by Device",
+  "subtitle": "Stacked area, dark theme, gradient fill",
+  "stacking": "normal",
+  "xAxis": {
+    "title": "Time",
+    "categories": ["t0", "t1", "t2", "t3", "t4"]
+  },
+  "yAxis": { "title": "Throughput (MB/s)" },
+  "series": [
+    {
+      "name": "nvme0",
+      "data": [140, 165, 150, 190, 210],
+      "fillOpacity": 0.8,
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#2f6fe0" }
+        ]
+      }
+    },
+    { "name": "nvme1", "data": [90, 100, 95, 120, 130], "fillOpacity": 0.8 },
+    { "name": "sda",   "data": [40, 48, 44, 55, 60],    "fillOpacity": 0.8 }
+  ]
+}

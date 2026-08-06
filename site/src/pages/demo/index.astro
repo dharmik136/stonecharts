@@ -1,0 +1,49 @@
+---
+import DemoLayout from '../../layouts/DemoLayout.astro';
+---
+<DemoLayout title="Overview" activeNav="overview">
+  <h1 style="margin-bottom: 0.5rem;">StoneCharts Demo</h1>
+  <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 3rem;">
+    Visual Integrity Infrastructure — deterministic, multi-language chart rendering
+    where every chart change is provable.
+  </p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+    <a href="/demo/gallery/" class="card" style="text-decoration: none; color: var(--text); transition: box-shadow 0.15s;">
+      <h3 style="color: var(--accent);">Chart Gallery</h3>
+      <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
+        Interactive charts across six certified types — line, column, area, bar, scatter,
+        and bubble. Toggle between light and dark themes. Hover for tooltips, click
+        legends, use keyboard navigation.
+      </p>
+    </a>
+    <a href="/demo/benchmarks/" class="card" style="text-decoration: none; color: var(--text); transition: box-shadow 0.15s;">
+      <h3 style="color: var(--accent);">Benchmarks</h3>
+      <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
+        Measured performance against Highcharts Export Server, Vega/Vega-Lite, QuickChart,
+        ECharts, and Plotly/Kaleido. Cold-start, warm throughput, concurrent load,
+        determinism, and dependency surface.
+      </p>
+    </a>
+    <a href="/demo/verify/" class="card" style="text-decoration: none; color: var(--text); transition: box-shadow 0.15s;">
+      <h3 style="color: var(--accent);">StoneVerify</h3>
+      <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
+        A real conformance proof: the same chart spec rendered by the Python and Go
+        runtimes, producing byte-identical SVG. Evidence bundle with SHA-256 hashes,
+        structural comparison, and CI integration.
+      </p>
+    </a>
+  </div>
+
+  <div class="card" style="background: var(--accent-subtle); border-color: var(--accent);">
+    <h3 style="font-size: 0.875rem; color: var(--accent); margin-bottom: 0.25rem;">
+      What this demo shows
+    </h3>
+    <p style="margin: 0; font-size: 0.8125rem; color: var(--text-secondary);">
+      This demo contains rendered chart outputs (golden SVGs), measured benchmark data
+      (from SC-QUAL-003), and StoneVerify conformance evidence. No source code, packages,
+      or installable artifacts are distributed. All benchmark numbers are single-host,
+      vendor-run measurements — reproducible and disclosed, not independently audited.
+    </p>
+  </div>
+</DemoLayout>

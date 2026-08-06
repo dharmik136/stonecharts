@@ -1,0 +1,93 @@
+---
+import DemoLayout from '../../layouts/DemoLayout.astro';
+import ChartEmbed from '../../components/ChartEmbed.astro';
+import { readFile, readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+
+const CHART_TYPES = [
+  { id: 'line-basic', label: 'Line', desc: 'Multi-series line chart with optional spline interpolation, markers, and gradient strokes.' },
+  { id: 'column', label: 'Column', desc: 'Vertical bar charts with grouped and stacked variants.' },
+  { id: 'area', label: 'Area', desc: 'Filled area charts with normal and percent stacking.' },
+  { id: 'bar', label: 'Bar', desc: 'Horizontal bar charts with grouped and stacked variants.' },
+  { id: 'scatter', label: 'Scatter', desc: 'XY point charts with correlation and regression line support.' },
+  { id: 'bubble', label: 'Bubble', desc: 'Three-dimensional data mapped to position and bubble size.' },
+];
+
+const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
+const specsDir = join(process.cwd(), 'src', 'assets', 'specs');
+
+type ChartData = {
+  id: string;
+  label: string;
+  desc: string;
+  lightSvg: string;
+  darkSvg: string | undefined;
+  spec: string;
+};
+
+const charts: ChartData[] = [];
+
+for (const ct of CHART_TYPES) {
+  const goldenDir = join(chartsDir, ct.id);
+  const files = await readdir(goldenDir);
+
+  const lightFile = files.includes('basic.svg') ? 'basic.svg' : files.find(f => f.endsWith('.svg') && !f.includes('dark') && !f.includes('adversarial'));
+  const darkFile = files.find(f => f === 'themed-dark.svg') || files.find(f => f === 'dark.svg');
+
+  const lightSvg = lightFile ? await readFile(join(goldenDir, lightFile), 'utf-8') : '';
+  const darkSvg = darkFile ? await readFile(join(goldenDir, darkFile), 'utf-8') : undefined;
+
+  let spec = '';
+  try {
+    const specFile = join(specsDir, ct.id, 'basic.json');
+    spec = await readFile(specFile, 'utf-8');
+  } catch {
+    spec = '// spec not available';
+  }
+
+  charts.push({ ...ct, lightSvg, darkSvg, spec });
+}
+---
+<DemoLayout title="Chart Gallery" activeNav="gallery">
+  <div style="margin-bottom: 2rem;">
+    <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
+    <p style="color: var(--text-secondary); max-width: 640px;">
+      Six certified chart types, rendered identically in Python and Go.
+      Every SVG below is actual golden output. Hover for tooltips, click legends
+      to toggle series, use arrow keys for keyboard navigation.
+    </p>
+    <p style="margin-top: 0.5rem;">
+      <span class="badge">0 runtime dependencies</span>
+      <span class="badge" style="margin-left: 0.5rem;">Byte-identical across runtimes</span>
+    </p>
+  </div>
+
+  {charts.map((chart) => (
+    <div class="chart-section" id={chart.id}>
+      <div class="chart-section-header">
+        <div>
+          <h2 style="margin-bottom: 0.25rem;">{chart.label}</h2>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">{chart.desc}</p>
+        </div>
+      </div>
+      <div class="chart-grid">
+        <div>
+          <ChartEmbed
+            lightSvg={chart.lightSvg}
+            darkSvg={chart.darkSvg}
+            chartType={chart.id}
+            chartName="basic"
+          />
+        </div>
+        <div class="spec-viewer card" style="padding: 0; overflow: hidden;">
+          <div style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+              Chart Spec (JSON)
+            </span>
+          </div>
+          <pre style="margin: 0; border: 0; border-radius: 0; max-height: 380px; overflow-y: auto;"><code>{chart.spec}</code></pre>
+        </div>
+      </div>
+    </div>
+  ))}
+</DemoLayout>

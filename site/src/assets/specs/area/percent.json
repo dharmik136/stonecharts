@@ -1,0 +1,16 @@
+{
+  "type": "area",
+  "title": "Request Mix by Cache Tier",
+  "subtitle": "Percent-stacked area, each interval totals 100%",
+  "stacking": "percent",
+  "xAxis": {
+    "title": "Interval",
+    "categories": ["09:00", "10:00", "11:00", "12:00", "13:00"]
+  },
+  "yAxis": { "title": "Share of requests" },
+  "series": [
+    { "name": "hit",    "data": [820, 910, 880, 1200, 1010] },
+    { "name": "miss",   "data": [180, 240, 210, 360, 300] },
+    { "name": "bypass", "data": [40, 55, 48, 90, 70] }
+  ]
+}

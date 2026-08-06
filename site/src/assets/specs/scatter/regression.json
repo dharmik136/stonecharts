@@ -1,0 +1,19 @@
+{
+  "type": "scatter",
+  "title": "Throughput vs Sample Index",
+  "subtitle": "Rising cloud with an OLS trend line and vertical x-gridlines",
+  "xAxis": {
+    "title": "Sample #",
+    "gridLine": { "enabled": true, "color": "#e8e8ee", "dashStyle": "dotted" }
+  },
+  "yAxis": { "title": "Requests / sec", "min": 0 },
+  "series": [
+    {
+      "name": "ingest-worker",
+      "data": [110, 138, 129, 165, 172, 158, 190, 205, 199, 224, 241, 233, 262, 258, 281],
+      "marker": { "symbol": "circle", "radius": 3.5 },
+      "fillOpacity": 0.7,
+      "regression": true
+    }
+  ]
+}

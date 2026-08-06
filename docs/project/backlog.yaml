@@ -1828,3 +1828,95 @@ items:
       - The record lives outside the git-tracked repository, matching WORK-GTM-010's rule for real prospect and customer data.
       - A short internal summary states which of the three assumptions in SC-PROD-003's platform-completion judgment section this pilot resolved or left open.
     verification: [manual review of the pilot record against this item's acceptance criteria]
+
+  - id: DEC-019
+    title: Gated demo site for prospect discovery
+    item_type: Decision
+    status: Done
+    priority: P1
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A gated demo website built at site/ using Astro (static output) presents golden SVG chart outputs, SC-QUAL-003 benchmark data, and StoneVerify byte-identity evidence to prospects and interested developers. The public landing page describes the problem space without naming the product (DEC-012 compliant); the gated demo behind Cloudflare Access uses the full StoneCharts branding. No source code, packages, or installable artifacts are distributed - only rendered outputs and measured data.
+    traceability: [SC-PROD-003, SC-PROD-010, DEC-012, DEC-018, SC-CON-018, SC-QUAL-003]
+    risks: []
+    evidence: []
+    dependencies: [DEC-017, DEC-018, WORK-GTM-007]
+    compatibility: Adds a new site/ directory with an Astro project and a GitHub Actions deployment workflow; does not change renderer output, schemas, the proprietary licensing boundary, or any existing released artifact. The public landing page contains no proprietary content. The gated demo exposes only golden SVG outputs (build artifacts, not source) and measured benchmark data already approved in SC-QUAL-003.
+    areas: [site, docs]
+    acceptance:
+      - The public landing page at / contains zero mentions of the product name, consistent with DEC-012's name-clearance requirement.
+      - The gated demo at /demo/* is accessible only via Cloudflare Access email allow-list, not by URL guessing.
+      - Every benchmark number on the benchmarks page is traceable to SC-QUAL-003 and carries the vendor-run measurement disclosure.
+      - No source code, Python wheel, Go module, or evaluation kit is downloadable or viewable through the site.
+      - No customer, case study, or reference deployment is claimed anywhere on the site.
+    verification: [cd site && npm run build, manual review of dist/ output against acceptance criteria]
+
+  - id: WORK-GTM-013
+    title: Build and deploy gated demo site
+    item_type: Work Package
+    status: Done
+    priority: P1
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A static Astro site at site/ with five pages (public landing, demo overview, interactive chart gallery with all 6 certified types, benchmark comparison tables, and StoneVerify conformance proof), buildable via npm run build in under 2 seconds, deployable to any static host with Cloudflare Access gating the /demo/* path.
+    traceability: [DEC-019, SC-PROD-003, SC-QUAL-003]
+    risks: []
+    evidence: []
+    dependencies: [DEC-019, WORK-GTM-007]
+    compatibility: Adds site/ directory only; no changes to renderer, spec, or existing docs.
+    areas: [site]
+    acceptance:
+      - npm run build in site/ completes without errors and produces dist/ with 5 HTML pages.
+      - The gallery page embeds all 6 certified chart types with working chart-interactions.js (tooltips, crosshair, legend toggle, keyboard navigation).
+      - Light/dark theme toggle swaps all chart SVGs and persists preference in localStorage.
+      - The benchmarks page displays cold-start, warm throughput, concurrent load, determinism, and dependency tables with SC-QUAL-003 disclosure.
+      - The verify page shows the real StoneVerify evidence bundle with matching SHA-256 hashes for Python and Go outputs.
+    verification: [cd site && npm run build]
+
+  - id: WORK-GTM-014
+    title: Execute DEC-012 name-clearance due diligence
+    item_type: Work Package
+    status: In Progress
+    priority: P1
+    workstream: WS-01 Governance
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: A dated due-diligence record documenting domain availability, package-index conflicts, trademark search results, GitHub namespace conflicts, and business-name registration conflicts for the StoneCharts name, so DEC-012's name-clearance requirement can be resolved and the gated demo can be ungated to a public site.
+    traceability: [DEC-012, DEC-019]
+    risks: []
+    evidence: []
+    dependencies: [DEC-012]
+    compatibility: Governance record only; no code or schema changes.
+    areas: [docs]
+    acceptance:
+      - Domain availability checked for stonecharts.com, stonecharts.dev, and stonecharts.io.
+      - Package-index search completed for PyPI, npm, Go modules (pkg.go.dev), and crates.io.
+      - USPTO TESS trademark search completed for "stonecharts" and "stone charts" in Classes 9 and 42.
+      - GitHub search completed for repos, organizations, and users named stonecharts.
+      - A dated due-diligence record summarizes all findings and conflict risk assessment.
+    verification: [manual review of the due-diligence record]
+
+  - id: WORK-GTM-015
+    title: Publish discovery content on external platforms
+    item_type: Work Package
+    status: Ready
+    priority: P2
+    workstream: WS-07 Docs & DX
+    stage: S5 Expansion
+    target: Unscheduled
+    outcome: Two to three technical articles published on external platforms (dev.to, Hashnode, or personal blog) covering the problem space - non-deterministic chart rendering, zero-dependency SVG generation, and visual integrity for regulated reporting - to drive organic developer discovery and link to the gated demo access request form. Articles disclose vendor authorship and cite SC-QUAL-003 where benchmark data appears.
+    traceability: [DEC-019, SC-PROD-003, SC-QUAL-003]
+    risks: []
+    evidence: []
+    dependencies: [WORK-GTM-013]
+    compatibility: External content only; no repository changes.
+    areas: [docs]
+    acceptance:
+      - At least two articles are published on platforms indexed by search engines.
+      - Each article discloses the author's relationship to the product.
+      - Any benchmark data in the articles is traceable to SC-QUAL-003 and carries the vendor-run measurement disclosure.
+      - Each article links to the gated demo access request page.
+      - No article names a price, claims a customer, or describes the product as open source.
+    verification: [manual review of published articles against acceptance criteria]

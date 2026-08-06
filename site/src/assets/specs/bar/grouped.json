@@ -1,0 +1,15 @@
+{
+  "type": "bar",
+  "title": "Response Latency by Service",
+  "subtitle": "Grouped horizontal bars, p50 vs p95",
+  "grouping": true,
+  "xAxis": {
+    "title": "Service",
+    "categories": ["auth", "catalog", "cart", "payments", "shipping"]
+  },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    { "name": "p50", "data": [24, 38, 31, 52, 45] },
+    { "name": "p95", "data": [88, 142, 119, 210, 176] }
+  ]
+}

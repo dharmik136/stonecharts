@@ -1,0 +1,27 @@
+{
+  "type": "bar",
+  "id": "\"><script>alert(1)</script>",
+  "title": "\"><script>alert(1)</script>",
+  "subtitle": "\"><script>alert(1)</script>",
+  "theme": {
+    "name": "light",
+    "gridColor": "#e8e8ee",
+    "palette": ["#2f7ed8"]
+  },
+  "xAxis": {
+    "title": "\"><script>alert(1)</script>",
+    "categories": ["\"><script>alert(1)</script>", "b&<c", "d\"e"]
+  },
+  "yAxis": { "title": "\"><script>alert(1)</script>" },
+  "series": [
+    {
+      "name": "\"><script>alert(1)</script>",
+      "data": [10, 20, 30],
+      "color": "#2f7ed8"
+    },
+    {
+      "name": "safe",
+      "data": [5, 15, 25]
+    }
+  ]
+}

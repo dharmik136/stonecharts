@@ -1,0 +1,16 @@
+{
+  "type": "column",
+  "title": "Requests by HTTP Method",
+  "subtitle": "Grouped columns, per hour",
+  "grouping": true,
+  "xAxis": {
+    "title": "Hour",
+    "categories": ["09:00", "10:00", "11:00", "12:00", "13:00"]
+  },
+  "yAxis": { "title": "Requests (thousands)" },
+  "series": [
+    { "name": "GET",  "data": [42, 55, 61, 48, 39] },
+    { "name": "POST", "data": [18, 24, 29, 22, 17] },
+    { "name": "PUT",  "data": [6, 9, 11, 8, 5] }
+  ]
+}

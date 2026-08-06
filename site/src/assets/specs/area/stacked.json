@@ -1,0 +1,16 @@
+{
+  "type": "area",
+  "title": "CPU Time by Subsystem",
+  "subtitle": "Stacked area, cumulative over time",
+  "stacking": "normal",
+  "xAxis": {
+    "title": "Time",
+    "categories": ["00:00", "00:30", "01:00", "01:30", "02:00", "02:30"]
+  },
+  "yAxis": { "title": "CPU seconds" },
+  "series": [
+    { "name": "user",   "data": [120, 138, 155, 149, 162, 170], "fillOpacity": 0.85 },
+    { "name": "system", "data": [60, 72, 80, 76, 88, 92],        "fillOpacity": 0.85 },
+    { "name": "iowait", "data": [18, 24, 30, 27, 33, 36],        "fillOpacity": 0.85 }
+  ]
+}

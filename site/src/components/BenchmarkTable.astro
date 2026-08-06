@@ -1,0 +1,43 @@
+---
+interface Props {
+  title: string;
+  headers: string[];
+  rows: { cells: string[]; highlights?: number[]; dangers?: number[] }[];
+  footnote?: string;
+}
+
+const { title, headers, rows, footnote } = Astro.props;
+---
+<div class="card" style="margin-bottom: 2rem; padding: 0; overflow: hidden;">
+  <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);">
+    <h3 style="margin: 0; font-size: 1rem;">{title}</h3>
+  </div>
+  <div style="overflow-x: auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          {headers.map(h => <th>{h}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(row => (
+          <tr>
+            {row.cells.map((cell, i) => (
+              <td class:list={[
+                row.highlights?.includes(i) ? 'highlight' : '',
+                row.dangers?.includes(i) ? 'danger' : '',
+              ]}>
+                <Fragment set:html={cell} />
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  {footnote && (
+    <div style="padding: 0.75rem 1.25rem; font-size: 0.75rem; color: var(--text-tertiary); border-top: 1px solid var(--border);">
+      {footnote}
+    </div>
+  )}
+</div>

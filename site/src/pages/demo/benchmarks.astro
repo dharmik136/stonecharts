@@ -1,0 +1,119 @@
+---
+import DemoLayout from '../../layouts/DemoLayout.astro';
+import BenchmarkTable from '../../components/BenchmarkTable.astro';
+---
+<DemoLayout title="Benchmarks" activeNav="benchmarks">
+  <h1 style="margin-bottom: 0.5rem;">Benchmark Comparisons</h1>
+  <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1.5rem;">
+    Measured performance against five chart rendering systems. All numbers from
+    SC-QUAL-003 (2026-07-29).
+  </p>
+
+  <div class="disclosure">
+    These are single-host, single-day, vendor-run measurements on Windows 11, 16 logical
+    CPUs. Reproducible and disclosed as such, not independently audited. See methodology
+    section below for full caveats.
+  </div>
+
+  <!-- Cold-start latency -->
+  <BenchmarkTable
+    title="Cold-start latency (line chart)"
+    headers={['Target', 'Median cold-start', 'Peak RSS', 'Factor vs fastest']}
+    rows={[
+      { cells: ['StoneCharts (Go)', '<strong>0.074 s</strong>', '10.8 MB', '1x'], highlights: [1] },
+      { cells: ['StoneCharts (Python)', '0.124 s', '20.8 MB', '1.7x'], highlights: [1] },
+      { cells: ['Vega / Vega-Lite (Node)', '1.057 s', '83.5 MB', '14x'] },
+      { cells: ['ECharts (Node SSR)', '1.259 s', '60.5 MB', '17x'] },
+      { cells: ['Plotly / Kaleido (Python)', '3.882 s', '588.6 MB', '52x'] },
+      { cells: ['Highcharts Export Server', '13.607 s', '552.9 MB', '184x'], dangers: [1, 2] },
+    ]}
+    footnote="Cold-start = time from process launch to first rendered SVG on disk. Orders-of-magnitude gaps hold consistently across all six tested chart shapes."
+  />
+
+  <!-- Warm throughput -->
+  <BenchmarkTable
+    title="Sustained warm throughput (line chart)"
+    headers={['Target', 'Warm median latency', 'Renders / second', 'Factor vs fastest']}
+    rows={[
+      { cells: ['StoneCharts (Python)', '<strong>0.000152 s</strong>', '<strong>6,570</strong>', '1x'], highlights: [1, 2] },
+      { cells: ['StoneCharts (Go)', '0.000190 s', '5,274', '1.2x'], highlights: [1, 2] },
+      { cells: ['Vega / Vega-Lite (Node)', '0.00576 s', '173', '38x'] },
+      { cells: ['Highcharts Export Server (warm)', '0.052 s', '~19', '~345x'], dangers: [2] },
+    ]}
+    footnote="Warm = renderer already loaded, repeated renders of the same spec."
+  />
+
+  <!-- Concurrent load -->
+  <BenchmarkTable
+    title="Concurrent load (16 simultaneous requests, line chart)"
+    headers={['Target', 'Result', 'Effective req/s']}
+    rows={[
+      { cells: ['StoneCharts (Go)', '16/16 succeeded', '57.0'], highlights: [1] },
+      { cells: ['StoneCharts (Python)', '16/16 succeeded', '36.9'], highlights: [1] },
+      { cells: ['QuickChart', '16/16 succeeded', '10.0'] },
+      { cells: ['Vega', '16/16 succeeded', '4.1'] },
+      { cells: ['Highcharts (first burst)', '<strong>6/16 succeeded, 10 failed</strong>', '1.6'], dangers: [1] },
+      { cells: ['Highcharts (second burst, warm)', '16/16 succeeded', '32.0'] },
+    ]}
+    footnote="Highcharts Export Server dropped 10 of 16 requests on first cold burst. All subsequent warm bursts succeeded."
+  />
+
+  <!-- Cross-invocation consistency -->
+  <BenchmarkTable
+    title="Cross-invocation determinism"
+    headers={['Target', 'Byte-identical on re-render?', 'Notes']}
+    rows={[
+      { cells: ['StoneCharts', 'Yes', 'Same spec, same bytes. Python and Go produce identical output.'], highlights: [1] },
+      { cells: ['Vega / Vega-Lite', 'Yes', 'Byte-identical across invocations.'], highlights: [1] },
+      { cells: ['ECharts', 'Yes', 'Byte-identical across invocations.'], highlights: [1] },
+      { cells: ['QuickChart', 'Yes', 'Byte-identical across invocations.'], highlights: [1] },
+      { cells: ['Highcharts', '<strong>No</strong>', 'Embeds a random ID in <code>clipPath</code> attributes. <code>useSerialIds(true)</code> does not fix cross-invocation determinism.'], dangers: [1] },
+      { cells: ['Plotly / Kaleido', '<strong>No</strong>', 'Embeds a random per-render ID in SVG output.'], dangers: [1] },
+    ]}
+    footnote="Non-deterministic output makes raw-byte conformance checking impossible without preprocessing."
+  />
+
+  <!-- Dependency surface -->
+  <BenchmarkTable
+    title="Dependency and CVE surface"
+    headers={['Target', 'Dependencies', 'Audit findings']}
+    rows={[
+      { cells: ['StoneCharts (Python)', '<strong>0</strong>', 'None'], highlights: [1] },
+      { cells: ['StoneCharts (Go)', '<strong>0</strong>', 'None'], highlights: [1] },
+      { cells: ['ECharts', '3–4', '0 vulnerabilities'] },
+      { cells: ['Plotly + Kaleido', '9', '0 vulnerabilities'] },
+      { cells: ['Vega + Vega-Lite', '84', '<strong>6 high-severity advisories (XSS)</strong>'], dangers: [2] },
+      { cells: ['Highcharts Export Server', '261', '1 moderate advisory; install-time warnings about outdated Puppeteer'], dangers: [1, 2] },
+    ]}
+  />
+
+  <!-- Methodology -->
+  <div class="card" style="margin-top: 2rem;">
+    <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Methodology and caveats</h3>
+    <ul style="font-size: 0.875rem; color: var(--text-secondary); padding-left: 1.25rem; margin: 0;">
+      <li style="margin-bottom: 0.5rem;">
+        <strong>Date:</strong> 2026-07-29. All sessions on the same day and host.
+      </li>
+      <li style="margin-bottom: 0.5rem;">
+        <strong>Host:</strong> Windows 11 Pro, 16 logical CPUs, single developer machine.
+      </li>
+      <li style="margin-bottom: 0.5rem;">
+        <strong>Versions:</strong> Python 3.14.4 / Go 1.26.4; Vega 5.33.1 + Vega-Lite 5.23.0;
+        Highcharts Export Server 5.1.0; ECharts 6.1.0; Plotly 6.9.0 + Kaleido 1.3.0.
+      </li>
+      <li style="margin-bottom: 0.5rem;">
+        <strong>Disclosure:</strong> These measurements do not establish results for chart
+        shapes beyond the six tested, or for ECharts/Plotly beyond the line chart shape.
+      </li>
+      <li style="margin-bottom: 0.5rem;">
+        <strong>Docker correction:</strong> The Highcharts Docker image produced a median
+        cold-start of ~6.9 s (faster than the 13.6 s npm CLI path), contradicting an
+        earlier hypothesis. This correction is disclosed.
+      </li>
+      <li>
+        <strong>Source:</strong> All numbers from SC-QUAL-003 (Competitor Benchmark Results,
+        2026-07). No number on this page appears in any other source.
+      </li>
+    </ul>
+  </div>
+</DemoLayout>

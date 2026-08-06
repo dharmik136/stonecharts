@@ -1,0 +1,21 @@
+{
+  "type": "scatter",
+  "title": "Request Latency Samples",
+  "subtitle": "Two endpoints, unconnected points, overlap shaded",
+  "xAxis": { "title": "Sample #" },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    {
+      "name": "checkout-api",
+      "data": [42, 55, 38, 61, 47, 90, 52, 44, 73, 58, 49, 66],
+      "marker": { "symbol": "circle", "radius": 4 },
+      "fillOpacity": 0.6
+    },
+    {
+      "name": "search-api",
+      "data": [61, 58, 72, 55, 80, 63, 69, 77, 84, 66, 59, 71],
+      "marker": { "symbol": "triangle", "radius": 4 },
+      "fillOpacity": 0.6
+    }
+  ]
+}

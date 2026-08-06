@@ -1,0 +1,14 @@
+{
+  "type": "bubble",
+  "title": "Endpoint Latency vs Payload",
+  "subtitle": "Bubble area = requests per minute",
+  "xAxis": { "title": "Payload size (KB)" },
+  "yAxis": { "title": "p95 latency (ms)" },
+  "sizeLegend": true,
+  "series": [
+    {
+      "name": "Checkout API",
+      "data": [[2, 45, 1200], [8, 62, 3400], [15, 78, 800], [30, 120, 5600], [55, 180, 2100], [90, 260, 900]]
+    }
+  ]
+}
