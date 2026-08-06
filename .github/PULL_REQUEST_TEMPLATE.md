@@ -25,11 +25,15 @@ Describe schema, API, DOM, output-byte, runtime, packaging, and migration impact
 
 ## Verification
 
+- [ ] `python tools/check_all.py` (runs lint, format, tests, docs, parity, schema compat, admission)
 - [ ] `python tools/check_docs.py`
 - [ ] `python tools/check_github_project.py` when Project or backlog controls change
 - [ ] `python -m pytest libs/python/tests`
 - [ ] `go test ./...` from `libs/go`
 - [ ] `npm test`
+- [ ] `ruff check libs/python/ tools/ && ruff format --check libs/python/ tools/`
+- [ ] `python tools/check_cross_language_parity.py`
+- [ ] `python tools/check_fuzz_property.py` (requires Go)
 - [ ] Direct cross-render comparison, when canonical output changes
 - [ ] Browser/runtime qualification, when interaction behavior changes
 - [ ] Benchmark comparison, when a performance-sensitive path changes
