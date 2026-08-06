@@ -200,9 +200,22 @@ ADR 0007).
                 },
                 "resolvedDependencies": [
                     {"uri": "git+https://github.com/dharmik136/stonecharts.git", "digest": {"sha1": commit}},
-                    {"uri": "file:docs/releases/0.0.0.1/evidence/manifest.schema.json", "digest": {"sha256": sha256(ROOT / "docs" / "releases" / "0.0.0.1" / "evidence" / "manifest.schema.json")}},
-                    {"uri": "file:docs/quality/evidence-registry.yaml", "digest": {"sha256": sha256(ROOT / "docs" / "quality" / "evidence-registry.yaml")}},
-                    {"uri": "file:tools/check_release_evidence.py", "digest": {"sha256": sha256(ROOT / "tools" / "check_release_evidence.py")}},
+                    {
+                        "uri": "file:docs/releases/0.0.0.1/evidence/manifest.schema.json",
+                        "digest": {
+                            "sha256": sha256(
+                                ROOT / "docs" / "releases" / "0.0.0.1" / "evidence" / "manifest.schema.json"
+                            )
+                        },
+                    },
+                    {
+                        "uri": "file:docs/quality/evidence-registry.yaml",
+                        "digest": {"sha256": sha256(ROOT / "docs" / "quality" / "evidence-registry.yaml")},
+                    },
+                    {
+                        "uri": "file:tools/check_release_evidence.py",
+                        "digest": {"sha256": sha256(ROOT / "tools" / "check_release_evidence.py")},
+                    },
                 ],
             },
             "runDetails": {
@@ -222,7 +235,7 @@ ADR 0007).
     }
     write_text(PACK / "provenance.json", json.dumps(provenance, indent=2) + "\n")
 
-    install_matrix = f"""---
+    install_matrix = """---
 id: SC-REL-009
 title: StoneCharts 0.0.0.1 Package Install Matrix
 status: proposed
@@ -439,18 +452,78 @@ It does not claim S3 completeness.
             },
         ],
         "risks": [
-            {"id": "RISK-001", "disposition": "accepted", "expires": None, "rationale": "The active schema is already narrowed; later chart expansion remains outside this candidate pack."},
-            {"id": "RISK-002", "disposition": "accepted", "expires": None, "rationale": "Validator parity is evidenced in the current release corpus; broader schema drift is tracked separately."},
-            {"id": "RISK-003", "disposition": "accepted", "expires": None, "rationale": "Typed capability errors and no-panic boundaries are covered by the stage-1 contract."},
-            {"id": "RISK-004", "disposition": "accepted", "expires": None, "rationale": "Mixed-sign stack geometry has a dedicated acceptance contract and evidence record."},
-            {"id": "RISK-005", "disposition": "accepted", "expires": None, "rationale": "Percent-domain rules are explicit for the current release scope."},
-            {"id": "RISK-006", "disposition": "accepted", "expires": None, "rationale": "Unicode sizing remains fixed by the current deterministic length model and evidence corpus."},
-            {"id": "RISK-007", "disposition": "accepted", "expires": None, "rationale": "Manual margins are the release boundary; auto-fit remains a later capability."},
-            {"id": "RISK-008", "disposition": "accepted", "expires": None, "rationale": "Browser and manual accessibility evidence exists for the current release profile."},
-            {"id": "RISK-009", "disposition": "closed", "expires": None, "rationale": "Package version mapping is already aligned with 0.0.0.1."},
-            {"id": "RISK-010", "disposition": "closed", "expires": None, "rationale": "Short category arrays are padded deterministically in both renderers."},
-            {"id": "RISK-011", "disposition": "accepted", "expires": None, "rationale": "Host-font and certified-export profiles are intentionally separate guarantees."},
-            {"id": "RISK-012", "disposition": "accepted", "expires": None, "rationale": "Release provenance is now bounded by the candidate evidence pack and validator, but public publication remains gated."},
+            {
+                "id": "RISK-001",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "The active schema is already narrowed; later chart expansion remains outside this candidate pack.",
+            },
+            {
+                "id": "RISK-002",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Validator parity is evidenced in the current release corpus; broader schema drift is tracked separately.",
+            },
+            {
+                "id": "RISK-003",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Typed capability errors and no-panic boundaries are covered by the stage-1 contract.",
+            },
+            {
+                "id": "RISK-004",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Mixed-sign stack geometry has a dedicated acceptance contract and evidence record.",
+            },
+            {
+                "id": "RISK-005",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Percent-domain rules are explicit for the current release scope.",
+            },
+            {
+                "id": "RISK-006",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Unicode sizing remains fixed by the current deterministic length model and evidence corpus.",
+            },
+            {
+                "id": "RISK-007",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Manual margins are the release boundary; auto-fit remains a later capability.",
+            },
+            {
+                "id": "RISK-008",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Browser and manual accessibility evidence exists for the current release profile.",
+            },
+            {
+                "id": "RISK-009",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Package version mapping is already aligned with 0.0.0.1.",
+            },
+            {
+                "id": "RISK-010",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Short category arrays are padded deterministically in both renderers.",
+            },
+            {
+                "id": "RISK-011",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Host-font and certified-export profiles are intentionally separate guarantees.",
+            },
+            {
+                "id": "RISK-012",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Release provenance is now bounded by the candidate evidence pack and validator, but public publication remains gated.",
+            },
         ],
         "knownLimits": [
             "This candidate pack is not a publication approval.",

@@ -7,15 +7,15 @@ import argparse
 import json
 import subprocess
 import sys
+from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Sequence
+from typing import Any
 
 try:
     import yaml
 except ImportError as exc:  # pragma: no cover - actionable bootstrap path
     print(
-        "missing project-control dependency: PyYAML; install with "
-        "`python -m pip install -e \"libs/python[dev]\"`",
+        'missing project-control dependency: PyYAML; install with `python -m pip install -e "libs/python[dev]"`',
         file=sys.stderr,
     )
     raise SystemExit(2) from exc
@@ -132,7 +132,7 @@ class ProjectError(RuntimeError):
     """Raised when GitHub Project application or verification fails."""
 
 
-def load_yaml(path: Path) -> Dict[str, Any]:
+def load_yaml(path: Path) -> dict[str, Any]:
     value = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise ProjectError(f"{path}: expected a YAML object")
@@ -162,7 +162,7 @@ def gh_json(args: Sequence[str], payload: Any = None) -> Any:
     return json.loads(output) if output.strip() else None
 
 
-def graphql(query: str, variables: Mapping[str, Any]) -> Dict[str, Any]:
+def graphql(query: str, variables: Mapping[str, Any]) -> dict[str, Any]:
     response = gh_json(["api", "graphql", "--input", "-"], {"query": query, "variables": variables})
     if response.get("errors"):
         raise ProjectError("GitHub GraphQL error: " + json.dumps(response["errors"]))
@@ -174,7 +174,7 @@ def csv(values: Iterable[str]) -> str:
     return ", ".join(materialized) if materialized else "None"
 
 
-def expected_labels(item: Mapping[str, Any]) -> List[str]:
+def expected_labels(item: Mapping[str, Any]) -> list[str]:
     type_label = {
         "Decision": "type:decision",
         "Requirement": "type:work",
@@ -287,7 +287,7 @@ def issue_body(
     return "\n".join(lines)
 
 
-def project_field_list(number: int, owner: str) -> Dict[str, Dict[str, Any]]:
+def project_field_list(number: int, owner: str) -> dict[str, dict[str, Any]]:
     data = gh_json(["project", "field-list", str(number), "--owner", owner, "--format", "json"])
     return {field["name"]: field for field in data["fields"]}
 
@@ -312,7 +312,7 @@ def update_select_options(field: Mapping[str, Any], names: Sequence[str]) -> Non
     graphql(query, {"input": {"fieldId": field["id"], "singleSelectOptions": options}})
 
 
-def ensure_fields(backlog: Mapping[str, Any]) -> tuple[str, Dict[str, Dict[str, Any]]]:
+def ensure_fields(backlog: Mapping[str, Any]) -> tuple[str, dict[str, dict[str, Any]]]:
     owner = backlog["project"]["owner"]
     number = backlog["project"]["number"]
     project = gh_json(["project", "view", str(number), "--owner", owner, "--format", "json"])
@@ -324,8 +324,17 @@ def ensure_fields(backlog: Mapping[str, Any]) -> tuple[str, Dict[str, Dict[str, 
     for name, (data_type, source) in FIELD_SPECS.items():
         if name not in fields:
             args = [
-                "project", "field-create", str(number), "--owner", owner,
-                "--name", name, "--data-type", data_type, "--format", "json",
+                "project",
+                "field-create",
+                str(number),
+                "--owner",
+                owner,
+                "--name",
+                name,
+                "--data-type",
+                data_type,
+                "--format",
+                "json",
             ]
             if source:
                 args.extend(["--single-select-options", ",".join(backlog["workflow"][source])])
@@ -342,8 +351,16 @@ def ensure_labels(repository: str) -> None:
     for name, (color, description) in LABEL_SPECS.items():
         run_gh(
             [
-                "label", "create", name, "--repo", repository, "--color", color,
-                "--description", description, "--force",
+                "label",
+                "create",
+                name,
+                "--repo",
+                repository,
+                "--color",
+                color,
+                "--description",
+                description,
+                "--force",
             ]
         )
 
@@ -369,18 +386,26 @@ def ensure_milestone(repository: str, title: str) -> int:
     return result["number"]
 
 
-def list_issues(repository: str) -> Dict[str, Dict[str, Any]]:
+def list_issues(repository: str) -> dict[str, dict[str, Any]]:
     issues = gh_json(
         [
-            "issue", "list", "--repo", repository, "--state", "all", "--limit", "1000",
-            "--json", "number,title,url,state,body,labels,milestone,assignees",
+            "issue",
+            "list",
+            "--repo",
+            repository,
+            "--state",
+            "all",
+            "--limit",
+            "1000",
+            "--json",
+            "number,title,url,state,body,labels,milestone,assignees",
         ]
     )
-    found: Dict[str, Dict[str, Any]] = {}
+    found: dict[str, dict[str, Any]] = {}
     for issue in issues:
         title = issue["title"]
         if title.startswith("[") and "]" in title:
-            found[title[1:title.index("]")]] = issue
+            found[title[1 : title.index("]")]] = issue
     return found
 
 
@@ -391,7 +416,7 @@ def upsert_issue(
     item: Mapping[str, Any],
     body: str,
     existing: Mapping[str, Any] | None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     payload = {
         "title": f"[{item['id']}] {item['title']}",
         "body": body,
@@ -417,7 +442,7 @@ def upsert_issue(
     return issue
 
 
-def fetch_project_items(owner: str, number: int) -> List[Dict[str, Any]]:
+def fetch_project_items(owner: str, number: int) -> list[dict[str, Any]]:
     query = """
       query($owner: String!, $number: Int!) {
         user(login: $owner) {
@@ -460,7 +485,7 @@ def fetch_project_items(owner: str, number: int) -> List[Dict[str, Any]]:
     return project["items"]["nodes"]
 
 
-def fetch_project_views(owner: str, number: int) -> List[Dict[str, Any]]:
+def fetch_project_views(owner: str, number: int) -> list[dict[str, Any]]:
     query = """
       query($owner: String!, $number: Int!) {
         user(login: $owner) {
@@ -505,7 +530,7 @@ def add_project_item(project_id: str, issue_node_id: str) -> str:
     return data["addProjectV2ItemById"]["item"]["id"]
 
 
-def expected_field_values(item: Mapping[str, Any]) -> Dict[str, str]:
+def expected_field_values(item: Mapping[str, Any]) -> dict[str, str]:
     return {
         "Tracking ID": item["id"],
         "Item Type": item["item_type"],
@@ -529,13 +554,12 @@ def set_item_fields(
 ) -> None:
     variable_definitions = []
     selections = []
-    variables: Dict[str, Any] = {}
+    variables: dict[str, Any] = {}
     for index, (name, value) in enumerate(values.items()):
         variable = f"input{index}"
         variable_definitions.append(f"${variable}: UpdateProjectV2ItemFieldValueInput!")
         selections.append(
-            f"value{index}: updateProjectV2ItemFieldValue(input: ${variable}) "
-            "{ projectV2Item { id } }"
+            f"value{index}: updateProjectV2ItemFieldValue(input: ${variable}) {{ projectV2Item {{ id }} }}"
         )
         field = fields[name]
         if field["type"] == "ProjectV2SingleSelectField":
@@ -592,8 +616,8 @@ def apply(backlog: Mapping[str, Any], requirements: Mapping[str, Mapping[str, An
         set_item_fields(project_id, project_item_id, fields, expected_field_values(item))
 
 
-def field_values(node: Mapping[str, Any]) -> Dict[str, str]:
-    values: Dict[str, str] = {}
+def field_values(node: Mapping[str, Any]) -> dict[str, str]:
+    values: dict[str, str] = {}
     for value in node["fieldValues"]["nodes"]:
         field = value.get("field")
         if not field or not field.get("name"):
@@ -605,7 +629,7 @@ def field_values(node: Mapping[str, Any]) -> Dict[str, str]:
     return values
 
 
-def check_fields(backlog: Mapping[str, Any], errors: List[str]) -> Dict[str, Dict[str, Any]]:
+def check_fields(backlog: Mapping[str, Any], errors: list[str]) -> dict[str, dict[str, Any]]:
     owner = backlog["project"]["owner"]
     number = backlog["project"]["number"]
     fields = project_field_list(number, owner)
@@ -630,7 +654,7 @@ def check_fields(backlog: Mapping[str, Any], errors: List[str]) -> Dict[str, Dic
     return fields
 
 
-def check_views(backlog: Mapping[str, Any], errors: List[str]) -> None:
+def check_views(backlog: Mapping[str, Any], errors: list[str]) -> None:
     owner = backlog["project"]["owner"]
     number = backlog["project"]["number"]
     expected_views = backlog["project"]["views"]
@@ -647,26 +671,19 @@ def check_views(backlog: Mapping[str, Any], errors: List[str]) -> None:
         if not actual:
             continue
         if actual["layout"] != expected["layout"]:
-            errors.append(
-                f"Project view {name}: layout is {actual['layout']}, expected {expected['layout']}"
-            )
+            errors.append(f"Project view {name}: layout is {actual['layout']}, expected {expected['layout']}")
         if (actual.get("filter") or "") != expected["filter"]:
-            errors.append(
-                f"Project view {name}: filter is {actual.get('filter')!r}, "
-                f"expected {expected['filter']!r}"
-            )
+            errors.append(f"Project view {name}: filter is {actual.get('filter')!r}, expected {expected['filter']!r}")
         actual_fields = [field["name"] for field in actual["fields"]["nodes"]]
         if actual_fields != expected["fields"]:
             errors.append(f"Project view {name}: visible fields drifted: {actual_fields}")
         actual_groups = [field["name"] for field in actual["groupByFields"]["nodes"]]
         if actual_groups != expected["group_by"]:
-            errors.append(
-                f"Project view {name}: grouping is {actual_groups}, expected {expected['group_by']}"
-            )
+            errors.append(f"Project view {name}: grouping is {actual_groups}, expected {expected['group_by']}")
 
 
 def check(backlog: Mapping[str, Any], requirements: Mapping[str, Mapping[str, Any]]) -> int:
-    errors: List[str] = []
+    errors: list[str] = []
     check_fields(backlog, errors)
     check_views(backlog, errors)
     owner = backlog["project"]["owner"]

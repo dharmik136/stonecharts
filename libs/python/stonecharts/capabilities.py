@@ -1,10 +1,11 @@
 """Machine-readable renderer capability manifest for the active release scope."""
+
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Dict, Optional
+from typing import Any
 
-_CAPABILITIES: Dict[str, Any] = {
+_CAPABILITIES: dict[str, Any] = {
     "specVersion": "0.0.0.1",
     "svgContractVersion": "0.0.0.1",
     "chartTypes": ["area", "bar", "bubble", "column", "line", "scatter"],
@@ -22,7 +23,7 @@ _CAPABILITIES: Dict[str, Any] = {
 class CapabilityError(Exception):
     """Typed non-fatal error for unsupported renderer capabilities."""
 
-    def __init__(self, code: str, path: str, message: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(self, code: str, path: str, message: str, details: dict[str, Any] | None = None):
         super().__init__(message)
         self.code = code
         self.path = path
@@ -33,6 +34,6 @@ class CapabilityError(Exception):
         return f"{self.path}: {self.message}" if self.path else self.message
 
 
-def capabilities() -> Dict[str, Any]:
+def capabilities() -> dict[str, Any]:
     """Return a machine-readable snapshot of the active renderer capabilities."""
     return deepcopy(_CAPABILITIES)

@@ -4,17 +4,17 @@ The spec is the language-agnostic 'recipe' for a chart: type, data, axes,
 titles, colors, and (from the customization layer) styling. Keep this in lockstep
 with spec/chart-spec.schema.json and libs/go/spec.go.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields
-from typing import List, Optional, Union
 
-from .util import esc
 from .limits import enforce_spec_limits
+from .util import esc
 from .validate import SpecError, validate
 
 
-def _opt_float(d: dict, key: str) -> Optional[float]:
+def _opt_float(d: dict, key: str) -> float | None:
     """Float if the key is present (validation guarantees it's numeric), else None.
 
     This is NOT coercion: a default is supplied only when the key is ABSENT;
@@ -23,7 +23,7 @@ def _opt_float(d: dict, key: str) -> Optional[float]:
     return float(d[key]) if key in d else None
 
 
-def _normalize_datum(v: object, index: int) -> "Datum":
+def _normalize_datum(v: object, index: int) -> Datum:
     """Point-model normalization (scatter §3.3 Rank 3 / bubble §3.3 Rank 4,
     §5.4b lockstep).
 
@@ -45,7 +45,7 @@ def _normalize_datum(v: object, index: int) -> "Datum":
 @dataclass
 class Marker:
     enabled: bool = True
-    symbol: str = "circle"     # circle | square | triangle | diamond
+    symbol: str = "circle"  # circle | square | triangle | diamond
     radius: float = 3.5
 
 
@@ -53,13 +53,14 @@ class Marker:
 class GradientStop:
     offset: float
     color: str
-    opacity: Optional[float] = None
+    opacity: float | None = None
 
 
 @dataclass
 class Gradient:
     """Linear gradient. Direction x1,y1 -> x2,y2 in 0..1 bounding-box coords."""
-    stops: List[GradientStop]
+
+    stops: list[GradientStop]
     x1: float = 0.0
     y1: float = 0.0
     x2: float = 0.0
@@ -70,16 +71,18 @@ class Gradient:
 class Pattern:
     type: str = "hatch"
     color: str = "#333333"
-    background: Optional[str] = None
+    background: str | None = None
     size: float = 8.0
     angle: float = 45.0
     stroke_width: float = 1.5
 
+
 @dataclass
 class Binning:
-    count: Optional[int] = None
-    width: Optional[float] = None
-    start: Optional[float] = None
+    count: int | None = None
+    width: float | None = None
+    start: float | None = None
+
 
 @dataclass
 class Datum:
@@ -95,67 +98,68 @@ class Datum:
 
     x: float
     y: float
-    z: Optional[float] = None
+    z: float | None = None
 
 
 @dataclass
 class Series:
     name: str
-    data: List[float]
-    type: str = "column"                # line | column (combo per-series mark kind)
-    y_axis: int = 0                      # 0 -> primary y_axis; 1 -> secondary_y_axis
-    color: Optional[Union[str, Gradient]] = None
-    fill_opacity: float = 0.0            # >0 -> area fill under the line
-    pattern: Optional[Pattern] = None    # hatch fill for the area
-    line_width: Optional[float] = None   # None -> default 2
-    dash_style: str = "solid"            # solid | dashed | dotted
-    step: Optional[str] = None           # None | before | after | center
-    curve: Optional[str] = None          # None/linear | monotone
-    marker: Optional[Marker] = None
+    data: list[float]
+    type: str = "column"  # line | column (combo per-series mark kind)
+    y_axis: int = 0  # 0 -> primary y_axis; 1 -> secondary_y_axis
+    color: str | Gradient | None = None
+    fill_opacity: float = 0.0  # >0 -> area fill under the line
+    pattern: Pattern | None = None  # hatch fill for the area
+    line_width: float | None = None  # None -> default 2
+    dash_style: str = "solid"  # solid | dashed | dotted
+    step: str | None = None  # None | before | after | center
+    curve: str | None = None  # None/linear | monotone
+    marker: Marker | None = None
     regression: bool = False
-    low: Optional[List[float]] = None
-    data_points: Optional[List[Datum]] = None   # scatter only — see Datum
+    low: list[float] | None = None
+    data_points: list[Datum] | None = None  # scatter only — see Datum
 
 
 @dataclass
 class GridLine:
     enabled: bool = True
-    color: Optional[str] = None      # None -> theme/default (#e8e8ee)
-    dash_style: str = "solid"        # solid | dashed | dotted
+    color: str | None = None  # None -> theme/default (#e8e8ee)
+    dash_style: str = "solid"  # solid | dashed | dotted
 
 
 @dataclass
 class Axis:
-    title: Optional[str] = None
-    categories: Optional[List[str]] = None
-    min: Optional[float] = None
-    max: Optional[float] = None
-    grid_line: Optional[GridLine] = None   # yAxis always; xAxis only meaningful for scatter's numeric x
+    title: str | None = None
+    categories: list[str] | None = None
+    min: float | None = None
+    max: float | None = None
+    grid_line: GridLine | None = None  # yAxis always; xAxis only meaningful for scatter's numeric x
 
-    opposite: Optional[bool] = None        # secondaryYAxis only
+    opposite: bool | None = None  # secondaryYAxis only
 
-    bin_edges: Optional[List[float]] = None   # xAxis only (histogram bins)
+    bin_edges: list[float] | None = None  # xAxis only (histogram bins)
 
 
 @dataclass
 class Margin:
-    top: Optional[float] = None
-    right: Optional[float] = None
-    bottom: Optional[float] = None
-    left: Optional[float] = None
+    top: float | None = None
+    right: float | None = None
+    bottom: float | None = None
+    left: float | None = None
 
 
 @dataclass
 class Layout:
-    margin: Optional[Margin] = None
+    margin: Margin | None = None
 
 
 @dataclass
 class Theme:
     """Concrete color set (canonical values in spec/themes/*.json). Defaults = light,
     exactly reproducing the classic look so light output is byte-identical."""
+
     name: str = "light"
-    background: Optional[str] = None
+    background: str | None = None
     title_color: str = "#1a1a2e"
     subtitle_color: str = "#6b6b80"
     axis_label_color: str = "#6b6b80"
@@ -165,10 +169,18 @@ class Theme:
     crosshair_color: str = "#c0c0cc"
     marker_halo: str = "#fff"
     legend_text_color: str = "#33334d"
-    palette: List[str] = field(default_factory=lambda: [
-        "#2f7ed8", "#f45b5b", "#8bbc21", "#e4a812",
-        "#1aadce", "#8e44ad", "#f28f43", "#77a1e5",
-    ])
+    palette: list[str] = field(
+        default_factory=lambda: [
+            "#2f7ed8",
+            "#f45b5b",
+            "#8bbc21",
+            "#e4a812",
+            "#1aadce",
+            "#8e44ad",
+            "#f28f43",
+            "#77a1e5",
+        ]
+    )
 
 
 # Built-in themes (baked; kept in lockstep with spec/themes/*.json by a parity test).
@@ -187,19 +199,30 @@ THEMES = {
         marker_halo="#1a1a2e",
         legend_text_color="#d0d0e0",
         palette=[
-            "#5aa2f0", "#ff7a7a", "#a3d95a", "#f5c542",
-            "#3ec8e0", "#b57ae0", "#ff9d5c", "#93b8ff",
+            "#5aa2f0",
+            "#ff7a7a",
+            "#a3d95a",
+            "#f5c542",
+            "#3ec8e0",
+            "#b57ae0",
+            "#ff9d5c",
+            "#93b8ff",
         ],
     ),
 }
 
 # camelCase JSON key -> Theme attribute (for custom-object overrides + JSON parity).
 _THEME_KEYS = {
-    "background": "background", "titleColor": "title_color",
-    "subtitleColor": "subtitle_color", "axisLabelColor": "axis_label_color",
-    "axisTitleColor": "axis_title_color", "gridColor": "grid_color",
-    "axisLineColor": "axis_line_color", "crosshairColor": "crosshair_color",
-    "markerHalo": "marker_halo", "legendTextColor": "legend_text_color",
+    "background": "background",
+    "titleColor": "title_color",
+    "subtitleColor": "subtitle_color",
+    "axisLabelColor": "axis_label_color",
+    "axisTitleColor": "axis_title_color",
+    "gridColor": "grid_color",
+    "axisLineColor": "axis_line_color",
+    "crosshairColor": "crosshair_color",
+    "markerHalo": "marker_halo",
+    "legendTextColor": "legend_text_color",
     "palette": "palette",
 }
 
@@ -232,17 +255,17 @@ def resolve_theme(value) -> Theme:
 
 @dataclass
 class ChartSpec:
-    series: List[Series]
+    series: list[Series]
     type: str = "line"
     id: str = "sc"
     theme: Theme = field(default_factory=lambda: THEMES["light"])
-    title: Optional[str] = None
-    subtitle: Optional[str] = None
+    title: str | None = None
+    subtitle: str | None = None
     x_axis: Axis = field(default_factory=Axis)
     y_axis: Axis = field(default_factory=Axis)
-    secondary_y_axis: Optional[Axis] = None
+    secondary_y_axis: Axis | None = None
 
-    binning: Optional[Binning] = None
+    binning: Binning | None = None
 
     pre_binned: bool = False
 
@@ -263,19 +286,19 @@ class ChartSpec:
 
     normalization: str = "frequency"
 
-    overlay: Optional[str] = None
+    overlay: str | None = None
 
     width: int = 820
     height: int = 460
     legend: bool = True
     responsive: bool = False
     a11y: bool = True
-    layout: Optional[Layout] = None
-    stacking: Optional[str] = None     # None | "normal" | "percent"
-    grouping: bool = True              # True = grouped side-by-side; False = overlaid
+    layout: Layout | None = None
+    stacking: str | None = None  # None | "normal" | "percent"
+    grouping: bool = True  # True = grouped side-by-side; False = overlaid
 
     @staticmethod
-    def from_dict(d: dict, *, raw_size_hint: int | None = None) -> "ChartSpec":
+    def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
         """Build a ChartSpec from a plain dict (parsed JSON).
 
         The dict is validated first (same rules as the Go renderer); a malformed
@@ -300,7 +323,7 @@ class ChartSpec:
                 )
             c = s.get("color")
             if isinstance(c, dict):
-                color: Optional[Union[str, Gradient]] = Gradient(
+                color: str | Gradient | None = Gradient(
                     # Keep every stop (missing offset -> 0.0, color -> "") so this
                     # matches Go's decoder byte-for-byte; do NOT drop partial stops.
                     stops=[
@@ -331,7 +354,7 @@ class ChartSpec:
                 )
             if chart_type in ("scatter", "bubble"):
                 data_points = [_normalize_datum(v, j) for j, v in enumerate(s["data"])]
-                data_field: List[float] = []
+                data_field: list[float] = []
             else:
                 data_points = None
                 data_field = [float(v) for v in s["data"]]
@@ -440,15 +463,10 @@ class ChartSpec:
                 grid_line=grid,
             ),
             secondary_y_axis=secondary,
-
             binning=binning,
-
             pre_binned=bool(d.get("preBinned", False)),
-
             normalization=d.get("normalization") or "frequency",
-
             overlay=d.get("overlay"),
-
             width=int(d.get("width", 820)),
             height=int(d.get("height", 460)),
             legend=bool(d.get("legend", True)),
@@ -458,4 +476,3 @@ class ChartSpec:
             stacking=d.get("stacking"),
             grouping=bool(d.get("grouping", True)),
         )
-

@@ -12,9 +12,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 import pytest
-
 from stonecharts.verify.result import SCHEMA_VERSION
-
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 VERIFY_PATH = ROOT / "tools" / "stonecharts_verify.py"
@@ -29,7 +27,7 @@ SVG_BASIC = (
     b'<g class="sc-series" data-series="0">'
     b'<path class="sc-series-line" data-series="0" d="M0,0 L10,10" stroke="#ff0000"/>'
     b'<circle class="sc-point" data-series="0" cx="10" cy="10" r="3.5"/>'
-    b'</g></svg>'
+    b"</g></svg>"
 )
 
 
@@ -348,6 +346,7 @@ def test_check_evidence_bundle_passes_for_valid_bundle(tmp_path):
         "go-output.svg": "<svg></svg>",
     }
     manifest = {
+        "schemaVersion": 1,
         "tool": "stonecharts_verify",
         "toolVersion": 1,
         "generatedAt": "2026-07-28T00:00:00+00:00",
@@ -376,10 +375,7 @@ def test_check_evidence_bundle_passes_for_valid_bundle(tmp_path):
     files["manifest.json"] = json.dumps(manifest, sort_keys=True) + "\n"
     for name, content in files.items():
         (evidence / name).write_text(content, encoding="utf-8")
-    checksums = [
-        f"{stonecharts_verify.sha256_file(evidence / name)}  {name}"
-        for name in sorted(files)
-    ]
+    checksums = [f"{stonecharts_verify.sha256_file(evidence / name)}  {name}" for name in sorted(files)]
     (evidence / "checksums.txt").write_text("\n".join(checksums) + "\n", encoding="utf-8")
 
     result = stonecharts_verify.check_evidence_bundle(evidence)
@@ -496,6 +492,7 @@ def _write_valid_bundle(
     for runtime in runtimes:
         files[f"{runtime}-output.svg"] = runtime_svg
     manifest = {
+        "schemaVersion": 1,
         "tool": "stonecharts_verify",
         "toolVersion": 1,
         "generatedAt": "2026-07-28T00:00:00+00:00",
@@ -518,10 +515,7 @@ def _write_valid_bundle(
     files["manifest.json"] = json.dumps(manifest, sort_keys=True) + "\n"
     for name, content in files.items():
         (evidence / name).write_text(content, encoding="utf-8")
-    checksums = [
-        f"{stonecharts_verify.sha256_file(evidence / name)}  {name}"
-        for name in sorted(files)
-    ]
+    checksums = [f"{stonecharts_verify.sha256_file(evidence / name)}  {name}" for name in sorted(files)]
     (evidence / "checksums.txt").write_text("\n".join(checksums) + "\n", encoding="utf-8")
 
 
@@ -627,10 +621,21 @@ def test_compare_outputs_enforces_comparison_timeout(monkeypatch):
 
 
 def test_render_python_enforces_render_timeout(monkeypatch):
-    monkeypatch.setitem(stonecharts_verify.render_python.__globals__, "RENDER_TIMEOUT_SECONDS", -1.0)
+    import time as _time
+
+    from stonecharts.verify import cli as _cli
+
+    original = _cli._render_python_inner
+
+    def slow_render(*args, **kwargs):
+        _time.sleep(2)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(_cli, "_render_python_inner", slow_render)
+    monkeypatch.setattr(_cli, "RENDER_TIMEOUT_SECONDS", 0.01)
 
     try:
-        stonecharts_verify.render_python({"type": "line", "series": [{"name": "s", "data": [1]}]})
+        _cli.render_python({"type": "line", "series": [{"name": "s", "data": [1]}]})
     except stonecharts_verify.ResourceLimitError as exc:
         assert exc.code == "LIMIT.RENDER_TIMEOUT"
     else:
@@ -735,7 +740,16 @@ def test_manifest_includes_schema_version_and_environment(tmp_path):
     manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["schemaVersion"] == 1
     env = manifest["environment"]
-    for key in ("os", "arch", "pythonVersion", "stonechartsVersion", "stoneverifyVersion", "schemaVersion", "locale", "timezone"):
+    for key in (
+        "os",
+        "arch",
+        "pythonVersion",
+        "stonechartsVersion",
+        "stoneverifyVersion",
+        "schemaVersion",
+        "locale",
+        "timezone",
+    ):
         assert key in env
     # existing fields untouched
     assert manifest["tool"] == "stonecharts_verify"
@@ -905,8 +919,16 @@ def test_manifest_only_adds_schema_version_environment_and_evidence(tmp_path):
     )
     manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
     pre_014a_keys = {
-        "tool", "toolVersion", "generatedAt", "status", "demoDrift",
-        "input", "runtimes", "comparison", "report", "baseline",
+        "tool",
+        "toolVersion",
+        "generatedAt",
+        "status",
+        "demoDrift",
+        "input",
+        "runtimes",
+        "comparison",
+        "report",
+        "baseline",
     }
     new_keys = {"schemaVersion", "environment", "evidence"}
     assert set(manifest.keys()) == pre_014a_keys | new_keys
@@ -1078,7 +1100,15 @@ def test_generated_at_can_be_pinned_for_reproducible_evidence(monkeypatch):
 def test_stoneverify_exit_code_pass(tmp_path):
     spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
     proc = subprocess.run(
-        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(tmp_path / "evidence")],
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--evidence",
+            str(tmp_path / "evidence"),
+        ],
         capture_output=True,
         cwd=ROOT,
     )
@@ -1126,7 +1156,15 @@ def test_stoneverify_exit_code_invalid_spec(tmp_path):
     spec_path = tmp_path / "bad.json"
     spec_path.write_text('{"type": "line", "series": [{"name": "broken", "data": ["not numeric"]}]}', encoding="utf-8")
     proc = subprocess.run(
-        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(tmp_path / "evidence")],
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--evidence",
+            str(tmp_path / "evidence"),
+        ],
         capture_output=True,
         cwd=ROOT,
     )
@@ -1137,9 +1175,19 @@ def test_stoneverify_exit_code_invalid_spec(tmp_path):
 
 def test_stoneverify_exit_code_resource_limit(tmp_path):
     spec_path = tmp_path / "too-large.json"
-    spec_path.write_text('{"type":"line","series":[{"name":"s","data":[' + ",".join(["1"] * 10001) + "]}]}", encoding="utf-8")
+    spec_path.write_text(
+        '{"type":"line","series":[{"name":"s","data":[' + ",".join(["1"] * 10001) + "]}]}", encoding="utf-8"
+    )
     proc = subprocess.run(
-        [sys.executable, str(VERIFY_PATH), str(spec_path), "--runtime", "python", "--evidence", str(tmp_path / "evidence")],
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--evidence",
+            str(tmp_path / "evidence"),
+        ],
         capture_output=True,
         cwd=ROOT,
     )
@@ -1158,7 +1206,11 @@ def test_stoneverify_resource_limit_leaves_existing_evidence_untouched(tmp_path,
     marker.write_text("original", encoding="utf-8")
 
     monkeypatch.setitem(stonecharts_verify.comparison_deadline.__globals__, "COMPARISON_TIMEOUT_SECONDS", -1.0)
-    monkeypatch.setitem(stonecharts_verify.main.__globals__, "render_go", lambda spec_path, **kwargs: (b"<svg>go</svg>", {"runtime": "go"}))
+    monkeypatch.setitem(
+        stonecharts_verify.main.__globals__,
+        "render_go",
+        lambda spec_path, **kwargs: (b"<svg>go</svg>", {"runtime": "go"}),
+    )
     monkeypatch.setattr(
         sys,
         "argv",
@@ -1195,7 +1247,7 @@ def test_stoneverify_exit_code_adapter_failure_when_go_is_unavailable(tmp_path):
 
 def test_pyproject_installs_stoneverify_console_script():
     pyproject = (ROOT / "libs/python/pyproject.toml").read_text(encoding="utf-8")
-    assert '[project.scripts]' in pyproject
+    assert "[project.scripts]" in pyproject
     assert 'stoneverify = "stonecharts.verify.cli:main"' in pyproject
 
 

@@ -3,13 +3,11 @@
 
 from __future__ import annotations
 
-import json
 import subprocess
 from datetime import datetime
 from pathlib import Path
 
 import yaml
-
 
 ROOT = Path(__file__).resolve().parents[1]
 STATE_DIR = ROOT / ".agents" / "state"
@@ -134,9 +132,9 @@ def main() -> int:
         "",
         *extract_blockers(),
         "",
-    "## Review note",
-    "",
-    review_note,
+        "## Review note",
+        "",
+        review_note,
     ]
 
     REVIEW_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

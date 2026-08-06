@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 MAX_SPEC_BYTES = 1_000_000
 MAX_SERIES = 50
 MAX_POINTS_PER_SERIES = 10_000

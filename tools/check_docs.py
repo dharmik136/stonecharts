@@ -6,8 +6,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Set, Tuple
+from typing import Any
 from urllib.parse import unquote, urlsplit
 
 try:
@@ -16,8 +17,7 @@ try:
     from markdown_it import MarkdownIt
 except ImportError as exc:  # pragma: no cover - actionable bootstrap path
     print(
-        "missing governance dependency: "
-        f"{exc.name}; install with `python -m pip install -e \"libs/python[dev]\"`",
+        f'missing governance dependency: {exc.name}; install with `python -m pip install -e "libs/python[dev]"`',
         file=sys.stderr,
     )
     raise SystemExit(2) from exc
@@ -53,9 +53,7 @@ EVIDENCE_SCHEMA = SCHEMA_DIR / "evidence-registry.schema.json"
 RISK_SCHEMA = SCHEMA_DIR / "risk-register.schema.json"
 ROLES_SCHEMA = SCHEMA_DIR / "roles.schema.json"
 PROJECT_BACKLOG_SCHEMA = SCHEMA_DIR / "project-backlog.schema.json"
-RELEASE_MANIFEST_SCHEMA = (
-    DOCS / "releases" / "0.0.0.1" / "evidence" / "manifest.schema.json"
-)
+RELEASE_MANIFEST_SCHEMA = DOCS / "releases" / "0.0.0.1" / "evidence" / "manifest.schema.json"
 
 REQUIREMENTS_FILE = DOCS / "requirements" / "registry.yaml"
 EVIDENCE_FILE = DOCS / "quality" / "evidence-registry.yaml"
@@ -68,20 +66,18 @@ def rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
-def load_json(path: Path) -> Dict[str, Any]:
+def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def load_yaml(path: Path) -> Dict[str, Any]:
+def load_yaml(path: Path) -> dict[str, Any]:
     value = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise ValueError("expected a YAML object")
     return value
 
 
-def validate_value(
-    value: Dict[str, Any], schema_path: Path, source_path: Path, errors: List[str]
-) -> None:
+def validate_value(value: dict[str, Any], schema_path: Path, source_path: Path, errors: list[str]) -> None:
     schema = load_json(schema_path)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     for issue in sorted(validator.iter_errors(value), key=lambda item: list(item.path)):
@@ -89,15 +85,15 @@ def validate_value(
         errors.append(f"{rel(source_path)}:{where}: {issue.message}")
 
 
-def controlled_markdown() -> List[Path]:
-    paths: Set[Path] = set(EXTRA_CONTROLLED)
+def controlled_markdown() -> list[Path]:
+    paths: set[Path] = set(EXTRA_CONTROLLED)
     for directory in CONTROLLED_DIRS:
         if directory.exists():
             paths.update(directory.rglob("*.md"))
     return sorted(paths, key=lambda path: rel(path))
 
 
-def parse_frontmatter(path: Path) -> Tuple[Dict[str, Any], str]:
+def parse_frontmatter(path: Path) -> tuple[dict[str, Any], str]:
     text = path.read_text(encoding="utf-8")
     lines = text.splitlines(keepends=True)
     if not lines or lines[0].strip() != "---":
@@ -126,7 +122,7 @@ def markdown_links(markdown: str) -> Iterable[str]:
                     yield src
 
 
-def check_local_links(path: Path, markdown: str, errors: List[str]) -> None:
+def check_local_links(path: Path, markdown: str, errors: list[str]) -> None:
     for target in markdown_links(markdown):
         split = urlsplit(target)
         if split.scheme or split.netloc or target.startswith("#"):
@@ -139,8 +135,8 @@ def check_local_links(path: Path, markdown: str, errors: List[str]) -> None:
             errors.append(f"{rel(path)}: broken local link `{target}`")
 
 
-def duplicate_ids(items: Iterable[Dict[str, Any]], label: str, errors: List[str]) -> Set[str]:
-    seen: Set[str] = set()
+def duplicate_ids(items: Iterable[dict[str, Any]], label: str, errors: list[str]) -> set[str]:
+    seen: set[str] = set()
     for item in items:
         item_id = item.get("id")
         if not isinstance(item_id, str):
@@ -151,28 +147,28 @@ def duplicate_ids(items: Iterable[Dict[str, Any]], label: str, errors: List[str]
     return seen
 
 
-def check_path_reference(value: Any, source: str, errors: List[str]) -> None:
+def check_path_reference(value: Any, source: str, errors: list[str]) -> None:
     if value is None or not isinstance(value, str):
         return
     if not (ROOT / value).exists():
         errors.append(f"{source}: referenced path does not exist: {value}")
 
 
-def check_dependency_cycles(items: List[Dict[str, Any]], errors: List[str]) -> None:
+def check_dependency_cycles(items: list[dict[str, Any]], errors: list[str]) -> None:
     dependencies = {item["id"]: item.get("dependencies", []) for item in items}
-    visiting: Set[str] = set()
-    visited: Set[str] = set()
+    visiting: set[str] = set()
+    visited: set[str] = set()
 
-    def visit(item_id: str, path: List[str]) -> None:
+    def visit(item_id: str, path: list[str]) -> None:
         if item_id in visited:
             return
         if item_id in visiting:
             start = path.index(item_id)
-            errors.append("project backlog dependency cycle: " + " -> ".join(path[start:] + [item_id]))
+            errors.append("project backlog dependency cycle: " + " -> ".join([*path[start:], item_id]))
             return
         visiting.add(item_id)
         for dependency in dependencies.get(item_id, []):
-            visit(dependency, path + [item_id])
+            visit(dependency, [*path, item_id])
         visiting.remove(item_id)
         visited.add(item_id)
 
@@ -188,7 +184,7 @@ def main() -> int:
         help="write a deterministic traceability snapshot after validation",
     )
     args = parser.parse_args()
-    errors: List[str] = []
+    errors: list[str] = []
 
     schemas = [
         METADATA_SCHEMA,
@@ -255,12 +251,9 @@ def main() -> int:
     view_names = [view.get("name") for view in project_views if isinstance(view.get("name"), str)]
     duplicate_view_names = sorted({name for name in view_names if view_names.count(name) > 1})
     if duplicate_view_names:
-        errors.append(
-            f"{rel(PROJECT_BACKLOG_FILE)}: duplicate Project view names: "
-            + ", ".join(duplicate_view_names)
-        )
+        errors.append(f"{rel(PROJECT_BACKLOG_FILE)}: duplicate Project view names: " + ", ".join(duplicate_view_names))
 
-    documents: Dict[str, Tuple[Path, Dict[str, Any]]] = {}
+    documents: dict[str, tuple[Path, dict[str, Any]]] = {}
     for path in controlled_markdown():
         try:
             metadata, body = parse_frontmatter(path)
@@ -268,9 +261,7 @@ def main() -> int:
             doc_id = metadata.get("id")
             if isinstance(doc_id, str):
                 if doc_id in documents:
-                    errors.append(
-                        f"duplicate document id {doc_id}: {rel(documents[doc_id][0])}, {rel(path)}"
-                    )
+                    errors.append(f"duplicate document id {doc_id}: {rel(documents[doc_id][0])}, {rel(path)}")
                 documents[doc_id] = (path, metadata)
             check_local_links(path, body, errors)
         except Exception as exc:
@@ -278,7 +269,7 @@ def main() -> int:
 
     artifact_ids = set(documents) | {"SC-GOV-003", "SC-GOV-004"}
 
-    for doc_id, (path, metadata) in documents.items():
+    for _doc_id, (path, metadata) in documents.items():
         for role_field in ("owner", "approver"):
             role = metadata.get(role_field)
             if role not in roles:
@@ -338,16 +329,31 @@ def main() -> int:
         "statuses": ["Inbox", "Triage", "Ready", "In Progress", "In Review", "Qualification", "Blocked", "Done"],
         "priorities": ["P0", "P1", "P2", "P3"],
         "workstreams": [
-            "WS-01 Governance", "WS-02 Renderer", "WS-03 Conformance",
-            "WS-04 Runtime & A11y", "WS-05 Customization", "WS-06 Release",
-            "WS-07 Docs & DX", "WS-08 Expansion",
+            "WS-01 Governance",
+            "WS-02 Renderer",
+            "WS-03 Conformance",
+            "WS-04 Runtime & A11y",
+            "WS-05 Customization",
+            "WS-06 Release",
+            "WS-07 Docs & DX",
+            "WS-08 Expansion",
         ],
         "stages": [
-            "S0 Foundation", "S1 Contract Closure", "S2 Qualification",
-            "S3 Release Candidate", "S4 Release", "S5 Expansion",
-            "S6 Qualification 0.0.0.2", "S7 Release Candidate 0.0.0.2", "S8 Release 0.0.0.2",
-            "S9 Qualification 0.0.0.3", "S10 Release Candidate 0.0.0.3", "S11 Release 0.0.0.3",
-            "S12 Qualification 0.0.0.4", "S13 Release Candidate 0.0.0.4", "S14 Release 0.0.0.4",
+            "S0 Foundation",
+            "S1 Contract Closure",
+            "S2 Qualification",
+            "S3 Release Candidate",
+            "S4 Release",
+            "S5 Expansion",
+            "S6 Qualification 0.0.0.2",
+            "S7 Release Candidate 0.0.0.2",
+            "S8 Release 0.0.0.2",
+            "S9 Qualification 0.0.0.3",
+            "S10 Release Candidate 0.0.0.3",
+            "S11 Release 0.0.0.3",
+            "S12 Qualification 0.0.0.4",
+            "S13 Release Candidate 0.0.0.4",
+            "S14 Release 0.0.0.4",
         ],
         "targets": ["0.0.0.1", "0.0.0.2", "0.0.0.3", "0.0.0.4", "Post-0.0.0.1", "Unscheduled"],
         "item_types": ["Decision", "Requirement", "Work Package", "Defect", "Release Gate"],
@@ -356,7 +362,7 @@ def main() -> int:
         if project_backlog.get("workflow", {}).get(field) != expected:
             errors.append(f"{rel(PROJECT_BACKLOG_FILE)}: workflow.{field} must match the governed order")
 
-    requirement_item_ids: Set[str] = set()
+    requirement_item_ids: set[str] = set()
     for row in backlog_rows:
         item_id = row.get("id", "<unknown>")
         traceability = row.get("traceability", [])
@@ -379,7 +385,9 @@ def main() -> int:
             if item_id not in traceability:
                 errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: requirement item must trace to itself")
         elif not row.get("acceptance") or not row.get("verification"):
-            errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: non-requirement item needs acceptance and verification")
+            errors.append(
+                f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: non-requirement item needs acceptance and verification"
+            )
 
     missing_requirement_items = requirement_ids - requirement_item_ids
     extra_requirement_items = requirement_item_ids - requirement_ids
@@ -425,7 +433,7 @@ def main() -> int:
 
     if args.traceability_json:
         evidence_status = {row["id"]: row["status"] for row in evidence_rows}
-        risk_by_requirement: Dict[str, List[str]] = {}
+        risk_by_requirement: dict[str, list[str]] = {}
         for row in risk_rows:
             for requirement_id in row.get("requirements", []):
                 risk_by_requirement.setdefault(requirement_id, []).append(row["id"])
@@ -448,10 +456,7 @@ def main() -> int:
                     "source": row["source"],
                     "decisions": row["decisions"],
                     "contracts": row["contracts"],
-                    "verification": [
-                        {"id": item, "status": evidence_status[item]}
-                        for item in row["verification"]
-                    ],
+                    "verification": [{"id": item, "status": evidence_status[item]} for item in row["verification"]],
                     "implementation": row["implementation"],
                     "risks": sorted(risk_by_requirement.get(row["id"], [])),
                 }

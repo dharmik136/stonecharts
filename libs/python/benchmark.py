@@ -13,6 +13,7 @@ benchmark) and exotic environment fields (container/virtualization
 detection, power mode) that have no portable, reliable reading on a
 personal development machine.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -30,8 +31,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from stonecharts.spec import Axis, ChartSpec, Series  # noqa: E402
 from stonecharts.render import render_html, render_svg  # noqa: E402
+from stonecharts.spec import ChartSpec  # noqa: E402
 
 SEED = 42
 GENERATOR = "python random.Random(seed).uniform(0, 100)"
@@ -65,10 +66,7 @@ def generate_spec(n_series: int, n_categories: int, variant: str) -> tuple[Chart
         series = [
             {
                 "name": f"Series {s}",
-                "data": [
-                    [round(rng.uniform(0, 1000), 2), round(rng.uniform(0, 100), 2)]
-                    for _ in range(n_categories)
-                ],
+                "data": [[round(rng.uniform(0, 1000), 2), round(rng.uniform(0, 100), 2)] for _ in range(n_categories)],
             }
             for s in range(n_series)
         ]
@@ -182,9 +180,7 @@ def run_case(profile: str, n_series: int, n_categories: int, variant: str, mode:
 
 def _git(*args: str) -> str:
     try:
-        return subprocess.run(
-            ["git", *args], cwd=ROOT, capture_output=True, text=True, check=True
-        ).stdout.strip()
+        return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     except Exception:
         return "unknown"
 
@@ -216,7 +212,9 @@ def main():
                 results.append(run_case(profile, n_series, n_categories, variant, mode))
 
     print("\n# Python Benchmark Results\n")
-    print("| Profile | Series | Categories | Variant | Mode | Cold (ms) | p50 (ms) | p95 (ms) | p99 (ms) | Peak Mem (B) | Output (B) | DOM elems |")
+    print(
+        "| Profile | Series | Categories | Variant | Mode | Cold (ms) | p50 (ms) | p95 (ms) | p99 (ms) | Peak Mem (B) | Output (B) | DOM elems |"
+    )
     print("|---|---:|---:|---|---|---:|---:|---:|---:|---:|---:|---:|")
     for r in results:
         print(

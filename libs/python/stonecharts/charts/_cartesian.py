@@ -15,12 +15,13 @@ render_cartesian injects ONE shared accumulator (a Python list `p`) through
 head -> marks -> tail so the writes, their order, and the buffer match the
 original single-buffer line renderer exactly — byte-identity by construction.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional
+from typing import Callable
 
-from ..spec import ChartSpec, Gradient, GridLine, Pattern, Theme
+from ..spec import Axis, ChartSpec, Gradient, GridLine, Pattern, Theme
 from ..util import esc, fmt_num, nice_ticks
 
 
@@ -37,11 +38,11 @@ class SeriesStyle:
     meaningful None; new fields must not overload these sentinels.
     """
 
-    stroke: str                 # hex or url(#grad) — the line/edge stroke ref
-    solid: str                  # representative solid — markers / legend / data-color
-    area_fill: Optional[str]    # None = no area; else hex / url(#grad) / url(#pat)
-    area_op: str                # ' fill-opacity="…"' or ''
-    fill: str                   # resolved BAR paint: url(#pat) -> url(#grad) -> solid hex
+    stroke: str  # hex or url(#grad) — the line/edge stroke ref
+    solid: str  # representative solid — markers / legend / data-color
+    area_fill: str | None  # None = no area; else hex / url(#grad) / url(#pat)
+    area_op: str  # ' fill-opacity="…"' or ''
+    fill: str  # resolved BAR paint: url(#pat) -> url(#grad) -> solid hex
 
 
 @dataclass
@@ -59,26 +60,26 @@ class CartesianFrame:
     plot_w: float
     plot_h: float
     n: int
-    cats: List[str]
+    cats: list[str]
     y_min: float
     y_max: float
-    y_ticks: List[float]
+    y_ticks: list[float]
     cid: str
-    styles: List[SeriesStyle]
-    defs_parts: List[str]
+    styles: list[SeriesStyle]
+    defs_parts: list[str]
     a11y_attr: str
     a11y_desc: str
-    scale: str                       # "point" | "band" | "linear"
-    include_zero: bool               # value-axis zero-anchor (see build_frame)
-    orientation: str                 # "vertical" | "horizontal"
-    stacking: Optional[str]          # None | "normal" | "percent" — frame owns stacked y-domain
-    secondary_axis: Optional[Axis] = None
+    scale: str  # "point" | "band" | "linear"
+    include_zero: bool  # value-axis zero-anchor (see build_frame)
+    orientation: str  # "vertical" | "horizontal"
+    stacking: str | None  # None | "normal" | "percent" — frame owns stacked y-domain
+    secondary_axis: Axis | None = None
     y2_min: float = 0.0
     y2_max: float = 0.0
-    y2_ticks: List[float] = field(default_factory=list)
-    x_min: float = 0.0               # LINEAR scale only (scatter) — free numeric x-domain
+    y2_ticks: list[float] = field(default_factory=list)
+    x_min: float = 0.0  # LINEAR scale only (scatter) — free numeric x-domain
     x_max: float = 0.0
-    x_ticks: List[float] = field(default_factory=list)
+    x_ticks: list[float] = field(default_factory=list)
 
     def xpix(self, i: float) -> float:
         """Category index (or, under LINEAR scale, a numeric x-VALUE) -> pixel x.
@@ -135,7 +136,7 @@ class CartesianFrame:
 
 
 # A chart supplies ONLY this: append its marks for one plot into the accumulator p.
-MarksFn = Callable[[CartesianFrame, List[str]], None]
+MarksFn = Callable[[CartesianFrame, list[str]], None]
 
 
 def a11y_summary(spec: ChartSpec, chart_noun: str) -> str:
@@ -168,13 +169,9 @@ def gradient_def(gid: str, g: Gradient) -> str:
 def pattern_def(pid: str, pat: Pattern) -> str:
     """<pattern> def: a diagonal hatch tile (userSpaceOnUse, rotated)."""
     sz = fmt_num(pat.size)
-    bg = (
-        f'<rect width="{sz}" height="{sz}" fill="{esc(pat.background)}"/>'
-        if pat.background else ""
-    )
+    bg = f'<rect width="{sz}" height="{sz}" fill="{esc(pat.background)}"/>' if pat.background else ""
     hatch = (
-        f'<line x1="0" y1="0" x2="0" y2="{sz}" stroke="{esc(pat.color)}" '
-        f'stroke-width="{fmt_num(pat.stroke_width)}"/>'
+        f'<line x1="0" y1="0" x2="0" y2="{sz}" stroke="{esc(pat.color)}" stroke-width="{fmt_num(pat.stroke_width)}"/>'
     )
     return (
         f'<pattern id="{pid}" patternUnits="userSpaceOnUse" width="{sz}" height="{sz}" '
@@ -192,8 +189,9 @@ def dash_array(style: str) -> str:
     return _DASH.get(style, "")
 
 
-def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
-                include_zero: bool = True, orientation: str = "vertical") -> CartesianFrame:
+def build_frame(
+    spec: ChartSpec, chart_noun: str, x_scale: str = "point", include_zero: bool = True, orientation: str = "vertical"
+) -> CartesianFrame:
     """The §4.2 "frame build" phase: margins, plot rect, n/cats, the value-axis
     range + nice_ticks, and the <defs> pre-pass resolving each SeriesStyle
     (stroke, solid, area_fill, area_op, fill) + cid + defs_parts + the a11y
@@ -258,7 +256,7 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
     cats = spec.x_axis.categories or [str(i) for i in range(n)]
 
     x_min = x_max = 0.0
-    x_ticks: List[float] = []
+    x_ticks: list[float] = []
     if is_point_model:
         xs = [d.x for s in spec.series for d in (s.data_points or [])]
         x_lo = spec.x_axis.min if spec.x_axis.min is not None else (min(xs) if xs else 0.0)
@@ -280,8 +278,8 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
                         pos_totals[i] += v
                     else:
                         neg_totals[i] += v
-            lo = spec.y_axis.min if spec.y_axis.min is not None else min(neg_totals + [0.0])
-            hi = spec.y_axis.max if spec.y_axis.max is not None else max(pos_totals + [0.0])
+            lo = spec.y_axis.min if spec.y_axis.min is not None else min([*neg_totals, 0.0])
+            hi = spec.y_axis.max if spec.y_axis.max is not None else max([*pos_totals, 0.0])
     elif is_point_model:
         # Free y-domain (include_zero=False is always passed for scatter).
         values = [d.y for s in spec.series for d in (s.data_points or [])]
@@ -295,8 +293,8 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
             if low is not None:
                 values.extend(low)
         if include_zero:
-            lo = spec.y_axis.min if spec.y_axis.min is not None else min(values + [0.0])
-            hi = spec.y_axis.max if spec.y_axis.max is not None else max(values + [0.0])
+            lo = spec.y_axis.min if spec.y_axis.min is not None else min([*values, 0.0])
+            hi = spec.y_axis.max if spec.y_axis.max is not None else max([*values, 0.0])
         else:
             lo = spec.y_axis.min if spec.y_axis.min is not None else (min(values) if values else 0.0)
             hi = spec.y_axis.max if spec.y_axis.max is not None else (max(values) if values else 0.0)
@@ -305,8 +303,8 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
     # Resolve per-series styling and collect <defs> (gradients/patterns). Defs are
     # emitted ONLY when something needs them, so default output stays byte-identical.
     cid = esc(spec.id)  # namespaces <defs> ids; escaped so a hostile id can't inject
-    defs_parts: List[str] = []
-    styles: List[SeriesStyle] = []
+    defs_parts: list[str] = []
+    styles: list[SeriesStyle] = []
     for si, s in enumerate(spec.series):
         if isinstance(s.color, Gradient):
             gid = f"{cid}-grad-{si}"
@@ -322,32 +320,49 @@ def build_frame(spec: ChartSpec, chart_noun: str, x_scale: str = "point",
         if s.pattern is not None:
             pid = f"{cid}-pat-{si}"
             defs_parts.append(pattern_def(pid, s.pattern))
-            area_fill: Optional[str] = f"url(#{pid})"
+            area_fill: str | None = f"url(#{pid})"
             area_op = ""
-            fill = f"url(#{pid})"     # bar paint: pattern wins
+            fill = f"url(#{pid})"  # bar paint: pattern wins
         elif s.fill_opacity > 0:
             area_fill = fill_color
             area_op = f' fill-opacity="{fmt_num(s.fill_opacity)}"'
-            fill = fill_color         # bar paint: url(#grad) or solid hex
+            fill = fill_color  # bar paint: url(#grad) or solid hex
         else:
             area_fill = None
             area_op = ""
-            fill = fill_color         # bar paint: url(#grad) or solid hex
+            fill = fill_color  # bar paint: url(#grad) or solid hex
         styles.append(SeriesStyle(stroke, solid, area_fill, area_op, fill))
 
     return CartesianFrame(
-        spec=spec, W=W, H=H, theme=theme,
-        plot_x=plot_x, plot_y=plot_y, plot_w=plot_w, plot_h=plot_h,
-        n=n, cats=cats,
-        y_min=y_min, y_max=y_max, y_ticks=y_ticks,
-        cid=cid, styles=styles, defs_parts=defs_parts,
-        a11y_attr=a11y_attr, a11y_desc=a11y_desc,
-        scale=x_scale, include_zero=include_zero, orientation=orientation, stacking=stacking,
-        x_min=x_min, x_max=x_max, x_ticks=x_ticks,
+        spec=spec,
+        W=W,
+        H=H,
+        theme=theme,
+        plot_x=plot_x,
+        plot_y=plot_y,
+        plot_w=plot_w,
+        plot_h=plot_h,
+        n=n,
+        cats=cats,
+        y_min=y_min,
+        y_max=y_max,
+        y_ticks=y_ticks,
+        cid=cid,
+        styles=styles,
+        defs_parts=defs_parts,
+        a11y_attr=a11y_attr,
+        a11y_desc=a11y_desc,
+        scale=x_scale,
+        include_zero=include_zero,
+        orientation=orientation,
+        stacking=stacking,
+        x_min=x_min,
+        x_max=x_max,
+        x_ticks=x_ticks,
     )
 
 
-def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
+def _chrome_head(fr: CartesianFrame, p: list[str]) -> None:
     """§4.1 HEAD — write into p, in place, in emission order: <svg> open,
     <desc>, <defs>, background rect, title + subtitle, y gridlines + labels,
     axis line, x labels, axis titles (x + rotated y), crosshair."""
@@ -381,21 +396,19 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
 
     # Background (only when the theme sets one; light theme -> none).
     if theme.background:
-        p.append(
-            f'<rect class="sc-bg" x="0" y="0" width="{W}" height="{H}" fill="{theme.background}"/>'
-        )
+        p.append(f'<rect class="sc-bg" x="0" y="0" width="{W}" height="{H}" fill="{theme.background}"/>')
 
     # Titles.
     ty = 26
     if spec.title:
         p.append(
-            f'<text class="sc-title" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
+            f'<text class="sc-title" x="{W / 2:.1f}" y="{ty}" text-anchor="middle" '
             f'font-size="17" font-weight="600" fill="{theme.title_color}">{esc(spec.title)}</text>'
         )
         ty += 20
     if spec.subtitle:
         p.append(
-            f'<text class="sc-subtitle" x="{W/2:.1f}" y="{ty}" text-anchor="middle" '
+            f'<text class="sc-subtitle" x="{W / 2:.1f}" y="{ty}" text-anchor="middle" '
             f'font-size="12" fill="{theme.subtitle_color}">{esc(spec.subtitle)}</text>'
         )
 
@@ -403,25 +416,25 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
         gl = spec.y_axis.grid_line or GridLine()
         grid_color = gl.color or theme.grid_color
         grid_dash = dash_array(gl.dash_style)
-        dash_attr = f' stroke-dasharray="{grid_dash}"' if grid_dash else ''
+        dash_attr = f' stroke-dasharray="{grid_dash}"' if grid_dash else ""
         p.append('<g class="sc-axis sc-axis-x">')
         for tv in y_ticks:
             gx = fr.value_pix(tv)
             if gl.enabled:
                 p.append(
                     f'<line class="sc-gridline" x1="{gx:.1f}" y1="{plot_y:.1f}" '
-                    f'x2="{gx:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{grid_color}" '
+                    f'x2="{gx:.1f}" y2="{plot_y + plot_h:.1f}" stroke="{grid_color}" '
                     f'stroke-width="1"{dash_attr}/>'
                 )
             p.append(
-                f'<text x="{gx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '
+                f'<text x="{gx:.1f}" y="{plot_y + plot_h + 18:.1f}" text-anchor="middle" '
                 f'font-size="11" fill="{theme.axis_label_color}">{esc(fmt_num(tv))}</text>'
             )
         p.append("</g>")
 
         p.append(
-            f'<line class="sc-axis-line" x1="{plot_x:.1f}" y1="{plot_y+plot_h:.1f}" '
-            f'x2="{plot_x+plot_w:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{theme.axis_line_color}" stroke-width="1"/>'
+            f'<line class="sc-axis-line" x1="{plot_x:.1f}" y1="{plot_y + plot_h:.1f}" '
+            f'x2="{plot_x + plot_w:.1f}" y2="{plot_y + plot_h:.1f}" stroke="{theme.axis_line_color}" stroke-width="1"/>'
         )
 
         p.append('<g class="sc-axis sc-axis-y">')
@@ -429,7 +442,7 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
             label = cats[i] if i < len(cats) else str(i)
             gy = fr.band_center(i)
             p.append(
-                f'<text x="{plot_x-8:.1f}" y="{gy+4:.1f}" text-anchor="end" '
+                f'<text x="{plot_x - 8:.1f}" y="{gy + 4:.1f}" text-anchor="end" '
                 f'font-size="11" fill="{theme.axis_label_color}">{esc(label)}</text>'
             )
         p.append("</g>")
@@ -442,7 +455,7 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
             )
         if spec.y_axis.title:
             p.append(
-                f'<text x="{plot_x+plot_w/2:.1f}" y="{H-6}" text-anchor="middle" '
+                f'<text x="{plot_x + plot_w / 2:.1f}" y="{H - 6}" text-anchor="middle" '
                 f'font-size="12" fill="{theme.axis_title_color}">{esc(spec.y_axis.title)}</text>'
             )
     else:
@@ -450,26 +463,26 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
         gl = spec.y_axis.grid_line or GridLine()
         grid_color = gl.color or theme.grid_color
         grid_dash = dash_array(gl.dash_style)
-        dash_attr = f' stroke-dasharray="{grid_dash}"' if grid_dash else ''
+        dash_attr = f' stroke-dasharray="{grid_dash}"' if grid_dash else ""
         p.append('<g class="sc-axis sc-axis-y">')
         for tv in y_ticks:
             gy = ypix(tv)
             if gl.enabled:
                 p.append(
                     f'<line class="sc-gridline" x1="{plot_x:.1f}" y1="{gy:.1f}" '
-                    f'x2="{plot_x+plot_w:.1f}" y2="{gy:.1f}" stroke="{grid_color}" '
+                    f'x2="{plot_x + plot_w:.1f}" y2="{gy:.1f}" stroke="{grid_color}" '
                     f'stroke-width="1"{dash_attr}/>'
                 )
             p.append(
-                f'<text x="{plot_x-8:.1f}" y="{gy+4:.1f}" text-anchor="end" '
+                f'<text x="{plot_x - 8:.1f}" y="{gy + 4:.1f}" text-anchor="end" '
                 f'font-size="11" fill="{theme.axis_label_color}">{esc(fmt_num(tv))}</text>'
             )
         p.append("</g>")
 
         # Axis lines.
         p.append(
-            f'<line class="sc-axis-line" x1="{plot_x:.1f}" y1="{plot_y+plot_h:.1f}" '
-            f'x2="{plot_x+plot_w:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{theme.axis_line_color}" stroke-width="1"/>'
+            f'<line class="sc-axis-line" x1="{plot_x:.1f}" y1="{plot_y + plot_h:.1f}" '
+            f'x2="{plot_x + plot_w:.1f}" y2="{plot_y + plot_h:.1f}" stroke="{theme.axis_line_color}" stroke-width="1"/>'
         )
 
         # X labels. LINEAR scale (scatter, §3.3 Rank 3) draws numeric ticks +
@@ -479,14 +492,14 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
             xgl = spec.x_axis.grid_line or GridLine(enabled=False)
             xgrid_color = xgl.color or theme.grid_color
             xgrid_dash = dash_array(xgl.dash_style)
-            xdash_attr = f' stroke-dasharray="{xgrid_dash}"' if xgrid_dash else ''
+            xdash_attr = f' stroke-dasharray="{xgrid_dash}"' if xgrid_dash else ""
             if xgl.enabled:
                 p.append('<g class="sc-gridlines-x">')
                 for tv in fr.x_ticks:
                     gx = xpix(tv)
                     p.append(
                         f'<line class="sc-gridline" x1="{gx:.1f}" y1="{plot_y:.1f}" '
-                        f'x2="{gx:.1f}" y2="{plot_y+plot_h:.1f}" stroke="{xgrid_color}" '
+                        f'x2="{gx:.1f}" y2="{plot_y + plot_h:.1f}" stroke="{xgrid_color}" '
                         f'stroke-width="1"{xdash_attr}/>'
                     )
                 p.append("</g>")
@@ -494,7 +507,7 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
             for tv in fr.x_ticks:
                 lx = xpix(tv)
                 p.append(
-                    f'<text x="{lx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '
+                    f'<text x="{lx:.1f}" y="{plot_y + plot_h + 18:.1f}" text-anchor="middle" '
                     f'font-size="11" fill="{theme.axis_label_color}">{esc(fmt_num(tv))}</text>'
                 )
             p.append("</g>")
@@ -504,7 +517,7 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
                 label = cats[i] if i < len(cats) else str(i)
                 lx = xpix(i)
                 p.append(
-                    f'<text x="{lx:.1f}" y="{plot_y+plot_h+18:.1f}" text-anchor="middle" '
+                    f'<text x="{lx:.1f}" y="{plot_y + plot_h + 18:.1f}" text-anchor="middle" '
                     f'font-size="11" fill="{theme.axis_label_color}">{esc(label)}</text>'
                 )
             p.append("</g>")
@@ -512,7 +525,7 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
         # Axis titles.
         if spec.x_axis.title:
             p.append(
-                f'<text x="{plot_x+plot_w/2:.1f}" y="{H-6}" text-anchor="middle" '
+                f'<text x="{plot_x + plot_w / 2:.1f}" y="{H - 6}" text-anchor="middle" '
                 f'font-size="12" fill="{theme.axis_title_color}">{esc(spec.x_axis.title)}</text>'
             )
         if spec.y_axis.title:
@@ -526,30 +539,34 @@ def _chrome_head(fr: CartesianFrame, p: List[str]) -> None:
         side_left = bool(getattr(fr.secondary_axis, "opposite", True) is False)
         ax_x = plot_x - 8 if side_left else plot_x + plot_w + 8
         anchor = "end" if side_left else "start"
-        title_x = 14 if side_left else max(14, W - 14)
-        title_rot = f'rotate(-90 14 {plot_y+plot_h/2:.1f})' if side_left else f'rotate(90 {W-14} {plot_y+plot_h/2:.1f})'
-        p.append(f'<g class="sc-axis sc-axis-y2">')
+        14 if side_left else max(14, W - 14)
+        title_rot = (
+            f"rotate(-90 14 {plot_y + plot_h / 2:.1f})"
+            if side_left
+            else f"rotate(90 {W - 14} {plot_y + plot_h / 2:.1f})"
+        )
+        p.append('<g class="sc-axis sc-axis-y2">')
         for tv in fr.y2_ticks:
             p.append(
-                f'<text x="{ax_x:.1f}" y="{fr.ypix2(tv)+4:.1f}" text-anchor="{anchor}" '
+                f'<text x="{ax_x:.1f}" y="{fr.ypix2(tv) + 4:.1f}" text-anchor="{anchor}" '
                 f'font-size="11" fill="{theme.axis_label_color}">{esc(fmt_num(tv))}</text>'
             )
         p.append("</g>")
         if fr.secondary_axis.title:
             p.append(
-                f'<text x="{W-14 if not side_left else 14}" y="{plot_y+plot_h/2:.1f}" '
+                f'<text x="{W - 14 if not side_left else 14}" y="{plot_y + plot_h / 2:.1f}" '
                 f'text-anchor="middle" font-size="12" fill="{theme.axis_title_color}" '
                 f'transform="{title_rot}">{esc(fr.secondary_axis.title)}</text>'
             )
 
     # Crosshair (hidden until a point is hovered; driven by the JS runtime).
     p.append(
-        f'<line class="sc-crosshair" x1="0" y1="{plot_y:.1f}" x2="0" y2="{plot_y+plot_h:.1f}" '
+        f'<line class="sc-crosshair" x1="0" y1="{plot_y:.1f}" x2="0" y2="{plot_y + plot_h:.1f}" '
         f'stroke="{theme.crosshair_color}" stroke-width="1" stroke-dasharray="4 3" style="display:none"/>'
     )
 
 
-def _chrome_tail(fr: CartesianFrame, p: List[str]) -> None:
+def _chrome_tail(fr: CartesianFrame, p: list[str]) -> None:
     """§4.1 TAIL — write into p, in place: legend (bottom-center), </svg>.
     No trailing newline."""
     spec, theme = fr.spec, fr.theme
@@ -567,11 +584,9 @@ def _chrome_tail(fr: CartesianFrame, p: List[str]) -> None:
         for si, s in enumerate(spec.series):
             color = fr.styles[si].solid
             p.append(f'<g class="sc-legend-item" data-series="{si}">')
+            p.append(f'<rect x="{lx:.1f}" y="{ly - 9:.1f}" width="14" height="4" rx="2" fill="{color}"/>')
             p.append(
-                f'<rect x="{lx:.1f}" y="{ly-9:.1f}" width="14" height="4" rx="2" fill="{color}"/>'
-            )
-            p.append(
-                f'<text x="{lx+20:.1f}" y="{ly-2:.1f}" font-size="12" fill="{theme.legend_text_color}">{esc(s.name)}</text>'
+                f'<text x="{lx + 20:.1f}" y="{ly - 2:.1f}" font-size="12" fill="{theme.legend_text_color}">{esc(s.name)}</text>'
             )
             p.append("</g>")
             lx += est[si] + gap
@@ -580,14 +595,19 @@ def _chrome_tail(fr: CartesianFrame, p: List[str]) -> None:
     p.append("</svg>")
 
 
-def render_cartesian(spec: ChartSpec, chart_noun: str, x_scale: str, marks: MarksFn,
-                     include_zero: bool = True, orientation: str = "vertical") -> str:
+def render_cartesian(
+    spec: ChartSpec,
+    chart_noun: str,
+    x_scale: str,
+    marks: MarksFn,
+    include_zero: bool = True,
+    orientation: str = "vertical",
+) -> str:
     """Orchestrate head -> (chart's marks) -> tail through ONE shared
     accumulator p. Returns a single "".join(p) with NO trailing newline."""
     fr = build_frame(spec, chart_noun, x_scale, include_zero, orientation)
-    p: List[str] = []
+    p: list[str] = []
     _chrome_head(fr, p)
-    marks(fr, p)          # chart appends its <g class="sc-series">…</g> blocks here
+    marks(fr, p)  # chart appends its <g class="sc-series">…</g> blocks here
     _chrome_tail(fr, p)
-    return "".join(p)     # single "".join, NO trailing newline
-
+    return "".join(p)  # single "".join, NO trailing newline

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import pytest
-
 from stonecharts.verify.result import (
     SCHEMA_VERSION,
     build_finding,
     build_verification_result,
     capture_environment,
+    check_schema_version,
     digest,
     sha256_digest,
+    validate_against_schema,
 )
 
 
@@ -24,7 +25,16 @@ def test_sha256_digest_is_digest_with_sha256_algorithm():
 
 def test_capture_environment_has_required_keys():
     env = capture_environment(stonecharts_version="0.0.0.4", stoneverify_version="1.0.0")
-    for key in ("os", "arch", "pythonVersion", "stonechartsVersion", "stoneverifyVersion", "schemaVersion", "locale", "timezone"):
+    for key in (
+        "os",
+        "arch",
+        "pythonVersion",
+        "stonechartsVersion",
+        "stoneverifyVersion",
+        "schemaVersion",
+        "locale",
+        "timezone",
+    ):
         assert key in env, f"missing {key}"
     assert env["schemaVersion"] == SCHEMA_VERSION
     assert env["goVersion"] is None
@@ -116,3 +126,50 @@ def test_build_verification_result_rejects_unknown_status(bad_status):
 def test_build_verification_result_rejects_unknown_mode(bad_mode):
     with pytest.raises(ValueError):
         build_verification_result(status="pass", comparison_mode=bad_mode)
+
+
+def test_build_verification_result_validates_against_schema():
+    env = capture_environment(
+        stonecharts_version="0.0.0.4",
+        stoneverify_version="1.0.0",
+    )
+    result = build_verification_result(
+        status="pass",
+        comparison_mode="cross-runtime",
+        baseline=None,
+        candidate={"runtimes": ["python", "go"]},
+        inputs={"specSha256": "abc"},
+        runtime_coverage={"shared": ["python", "go"], "onlyLeft": [], "onlyRight": []},
+        findings=[],
+        evidence={},
+        environment=env,
+    )
+    errors = validate_against_schema(result)
+    assert errors == [], f"schema validation errors: {errors}"
+
+
+def test_canonical_result_schema_is_valid_json_schema():
+    import json
+    import pathlib
+
+    from jsonschema import Draft202012Validator
+
+    schema_path = pathlib.Path(__file__).resolve().parents[3] / "spec" / "stoneverify-result.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+
+
+def test_check_schema_version_accepts_current():
+    assert check_schema_version(1) is None
+
+
+def test_check_schema_version_rejects_future():
+    err = check_schema_version(2)
+    assert err is not None
+    assert isinstance(err, str)
+
+
+def test_check_schema_version_rejects_non_integer():
+    err = check_schema_version("1")
+    assert err is not None
+    assert isinstance(err, str)

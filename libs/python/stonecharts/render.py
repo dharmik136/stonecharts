@@ -5,18 +5,19 @@ the shared JS interaction runtime (runtime/chart-interactions.js at the repo
 root — one source of truth, embedded inline so the output is a single portable
 file).
 """
+
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable, Dict
+from typing import Callable
 
+from .capabilities import CapabilityError, capabilities
 from .charts import area as _area
 from .charts import bar as _bar
+from .charts import bubble as _bubble
 from .charts import column as _column
 from .charts import line as _line
 from .charts import scatter as _scatter
-from .charts import bubble as _bubble
-from .capabilities import CapabilityError, capabilities
 from .limits import enforce_svg_limit
 from .spec import ChartSpec
 from .util import esc, fmt_num
@@ -26,7 +27,7 @@ from .util import esc, fmt_num
 _RUNTIME_PATH = Path(__file__).resolve().parents[3] / "runtime" / "chart-interactions.js"
 
 # chart type -> SVG renderer. New chart types register here.
-_RENDERERS: Dict[str, Callable[[ChartSpec], str]] = {
+_RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "area": _area.render_svg,
     "bar": _bar.render_svg,
     "column": _column.render_svg,
@@ -68,7 +69,7 @@ def _data_table(spec: ChartSpec) -> str:
             for d in s.data_points or []:
                 z_cell = f"<td>{esc(fmt_num(d.z if d.z is not None else 0.0))}</td>" if has_z else ""
                 rows.append(
-                    f"<tr><th scope=\"row\">{esc(s.name)}</th>"
+                    f'<tr><th scope="row">{esc(s.name)}</th>'
                     f"<td>{esc(fmt_num(d.x))}</td><td>{esc(fmt_num(d.y))}</td>{z_cell}</tr>"
                 )
         z_head = '<th scope="col">Z</th>' if has_z else ""
@@ -76,25 +77,19 @@ def _data_table(spec: ChartSpec) -> str:
             f'<table class="sc-visually-hidden">{caption}'
             '<thead><tr><th scope="col">Series</th><th scope="col">X</th>'
             f'<th scope="col">Y</th>{z_head}</tr></thead>'
-            f'<tbody>{"".join(rows)}</tbody></table>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
         )
     n = max((len(s.data) for s in spec.series), default=0)
     cats = spec.x_axis.categories or []
-    head = "".join(
-        f'<th scope="col">{esc(cats[i] if i < len(cats) else str(i))}</th>'
-        for i in range(n)
-    )
+    head = "".join(f'<th scope="col">{esc(cats[i] if i < len(cats) else str(i))}</th>' for i in range(n))
     rows = []
     for s in spec.series:
-        cells = "".join(
-            f"<td>{esc(fmt_num(s.data[i]))}</td>" if i < len(s.data) else "<td></td>"
-            for i in range(n)
-        )
+        cells = "".join(f"<td>{esc(fmt_num(s.data[i]))}</td>" if i < len(s.data) else "<td></td>" for i in range(n))
         rows.append(f'<tr><th scope="row">{esc(s.name)}</th>{cells}</tr>')
     return (
         f'<table class="sc-visually-hidden">{caption}'
-        f'<thead><tr><td></td>{head}</tr></thead>'
-        f'<tbody>{"".join(rows)}</tbody></table>'
+        f"<thead><tr><td></td>{head}</tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table>"
     )
 
 
@@ -125,7 +120,7 @@ def _runtime_js() -> str:
         return _RUNTIME_PATH.read_text(encoding="utf-8")
     except OSError:
         # Degrade gracefully: static chart still renders, just without interactivity.
-        return "/* StoneCharts runtime not found at %s */" % _RUNTIME_PATH
+        return f"/* StoneCharts runtime not found at {_RUNTIME_PATH} */"
 
 
 def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
@@ -133,9 +128,9 @@ def render_html(spec: ChartSpec, page_title: str | None = None) -> str:
     svg = render_svg(spec)
     title = page_title or spec.title or "StoneCharts"
     wrap_style = (
-        f' style="display:block;width:100%;max-width:{spec.width}px;'
-        f'aspect-ratio:{spec.width} / {spec.height}"'
-        if spec.responsive else ""
+        f' style="display:block;width:100%;max-width:{spec.width}px;aspect-ratio:{spec.width} / {spec.height}"'
+        if spec.responsive
+        else ""
     )
     table = _data_table(spec) if spec.a11y else ""
     return (
@@ -156,6 +151,3 @@ def save_html(spec: ChartSpec, path: str | Path, page_title: str | None = None) 
     out = Path(path)
     out.write_text(render_html(spec, page_title), encoding="utf-8")
     return out
-
-
-

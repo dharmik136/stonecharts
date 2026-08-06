@@ -7,11 +7,11 @@ marks: one baseline-anchored <rect> per category/series segment, widened
 along x instead of column's height along y. See charts/bar/design.md for the
 full geometry contract.
 """
+
 from __future__ import annotations
 
 from ..util import esc, fmt_num
 from ._cartesian import CartesianFrame, render_cartesian
-
 
 PAD = 0.2
 

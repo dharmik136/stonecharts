@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
+import json
 import locale
+import pathlib
 import platform
 import time
 from typing import Any
 
 SCHEMA_VERSION = 1
+SCHEMA_VERSION_MIN = 1
+SCHEMA_VERSION_MAX = 1
 RESULT_SCHEMA_URI = "https://stonecharts.dev/schemas/stoneverify-result.schema.json"
+
+_SCHEMA_PATH = pathlib.Path(__file__).resolve().parents[4] / "spec" / "stoneverify-result.schema.json"
 
 _VALID_EQUALITY = {"byte", "structural", "semantic", "unknown"}
 _VALID_CONFIDENCE = {"high", "medium", "low"}
@@ -97,3 +103,31 @@ def build_verification_result(
         "evidence": dict(evidence or {}),
         "environment": environment,
     }
+
+
+def check_schema_version(version: Any) -> str | None:
+    """Return ``None`` if *version* is supported, or an error string otherwise."""
+    if not isinstance(version, int):
+        return f"schema version must be an integer, got {type(version).__name__}"
+    if version < SCHEMA_VERSION_MIN:
+        return f"schema version {version} is below minimum supported ({SCHEMA_VERSION_MIN})"
+    if version > SCHEMA_VERSION_MAX:
+        return f"schema version {version} is above maximum supported ({SCHEMA_VERSION_MAX})"
+    return None
+
+
+def validate_against_schema(result: dict[str, Any]) -> list[str]:
+    """Validate *result* against the canonical JSON Schema.
+
+    Returns a list of human-readable error strings (empty means valid).
+    If *jsonschema* is not installed the function returns an empty list
+    silently so that validation remains a dev-only concern.
+    """
+    try:
+        from jsonschema import Draft202012Validator
+    except ImportError:
+        return []
+
+    schema = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
+    validator = Draft202012Validator(schema)
+    return [error.message for error in validator.iter_errors(result)]

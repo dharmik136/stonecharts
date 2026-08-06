@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import difflib
 import hashlib
 import html
@@ -21,13 +22,20 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from typing import Any
 
-
-from stonecharts import ChartSpec, __version__ as PY_STONECHARTS_VERSION
+from stonecharts import ChartSpec
+from stonecharts import __version__ as PY_STONECHARTS_VERSION
 from stonecharts.capabilities import CapabilityError
 from stonecharts.limits import MAX_SPEC_BYTES, ResourceLimitError
 from stonecharts.render import render_svg
 from stonecharts.validate import SpecError
-from stonecharts.verify.result import SCHEMA_VERSION, build_finding, build_verification_result, capture_environment, sha256_digest
+from stonecharts.verify.result import (
+    SCHEMA_VERSION,
+    build_finding,
+    build_verification_result,
+    capture_environment,
+    check_schema_version,
+    sha256_digest,
+)
 
 EXIT_PASS = 0
 EXIT_DIFFERENCES = 1
@@ -123,7 +131,12 @@ def comparison_deadline() -> float:
 
 def check_comparison_deadline(deadline: float) -> None:
     if time.monotonic() > deadline:
-        raise ResourceLimitError("LIMIT.COMPARISON_TIMEOUT", "$.comparison", int(COMPARISON_TIMEOUT_SECONDS * 1000), int(COMPARISON_TIMEOUT_SECONDS * 1000) + 1)
+        raise ResourceLimitError(
+            "LIMIT.COMPARISON_TIMEOUT",
+            "$.comparison",
+            int(COMPARISON_TIMEOUT_SECONDS * 1000),
+            int(COMPARISON_TIMEOUT_SECONDS * 1000) + 1,
+        )
 
 
 def enforce_finding_limit(count: int) -> None:
@@ -164,6 +177,9 @@ def parse_checksums(path: pathlib.Path) -> dict[str, str]:
 
 def validate_manifest_shape(manifest: dict[str, Any]) -> list[str]:
     errors: list[str] = []
+    version_error = check_schema_version(manifest.get("schemaVersion"))
+    if version_error:
+        errors.append(f"manifest.schemaVersion: {version_error}")
     if manifest.get("tool") != "stonecharts_verify":
         errors.append("manifest.tool must be stonecharts_verify")
     if not isinstance(manifest.get("toolVersion"), int):
@@ -183,7 +199,9 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> list[str]:
     else:
         if not isinstance(input_info.get("file"), str):
             errors.append("manifest.input.file must name input-spec.json")
-        if not isinstance(input_info.get("sha256"), str) or not re.fullmatch(r"[0-9a-f]{64}", input_info.get("sha256", "")):
+        if not isinstance(input_info.get("sha256"), str) or not re.fullmatch(
+            r"[0-9a-f]{64}", input_info.get("sha256", "")
+        ):
             errors.append("manifest.input.sha256 must be a lowercase SHA-256 digest")
         if not isinstance(input_info.get("bytes"), int) or input_info.get("bytes", -1) < 0:
             errors.append("manifest.input.bytes must be a non-negative integer")
@@ -207,7 +225,9 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> list[str]:
                 seen.add(name)
             if not isinstance(runtime.get("output"), str) or not runtime.get("output", "").endswith(".svg"):
                 errors.append(f"{where}.output must name an SVG artifact")
-            if not isinstance(runtime.get("sha256"), str) or not re.fullmatch(r"[0-9a-f]{64}", runtime.get("sha256", "")):
+            if not isinstance(runtime.get("sha256"), str) or not re.fullmatch(
+                r"[0-9a-f]{64}", runtime.get("sha256", "")
+            ):
                 errors.append(f"{where}.sha256 must be a lowercase SHA-256 digest")
             if not isinstance(runtime.get("bytes"), int) or runtime.get("bytes", -1) < 0:
                 errors.append(f"{where}.bytes must be a non-negative integer")
@@ -271,7 +291,9 @@ def check_evidence_bundle(evidence: pathlib.Path) -> dict[str, Any]:
     status = "pass" if not missing and not checksum_errors and not manifest_errors else "fail"
     return {
         "status": status,
-        "message": "Evidence bundle is internally consistent." if status == "pass" else "Evidence bundle validation failed.",
+        "message": "Evidence bundle is internally consistent."
+        if status == "pass"
+        else "Evidence bundle validation failed.",
         "evidence": str(evidence),
         "missing": sorted(set(missing)),
         "manifestErrors": manifest_errors,
@@ -290,12 +312,22 @@ def generated_at() -> str:
     return os.environ.get(GENERATED_AT_ENV) or datetime.now(timezone.utc).isoformat()
 
 
+def _render_python_inner(spec_data: dict[str, Any], *, raw_size_hint: int | None = None) -> bytes:
+    return render_svg(ChartSpec.from_dict(spec_data, raw_size_hint=raw_size_hint)).encode("utf-8")
+
+
 def render_python(spec_data: dict[str, Any], *, raw_size_hint: int | None = None) -> tuple[bytes, dict[str, Any]]:
-    start = time.monotonic()
-    svg = render_svg(ChartSpec.from_dict(spec_data, raw_size_hint=raw_size_hint)).encode("utf-8")
-    elapsed = time.monotonic() - start
-    if elapsed > RENDER_TIMEOUT_SECONDS:
-        raise ResourceLimitError("LIMIT.RENDER_TIMEOUT", "$.render", int(RENDER_TIMEOUT_SECONDS * 1000), int(elapsed * 1000))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(_render_python_inner, spec_data, raw_size_hint=raw_size_hint)
+        try:
+            svg = future.result(timeout=RENDER_TIMEOUT_SECONDS)
+        except concurrent.futures.TimeoutError as exc:
+            raise ResourceLimitError(
+                "LIMIT.RENDER_TIMEOUT",
+                "$.render",
+                int(RENDER_TIMEOUT_SECONDS * 1000),
+                int(RENDER_TIMEOUT_SECONDS * 1000) + 1,
+            ) from exc
     metadata = {
         "runtime": "python",
         "stonechartsVersion": PY_STONECHARTS_VERSION,
@@ -358,7 +390,9 @@ def _render_go_from_source(spec_path: pathlib.Path) -> tuple[bytes, dict[str, An
                 timeout=RENDER_TIMEOUT_SECONDS,
             )
         except subprocess.TimeoutExpired as exc:
-            raise ResourceLimitError("LIMIT.RENDER_TIMEOUT", "$.render.go", int(RENDER_TIMEOUT_SECONDS * 1000), int(exc.timeout * 1000)) from exc
+            raise ResourceLimitError(
+                "LIMIT.RENDER_TIMEOUT", "$.render.go", int(RENDER_TIMEOUT_SECONDS * 1000), int(exc.timeout * 1000)
+            ) from exc
         except OSError as exc:
             raise RuntimeError(f"Go renderer adapter could not be executed: {exc}") from exc
     if proc.returncode != 0:
@@ -387,7 +421,9 @@ def render_go(
     try:
         proc = subprocess.run([str(binary), str(spec_path)], capture_output=True, timeout=RENDER_TIMEOUT_SECONDS)
     except subprocess.TimeoutExpired as exc:
-        raise ResourceLimitError("LIMIT.RENDER_TIMEOUT", "$.render.go", int(RENDER_TIMEOUT_SECONDS * 1000), int(exc.timeout * 1000)) from exc
+        raise ResourceLimitError(
+            "LIMIT.RENDER_TIMEOUT", "$.render.go", int(RENDER_TIMEOUT_SECONDS * 1000), int(exc.timeout * 1000)
+        ) from exc
     except OSError as exc:
         raise RuntimeError(f"Go renderer adapter could not be executed: {exc}") from exc
     if proc.returncode != 0:
@@ -424,7 +460,17 @@ def tag_counts(svg: bytes) -> dict[str, int]:
 
 
 _GEOMETRY_ATTRS = {"d", "cx", "cy", "r", "x", "y", "x1", "y1", "x2", "y2", "points", "transform", "width", "height"}
-_THEME_ATTRS = {"fill", "stroke", "stroke-width", "stroke-dasharray", "opacity", "class", "style", "font-size", "font-weight"}
+_THEME_ATTRS = {
+    "fill",
+    "stroke",
+    "stroke-width",
+    "stroke-dasharray",
+    "opacity",
+    "class",
+    "style",
+    "font-size",
+    "font-weight",
+}
 _ACCESSIBILITY_ATTRS = {"role", "aria-hidden", "aria-label", "aria-labelledby", "aria-describedby", "scope"}
 _INPUT_DATA_ATTRS = {"data-x", "data-y", "data-z", "data-r"}
 _FINDING_CODES = {
@@ -511,7 +557,12 @@ def classify_semantic(left: bytes, right: bytes) -> dict[str, Any]:
             elif key == "data-series-name":
                 text_hits.append(basis)
             elif key in _GEOMETRY_ATTRS:
-                if "sc-axis" in classes or "sc-gridline" in classes or "sc-axis-line" in classes or "sc-point" in classes:
+                if (
+                    "sc-axis" in classes
+                    or "sc-gridline" in classes
+                    or "sc-axis-line" in classes
+                    or "sc-point" in classes
+                ):
                     scale_hits.append(basis)
                 else:
                     geometry_hits.append(basis)
@@ -539,7 +590,12 @@ def classify_semantic(left: bytes, right: bytes) -> dict[str, Any]:
     if text_hits:
         return {"category": "label-text", "equality": "unknown", "confidence": "high", "basis": text_hits}
     if accessibility_hits:
-        return {"category": "accessibility-metadata", "equality": "semantic", "confidence": "high", "basis": accessibility_hits}
+        return {
+            "category": "accessibility-metadata",
+            "equality": "semantic",
+            "confidence": "high",
+            "basis": accessibility_hits,
+        }
     if theme_hits:
         return {"category": "theme-style", "equality": "semantic", "confidence": "high", "basis": theme_hits}
     if other_hits:
@@ -716,6 +772,9 @@ def load_baseline(baseline_dir: pathlib.Path) -> dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(manifest, dict):
         raise ValueError("baseline manifest must be a JSON object")
+    version_error = check_schema_version(manifest.get("schemaVersion"))
+    if version_error:
+        raise ValueError(f"baseline evidence: {version_error}")
     return manifest
 
 
@@ -862,8 +921,12 @@ def compare_evidence_bundles(left_evidence: pathlib.Path, right_evidence: pathli
     left_manifest = load_manifest(left_evidence)
     right_manifest = load_manifest(right_evidence)
 
-    left_outputs = {item["runtime"]: (left_evidence / item["output"]).read_bytes() for item in left_manifest.get("runtimes", [])}
-    right_outputs = {item["runtime"]: (right_evidence / item["output"]).read_bytes() for item in right_manifest.get("runtimes", [])}
+    left_outputs = {
+        item["runtime"]: (left_evidence / item["output"]).read_bytes() for item in left_manifest.get("runtimes", [])
+    }
+    right_outputs = {
+        item["runtime"]: (right_evidence / item["output"]).read_bytes() for item in right_manifest.get("runtimes", [])
+    }
 
     # A runtime present on only one side is a real mismatch, not something to skip:
     # comparing the intersection alone would let bundles covering different runtimes
@@ -1015,7 +1078,7 @@ def apply_demo_drift(svg: bytes, mode: str) -> bytes:
     if mode == "none":
         return svg
     if mode == "text":
-        return svg.replace(b"</svg>", b"<text x=\"8\" y=\"16\">demo drift</text></svg>", 1)
+        return svg.replace(b"</svg>", b'<text x="8" y="16">demo drift</text></svg>', 1)
     if mode == "attribute":
         return svg.replace(b'role="img"', b'role="figure"', 1)
     raise ValueError(f"unsupported demo drift mode: {mode}")
@@ -1101,15 +1164,15 @@ def write_report(path: pathlib.Path, manifest: dict[str, Any], comparison: dict[
 </head>
 <body>
   <h1>StoneVerify Report: {status}</h1>
-  <p>{html.escape(comparison['message'])}</p>
-  <p>Demo drift: <code>{html.escape(manifest.get('demoDrift', 'none'))}</code></p>
-  <p>Spec hash: <code>{html.escape(manifest['input']['sha256'])}</code></p>
+  <p>{html.escape(comparison["message"])}</p>
+  <p>Demo drift: <code>{html.escape(manifest.get("demoDrift", "none"))}</code></p>
+  <p>Spec hash: <code>{html.escape(manifest["input"]["sha256"])}</code></p>
   <table>
     <thead><tr><th>Runtime</th><th>Output</th><th>SHA-256</th><th>Bytes</th></tr></thead>
-    <tbody>{''.join(rows)}</tbody>
+    <tbody>{"".join(rows)}</tbody>
   </table>
   {baseline_block}
-  {''.join(diff_blocks)}
+  {"".join(diff_blocks)}
 </body>
 </html>
 """
@@ -1245,7 +1308,9 @@ def write_junit_report(path: pathlib.Path, manifest: dict[str, Any] | None, comp
             },
         )
         if not case["passed"]:
-            failure = ET.SubElement(testcase, "failure", {"message": str(case["message"]), "type": "StoneVerifyFailure"})
+            failure = ET.SubElement(
+                testcase, "failure", {"message": str(case["message"]), "type": "StoneVerifyFailure"}
+            )
             failure.text = _junit_failure_text(case["findings"], str(case["message"]))
     path.parent.mkdir(parents=True, exist_ok=True)
     ET.ElementTree(suite).write(path, encoding="utf-8", xml_declaration=True)
@@ -1291,7 +1356,9 @@ def emit_github_actions_output(
     else:
         print("::notice title=StoneVerify::Verification passed", file=output)
 
-    summary = summary_path or (pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]) if os.environ.get("GITHUB_STEP_SUMMARY") else None)
+    summary = summary_path or (
+        pathlib.Path(os.environ["GITHUB_STEP_SUMMARY"]) if os.environ.get("GITHUB_STEP_SUMMARY") else None
+    )
     if summary:
         summary.parent.mkdir(parents=True, exist_ok=True)
         lines = [
@@ -1383,17 +1450,17 @@ def write_compare_report(path: pathlib.Path, comparison: dict[str, Any]) -> None
 </head>
 <body>
   <h1>StoneVerify Compare: {status}</h1>
-  <p>{html.escape(comparison['message'])}</p>
-  <p>Left bundle: <code>{html.escape(comparison['left']['evidence'])}</code></p>
-  <p>Right bundle: <code>{html.escape(comparison['right']['evidence'])}</code></p>
-  <p>Input spec match: <strong>{'PASS' if input_info.get('equal') else 'FAIL'}</strong></p>
+  <p>{html.escape(comparison["message"])}</p>
+  <p>Left bundle: <code>{html.escape(comparison["left"]["evidence"])}</code></p>
+  <p>Right bundle: <code>{html.escape(comparison["right"]["evidence"])}</code></p>
+  <p>Input spec match: <strong>{"PASS" if input_info.get("equal") else "FAIL"}</strong></p>
   {coverage_note}
   <table>
     <thead><tr><th>Runtime</th><th>Status</th><th>Left SHA-256</th>
     <th>Right SHA-256</th><th>Reason</th></tr></thead>
-    <tbody>{''.join(rows)}</tbody>
+    <tbody>{"".join(rows)}</tbody>
   </table>
-  {''.join(detail_blocks)}
+  {"".join(detail_blocks)}
 </body>
 </html>
 """
@@ -1463,6 +1530,12 @@ def main() -> int:
         action="store_true",
         help="Development fallback for --runtime go: run the Go adapter from this source checkout with go run.",
     )
+    parser.add_argument(
+        "--output-format",
+        choices=["human", "json"],
+        default="human",
+        help="Output format. 'json' emits a single JSON object to stdout instead of human-readable text.",
+    )
     args = parser.parse_args()
 
     if args.compare_report and not args.compare_evidence:
@@ -1476,14 +1549,18 @@ def main() -> int:
         except ResourceLimitError as exc:
             print(f"StoneVerify RESOURCE_LIMIT: {exc}", file=sys.stderr)
             return EXIT_RESOURCE_LIMIT
-        print(f"StoneVerify evidence {result['status'].upper()}: {result['message']}")
-        print(f"evidence: {result['evidence']}")
-        if result["missing"]:
-            print("missing: " + ", ".join(result["missing"]))
-        if result["manifestErrors"]:
-            print("manifest errors: " + "; ".join(result["manifestErrors"]))
-        if result["checksumErrors"]:
-            print("checksum errors: " + "; ".join(result["checksumErrors"]))
+        exit_code = 0 if result["status"] == "pass" else 1
+        if args.output_format == "json":
+            print(json.dumps({"status": result["status"], "message": result["message"], "exitCode": exit_code}))
+        else:
+            print(f"StoneVerify evidence {result['status'].upper()}: {result['message']}")
+            print(f"evidence: {result['evidence']}")
+            if result["missing"]:
+                print("missing: " + ", ".join(result["missing"]))
+            if result["manifestErrors"]:
+                print("manifest errors: " + "; ".join(result["manifestErrors"]))
+            if result["checksumErrors"]:
+                print("checksum errors: " + "; ".join(result["checksumErrors"]))
         comparison = {
             "schemaVersion": SCHEMA_VERSION,
             "status": result["status"],
@@ -1493,9 +1570,10 @@ def main() -> int:
             report_path = args.junit_report.resolve()
             write_junit_report(report_path, None, comparison)
             validate_junit_report(report_path)
-            print(f"junit: {report_path}")
+            if args.output_format != "json":
+                print(f"junit: {report_path}")
         emit_github_actions_output(None, comparison)
-        return 0 if result["status"] == "pass" else 1
+        return exit_code
 
     if args.compare_evidence:
         left_path, right_path = (path.resolve() for path in args.compare_evidence)
@@ -1504,25 +1582,31 @@ def main() -> int:
         except ResourceLimitError as exc:
             print(f"StoneVerify RESOURCE_LIMIT: {exc}", file=sys.stderr)
             return EXIT_RESOURCE_LIMIT
-        print(f"StoneVerify compare {result['status'].upper()}: {result['message']}")
-        print(f"left: {result['left']['evidence']}")
-        print(f"right: {result['right']['evidence']}")
-        print(f"input spec: {'match' if result['input']['equal'] else 'differs'}")
-        for runtime in result["runtimes"]:
-            state = "PASS" if runtime["equal"] else "FAIL"
-            print(f"  {runtime['runtime']}: {state} - {runtime['reason']}")
+        exit_code = 0 if result["status"] == "pass" else 1
+        if args.output_format == "json":
+            print(json.dumps({"status": result["status"], "message": result["message"], "exitCode": exit_code}))
+        else:
+            print(f"StoneVerify compare {result['status'].upper()}: {result['message']}")
+            print(f"left: {result['left']['evidence']}")
+            print(f"right: {result['right']['evidence']}")
+            print(f"input spec: {'match' if result['input']['equal'] else 'differs'}")
+            for runtime in result["runtimes"]:
+                state = "PASS" if runtime["equal"] else "FAIL"
+                print(f"  {runtime['runtime']}: {state} - {runtime['reason']}")
         if args.compare_report:
             report_path = args.compare_report.resolve()
             report_path.parent.mkdir(parents=True, exist_ok=True)
             write_compare_report(report_path, result)
-            print(f"report: {report_path}")
+            if args.output_format != "json":
+                print(f"report: {report_path}")
         if args.junit_report:
             junit_path = args.junit_report.resolve()
             write_junit_report(junit_path, None, result)
             validate_junit_report(junit_path)
-            print(f"junit: {junit_path}")
+            if args.output_format != "json":
+                print(f"junit: {junit_path}")
         emit_github_actions_output(None, result)
-        return 0 if result["status"] == "pass" else 1
+        return exit_code
 
     if args.spec is None:
         parser.error("spec is required unless --check-evidence or --compare-evidence is used")
@@ -1637,16 +1721,18 @@ def main() -> int:
             manifest["status"] = comparison["status"]
             manifest["baseline"] = baseline
 
-            (staging / "comparison.json").write_text(json.dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            (staging / "comparison.json").write_text(
+                json.dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+            )
             write_report(staging / "report.html", manifest, comparison)
 
             manifest["evidence"] = {
                 "inputSpec": sha256_digest(manifest["input"]["sha256"]),
-                "artifacts": {
-                    runtime["output"]: sha256_digest(runtime["sha256"]) for runtime in runtime_metadata
-                },
+                "artifacts": {runtime["output"]: sha256_digest(runtime["sha256"]) for runtime in runtime_metadata},
             }
-            (staging / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            (staging / "manifest.json").write_text(
+                json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+            )
 
             checksum_paths = ["manifest.json", "input-spec.json", "comparison.json", "report.html"]
             checksum_paths.extend(runtime["output"] for runtime in runtime_metadata)
@@ -1662,13 +1748,32 @@ def main() -> int:
         junit_path = args.junit_report.resolve()
         write_junit_report(junit_path, manifest, comparison)
         validate_junit_report(junit_path)
-    print(f"StoneVerify {comparison['status'].upper()}: {comparison['message']}")
-    print(f"evidence: {evidence}")
-    if args.junit_report:
-        print(f"junit: {args.junit_report.resolve()}")
+    exit_code = EXIT_PASS if comparison["status"] == "pass" else EXIT_DIFFERENCES
+    if args.output_format == "json":
+        print(
+            json.dumps(
+                {
+                    "status": comparison["status"],
+                    "message": comparison["message"],
+                    "exitCode": exit_code,
+                    "evidence": str(evidence),
+                }
+            )
+        )
+    else:
+        print(f"StoneVerify {comparison['status'].upper()}: {comparison['message']}")
+        print(f"evidence: {evidence}")
+        if args.junit_report:
+            print(f"junit: {args.junit_report.resolve()}")
     emit_github_actions_output(manifest, comparison)
-    return EXIT_PASS if comparison["status"] == "pass" else EXIT_DIFFERENCES
+    return exit_code
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except Exception as exc:
+        print(f"StoneVerify INTERNAL: {exc}", file=sys.stderr)
+        raise SystemExit(EXIT_INTERNAL) from exc

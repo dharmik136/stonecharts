@@ -3,11 +3,11 @@
 Shared Cartesian chrome comes from _cartesian.py. This module draws only column
 marks: one <rect> per category/series segment.
 """
+
 from __future__ import annotations
 
 from ..util import esc, fmt_num
 from ._cartesian import CartesianFrame, render_cartesian
-
 
 PAD = 0.2
 

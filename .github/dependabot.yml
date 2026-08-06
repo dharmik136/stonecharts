@@ -8,3 +8,30 @@ updates:
     labels:
       - area:release
       - type:work
+
+  - package-ecosystem: pip
+    directory: /libs/python
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    labels:
+      - area:release
+      - type:work
+
+  - package-ecosystem: gomod
+    directory: /libs/go
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    labels:
+      - area:release
+      - type:work
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    labels:
+      - area:release
+      - type:work

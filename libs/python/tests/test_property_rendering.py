@@ -32,19 +32,14 @@ def _specs():
                 "type": chart_type,
                 "title": f"{chart_type} property {case}",
                 "xAxis": {"categories": [f"C{i}" for i in range(points)]},
-                "series": [
-                    {"name": f"S{s}", "data": _series_data(rng, points)}
-                    for s in range(series_count)
-                ],
+                "series": [{"name": f"S{s}", "data": _series_data(rng, points)} for s in range(series_count)],
             }
     for chart_type, has_z in (("scatter", False), ("bubble", True)):
         for case in range(8):
             yield {
                 "type": chart_type,
                 "title": f"{chart_type} property {case}",
-                "series": [
-                    {"name": "S0", "data": _point_data(rng, rng.randint(1, 12), z=has_z)}
-                ],
+                "series": [{"name": "S0", "data": _point_data(rng, rng.randint(1, 12), z=has_z)}],
             }
 
 

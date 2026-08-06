@@ -15,8 +15,7 @@ try:
     from jsonschema import Draft202012Validator, FormatChecker
 except ImportError as exc:  # pragma: no cover - bootstrap path
     print(
-        "missing release evidence dependency: "
-        f"{exc.name}; install with `python -m pip install -e \"libs/python[dev]\"`",
+        f'missing release evidence dependency: {exc.name}; install with `python -m pip install -e "libs/python[dev]"`',
         file=sys.stderr,
     )
     raise SystemExit(2) from exc
@@ -100,11 +99,7 @@ def validate_artifact(path: Path, expected_sha: str | None = None) -> None:
 
 
 def validate_manifest(manifest_path: Path, manifest: dict[str, Any]) -> None:
-    implemented = {
-        item["id"]
-        for item in load_yaml(EVIDENCE_REGISTRY)["evidence"]
-        if item["status"] == "implemented"
-    }
+    implemented = {item["id"] for item in load_yaml(EVIDENCE_REGISTRY)["evidence"] if item["status"] == "implemented"}
 
     evidence_ids: set[str] = set()
     for entry in manifest["evidence"]:

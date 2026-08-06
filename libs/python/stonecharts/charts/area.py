@@ -3,9 +3,8 @@
 Shared cartesian chrome comes from _cartesian.py. This module draws the area
 fill, the top-edge line, and markers for each series.
 """
-from __future__ import annotations
 
-from typing import List
+from __future__ import annotations
 
 from ..spec import Marker
 from ..util import esc, fmt_num
@@ -37,7 +36,7 @@ def _series_fill(st) -> str:
     return st.solid
 
 
-def _area_marks(fr: CartesianFrame, p: List[str]) -> None:
+def _area_marks(fr: CartesianFrame, p: list[str]) -> None:
     if fr.n <= 0:
         return
 
@@ -53,7 +52,7 @@ def _area_marks(fr: CartesianFrame, p: List[str]) -> None:
     theme = fr.theme
     for si, s in enumerate(fr.spec.series):
         st = fr.styles[si]
-        raw_vals = [float(v) for v in s.data[:fr.n]]
+        raw_vals = [float(v) for v in s.data[: fr.n]]
         top_pts = []
         p.append(f'<g class="sc-series" data-series="{si}">')
 
@@ -65,9 +64,9 @@ def _area_marks(fr: CartesianFrame, p: List[str]) -> None:
                     vals.append(0.0 if total == 0.0 else raw / total * 100.0)
                 else:
                     vals.append(raw)
-            bottom_vals = running[:len(vals)]
+            bottom_vals = running[: len(vals)]
             top_vals = [bottom_vals[i] + vals[i] for i in range(len(vals))]
-            running[:len(vals)] = top_vals
+            running[: len(vals)] = top_vals
             top_pts = [(fr.xpix(i), fr.ypix(top_vals[i])) for i in range(len(vals))]
             bottom_pts = [(fr.xpix(i), fr.ypix(bottom_vals[i])) for i in range(len(vals))]
             if top_pts:
