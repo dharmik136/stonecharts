@@ -1,5 +1,5 @@
 id: SC-REQ-REGISTRY
-version: 3
+version: 4
 updated: "2026-08-06"
 requirements:
   - id: REQ-PROD-001
@@ -8,7 +8,7 @@ requirements:
     rationale: A shared specification is the product boundary that makes cross-language behavior testable and portable.
     kind: functional
     priority: must
-    status: implemented
+    status: verified
     owner: product-owner
     target: 0.0.0.1
     source: SC-PROD-001
@@ -26,7 +26,7 @@ requirements:
     rationale: Passing validation for an unrenderable chart breaks the public contract and creates runtime failures.
     kind: constraint
     priority: must
-    status: implemented
+    status: verified
     owner: product-owner
     target: 0.0.0.1
     source: SC-PROD-002
@@ -44,7 +44,7 @@ requirements:
     rationale: Byte identity is the internal oracle for detecting cross-language serialization and geometry drift.
     kind: quality
     priority: must
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-001
@@ -63,7 +63,7 @@ requirements:
     rationale: Identical rendering is irrelevant when language entry points disagree about which input is legal.
     kind: quality
     priority: must
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-002
@@ -82,7 +82,7 @@ requirements:
     rationale: Capability negotiation is distinct from schema validity and must be safe across renderer versions.
     kind: functional
     priority: must
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-002
@@ -101,7 +101,7 @@ requirements:
     rationale: A shared accumulator produces invalid geometry when signs differ within a category.
     kind: functional
     priority: must
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.1
     source: SC-ARCH-ADR-0003
@@ -120,7 +120,7 @@ requirements:
     rationale: Net-sum and absolute-sum conventions assign different meanings to signed data; 0.0.0.1 must not choose silently.
     kind: constraint
     priority: must
-    status: implemented
+    status: verified
     owner: product-owner
     target: 0.0.0.1
     source: SC-ARCH-ADR-0003
@@ -139,7 +139,7 @@ requirements:
     rationale: Host text measurement is not stable enough for the canonical byte profile, while fixed margins can clip real data.
     kind: functional
     priority: must
-    status: implemented
+    status: verified
     owner: product-owner
     target: 0.0.0.1
     source: SC-ARCH-ADR-0005
@@ -159,7 +159,7 @@ requirements:
     rationale: Browser presentation must adapt without changing the meaning or observable state of an interaction.
     kind: functional
     priority: must
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.1
     source: SC-CON-004
@@ -179,7 +179,7 @@ requirements:
     rationale: SVG text and visual marks alone do not expose sufficient chart meaning or operation to assistive technology.
     kind: quality
     priority: must
-    status: implemented
+    status: verified
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-007
@@ -199,7 +199,7 @@ requirements:
     rationale: Identical SVG bytes do not guarantee identical rasterized pixels across fonts, browsers, operating systems, and converters.
     kind: quality
     priority: must
-    status: implemented
+    status: verified
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-006
@@ -218,7 +218,7 @@ requirements:
     rationale: Personalization is central to the product, but unbounded injection defeats portability, security, and parity.
     kind: constraint
     priority: must
-    status: implemented
+    status: verified
     owner: product-owner
     target: 0.0.0.1
     source: SC-CON-005
@@ -237,7 +237,7 @@ requirements:
     rationale: Self-contained HTML and SVG place user-controlled values near executable and styling contexts.
     kind: security
     priority: must
-    status: implemented
+    status: verified
     owner: security-contact
     target: 0.0.0.1
     source: SC-SEC-001
@@ -256,7 +256,7 @@ requirements:
     rationale: Claims must be auditable against the exact artifacts delivered to users.
     kind: delivery
     priority: must
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.1
     source: SC-REL-001
@@ -275,7 +275,7 @@ requirements:
     rationale: Uncontrolled benchmark numbers are not comparable and create misleading promises.
     kind: quality
     priority: should
-    status: implemented
+    status: verified
     owner: maintainer
     target: 0.0.0.1
     source: SC-QUAL-002
