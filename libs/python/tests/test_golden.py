@@ -443,6 +443,44 @@ def test_theme_json_parity():
             assert getattr(t, attr) == j[jk], f"{name}.{jk}"
 
 
+def test_golden_coverage_completeness():
+    """Every golden SVG must have a matching example JSON, and vice versa."""
+    for chart_dir in ACTIVE_VALIDATION_CASES:
+        golden_dir = ROOT / "charts" / chart_dir / "golden"
+        example_dir = ROOT / "charts" / chart_dir / "examples"
+        golden_names = {p.stem for p in golden_dir.glob("*.svg")}
+        example_names = {p.stem for p in example_dir.glob("*.json")}
+        assert golden_names == example_names, (
+            f"{chart_dir}: golden/example mismatch — "
+            f"golden-only: {golden_names - example_names}, "
+            f"example-only: {example_names - golden_names}"
+        )
+
+
+def test_schema_type_enum_matches_capabilities():
+    """The JSON schema type enum must list exactly the capabilities chartTypes."""
+    schema_types = set(SCHEMA["properties"]["type"]["enum"])
+    cap_types = set(capabilities()["chartTypes"])
+    assert schema_types == cap_types, f"schema={schema_types}, capabilities={cap_types}"
+
+
+def test_active_validation_cases_cover_all_chart_types():
+    """ACTIVE_VALIDATION_CASES must cover every capability-listed chart type."""
+    dir_to_type = {"line-basic": "line"}
+    tested_types = {dir_to_type.get(d, d) for d in ACTIVE_VALIDATION_CASES}
+    cap_types = set(capabilities()["chartTypes"])
+    assert tested_types == cap_types, f"tested={tested_types}, capabilities={cap_types}"
+
+
+def test_invalid_fixtures_minimum_coverage():
+    """Every certified chart type must have at least 3 invalid fixture cases."""
+    for chart_dir in ACTIVE_VALIDATION_CASES:
+        path = ROOT / "charts" / chart_dir / "invalid-fixtures.json"
+        assert path.is_file(), f"{chart_dir} missing invalid-fixtures.json"
+        cases = json.loads(path.read_text(encoding="utf-8"))
+        assert len(cases) >= 3, f"{chart_dir} has only {len(cases)} invalid fixtures (minimum 3)"
+
+
 # Edge-case vectors from the Phase-3 QA report: flat data, extrema, single/dual
 # points, steep jumps, negatives, mixed extrema. The spline must stay finite.
 SPLINE_EDGE_CASES = [

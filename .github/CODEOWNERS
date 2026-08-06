@@ -7,3 +7,8 @@
 /docs/contracts/ @dharmik136
 /docs/releases/ @dharmik136
 /runtime/ @dharmik136
+
+# CI and supply-chain configuration require maintainer review.
+/.github/ @dharmik136
+/.pre-commit-config.yaml @dharmik136
+/ruff.toml @dharmik136
