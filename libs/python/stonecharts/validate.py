@@ -13,14 +13,14 @@ Policy (see docs/customization/plan.md):
 `validate(spec_dict)` returns a list of error strings (empty = valid). Errors are
 emitted in a deterministic order so both languages produce identical output.
 """
+
 from __future__ import annotations
 
 import math
 import re
-from typing import Any, List
+from typing import Any
 
 from .util import fmt_num
-
 
 _HEX_COLOR_RE = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
 _THEME_NAMES = {"light", "dark"}
@@ -34,7 +34,7 @@ _PATTERN_TYPES = {"hatch"}
 class SpecError(ValueError):
     """Raised when a chart spec fails validation. `.errors` lists every problem."""
 
-    def __init__(self, errors: List[str]):
+    def __init__(self, errors: list[str]):
         self.errors = list(errors)
         super().__init__("invalid chart spec:\n  " + "\n  ".join(self.errors))
 
@@ -55,15 +55,14 @@ def _jtype(v: Any) -> str:
     return "unknown"
 
 
-def _num(v: Any, path: str, errs: List[str]) -> None:
+def _num(v: Any, path: str, errs: list[str]) -> None:
     if isinstance(v, bool) or not isinstance(v, (int, float)):
         errs.append(f"{path}: expected number, received {_jtype(v)}")
     elif isinstance(v, float) and not math.isfinite(v):
-        errs.append(f"{path}: expected finite number, received "
-                    + ("NaN" if math.isnan(v) else "Infinity"))
+        errs.append(f"{path}: expected finite number, received " + ("NaN" if math.isnan(v) else "Infinity"))
 
 
-def _nonneg_num(v: Any, path: str, errs: List[str]) -> None:
+def _nonneg_num(v: Any, path: str, errs: list[str]) -> None:
     if isinstance(v, bool) or not isinstance(v, (int, float)):
         return
     if isinstance(v, float) and not math.isfinite(v):
@@ -72,27 +71,29 @@ def _nonneg_num(v: Any, path: str, errs: List[str]) -> None:
         errs.append(f"{path}: expected non-negative number, received {fmt_num(float(v))}")
 
 
-def _intnum(v: Any, path: str, errs: List[str]) -> None:
+def _intnum(v: Any, path: str, errs: list[str]) -> None:
     # width/height map to Go int; require an integer-VALUED number (5 and 5.0 ok,
     # 5.7 rejected) so both languages agree. Go's interface{} can't tell 5 from 5.0.
     if isinstance(v, bool) or not isinstance(v, (int, float)):
         errs.append(f"{path}: expected integer, received {_jtype(v)}")
     elif isinstance(v, float) and (not math.isfinite(v) or not v.is_integer()):
-        errs.append(f"{path}: expected integer, received "
-                    + ("non-finite number" if not math.isfinite(v) else "non-integer number"))
+        errs.append(
+            f"{path}: expected integer, received "
+            + ("non-finite number" if not math.isfinite(v) else "non-integer number")
+        )
 
 
-def _str(v: Any, path: str, errs: List[str]) -> None:
+def _str(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, str):
         errs.append(f"{path}: expected string, received {_jtype(v)}")
 
 
-def _bool(v: Any, path: str, errs: List[str]) -> None:
+def _bool(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, bool):
         errs.append(f"{path}: expected boolean, received {_jtype(v)}")
 
 
-def _str_array(v: Any, path: str, errs: List[str]) -> None:
+def _str_array(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, list):
         errs.append(f"{path}: expected array, received {_jtype(v)}")
         return
@@ -100,7 +101,7 @@ def _str_array(v: Any, path: str, errs: List[str]) -> None:
         _str(e, f"{path}[{i}]", errs)
 
 
-def _gridline(v: Any, path: str, errs: List[str]) -> None:
+def _gridline(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
@@ -112,7 +113,7 @@ def _gridline(v: Any, path: str, errs: List[str]) -> None:
         _str(v["dashStyle"], f"{path}.dashStyle", errs)
 
 
-def _axis(v: Any, path: str, errs: List[str]) -> None:
+def _axis(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
@@ -136,7 +137,7 @@ def _axis(v: Any, path: str, errs: List[str]) -> None:
                 _num(e, f"{path}.binEdges[{i}]", errs)
 
 
-def _margin(v: Any, path: str, errs: List[str]) -> None:
+def _margin(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
@@ -147,18 +148,19 @@ def _margin(v: Any, path: str, errs: List[str]) -> None:
                 errs.append(f"{path}.{k}: expected non-negative number, received {fmt_num(float(v[k]))}")
 
 
-def _layout(v: Any, path: str, errs: List[str]) -> None:
+def _layout(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
     if "margin" in v:
         _margin(v["margin"], f"{path}.margin", errs)
 
+
 def _num_or_default(v: Any, default: float) -> float:
     return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else default
 
 
-def _marker(v: Any, path: str, errs: List[str]) -> None:
+def _marker(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
@@ -170,7 +172,7 @@ def _marker(v: Any, path: str, errs: List[str]) -> None:
         _num(v["radius"], f"{path}.radius", errs)
 
 
-def _pattern(v: Any, path: str, errs: List[str]) -> None:
+def _pattern(v: Any, path: str, errs: list[str]) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
@@ -188,7 +190,7 @@ def _pattern(v: Any, path: str, errs: List[str]) -> None:
         errs.append(f'{path}.background: expected hex color, received "{v["background"]}"')
 
 
-def _gradient(v: dict, path: str, errs: List[str]) -> None:
+def _gradient(v: dict, path: str, errs: list[str]) -> None:
     for k in ("x1", "y1", "x2", "y2"):
         if k in v:
             _num(v[k], f"{path}.{k}", errs)
@@ -214,7 +216,7 @@ def _gradient(v: dict, path: str, errs: List[str]) -> None:
                     errs.append(f'{sp}.color: expected hex color, received "{st["color"]}"')
 
 
-def _color(v: Any, path: str, errs: List[str]) -> None:
+def _color(v: Any, path: str, errs: list[str]) -> None:
     # oneOf: hex string OR a linear-gradient object.
     if isinstance(v, str):
         if not _HEX_COLOR_RE.fullmatch(v):
@@ -226,7 +228,7 @@ def _color(v: Any, path: str, errs: List[str]) -> None:
     errs.append(f"{path}: expected string or gradient object, received {_jtype(v)}")
 
 
-def _theme(v: Any, path: str, errs: List[str]) -> None:
+def _theme(v: Any, path: str, errs: list[str]) -> None:
     # oneOf: theme name (string) OR a theme object.
     if isinstance(v, str):
         if v not in _THEME_NAMES:
@@ -239,9 +241,17 @@ def _theme(v: Any, path: str, errs: List[str]) -> None:
         _str(v["name"], f"{path}.name", errs)
     if "background" in v and v["background"] is not None:  # background is nullable
         _str(v["background"], f"{path}.background", errs)
-    for k in ("titleColor", "subtitleColor", "axisLabelColor", "axisTitleColor",
-              "gridColor", "axisLineColor", "crosshairColor", "markerHalo",
-              "legendTextColor"):
+    for k in (
+        "titleColor",
+        "subtitleColor",
+        "axisLabelColor",
+        "axisTitleColor",
+        "gridColor",
+        "axisLineColor",
+        "crosshairColor",
+        "markerHalo",
+        "legendTextColor",
+    ):
         if k in v:
             _str(v[k], f"{path}.{k}", errs)
             if isinstance(v[k], str) and not _HEX_COLOR_RE.fullmatch(v[k]):
@@ -254,7 +264,7 @@ def _theme(v: Any, path: str, errs: List[str]) -> None:
                     errs.append(f'{path}.palette[{i}]: expected hex color, received "{c}"')
 
 
-def _datum(v: Any, path: str, errs: List[str]) -> None:
+def _datum(v: Any, path: str, errs: list[str]) -> None:
     """Point-model element (scatter only, §3.3 Rank 3): number | [x,y] | {x,y}."""
     if isinstance(v, bool):
         errs.append(f"{path}: expected number, [x,y], or {{x,y}}, received boolean")
@@ -282,7 +292,7 @@ def _datum(v: Any, path: str, errs: List[str]) -> None:
         errs.append(f"{path}: expected number, [x,y], or {{x,y}}, received {_jtype(v)}")
 
 
-def _datum_xyz(v: Any, path: str, errs: List[str]) -> None:
+def _datum_xyz(v: Any, path: str, errs: list[str]) -> None:
     """Point-model element (bubble only, §3.3 Rank 4): number | [x,y,z] | {x,y,z}."""
     if isinstance(v, bool):
         errs.append(f"{path}: expected number, [x,y,z], or {{x,y,z}}, received boolean")
@@ -308,7 +318,7 @@ def _datum_xyz(v: Any, path: str, errs: List[str]) -> None:
         errs.append(f"{path}: expected number, [x,y,z], or {{x,y,z}}, received {_jtype(v)}")
 
 
-def _series(v: Any, path: str, errs: List[str], chart_type: Any = None) -> None:
+def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
         return
@@ -348,9 +358,15 @@ def _series(v: Any, path: str, errs: List[str], chart_type: Any = None) -> None:
         errs.append(f'{path}.step: expected one of "before", "after", "center", received "{v["step"]}"')
     if isinstance(v.get("curve"), str) and v["curve"] not in _CURVE_TYPES:
         errs.append(f'{path}.curve: expected one of "linear", "monotone", received "{v["curve"]}"')
-    if "marker" in v and isinstance(v["marker"], dict):
-        if isinstance(v["marker"].get("symbol"), str) and v["marker"]["symbol"] not in _MARKER_SYMBOLS:
-            errs.append(f'{path}.marker.symbol: expected one of "circle", "square", "triangle", "diamond", received "{v["marker"]["symbol"]}"')
+    if (
+        "marker" in v
+        and isinstance(v["marker"], dict)
+        and isinstance(v["marker"].get("symbol"), str)
+        and v["marker"]["symbol"] not in _MARKER_SYMBOLS
+    ):
+        errs.append(
+            f'{path}.marker.symbol: expected one of "circle", "square", "triangle", "diamond", received "{v["marker"]["symbol"]}"'
+        )
     if "marker" in v:
         _marker(v["marker"], f"{path}.marker", errs)
 
@@ -368,17 +384,16 @@ _KNOWN_TYPES = {
 }
 
 
-def validate(d: Any) -> List[str]:
+def validate(d: Any) -> list[str]:
     """Return a list of validation errors ([] = valid)."""
-    errs: List[str] = []
+    errs: list[str] = []
     if not isinstance(d, dict):
         return [f"$: expected object, received {_jtype(d)}"]
     for k in ("type", "id", "title", "subtitle"):
         if k in d:
             _str(d[k], f"$.{k}", errs)
-    if "type" in d:
-        if isinstance(d["type"], str) and d["type"] not in _KNOWN_TYPES:
-            errs.append(f'$.type: unknown chart type "{d["type"]}"')
+    if "type" in d and isinstance(d["type"], str) and d["type"] not in _KNOWN_TYPES:
+        errs.append(f'$.type: unknown chart type "{d["type"]}"')
     for k in ("width", "height"):
         if k in d:
             _intnum(d[k], f"$.{k}", errs)
@@ -425,7 +440,9 @@ def validate(d: Any) -> List[str]:
             left = _num_or_default(m.get("left"), 62 if ya.get("title") else 52)
             right = _num_or_default(m.get("right"), 22)
             top = _num_or_default(m.get("top"), 20 + (26 if d.get("title") else 0) + (18 if d.get("subtitle") else 0))
-            bottom = _num_or_default(m.get("bottom"), 46 + (18 if d.get("legend", True) else 0) + (18 if xa.get("title") else 0))
+            bottom = _num_or_default(
+                m.get("bottom"), 46 + (18 if d.get("legend", True) else 0) + (18 if xa.get("title") else 0)
+            )
             plot_w = float(d["width"]) - left - right
             plot_h = float(d["height"]) - top - bottom
             if plot_w <= 0:

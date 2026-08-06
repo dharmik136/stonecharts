@@ -6,6 +6,7 @@ cartesian frame with x_scale="linear" and include_zero=False on both axes;
 this module supplies only the marks callback, reusing line's marker builder
 (circle/square/triangle/diamond) exactly as area.py already does.
 """
+
 from __future__ import annotations
 
 from ..spec import Marker

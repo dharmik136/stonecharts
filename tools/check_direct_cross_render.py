@@ -3,19 +3,16 @@
 from __future__ import annotations
 
 import json
-import os
 import pathlib
 import subprocess
 import sys
 import tempfile
 
-
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from stonecharts import ChartSpec  # noqa: E402
-from stonecharts.render import render_svg  # noqa: E402
-
+from stonecharts import ChartSpec
+from stonecharts.render import render_svg
 
 ACTIVE = {
     "line-basic": [

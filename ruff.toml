@@ -1,0 +1,20 @@
+target-version = "py39"
+line-length = 120
+
+[lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "S", "RUF"]
+ignore = [
+  "S101",
+  "S311",
+  "S314",
+  "S603",
+  "S607",
+  "BLE001",
+  "E501",
+  "SIM115",
+  "TRY004",
+]
+
+[lint.per-file-ignores]
+"libs/python/tests/*" = ["S101"]
+"tools/*" = ["S603", "S607", "E402", "F403"]

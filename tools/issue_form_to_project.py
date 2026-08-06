@@ -8,8 +8,6 @@ import json
 import re
 import sys
 from dataclasses import dataclass
-from typing import Dict, List, Optional
-
 
 SECTION_RE = re.compile(r"^##\s+(?P<title>.+?)\s*$")
 
@@ -40,12 +38,12 @@ TARGETS = ["0.0.0.1", "Post-0.0.0.1", "Unscheduled"]
 
 @dataclass
 class FormData:
-    sections: Dict[str, str]
+    sections: dict[str, str]
 
 
 def parse_sections(text: str) -> FormData:
-    sections: Dict[str, List[str]] = {}
-    current: Optional[str] = None
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
 
     for raw_line in text.splitlines():
         match = SECTION_RE.match(raw_line.strip())
@@ -60,19 +58,19 @@ def parse_sections(text: str) -> FormData:
     return FormData(sections=joined)
 
 
-def first_nonempty(*values: Optional[str]) -> str:
+def first_nonempty(*values: str | None) -> str:
     for value in values:
         if value and value.strip():
             return value.strip()
     return ""
 
 
-def normalize_choice(value: str, allowed: List[str]) -> str:
+def normalize_choice(value: str, allowed: list[str]) -> str:
     value = value.strip()
     return value if value in allowed else ""
 
 
-def map_project_fields(role: str, form: FormData) -> Dict[str, str]:
+def map_project_fields(role: str, form: FormData) -> dict[str, str]:
     sections = form.sections
     workstream = normalize_choice(first_nonempty(sections.get("Workstream")), WORKSTREAMS)
     stage = normalize_choice(first_nonempty(sections.get("Stage")), STAGES)
@@ -108,15 +106,14 @@ def map_project_fields(role: str, form: FormData) -> Dict[str, str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--role", required=True, choices=["planner", "developer", "qa", "security", "compliance", "release"])
+    parser.add_argument(
+        "--role", required=True, choices=["planner", "developer", "qa", "security", "compliance", "release"]
+    )
     parser.add_argument("--input", "-i", help="Path to issue body text; defaults to stdin")
     parser.add_argument("--format", choices=["json", "text"], default="json")
     args = parser.parse_args()
 
-    if args.input:
-        text = open(args.input, "r", encoding="utf-8").read()
-    else:
-        text = sys.stdin.read()
+    text = open(args.input, encoding="utf-8").read() if args.input else sys.stdin.read()
 
     form = parse_sections(text)
     mapped = map_project_fields(args.role, form)

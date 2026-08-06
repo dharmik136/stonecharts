@@ -29,6 +29,13 @@ dev = [
 [project.urls]
 Homepage = "https://github.com/dharmik136/stonecharts"
 
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["stonecharts*"]

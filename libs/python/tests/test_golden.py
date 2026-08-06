@@ -6,17 +6,18 @@ pass, the two libraries are provably byte-identical for every fixture.
 Run standalone:  python libs/python/tests/test_golden.py
 Or with pytest:  pytest libs/python/tests/
 """
+
 import json
 import pathlib
-import sys
 import re
+import sys
 
 import jsonschema
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
-from stonecharts import CapabilityError, ChartSpec, THEMES, capabilities  # noqa: E402
+from stonecharts import THEMES, CapabilityError, ChartSpec, capabilities  # noqa: E402
 from stonecharts.render import render_svg  # noqa: E402
 from stonecharts.validate import SpecError, validate  # noqa: E402
 
@@ -108,16 +109,25 @@ def test_bubble_goldens():
 
 def test_column_edge_cases():
     for spec in [
-        {"type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
-         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
-        {"type": "column", "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
-         "series": [{"name": "s", "data": [1, 2, 3]}]},
-        {"type": "column", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
-         "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
-        {"type": "column", "xAxis": {"categories": ["neg", "pos"]},
-         "series": [{"name": "a", "data": [-5, 10]}]},
-        {"type": "column", "grouping": False,
-         "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
+        {
+            "type": "column",
+            "stacking": "normal",
+            "xAxis": {"categories": ["mix"]},
+            "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}],
+        },
+        {
+            "type": "column",
+            "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+            "series": [{"name": "s", "data": [1, 2, 3]}],
+        },
+        {
+            "type": "column",
+            "stacking": "percent",
+            "xAxis": {"categories": ["zero", "nonzero"]},
+            "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}],
+        },
+        {"type": "column", "xAxis": {"categories": ["neg", "pos"]}, "series": [{"name": "a", "data": [-5, 10]}]},
+        {"type": "column", "grouping": False, "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
         {"type": "column", "series": [{"name": str(i), "data": [1, 2, 3]} for i in range(10)]},
         {"type": "column", "series": [{"name": "a", "data": [42]}]},
     ]:
@@ -127,12 +137,19 @@ def test_column_edge_cases():
 
 def test_area_edge_cases():
     for spec in [
-        {"type": "area", "xAxis": {"categories": ["a", "b"]},
-         "series": [{"name": "s", "data": [1, 2]}]},
-        {"type": "area", "stacking": "normal", "xAxis": {"categories": ["mix"]},
-         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
-        {"type": "area", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
-         "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
+        {"type": "area", "xAxis": {"categories": ["a", "b"]}, "series": [{"name": "s", "data": [1, 2]}]},
+        {
+            "type": "area",
+            "stacking": "normal",
+            "xAxis": {"categories": ["mix"]},
+            "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}],
+        },
+        {
+            "type": "area",
+            "stacking": "percent",
+            "xAxis": {"categories": ["zero", "nonzero"]},
+            "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}],
+        },
         {"type": "area", "series": [{"name": "a", "data": [42]}]},
     ]:
         low = render_svg(ChartSpec.from_dict(spec)).lower()
@@ -141,16 +158,25 @@ def test_area_edge_cases():
 
 def test_bar_edge_cases():
     for spec in [
-        {"type": "bar", "stacking": "normal", "xAxis": {"categories": ["mix"]},
-         "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}]},
-        {"type": "bar", "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
-         "series": [{"name": "s", "data": [1, 2, 3]}]},
-        {"type": "bar", "stacking": "percent", "xAxis": {"categories": ["zero", "nonzero"]},
-         "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}]},
-        {"type": "bar", "xAxis": {"categories": ["neg", "pos"]},
-         "series": [{"name": "a", "data": [-5, 10]}]},
-        {"type": "bar", "grouping": False,
-         "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
+        {
+            "type": "bar",
+            "stacking": "normal",
+            "xAxis": {"categories": ["mix"]},
+            "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}],
+        },
+        {
+            "type": "bar",
+            "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+            "series": [{"name": "s", "data": [1, 2, 3]}],
+        },
+        {
+            "type": "bar",
+            "stacking": "percent",
+            "xAxis": {"categories": ["zero", "nonzero"]},
+            "series": [{"name": "a", "data": [0, 2]}, {"name": "b", "data": [0, 3]}],
+        },
+        {"type": "bar", "xAxis": {"categories": ["neg", "pos"]}, "series": [{"name": "a", "data": [-5, 10]}]},
+        {"type": "bar", "grouping": False, "series": [{"name": "a", "data": [1, 2]}, {"name": "b", "data": [2, 1]}]},
         {"type": "bar", "series": [{"name": str(i), "data": [1, 2, 3]} for i in range(10)]},
         {"type": "bar", "series": [{"name": "a", "data": [42]}]},
     ]:
@@ -172,14 +198,21 @@ def test_scatter_edge_cases():
         # Negative x and y — free domain, no zero anchor.
         {"type": "scatter", "series": [{"name": "s", "data": [[-10, -20], [-5, -8], [-1, -30]]}]},
         # Manual xAxis/yAxis min/max clamp.
-        {"type": "scatter", "xAxis": {"min": 0, "max": 100}, "yAxis": {"min": -50, "max": 50},
-         "series": [{"name": "s", "data": [[10, 5], [90, -40]]}]},
+        {
+            "type": "scatter",
+            "xAxis": {"min": 0, "max": 100},
+            "yAxis": {"min": -50, "max": 50},
+            "series": [{"name": "s", "data": [[10, 5], [90, -40]]}],
+        },
         # Mixed element shapes within one series (bare number, positional, object) —
         # schema-legal since the point-model union applies per element, not per series.
         {"type": "scatter", "series": [{"name": "s", "data": [3, [10, 20], {"x": 30, "y": 40}]}]},
         # Vertical x-gridlines enabled.
-        {"type": "scatter", "xAxis": {"gridLine": {"enabled": True}},
-         "series": [{"name": "s", "data": [[1, 2], [3, 4], [5, 6]]}]},
+        {
+            "type": "scatter",
+            "xAxis": {"gridLine": {"enabled": True}},
+            "series": [{"name": "s", "data": [[1, 2], [3, 4], [5, 6]]}],
+        },
         # fillOpacity explicitly 0 must still render a fully opaque point (NN#2).
         {"type": "scatter", "series": [{"name": "s", "data": [[1, 2]], "fillOpacity": 0}]},
     ]:
@@ -201,16 +234,23 @@ def test_bubble_edge_cases():
         # z = 0 for some points (valid lower bound, not degenerate by itself).
         {"type": "bubble", "series": [{"name": "s", "data": [[1, 2, 0], [3, 4, 100]]}]},
         # Manual xAxis/yAxis min/max clamp.
-        {"type": "bubble", "xAxis": {"min": 0, "max": 100}, "yAxis": {"min": -50, "max": 50},
-         "series": [{"name": "s", "data": [[10, 5, 20], [90, -40, 80]]}]},
+        {
+            "type": "bubble",
+            "xAxis": {"min": 0, "max": 100},
+            "yAxis": {"min": -50, "max": 50},
+            "series": [{"name": "s", "data": [[10, 5, 20], [90, -40, 80]]}],
+        },
         # Mixed element shapes within one series (bare number, positional, object).
         {"type": "bubble", "series": [{"name": "s", "data": [3, [10, 20, 30], {"x": 40, "y": 50, "z": 60}]}]},
         # Global z-domain spans multiple series — a series with only the min
         # or only the max z must still size correctly against the shared domain.
-        {"type": "bubble", "series": [
-            {"name": "a", "data": [[1, 1, 1]]},
-            {"name": "b", "data": [[2, 2, 1000]]},
-        ]},
+        {
+            "type": "bubble",
+            "series": [
+                {"name": "a", "data": [[1, 1, 1]]},
+                {"name": "b", "data": [[2, 2, 1000]]},
+            ],
+        },
         # fillOpacity explicitly 0 must still render a fully opaque bubble (NN#2);
         # bubble's pinned default (0.65) differs from line's (0).
         {"type": "bubble", "series": [{"name": "s", "data": [[1, 2, 3]], "fillOpacity": 0}]},
@@ -220,43 +260,51 @@ def test_bubble_edge_cases():
 
 
 def test_column_signed_stack_geometry():
-    svg = render_svg(ChartSpec.from_dict({
-        "type": "column", "stacking": "normal", "xAxis": {"categories": ["mix"]},
-        "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}],
-    }))
-    rects = {
-        int(series): float(y)
-        for series, y in re.findall(r'data-series="(\d)"[^>]* y="([^"]+)"', svg)
-    }
+    svg = render_svg(
+        ChartSpec.from_dict(
+            {
+                "type": "column",
+                "stacking": "normal",
+                "xAxis": {"categories": ["mix"]},
+                "series": [{"name": "pos", "data": [10]}, {"name": "neg", "data": [-9]}],
+            }
+        )
+    )
+    rects = {int(series): float(y) for series, y in re.findall(r'data-series="(\d)"[^>]* y="([^"]+)"', svg)}
     assert rects[1] > rects[0], rects
 
 
 def test_layout_margins():
-    spec = ChartSpec.from_dict({
-        "type": "column",
-        "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
-        "series": [{"name": "s", "data": [1, 2, 3]}],
-    })
+    spec = ChartSpec.from_dict(
+        {
+            "type": "column",
+            "layout": {"margin": {"left": 90, "right": 40, "top": 30, "bottom": 50}},
+            "series": [{"name": "s", "data": [1, 2, 3]}],
+        }
+    )
     svg = render_svg(spec)
     assert 'x1="90.0"' in svg
     assert 'y="30"' in svg or 'y="30.0"' in svg
 
 
 def test_short_categories_pad_and_unicode_title():
-    spec = ChartSpec.from_dict({
-        "type": "column",
-        "title": "Temperature (°C)",
-        "xAxis": {"categories": ["Jan", "Q4 2026 - Production Operations"]},
-        "series": [{"name": "s", "data": [1, 2, 3]}],
-    })
+    spec = ChartSpec.from_dict(
+        {
+            "type": "column",
+            "title": "Temperature (°C)",
+            "xAxis": {"categories": ["Jan", "Q4 2026 - Production Operations"]},
+            "series": [{"name": "s", "data": [1, 2, 3]}],
+        }
+    )
     svg = render_svg(spec)
     from stonecharts.render import render_html
+
     html = render_html(spec)
     assert "Temperature (°C)" in svg
-    assert 'Jan</text>' in svg
-    assert 'Q4 2026 - Production Operations' in svg
-    assert '>1</text>' in svg
-    assert '>2</text>' in svg
+    assert "Jan</text>" in svg
+    assert "Q4 2026 - Production Operations" in svg
+    assert ">1</text>" in svg
+    assert ">2</text>" in svg
     assert '<th scope="col">Jan</th>' in html
     assert '<th scope="col">Q4 2026 - Production Operations</th>' in html
     assert '<th scope="col">2</th>' in html
@@ -266,15 +314,28 @@ def test_short_categories_pad_and_unicode_title():
 def test_xss_escaping():
     """Hostile strings in every user-facing field must be escaped, never injected."""
     x = '"><script>alert(1)</script>'
-    spec = ChartSpec.from_dict({
-        "id": x, "type": "line", "title": x, "subtitle": x,
-        "theme": {"name": "light", "gridColor": "#e8e8ee", "palette": ["#2f7ed8"]},
-        "xAxis": {"title": x, "categories": [x, "b", "c"]}, "yAxis": {"title": x},
-        "series": [{"name": x, "data": [1, 2, 3], "color": "#2f7ed8",
+    spec = ChartSpec.from_dict(
+        {
+            "id": x,
+            "type": "line",
+            "title": x,
+            "subtitle": x,
+            "theme": {"name": "light", "gridColor": "#e8e8ee", "palette": ["#2f7ed8"]},
+            "xAxis": {"title": x, "categories": [x, "b", "c"]},
+            "yAxis": {"title": x},
+            "series": [
+                {
+                    "name": x,
+                    "data": [1, 2, 3],
+                    "color": "#2f7ed8",
                     "pattern": {"type": "hatch", "color": "#333333", "background": "#ffffff"},
-                    "fillOpacity": 0.3}],
-    })
+                    "fillOpacity": 0.3,
+                }
+            ],
+        }
+    )
     from stonecharts.render import render_html
+
     assert "<script>alert(1)</script>" not in render_svg(spec)
     assert "<script>alert(1)</script>" not in render_html(spec)
 
@@ -362,11 +423,16 @@ def test_a11y_toggle():
 def test_theme_json_parity():
     """The baked THEMES must stay in lockstep with the canonical spec/themes/*.json."""
     key_map = {
-        "background": "background", "titleColor": "title_color",
-        "subtitleColor": "subtitle_color", "axisLabelColor": "axis_label_color",
-        "axisTitleColor": "axis_title_color", "gridColor": "grid_color",
-        "axisLineColor": "axis_line_color", "crosshairColor": "crosshair_color",
-        "markerHalo": "marker_halo", "legendTextColor": "legend_text_color",
+        "background": "background",
+        "titleColor": "title_color",
+        "subtitleColor": "subtitle_color",
+        "axisLabelColor": "axis_label_color",
+        "axisTitleColor": "axis_title_color",
+        "gridColor": "grid_color",
+        "axisLineColor": "axis_line_color",
+        "crosshairColor": "crosshair_color",
+        "markerHalo": "marker_halo",
+        "legendTextColor": "legend_text_color",
         "palette": "palette",
     }
     for name in ("light", "dark"):
@@ -380,17 +446,20 @@ def test_theme_json_parity():
 # Edge-case vectors from the Phase-3 QA report: flat data, extrema, single/dual
 # points, steep jumps, negatives, mixed extrema. The spline must stay finite.
 SPLINE_EDGE_CASES = [
-    [10.0], [10.0, 20.0], [10.0, 10.0, 10.0, 10.0], [10.0, 30.0, 10.0],
-    [30.0, 10.0, 30.0], [10.0, 10.0, 100.0, 100.0], [-10.0, -20.0, -10.0],
+    [10.0],
+    [10.0, 20.0],
+    [10.0, 10.0, 10.0, 10.0],
+    [10.0, 30.0, 10.0],
+    [30.0, 10.0, 30.0],
+    [10.0, 10.0, 100.0, 100.0],
+    [-10.0, -20.0, -10.0],
     [0.0, 20.0, -10.0, 30.0, 5.0, 0.0, -5.0, 15.0],
 ]
 
 
 def test_spline_edge_cases():
     for data in SPLINE_EDGE_CASES:
-        spec = ChartSpec.from_dict(
-            {"type": "line", "series": [{"name": "s", "data": data, "curve": "monotone"}]}
-        )
+        spec = ChartSpec.from_dict({"type": "line", "series": [{"name": "s", "data": data, "curve": "monotone"}]})
         low = render_svg(spec).lower()
         assert "nan" not in low and "inf" not in low, f"NaN/Inf in spline for {data}"
 
@@ -416,4 +485,3 @@ if __name__ == "__main__":
         print(f"PASS: python bubble-{_n} golden")
     test_spline_edge_cases()
     print("PASS: python spline edge cases")
-

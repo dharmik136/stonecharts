@@ -6,6 +6,7 @@ piece is the size-scale (z -> area-proportional radius). No shared-frame
 changes are needed at all — this module supplies only the marks callback,
 exactly like bar's admission, not scatter's.
 """
+
 from __future__ import annotations
 
 import math

@@ -1,0 +1,176 @@
+[
+  {
+    "spec": {
+      "type": "area",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ],
+          "fillOpacity": "opaque"
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].fillOpacity: expected number, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": "area",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ],
+          "fillOpacity": true
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].fillOpacity: expected number, received boolean"
+    ]
+  },
+  {
+    "spec": {
+      "type": "area",
+      "stacking": 123,
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.stacking: expected string, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "area",
+      "stacking": "invalid",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.stacking: expected one of \"normal\", \"percent\", received \"invalid\""
+    ]
+  },
+  {
+    "spec": {
+      "type": "area",
+      "series": [
+        {
+          "name": "s",
+          "data": "not-array"
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data: expected array, received string"
+    ]
+  },
+  {
+    "spec": {
+      "type": 123,
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.type: expected string, received number"
+    ]
+  },
+  {
+    "spec": {
+      "type": "area"
+    },
+    "errors": [
+      "$.series: required"
+    ]
+  },
+  {
+    "spec": {
+      "type": "area",
+      "stacking": "percent",
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1,
+            -2
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[1]: expected non-negative number, received -2"
+    ]
+  },
+  {
+    "spec": {
+      "type": "area",
+      "layout": {
+        "margin": {
+          "left": -1
+        }
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ]
+        }
+      ]
+    },
+    "errors": [
+      "$.layout.margin.left: expected non-negative number, received -1"
+    ]
+  },
+  {
+    "spec": {
+      "type": "area",
+      "theme": {
+        "name": "light",
+        "gridColor": "inherit",
+        "palette": [
+          "#123",
+          "not-a-color"
+        ]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [
+            1
+          ],
+          "pattern": {
+            "type": "weave"
+          }
+        }
+      ]
+    },
+    "errors": [
+      "$.theme.gridColor: expected hex color, received \"inherit\"",
+      "$.theme.palette[1]: expected hex color, received \"not-a-color\"",
+      "$.series[0].pattern.type: expected one of \"hatch\", received \"weave\""
+    ]
+  }
+]

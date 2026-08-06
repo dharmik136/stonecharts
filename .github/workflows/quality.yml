@@ -10,6 +10,52 @@ permissions:
   contents: read
 
 jobs:
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - run: python -m pip install "ruff>=0.8,<1"
+      - run: ruff check libs/python/ tools/
+      - run: ruff format --check libs/python/ tools/
+
+  python-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - run: python -m pip install "mypy>=1.12,<2"
+      - run: mypy libs/python/stonecharts/ --ignore-missing-imports
+
+  go-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: libs/go
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: libs/go/go.mod
+          cache-dependency-path: libs/go/go.mod
+      - run: go vet ./...
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: github/codeql-action/init@ea87a0ef64b51e6bc6ea7d15b3c9416f0e8f6a9a # v3.28.16
+        with:
+          languages: python, go
+      - uses: github/codeql-action/autobuild@ea87a0ef64b51e6bc6ea7d15b3c9416f0e8f6a9a # v3.28.16
+      - uses: github/codeql-action/analyze@ea87a0ef64b51e6bc6ea7d15b3c9416f0e8f6a9a # v3.28.16
+
   documentation:
     runs-on: ubuntu-latest
     steps:
@@ -108,7 +154,18 @@ jobs:
         with:
           go-version-file: libs/go/go.mod
           cache-dependency-path: libs/go/go.mod
-      - run: go test . -cover -covermode=atomic
+      - run: go vet ./...
+      - run: go test . -cover -covermode=atomic -coverprofile=coverage.out
+      - name: Enforce Go coverage threshold
+        shell: bash
+        run: |
+          total=$(go tool cover -func=coverage.out | grep total: | awk '{print $3}' | tr -d '%')
+          threshold=70
+          echo "Go coverage: ${total}%  (threshold: ${threshold}%)"
+          if [ "$(echo "$total < $threshold" | bc -l)" -eq 1 ]; then
+            echo "::error::Go coverage ${total}% is below threshold ${threshold}%"
+            exit 1
+          fi
       - run: go build ./cmd/stoneverify-go-render
 
   stoneverify-pilot-gate:
@@ -180,6 +237,80 @@ jobs:
         with:
           name: stoneverify-pilot-gate-evidence
           path: /tmp/stoneverify-pilot-evidence
+
+  schema-compat:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Check chart-spec schema backward compatibility
+        run: |
+          git show origin/main:spec/chart-spec.schema.json > /tmp/main-chart-spec.json 2>/dev/null || exit 0
+          python tools/check_schema_compat.py /tmp/main-chart-spec.json spec/chart-spec.schema.json
+      - name: Check stoneverify-result schema backward compatibility
+        run: |
+          git show origin/main:spec/stoneverify-result.schema.json > /tmp/main-result-schema.json 2>/dev/null || exit 0
+          python tools/check_schema_compat.py /tmp/main-result-schema.json spec/stoneverify-result.schema.json
+
+  chart-admission:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Detect new chart types in PR
+        id: detect
+        run: |
+          new_types=$(git diff --name-only origin/main...HEAD -- 'charts/' | grep -oP 'charts/\K[^/]+' | sort -u | while read type; do
+            if [ "$type" != "_cartesian" ] && ! git show origin/main:charts/$type/golden/ >/dev/null 2>&1; then
+              echo "$type"
+            fi
+          done | tr '\n' ' ')
+          echo "new_types=$new_types" >> "$GITHUB_OUTPUT"
+      - name: Run chart admission checks
+        if: steps.detect.outputs.new_types != ''
+        run: python tools/check_chart_admission.py ${{ steps.detect.outputs.new_types }}
+
+  evidence-regression:
+    runs-on: ubuntu-latest
+    needs: [python]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+          cache: pip
+      - run: python -m pip install "pytest>=8,<10" "jsonschema>=4.23,<5"
+      - name: Generate and validate evidence for all example specs
+        env:
+          STONEVERIFY_RENDER_TIMEOUT: "30"
+        run: |
+          failed=0
+          for spec in charts/*/examples/*.json; do
+            chart_type=$(basename $(dirname $(dirname "$spec")))
+            name=$(basename "$spec" .json)
+            evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
+            python tools/stonecharts_verify.py "$spec" \
+              --runtime python \
+              --evidence "$evidence_dir" 2>/dev/null || true
+            if [ -d "$evidence_dir" ]; then
+              result=$(python tools/stonecharts_verify.py --check-evidence "$evidence_dir" 2>&1) || true
+              if echo "$result" | grep -qi "fail"; then
+                echo "::error::Evidence bundle validation failed for ${chart_type}/${name}"
+                failed=1
+              fi
+            fi
+          done
+          exit $failed
 
   runtime-browser:
     runs-on: ubuntu-latest

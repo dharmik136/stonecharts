@@ -10,6 +10,7 @@ rely on `stonecharts` being importable without needing its own sys.path setup.
 
 Mirrors the sys.path setup in test_golden.py.
 """
+
 import pathlib
 import sys
 

@@ -6,21 +6,21 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+import shutil
 import subprocess
 import sys
 import tempfile
-import shutil
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 PACK = ROOT / "docs" / "releases" / "0.0.0.1" / "evidence" / "rc.1"
-SEED = 20260719
-CASES = 48
+SEED = 20260807
+CASES = 96
 
 sys.path.insert(0, str(ROOT / "libs" / "python"))
-from stonecharts import ChartSpec  # noqa: E402
-from stonecharts.render import render_svg  # noqa: E402
+from stonecharts import ChartSpec
+from stonecharts.render import render_svg
 
 
 def rand_hex(rng: random.Random) -> str:
@@ -36,17 +36,34 @@ def build_specs() -> list[dict[str, Any]]:
     rng = random.Random(SEED)
     specs: list[dict[str, Any]] = []
     for i in range(CASES):
-        chart_type = rng.choice(["line", "column"])
+        chart_type = rng.choice(["line", "column", "area", "bar", "scatter", "bubble"])
         series_count = rng.randint(1, 4)
         point_count = rng.randint(1, 8)
         categories = [safe_text(rng, f"Cat {j + 1}") for j in range(rng.randint(0, point_count + 2))]
         series: list[dict[str, Any]] = []
         for s in range(series_count):
-            if chart_type == "column":
+            if chart_type in ("column", "bar"):
                 if rng.random() < 0.25:
                     data = [float(rng.randint(0, 30)) for _ in range(point_count)]
                 else:
                     data = [float(rng.randint(0, 60)) for _ in range(point_count)]
+            elif chart_type == "scatter":
+                data = [
+                    [
+                        round(rng.uniform(-100, 100), 4),
+                        round(rng.uniform(-100, 100), 4),
+                    ]
+                    for _ in range(point_count)
+                ]
+            elif chart_type == "bubble":
+                data = [
+                    [
+                        round(rng.uniform(-100, 100), 4),
+                        round(rng.uniform(-100, 100), 4),
+                        round(rng.uniform(1, 100), 4),
+                    ]
+                    for _ in range(point_count)
+                ]
             else:
                 data = [round(rng.uniform(-40, 120), 4) for _ in range(point_count)]
             item: dict[str, Any] = {
@@ -67,7 +84,7 @@ def build_specs() -> list[dict[str, Any]]:
                         {"offset": 1, "color": rand_hex(rng)},
                     ],
                 }
-            if chart_type == "line" and rng.random() < 0.3:
+            if chart_type in ("line", "area") and rng.random() < 0.3:
                 item["pattern"] = {
                     "type": "hatch",
                     "color": rand_hex(rng),
@@ -75,11 +92,11 @@ def build_specs() -> list[dict[str, Any]]:
                 }
             if rng.random() < 0.5:
                 item["dashStyle"] = rng.choice(["solid", "dashed", "dotted"])
-            if chart_type == "line" and rng.random() < 0.3:
+            if chart_type in ("line", "area") and rng.random() < 0.3:
                 item["curve"] = rng.choice(["linear", "monotone"])
-            if chart_type == "line" and rng.random() < 0.2:
+            if chart_type in ("line", "area") and rng.random() < 0.2:
                 item["step"] = rng.choice(["before", "after", "center"])
-            if rng.random() < 0.3:
+            if chart_type in ("line", "area", "scatter", "bubble") and rng.random() < 0.3:
                 item["marker"] = {
                     "symbol": rng.choice(["circle", "square", "triangle", "diamond"]),
                     "radius": round(rng.uniform(2.5, 6.5), 2),
@@ -93,27 +110,34 @@ def build_specs() -> list[dict[str, Any]]:
             "series": series,
             "theme": rng.choice(["light", "dark"]),
         }
-        if categories and rng.random() < 0.85:
-            spec["xAxis"] = {"categories": categories}
-        if rng.random() < 0.4:
-            spec["xAxis"] = {**spec.get("xAxis", {}), "title": safe_text(rng, "X axis")}
+        if chart_type in ("scatter", "bubble"):
+            spec["xAxis"] = {"title": safe_text(rng, "X axis")}
+        else:
+            if categories and rng.random() < 0.85:
+                spec["xAxis"] = {"categories": categories}
+            if rng.random() < 0.4:
+                spec["xAxis"] = {**spec.get("xAxis", {}), "title": safe_text(rng, "X axis")}
         if rng.random() < 0.35:
             spec["yAxis"] = {"title": safe_text(rng, "Y axis")}
         if rng.random() < 0.35:
             spec["legend"] = rng.choice([True, False])
         if rng.random() < 0.25:
             spec["responsive"] = rng.choice([True, False])
-        if chart_type == "column" and rng.random() < 0.4:
+        if chart_type in ("column", "bar") and rng.random() < 0.4:
             spec["grouping"] = rng.choice([True, False])
-        if chart_type == "column" and rng.random() < 0.3:
+        if chart_type in ("column", "bar", "area") and rng.random() < 0.3:
             spec["stacking"] = rng.choice(["normal", "percent"])
+        if chart_type == "area" and rng.random() < 0.4:
+            spec["fillOpacity"] = round(rng.uniform(0.1, 0.9), 2)
         if rng.random() < 0.35:
-            spec["layout"] = {"margin": {
-                "left": rng.randint(40, 120),
-                "right": rng.randint(20, 60),
-                "top": rng.randint(20, 60),
-                "bottom": rng.randint(30, 80),
-            }}
+            spec["layout"] = {
+                "margin": {
+                    "left": rng.randint(40, 120),
+                    "right": rng.randint(20, 60),
+                    "top": rng.randint(20, 60),
+                    "bottom": rng.randint(30, 80),
+                }
+            }
         if rng.random() < 0.2:
             spec["a11y"] = rng.choice([True, False])
         specs.append(spec)
@@ -189,7 +213,7 @@ def main() -> int:
         raise SystemExit("fuzz corpus length mismatch")
 
     mismatches = []
-    for idx, (spec, py_svg, go_svg) in enumerate(zip(specs, py_svgs, go_svgs)):
+    for idx, (_spec, py_svg, go_svg) in enumerate(zip(specs, py_svgs, go_svgs)):
         if py_svg != go_svg:
             mismatches.append(idx)
         if "nan" in py_svg.lower() or "inf" in py_svg.lower():
@@ -227,9 +251,9 @@ superseded_by: null
 - Cases: `{CASES}`
 - Result: PASS
 
-This deterministic corpus exercised valid line and column specs across category-length,
-series-count, theme, style, and layout combinations. Python and Go rendered the same
-SVG bytes for every generated case, and no NaN/Inf escaped into output.
+This deterministic corpus exercised valid line, column, area, bar, scatter, and bubble specs
+across category-length, series-count, theme, style, and layout combinations. Python and Go
+rendered the same SVG bytes for every generated case, and no NaN/Inf escaped into output.
 """
     (PACK / "fuzz-property-report.md").write_text(report, encoding="utf-8")
     corpus_sha = hashlib.sha256(corpus_path.read_bytes()).hexdigest()

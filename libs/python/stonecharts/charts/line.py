@@ -6,10 +6,10 @@ chrome (margins, scales, axes, gridlines, legend, theme, a11y, <defs>) comes
 from the shared frame (_cartesian.py); this module draws ONLY the line-specific
 marks — series paths, area fills, and point markers.
 """
+
 from __future__ import annotations
 
 import math
-from typing import List
 
 from ..spec import Marker
 from ..util import esc, fmt_num
@@ -19,10 +19,8 @@ from ._cartesian import CartesianFrame, dash_array, render_cartesian
 def _path_d(pts, step) -> str:
     """Build the line path 'd'. step in {None, before, after, center}."""
     if not step:
-        return " ".join(
-            ("M" if i == 0 else "L") + f"{x:.1f} {y:.1f}" for i, (x, y) in enumerate(pts)
-        )
-    parts: List[str] = []
+        return " ".join(("M" if i == 0 else "L") + f"{x:.1f} {y:.1f}" for i, (x, y) in enumerate(pts))
+    parts: list[str] = []
     for i, (x, y) in enumerate(pts):
         if i == 0:
             parts.append(f"M{x:.1f} {y:.1f}")
@@ -77,9 +75,7 @@ def _spline_d(pts) -> str:
         c1y = ys[i] + m[i] * h / 3
         c2x = xs[i + 1] - h / 3
         c2y = ys[i + 1] - m[i + 1] * h / 3
-        parts.append(
-            f"C{c1x:.1f} {c1y:.1f} {c2x:.1f} {c2y:.1f} {xs[i + 1]:.1f} {ys[i + 1]:.1f}"
-        )
+        parts.append(f"C{c1x:.1f} {c1y:.1f} {c2x:.1f} {c2y:.1f} {xs[i + 1]:.1f} {ys[i + 1]:.1f}")
     return " ".join(parts)
 
 
@@ -93,21 +89,21 @@ def _marker(symbol, x, y, r, common, color, halo, fill_opacity: float = 1.0) -> 
     fs = f'fill="{color}" stroke="{halo}" stroke-width="1"{op_attr}'
     if symbol == "square":
         return (
-            f'<rect {common} cx="{x:.1f}" cy="{y:.1f}" x="{x-r:.1f}" y="{y-r:.1f}" '
-            f'width="{2*r:.1f}" height="{2*r:.1f}" {fs}/>'
+            f'<rect {common} cx="{x:.1f}" cy="{y:.1f}" x="{x - r:.1f}" y="{y - r:.1f}" '
+            f'width="{2 * r:.1f}" height="{2 * r:.1f}" {fs}/>'
         )
     if symbol == "triangle":
-        poly = f"{x:.1f},{y-r:.1f} {x-r:.1f},{y+r:.1f} {x+r:.1f},{y+r:.1f}"
+        poly = f"{x:.1f},{y - r:.1f} {x - r:.1f},{y + r:.1f} {x + r:.1f},{y + r:.1f}"
         return f'<polygon {common} cx="{x:.1f}" cy="{y:.1f}" points="{poly}" {fs}/>'
     if symbol == "diamond":
-        poly = f"{x:.1f},{y-r:.1f} {x+r:.1f},{y:.1f} {x:.1f},{y+r:.1f} {x-r:.1f},{y:.1f}"
+        poly = f"{x:.1f},{y - r:.1f} {x + r:.1f},{y:.1f} {x:.1f},{y + r:.1f} {x - r:.1f},{y:.1f}"
         return f'<polygon {common} cx="{x:.1f}" cy="{y:.1f}" points="{poly}" {fs}/>'
     # circle (default)
     return f'<circle {common} cx="{x:.1f}" cy="{y:.1f}" r="{fmt_num(r)}" {fs}/>'
 
 
 def render_svg(spec) -> str:
-    return render_cartesian(spec, "Line", "point", _line_marks)   # include_zero defaults True
+    return render_cartesian(spec, "Line", "point", _line_marks)  # include_zero defaults True
 
 
 def _line_marks(fr: CartesianFrame, p: list) -> None:

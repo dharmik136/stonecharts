@@ -14,7 +14,6 @@ import textwrap
 import zipfile
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "dist" / "stoneverify-evaluation-kit"
 KIT_VERSION = "0.0.0.4"

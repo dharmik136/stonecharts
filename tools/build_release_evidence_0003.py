@@ -238,9 +238,22 @@ exist, per ADR 0007).
                 },
                 "resolvedDependencies": [
                     {"uri": "git+https://github.com/dharmik136/stonecharts.git", "digest": {"sha1": commit}},
-                    {"uri": "file:docs/releases/0.0.0.3/evidence/manifest.schema.json", "digest": {"sha256": sha256(ROOT / "docs" / "releases" / "0.0.0.3" / "evidence" / "manifest.schema.json")}},
-                    {"uri": "file:docs/quality/evidence-registry.yaml", "digest": {"sha256": sha256(ROOT / "docs" / "quality" / "evidence-registry.yaml")}},
-                    {"uri": "file:tools/check_release_evidence.py", "digest": {"sha256": sha256(ROOT / "tools" / "check_release_evidence.py")}},
+                    {
+                        "uri": "file:docs/releases/0.0.0.3/evidence/manifest.schema.json",
+                        "digest": {
+                            "sha256": sha256(
+                                ROOT / "docs" / "releases" / "0.0.0.3" / "evidence" / "manifest.schema.json"
+                            )
+                        },
+                    },
+                    {
+                        "uri": "file:docs/quality/evidence-registry.yaml",
+                        "digest": {"sha256": sha256(ROOT / "docs" / "quality" / "evidence-registry.yaml")},
+                    },
+                    {
+                        "uri": "file:tools/check_release_evidence.py",
+                        "digest": {"sha256": sha256(ROOT / "tools" / "check_release_evidence.py")},
+                    },
                 ],
             },
             "runDetails": {
@@ -260,7 +273,7 @@ exist, per ADR 0007).
     }
     write_text(PACK / "provenance.json", json.dumps(provenance, indent=2) + "\n")
 
-    install_matrix = f"""---
+    install_matrix = """---
 id: SC-REL-021
 title: StoneCharts 0.0.0.3 Package Install Matrix
 status: approved
@@ -382,10 +395,17 @@ was found and fixed during `GATE-S9`.
         evidence_entry("TEST-DIRECT-CROSS-RENDER", "tools/check_direct_cross_render.py"),
         evidence_entry("TEST-FUZZ-PROPERTY", "tools/check_fuzz_property.py"),
         evidence_entry("TEST-RELEASE-EVIDENCE", "tools/check_release_evidence.py"),
-        evidence_entry("REVIEW-BAR-ACCESSIBILITY-SECURITY", "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md"),
+        evidence_entry(
+            "REVIEW-BAR-ACCESSIBILITY-SECURITY", "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md"
+        ),
         evidence_entry("BENCH-BAR-BASELINE", "docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md"),
-        evidence_entry("REVIEW-SCATTER-ACCESSIBILITY-SECURITY", "docs/releases/0.0.0.3/evidence/scatter-accessibility-security-review.md"),
-        evidence_entry("BENCH-SCATTER-BASELINE", "docs/releases/0.0.0.3/evidence/scatter-performance-baseline-review.md"),
+        evidence_entry(
+            "REVIEW-SCATTER-ACCESSIBILITY-SECURITY",
+            "docs/releases/0.0.0.3/evidence/scatter-accessibility-security-review.md",
+        ),
+        evidence_entry(
+            "BENCH-SCATTER-BASELINE", "docs/releases/0.0.0.3/evidence/scatter-performance-baseline-review.md"
+        ),
     ]
 
     manifest = {
@@ -415,20 +435,90 @@ was found and fixed during `GATE-S9`.
         "artifacts": artifacts,
         "evidence": evidence,
         "risks": [
-            {"id": "RISK-001", "disposition": "closed", "expires": None, "rationale": "The active schema is narrowed to line/column/area/bar/scatter; no unrendereable type is exposed."},
-            {"id": "RISK-002", "disposition": "closed", "expires": None, "rationale": "Validator parity is evidenced across the full active corpus including scatter's new point-model element type."},
-            {"id": "RISK-003", "disposition": "closed", "expires": None, "rationale": "Typed capability errors and no-panic boundaries cover scatter identically to line/column/area/bar."},
-            {"id": "RISK-004", "disposition": "closed", "expires": None, "rationale": "Mixed-sign stack geometry evidence is unchanged and still passes; scatter does not stack."},
-            {"id": "RISK-005", "disposition": "closed", "expires": None, "rationale": "Percent-domain rules are explicit and unchanged for this release scope."},
-            {"id": "RISK-006", "disposition": "closed", "expires": None, "rationale": "Unicode sizing remains fixed by the current deterministic length model; scatter reuses it unchanged."},
-            {"id": "RISK-007", "disposition": "closed", "expires": None, "rationale": "Manual margins are the release boundary; unchanged for scatter."},
-            {"id": "RISK-008", "disposition": "closed", "expires": None, "rationale": "Browser and accessibility evidence now exists for scatter specifically (SC-REL-018), matching line/column/area/bar, including the generalized long-format data table."},
-            {"id": "RISK-009", "disposition": "closed", "expires": None, "rationale": "Package version is aligned with 0.0.0.3 across pyproject.toml and __init__.py."},
-            {"id": "RISK-010", "disposition": "closed", "expires": None, "rationale": "Short category arrays are padded deterministically in both renderers; scatter's free axes are exercised by its edge-case tests."},
-            {"id": "RISK-011", "disposition": "accepted", "expires": None, "rationale": "Host-font and certified-export profiles remain intentionally separate guarantees, unchanged from 0.0.0.1/0.0.0.2."},
-            {"id": "RISK-012", "disposition": "accepted", "expires": None, "rationale": "Release provenance is bounded by this candidate evidence pack and validator; public publication remains gated."},
-            {"id": "RISK-013", "disposition": "accepted", "expires": None, "rationale": "No branch-protection technical control exists yet (private repo tier); unchanged from 0.0.0.1/0.0.0.2, enforcement remains the governed gate sequence."},
-            {"id": "RISK-014", "disposition": "accepted", "expires": None, "rationale": "No GitHub-native private vulnerability reporting exists yet; unchanged from 0.0.0.1/0.0.0.2."},
+            {
+                "id": "RISK-001",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "The active schema is narrowed to line/column/area/bar/scatter; no unrendereable type is exposed.",
+            },
+            {
+                "id": "RISK-002",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Validator parity is evidenced across the full active corpus including scatter's new point-model element type.",
+            },
+            {
+                "id": "RISK-003",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Typed capability errors and no-panic boundaries cover scatter identically to line/column/area/bar.",
+            },
+            {
+                "id": "RISK-004",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Mixed-sign stack geometry evidence is unchanged and still passes; scatter does not stack.",
+            },
+            {
+                "id": "RISK-005",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Percent-domain rules are explicit and unchanged for this release scope.",
+            },
+            {
+                "id": "RISK-006",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Unicode sizing remains fixed by the current deterministic length model; scatter reuses it unchanged.",
+            },
+            {
+                "id": "RISK-007",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Manual margins are the release boundary; unchanged for scatter.",
+            },
+            {
+                "id": "RISK-008",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Browser and accessibility evidence now exists for scatter specifically (SC-REL-018), matching line/column/area/bar, including the generalized long-format data table.",
+            },
+            {
+                "id": "RISK-009",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Package version is aligned with 0.0.0.3 across pyproject.toml and __init__.py.",
+            },
+            {
+                "id": "RISK-010",
+                "disposition": "closed",
+                "expires": None,
+                "rationale": "Short category arrays are padded deterministically in both renderers; scatter's free axes are exercised by its edge-case tests.",
+            },
+            {
+                "id": "RISK-011",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Host-font and certified-export profiles remain intentionally separate guarantees, unchanged from 0.0.0.1/0.0.0.2.",
+            },
+            {
+                "id": "RISK-012",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Release provenance is bounded by this candidate evidence pack and validator; public publication remains gated.",
+            },
+            {
+                "id": "RISK-013",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "No branch-protection technical control exists yet (private repo tier); unchanged from 0.0.0.1/0.0.0.2, enforcement remains the governed gate sequence.",
+            },
+            {
+                "id": "RISK-014",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "No GitHub-native private vulnerability reporting exists yet; unchanged from 0.0.0.1/0.0.0.2.",
+            },
         ],
         "knownLimits": [
             "This candidate pack is not a publication approval.",

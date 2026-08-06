@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 from stonecharts import ChartSpec, render_svg
 from stonecharts.limits import (
     MAX_LABEL_LENGTH,
