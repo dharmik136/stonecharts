@@ -314,30 +314,44 @@ def test_short_categories_pad_and_unicode_title():
 def test_xss_escaping():
     """Hostile strings in every user-facing field must be escaped, never injected."""
     x = '"><script>alert(1)</script>'
-    spec = ChartSpec.from_dict(
-        {
-            "id": x,
-            "type": "line",
-            "title": x,
-            "subtitle": x,
-            "theme": {"name": "light", "gridColor": "#e8e8ee", "palette": ["#2f7ed8"]},
-            "xAxis": {"title": x, "categories": [x, "b", "c"]},
-            "yAxis": {"title": x},
-            "series": [
-                {
-                    "name": x,
-                    "data": [1, 2, 3],
-                    "color": "#2f7ed8",
-                    "pattern": {"type": "hatch", "color": "#333333", "background": "#ffffff"},
-                    "fillOpacity": 0.3,
-                }
-            ],
-        }
-    )
+    payload = "<script>alert(1)</script>"
+
+    type_data = {
+        "line": [1, 2, 3],
+        "column": [1, 2, 3],
+        "area": [1, 2, 3],
+        "bar": [1, 2, 3],
+        "scatter": [[1, 2], [3, 4]],
+        "bubble": [[1, 2, 3], [4, 5, 6]],
+    }
+
     from stonecharts.render import render_html
 
-    assert "<script>alert(1)</script>" not in render_svg(spec)
-    assert "<script>alert(1)</script>" not in render_html(spec)
+    for chart_type, data in type_data.items():
+        spec = ChartSpec.from_dict(
+            {
+                "id": x,
+                "type": chart_type,
+                "title": x,
+                "subtitle": x,
+                "theme": {"name": "light", "gridColor": "#e8e8ee", "palette": ["#2f7ed8"]},
+                "xAxis": {"title": x, "categories": [x, "b", "c"]} if chart_type not in ("scatter", "bubble") else {"title": x},
+                "yAxis": {"title": x},
+                "series": [
+                    {
+                        "name": x,
+                        "data": data,
+                        "color": "#2f7ed8",
+                        "pattern": {"type": "hatch", "color": "#333333", "background": "#ffffff"},
+                        "fillOpacity": 0.3,
+                    }
+                ],
+            }
+        )
+        svg = render_svg(spec)
+        html = render_html(spec)
+        assert payload not in svg, f"XSS in SVG for {chart_type}"
+        assert payload not in html, f"XSS in HTML for {chart_type}"
 
 
 def test_valid_edges_render():

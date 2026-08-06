@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "title": "Line styles & markers",
+  "subtitle": "dashed + square · stepped + triangle · dotted + diamond (Phase 2)",
+  "xAxis": { "title": "Stage", "categories": ["A", "B", "C", "D", "E", "F"] },
+  "yAxis": { "title": "Value" },
+  "series": [
+    { "name": "Dashed+Square",   "data": [3, 7, 4, 8, 6, 9], "dashStyle": "dashed", "lineWidth": 3, "marker": { "symbol": "square",   "radius": 4 } },
+    { "name": "Stepped+Triangle", "data": [2, 5, 3, 6, 4, 7], "step": "after",       "marker": { "symbol": "triangle", "radius": 4 } },
+    { "name": "Dotted+Diamond",  "data": [1, 3, 2, 4, 3, 5], "dashStyle": "dotted", "marker": { "symbol": "diamond",  "radius": 4 } }
+  ]
+}

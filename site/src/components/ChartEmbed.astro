@@ -1,0 +1,14 @@
+---
+interface Props {
+  lightSvg: string;
+  darkSvg?: string;
+  chartType: string;
+  chartName: string;
+}
+
+const { lightSvg, darkSvg, chartType, chartName } = Astro.props;
+---
+<div class="sc-chart-wrap" data-chart-type={chartType} data-chart-name={chartName}>
+  <div class="sc-chart-light" set:html={lightSvg} />
+  {darkSvg && <div class="sc-chart-dark" set:html={darkSvg} />}
+</div>

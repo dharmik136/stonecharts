@@ -1,0 +1,13 @@
+{
+  "type": "bar",
+  "title": "Top API Endpoints by Request Volume",
+  "subtitle": "Last 24 hours, ranked",
+  "xAxis": {
+    "title": "Endpoint",
+    "categories": ["/api/login", "/api/search", "/api/orders", "/api/profile", "/api/checkout", "/api/logout"]
+  },
+  "yAxis": { "title": "Requests (thousands)" },
+  "series": [
+    { "name": "Requests", "data": [182, 164, 97, 88, 64, 41] }
+  ]
+}

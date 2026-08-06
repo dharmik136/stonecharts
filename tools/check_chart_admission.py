@@ -8,13 +8,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "libs" / "python"))
 
 DECISIONS_PATH = ROOT / "docs" / "project" / "decisions.md"
 SCHEMA_PATH = ROOT / "spec" / "chart-spec.schema.json"
 CHARTS_DIR = ROOT / "charts"
+PYTHON_CHARTS_DIR = ROOT / "libs" / "python" / "stonecharts" / "charts"
+GO_DIR = ROOT / "libs" / "go"
 
 DIR_TO_TYPE = {"line-basic": "line"}
 
@@ -93,6 +97,54 @@ def check_example_specs(chart_type: str) -> str | None:
     return None
 
 
+def check_python_renderer(chart_type: str) -> str | None:
+    """Phase 3: Python renderer module must exist."""
+    type_id = _schema_type(chart_type)
+    path = PYTHON_CHARTS_DIR / f"{type_id}.py"
+    if not path.is_file():
+        return f"Python renderer {path.relative_to(ROOT)} does not exist"
+    return None
+
+
+def check_go_renderer(chart_type: str) -> str | None:
+    """Phase 3: Go renderer file must exist."""
+    type_id = _schema_type(chart_type)
+    path = GO_DIR / f"{type_id}.go"
+    if not path.is_file():
+        return f"Go renderer {path.relative_to(ROOT)} does not exist"
+    return None
+
+
+def check_capabilities_registration(chart_type: str) -> str | None:
+    """Phase 3: Chart type must be listed in the capabilities manifest."""
+    type_id = _schema_type(chart_type)
+    from stonecharts.capabilities import capabilities
+
+    cap_types = capabilities()["chartTypes"]
+    if type_id not in cap_types:
+        return f"'{type_id}' not in capabilities chartTypes: {cap_types}"
+    return None
+
+
+def check_adversarial_fixture(chart_type: str) -> str | None:
+    """Phase 4: An adversarial example must exist for edge-case coverage."""
+    adversarial = CHARTS_DIR / chart_type / "examples" / "adversarial.json"
+    if not adversarial.is_file():
+        return f"No adversarial example at {adversarial.relative_to(ROOT)}"
+    return None
+
+
+def check_cross_render_corpus(chart_type: str) -> str | None:
+    """Phase 5: Chart type must be in the direct cross-render ACTIVE corpus."""
+    cross_render = ROOT / "tools" / "check_direct_cross_render.py"
+    if not cross_render.is_file():
+        return None
+    text = cross_render.read_text(encoding="utf-8")
+    if f'"{chart_type}"' in text:
+        return None
+    return f"'{chart_type}' not in check_direct_cross_render.py ACTIVE corpus"
+
+
 def run_checks(chart_type: str) -> list[tuple[str, str | None]]:
     """Run all admission checks for a single chart type.
 
@@ -104,10 +156,15 @@ def run_checks(chart_type: str) -> list[tuple[str, str | None]]:
     return [
         ("Decision document (DEC-*)", check_decision_document(chart_type, decisions_text)),
         ("Schema registration", check_schema_registration(chart_type, type_enum)),
+        ("Design document", check_design_document(chart_type)),
+        ("Python renderer", check_python_renderer(chart_type)),
+        ("Go renderer", check_go_renderer(chart_type)),
+        ("Capabilities manifest", check_capabilities_registration(chart_type)),
         ("Golden fixtures", check_golden_fixtures(chart_type)),
         ("Invalid fixtures", check_invalid_fixtures(chart_type)),
-        ("Design document", check_design_document(chart_type)),
+        ("Adversarial fixture", check_adversarial_fixture(chart_type)),
         ("Example specs", check_example_specs(chart_type)),
+        ("Cross-render corpus", check_cross_render_corpus(chart_type)),
     ]
 
 

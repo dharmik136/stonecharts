@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Deterministic Chart Rendering for Regulated Reporting">
+  <!-- Hero -->
+  <section style="padding: 6rem 0 4rem; text-align: center;">
+    <div class="container">
+      <p style="margin-bottom: 1.5rem;">
+        <span class="badge">Private Preview</span>
+      </p>
+      <h1 style="max-width: 720px; margin: 0 auto 1.5rem; font-size: 2.75rem; line-height: 1.15;">
+        When your Python pipeline and Go service render the same chart and the output
+        drifts — even by one pixel — someone has to explain&nbsp;it.
+      </h1>
+      <p style="max-width: 560px; margin: 0 auto 2.5rem; font-size: 1.125rem; color: var(--text-secondary);">
+        A deterministic, multi-language chart system that makes every chart change
+        provable — so regulated reporting teams spend less time explaining visual
+        differences and more time shipping.
+      </p>
+      <a href="#request-access" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 2rem;">
+        Request early access
+      </a>
+    </div>
+  </section>
+
+  <!-- Static chart preview -->
+  <section style="padding: 0 0 4rem;">
+    <div class="container" style="max-width: 860px;">
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <img
+          src="/preview-chart.svg"
+          alt="Line chart showing Monthly Average Temperature for Tokyo and London, rendered as deterministic SVG"
+          width="820"
+          height="460"
+          style="display: block; width: 100%; height: auto;"
+          loading="lazy"
+        />
+        <p style="padding: 0.75rem 1.25rem; margin: 0; font-size: 0.8125rem; color: var(--text-tertiary); border-top: 1px solid var(--border);">
+          Deterministic SVG output. Same spec, same bytes, Python or Go. Zero runtime dependencies.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pain points -->
+  <section class="section" style="background: var(--bg-surface);">
+    <div class="container">
+      <h2 style="text-align: center; margin-bottom: 3rem;">
+        Three problems regulated teams face with chart infrastructure
+      </h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        <div class="card">
+          <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">01</div>
+          <h3>Inconsistent output</h3>
+          <p style="color: var(--text-secondary); margin: 0;">
+            The same chart spec produces different bytes depending on the language,
+            platform, or even the time of day. Two of five major chart libraries embed
+            random IDs in their SVG output, making byte-level comparison impossible.
+          </p>
+        </div>
+        <div class="card">
+          <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">02</div>
+          <h3>Unauditable changes</h3>
+          <p style="color: var(--text-secondary); margin: 0;">
+            When a chart in a quarterly filing looks different from the previous version,
+            there is no evidence trail showing whether the data changed, the renderer
+            changed, or both. The investigation is manual, and the cost is real.
+          </p>
+        </div>
+        <div class="card">
+          <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">03</div>
+          <h3>Dependency risk</h3>
+          <p style="color: var(--text-secondary); margin: 0;">
+            Server-side chart rendering typically requires headless browsers,
+            hundreds of npm dependencies, and large memory footprints. One popular
+            export server ships 261 dependencies and needs 550 MB of RAM to start.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section">
+    <div class="container" style="max-width: 720px; text-align: center;">
+      <h2 style="margin-bottom: 1rem;">A different approach</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 3rem;">
+        One shared specification. Certified renderers in Python and Go with zero runtime
+        dependencies. A conformance tool that proves cross-runtime parity for every release.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; text-align: center;">
+        <div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent);">0</div>
+          <div style="font-size: 0.875rem; color: var(--text-secondary);">Runtime dependencies</div>
+        </div>
+        <div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent);">2</div>
+          <div style="font-size: 0.875rem; color: var(--text-secondary);">Certified languages</div>
+        </div>
+        <div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent);">Byte-identical</div>
+          <div style="font-size: 0.875rem; color: var(--text-secondary);">Cross-runtime output</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Access request -->
+  <section id="request-access" class="section" style="background: var(--bg-surface);">
+    <div class="container" style="max-width: 560px; text-align: center;">
+      <h2 style="margin-bottom: 0.75rem;">Request early access</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+        The interactive demo includes a chart gallery with six certified chart types,
+        measured benchmark comparisons against five chart libraries, and a conformance
+        proof showing byte-identical output across Python and Go.
+      </p>
+      <form id="access-form" style="display: flex; gap: 0.5rem; max-width: 420px; margin: 0 auto;">
+        <input
+          type="email"
+          name="email"
+          placeholder="you@company.com"
+          required
+          style="flex: 1; padding: 0.625rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.875rem; background: var(--bg-surface-raised); color: var(--text);"
+        />
+        <button type="submit" class="btn btn-primary">Request</button>
+      </form>
+      <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-tertiary);">
+        We will review requests and grant access within one business day.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="border-top: 1px solid var(--border); padding: 2rem 0; text-align: center;">
+    <div class="container" style="font-size: 0.8rem; color: var(--text-tertiary);">
+      Copyright 2026. All rights reserved. This product is in private preview.
+    </div>
+  </footer>
+</BaseLayout>

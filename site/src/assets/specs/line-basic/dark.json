@@ -1,0 +1,12 @@
+{
+  "type": "line",
+  "theme": "dark",
+  "title": "Server Response Time",
+  "subtitle": "Dark theme (Phase 5)",
+  "xAxis": { "title": "Hour", "categories": ["00", "04", "08", "12", "16", "20"] },
+  "yAxis": { "title": "ms" },
+  "series": [
+    { "name": "p50", "data": [42, 38, 55, 71, 64, 48], "curve": "monotone" },
+    { "name": "p95", "data": [88, 79, 120, 156, 138, 96], "curve": "monotone" }
+  ]
+}

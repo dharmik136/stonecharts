@@ -1,0 +1,31 @@
+{
+  "type": "scatter",
+  "theme": "dark",
+  "title": "GC Pause vs Heap Occupancy",
+  "subtitle": "Dark theme, gradient point fill, two marker symbols",
+  "xAxis": { "title": "Sample #" },
+  "yAxis": { "title": "Pause (ms)" },
+  "series": [
+    {
+      "name": "young-gen",
+      "data": [3.2, 4.1, 2.8, 5.0, 3.9, 4.6, 3.1, 5.4, 4.2, 3.7],
+      "marker": { "symbol": "diamond", "radius": 5 },
+      "fillOpacity": 0.75,
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      }
+    },
+    {
+      "name": "old-gen",
+      "data": [11.5, 14.2, 9.8, 16.0, 12.7, 15.1, 10.4, 17.3, 13.6, 12.1],
+      "marker": { "symbol": "square", "radius": 5 },
+      "fillOpacity": 0.75,
+      "color": "#f7a35c"
+    }
+  ]
+}

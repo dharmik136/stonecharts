@@ -28,3 +28,6 @@ Thumbs.db
 # machine-specific benchmark output
 benchmark_results.json
 .stress/
+
+# Go fuzz test corpus (auto-generated)
+libs/go/stonecharts-fuzz-*/

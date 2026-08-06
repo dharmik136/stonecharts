@@ -1,0 +1,25 @@
+{
+  "type": "scatter",
+  "title": "Latency vs Payload Size",
+  "subtitle": "Explicit (x, y) point model - positional and object forms",
+  "xAxis": { "title": "Payload (bytes)" },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    {
+      "name": "positional-pairs",
+      "data": [[128, 47], [256, 52], [512, 66], [1024, 91], [2048, 140]],
+      "marker": { "symbol": "circle", "radius": 4 }
+    },
+    {
+      "name": "object-pairs",
+      "data": [
+        { "x": 150, "y": 30 },
+        { "x": 300, "y": 58 },
+        { "x": 600, "y": 74 },
+        { "x": 1200, "y": 110 }
+      ],
+      "marker": { "symbol": "square", "radius": 4 },
+      "fillOpacity": 0.7
+    }
+  ]
+}

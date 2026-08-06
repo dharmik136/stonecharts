@@ -1,0 +1,25 @@
+{
+  "type": "bubble",
+  "title": "Latency vs Payload by Region",
+  "subtitle": "Bubble area = requests/min (shared global z-scale); translucent for overlap",
+  "xAxis": { "title": "Payload size (KB)" },
+  "yAxis": { "title": "p95 latency (ms)" },
+  "sizeLegend": true,
+  "series": [
+    {
+      "name": "us-east",
+      "fillOpacity": 0.6,
+      "data": [[4, 38, 4200], [12, 55, 6100], [26, 92, 3300], [48, 140, 5200], [80, 210, 1800]]
+    },
+    {
+      "name": "eu-west",
+      "fillOpacity": 0.6,
+      "data": [[6, 52, 1500], [18, 74, 2800], [33, 110, 3900], [60, 168, 2100], [95, 240, 1200]]
+    },
+    {
+      "name": "ap-south",
+      "fillOpacity": 0.6,
+      "data": [[3, 66, 900], [10, 88, 1700], [22, 134, 2400], [40, 190, 3100], [70, 275, 800]]
+    }
+  ]
+}
