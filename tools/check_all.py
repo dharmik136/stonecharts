@@ -25,6 +25,19 @@ CHECKS: list[tuple[str, list[str]]] = [
             "spec/chart-spec.schema.json",
         ],
     ),
+    (
+        "chart admission (certified)",
+        [
+            sys.executable,
+            "tools/check_chart_admission.py",
+            "line-basic",
+            "column",
+            "area",
+            "bar",
+            "scatter",
+            "bubble",
+        ],
+    ),
 ]
 
 CHECKS_REQUIRING_GO: list[tuple[str, list[str]]] = [

@@ -16,6 +16,8 @@ DECISIONS_PATH = ROOT / "docs" / "project" / "decisions.md"
 SCHEMA_PATH = ROOT / "spec" / "chart-spec.schema.json"
 CHARTS_DIR = ROOT / "charts"
 
+DIR_TO_TYPE = {"line-basic": "line"}
+
 
 def _load_schema_type_enum() -> list[str]:
     """Return the list of accepted chart type strings from the spec schema."""
@@ -29,21 +31,27 @@ def _load_decisions_text() -> str:
     return DECISIONS_PATH.read_text(encoding="utf-8")
 
 
+def _schema_type(chart_dir: str) -> str:
+    """Map a chart directory name to its schema type identifier."""
+    return DIR_TO_TYPE.get(chart_dir, chart_dir)
+
+
 def check_decision_document(chart_type: str, decisions_text: str) -> str | None:
     """A DEC-* reference that mentions *chart_type* must exist in decisions.md."""
+    lookup = _schema_type(chart_type)
     for line in decisions_text.splitlines():
-        if "DEC-" in line and chart_type in line:
+        if "DEC-" in line and lookup in line:
             return None
-    return f"No DEC-* reference mentioning '{chart_type}' found in {DECISIONS_PATH.relative_to(ROOT)}"
+    return f"No DEC-* reference mentioning '{lookup}' found in {DECISIONS_PATH.relative_to(ROOT)}"
 
 
 def check_schema_registration(chart_type: str, type_enum: list[str]) -> str | None:
     """The chart type string must appear in the schema's type enum."""
-    if chart_type in type_enum:
+    lookup = _schema_type(chart_type)
+    if lookup in type_enum:
         return None
     return (
-        f"'{chart_type}' not found in {SCHEMA_PATH.relative_to(ROOT)} type enum "
-        f"(registered types: {', '.join(type_enum)})"
+        f"'{lookup}' not found in {SCHEMA_PATH.relative_to(ROOT)} type enum (registered types: {', '.join(type_enum)})"
     )
 
 
