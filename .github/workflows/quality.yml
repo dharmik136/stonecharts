@@ -108,7 +108,7 @@ jobs:
       - run: python -m pip install "build>=1,<2"
       - run: python -m build --wheel --outdir dist libs/python
       - run: python -m venv /tmp/install-test-venv
-      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.10-py3-none-any.whl
+      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-*.whl
       - name: Smoke-test the installed wheel from a neutral directory
         working-directory: /tmp
         run: |
@@ -152,6 +152,10 @@ jobs:
           cr_spec = ChartSpec.from_dict({'type':'columnrange','title':'CR Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[5.0,10.0,8.0],'high':[15.0,25.0,20.0]}]})
           cr_svg = render_svg(cr_spec)
           assert cr_svg.startswith('<svg'), 'columnrange render failed'
+          from stonecharts.charts import waterfall
+          wf_spec = ChartSpec.from_dict({'type':'waterfall','title':'WF Smoke','xAxis':{'categories':['Rev','Cost','Profit']},'series':[{'name':'S','data':[100.0,-60.0,40.0]}],'sumIndices':[2]})
+          wf_svg = render_svg(wf_spec)
+          assert wf_svg.startswith('<svg'), 'waterfall render failed'
           try:
               from stonecharts.charts import boxplot
               raise AssertionError('unapproved boxplot module present in installed package')
@@ -214,7 +218,10 @@ jobs:
       - run: go build -o /tmp/stoneverify-go-render ./cmd/stoneverify-go-render
         working-directory: libs/go
       - run: python -m venv /tmp/stoneverify-pilot-venv
-      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.10
+      - name: Install built wheel
+        run: |
+          VERSION=$(grep -m1 'version' libs/python/pyproject.toml | cut -d'"' -f2)
+          /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist "stonecharts==${VERSION}"
       - name: Create external pilot fixture
         run: |
           cat > /tmp/stoneverify-external-fixture.json <<'JSON'
@@ -333,7 +340,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area arearange bar bubble candlestick column columnrange combo error-bar histogram line-basic scatter; do
+          for chart_type in area arearange bar bubble candlestick column columnrange combo error-bar histogram line-basic scatter waterfall; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
