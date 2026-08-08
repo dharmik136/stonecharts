@@ -194,12 +194,12 @@ func (f *cartesianFrame) valuePix(v float64) float64 {
 // valueZero returns the pixel coordinate for the zero baseline on the value axis.
 func (f *cartesianFrame) valueZero() float64 { return f.valuePix(0.0) }
 
-// ypix2 maps a secondary-axis value v to a pixel x (used by combo charts).
+// ypix2 maps a secondary-axis value to a pixel y (used by combo dual-axis charts).
 func (f *cartesianFrame) ypix2(v float64) float64 {
 	if f.y2Max == f.y2Min {
-		return f.plotX + f.plotW/2
+		return f.plotY + f.plotH/2
 	}
-	return f.plotX + f.plotW*(v-f.y2Min)/(f.y2Max-f.y2Min)
+	return f.plotY + f.plotH*(1-(v-f.y2Min)/(f.y2Max-f.y2Min))
 }
 
 // marksFn — a chart supplies ONLY this: append its marks for one plot into the
@@ -241,23 +241,23 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		mTop += 18
 	}
 	mLeft := 52.0
-	if orientation == "horizontal" {
-		if spec.XAxis.Title != "" {
-			mLeft = 62
-		}
-	} else if spec.YAxis.Title != "" {
+	if spec.YAxis.Title != "" {
 		mLeft = 62
 	}
+	hasSecondary := spec.SecondaryYAxis != nil
 	mRight := 22.0
+	if hasSecondary {
+		if spec.SecondaryYAxis.Title != "" {
+			mRight = 62
+		} else {
+			mRight = 52
+		}
+	}
 	mBottom := 46.0
 	if spec.legendOn() {
 		mBottom += 18
 	}
-	if orientation == "horizontal" {
-		if spec.YAxis.Title != "" {
-			mBottom += 18
-		}
-	} else if spec.XAxis.Title != "" {
+	if spec.XAxis.Title != "" {
 		mBottom += 18
 	}
 	if spec.Layout != nil && spec.Layout.Margin != nil {
@@ -447,6 +447,45 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 	}
 	yMin, yMax, yTicks := niceTicks(lo, hi, 6)
 
+	// Secondary y-axis domain (combo dual-axis).
+	y2Min, y2Max := 0.0, 0.0
+	var y2Ticks []float64
+	if hasSecondary {
+		var y2vals []float64
+		for si := range spec.Series {
+			if spec.Series[si].YAxis == 1 {
+				y2vals = append(y2vals, spec.Series[si].Data...)
+			}
+		}
+		y2lo := 0.0
+		y2hi := 0.0
+		if len(y2vals) > 0 {
+			y2lo = y2vals[0]
+			y2hi = y2vals[0]
+			for _, v := range y2vals[1:] {
+				if v < y2lo {
+					y2lo = v
+				}
+				if v > y2hi {
+					y2hi = v
+				}
+			}
+			if y2lo > 0 {
+				y2lo = 0
+			}
+			if y2hi < 0 {
+				y2hi = 0
+			}
+		}
+		if spec.SecondaryYAxis.Min != nil {
+			y2lo = *spec.SecondaryYAxis.Min
+		}
+		if spec.SecondaryYAxis.Max != nil {
+			y2hi = *spec.SecondaryYAxis.Max
+		}
+		y2Min, y2Max, y2Ticks = niceTicks(y2lo, y2hi, 6)
+	}
+
 	// Resolve per-series styling and collect <defs>. Defs are emitted ONLY when
 	// a series needs them, so default output stays byte-identical. `fill` is the
 	// resolved BAR paint (pattern -> gradient -> solid hex); line ignores it.
@@ -506,6 +545,8 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		orientation: orientation,
 		stacking:    spec.Stacking,
 		xMin: xMin, xMax: xMax, xTicks: xTicks,
+		secondaryAxis: spec.SecondaryYAxis,
+		y2Min: y2Min, y2Max: y2Max, y2Ticks: y2Ticks,
 	}
 }
 
@@ -755,9 +796,15 @@ func chromeTail(f *cartesianFrame, p *strings.Builder) {
 		for si, s := range spec.Series {
 			color := f.styles[si].solid
 			p.WriteString(fmt.Sprintf(`<g class="sc-legend-item" data-series="%d">`, si))
-			p.WriteString(fmt.Sprintf(
-				`<rect x="%s" y="%s" width="14" height="4" rx="2" fill="%s"/>`,
-				f1(lx), f1(ly-9), color))
+			if spec.Type == "combo" && s.Type == "line" {
+				p.WriteString(fmt.Sprintf(
+					`<rect x="%s" y="%s" width="14" height="2" rx="1" fill="%s"/>`,
+					f1(lx), f1(ly-8), color))
+			} else {
+				p.WriteString(fmt.Sprintf(
+					`<rect x="%s" y="%s" width="14" height="4" rx="2" fill="%s"/>`,
+					f1(lx), f1(ly-9), color))
+			}
 			p.WriteString(fmt.Sprintf(
 				`<text x="%s" y="%s" font-size="12" fill="%s">%s</text>`,
 				f1(lx+20), f1(ly-2), theme.LegendTextColor, esc(s.Name)))

@@ -43,22 +43,26 @@ jobs:
           go-version-file: libs/go/go.mod
           cache-dependency-path: libs/go/go.mod
       - run: go vet ./...
-      - uses: golangci/golangci-lint-action@1481404843c368bc19ca9d2d2e9e3cd4ab816cee # v7.0.0
+      - uses: golangci/golangci-lint-action@9fae48acfc02a90574d7c304a1758ef9895495fa # v7.0.1
         with:
-          version: v2.1
+          version: v2.12
           working-directory: libs/go
 
   codeql:
     runs-on: ubuntu-latest
     permissions:
+      actions: read
+      contents: read
       security-events: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: github/codeql-action/init@ea87a0ef64b51e6bc6ea7d15b3c9416f0e8f6a9a # v3.28.16
+      - uses: github/codeql-action/init@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
         with:
           languages: python, go
-      - uses: github/codeql-action/autobuild@ea87a0ef64b51e6bc6ea7d15b3c9416f0e8f6a9a # v3.28.16
-      - uses: github/codeql-action/analyze@ea87a0ef64b51e6bc6ea7d15b3c9416f0e8f6a9a # v3.28.16
+      - uses: github/codeql-action/autobuild@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
+      - uses: github/codeql-action/analyze@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
+        with:
+          upload: never
 
   documentation:
     runs-on: ubuntu-latest
@@ -104,7 +108,7 @@ jobs:
       - run: python -m pip install "build>=1,<2"
       - run: python -m build --wheel --outdir dist libs/python
       - run: python -m venv /tmp/install-test-venv
-      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.4-py3-none-any.whl
+      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.5-py3-none-any.whl
       - name: Smoke-test the installed wheel from a neutral directory
         working-directory: /tmp
         run: |
@@ -128,6 +132,10 @@ jobs:
           bubble_spec = ChartSpec(type='bubble', title='Bubble Smoke Test', x_axis=Axis(title='X'), series=[Series(name='S', data=[[1.0,2.0,3.0],[4.0,5.0,6.0]])])
           bubble_svg = render_svg(bubble_spec)
           assert bubble_svg.startswith('<svg'), 'bubble render failed'
+          from stonecharts.charts import combo
+          combo_spec = ChartSpec(type='combo', title='Combo Smoke Test', x_axis=Axis(categories=['Jan','Feb']), series=[Series(name='Rev', data=[10.0,20.0], type='column'), Series(name='Trend', data=[12.0,18.0], type='line')])
+          combo_svg = render_svg(combo_spec)
+          assert combo_svg.startswith('<svg'), 'combo render failed'
           try:
               from stonecharts.charts import boxplot
               raise AssertionError('unapproved boxplot module present in installed package')
@@ -161,12 +169,13 @@ jobs:
       - run: go vet ./...
       - run: go test . -cover -covermode=atomic -coverprofile=coverage.out
       - name: Enforce Go coverage threshold
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           total=$(go tool cover -func=coverage.out | grep total: | awk '{print $3}' | tr -d '%')
           threshold=70
           echo "Go coverage: ${total}%  (threshold: ${threshold}%)"
-          if [ "$(echo "$total < $threshold" | bc -l)" -eq 1 ]; then
+          if awk "BEGIN{exit(!($total < $threshold))}"; then
             echo "::error::Go coverage ${total}% is below threshold ${threshold}%"
             exit 1
           fi
@@ -189,7 +198,7 @@ jobs:
       - run: go build -o /tmp/stoneverify-go-render ./cmd/stoneverify-go-render
         working-directory: libs/go
       - run: python -m venv /tmp/stoneverify-pilot-venv
-      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.4
+      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.5
       - name: Create external pilot fixture
         run: |
           cat > /tmp/stoneverify-external-fixture.json <<'JSON'
@@ -308,7 +317,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area bar bubble column line-basic scatter; do
+          for chart_type in area bar bubble column combo line-basic scatter; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"

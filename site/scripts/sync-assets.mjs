@@ -6,7 +6,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 const SITE = join(__dirname, '..');
 
-const CHART_TYPES = ['line-basic', 'column', 'area', 'bar', 'scatter', 'bubble'];
+const CHART_TYPES = ['line-basic', 'column', 'area', 'bar', 'scatter', 'bubble', 'combo'];
 
 async function ensureDir(dir) {
   await mkdir(dir, { recursive: true });

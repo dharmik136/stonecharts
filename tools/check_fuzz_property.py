@@ -141,6 +141,40 @@ def build_specs() -> list[dict[str, Any]]:
         if rng.random() < 0.2:
             spec["a11y"] = rng.choice([True, False])
         specs.append(spec)
+    combo_rng = random.Random(SEED + 1)
+    for i in range(CASES // 4):
+        point_count = combo_rng.randint(1, 8)
+        col_count = combo_rng.randint(1, 3)
+        line_count = combo_rng.randint(1, 2)
+        categories = [safe_text(combo_rng, f"Cat {j + 1}") for j in range(combo_rng.randint(1, point_count + 2))]
+        series: list[dict[str, Any]] = []
+        for s in range(col_count):
+            series.append(
+                {
+                    "name": safe_text(combo_rng, f"Col {s + 1}"),
+                    "type": "column",
+                    "data": [round(combo_rng.uniform(-40, 120), 4) for _ in range(point_count)],
+                }
+            )
+        for s in range(line_count):
+            series.append(
+                {
+                    "name": safe_text(combo_rng, f"Line {s + 1}"),
+                    "type": "line",
+                    "data": [round(combo_rng.uniform(-40, 120), 4) for _ in range(point_count)],
+                }
+            )
+        spec = {
+            "type": "combo",
+            "title": safe_text(combo_rng, f"Combo Fuzz {i + 1}"),
+            "series": series,
+            "theme": combo_rng.choice(["light", "dark"]),
+        }
+        if categories and combo_rng.random() < 0.85:
+            spec["xAxis"] = {"categories": categories}
+        if combo_rng.random() < 0.35:
+            spec["yAxis"] = {"title": safe_text(combo_rng, "Y axis")}
+        specs.append(spec)
     return specs
 
 
@@ -230,13 +264,13 @@ def main() -> int:
 
     report = f"""---
 id: SC-REL-010
-title: StoneCharts 0.0.0.1 Fuzz and Property Qualification
+title: StoneCharts Fuzz and Property Qualification
 status: proposed
 classification: informative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.0.1
+applies_to: 0.0.0.5
 requirements: [REQ-DET-001, REQ-SEC-001]
 evidence: [TEST-FUZZ-PROPERTY]
 last_reviewed: "2026-07-19"
@@ -248,16 +282,16 @@ superseded_by: null
 # Fuzz And Property Qualification
 
 - Seed: `{SEED}`
-- Cases: `{CASES}`
+- Cases: `{len(specs)}`
 - Result: PASS
 
-This deterministic corpus exercised valid line, column, area, bar, scatter, and bubble specs
-across category-length, series-count, theme, style, and layout combinations. Python and Go
-rendered the same SVG bytes for every generated case, and no NaN/Inf escaped into output.
+This deterministic corpus exercised valid line, column, area, bar, scatter, bubble, and combo
+specs across category-length, series-count, theme, style, and layout combinations. Python and
+Go rendered the same SVG bytes for every generated case, and no NaN/Inf escaped into output.
 """
     (PACK / "fuzz-property-report.md").write_text(report, encoding="utf-8")
     corpus_sha = hashlib.sha256(corpus_path.read_bytes()).hexdigest()
-    print(f"fuzz property PASS: seed={SEED} cases={CASES} corpus={corpus_sha}")
+    print(f"fuzz property PASS: seed={SEED} cases={len(specs)} corpus={corpus_sha}")
     return 0
 
 

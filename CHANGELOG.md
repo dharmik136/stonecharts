@@ -7,6 +7,89 @@ not represented as Semantic Versioning.
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [0.0.0.5] - 2026-08-08
+
+### Added
+
+- `combo` chart type (DEC-020): per-series mark types (column + line) on shared
+  Cartesian axes with optional dual y-axis (`secondaryYAxis`). Certified renderers in
+  both Python and Go with byte-identical golden SVGs. Schema extended with
+  `series[].type` and `series[].yAxis` fields. Legend swatch differentiates column
+  (rect) vs line (thin bar). Approved as validation infrastructure under DEC-017.
+- Gated demo site (DEC-019): landing page with stats bar, problem/solution cards, and
+  access-request form; demo gallery, benchmarks dashboard, StoneVerify evidence viewer.
+  Deployed via Astro with Cloudflare Access gate. JSON-LD structured data, canonical
+  URLs, Open Graph image, Twitter cards, sitemap, CSP headers, 404 page.
+- Go fuzz test (`FuzzFromJSON`) with 10 seed corpus entries from all 7 chart types.
+- Go benchmark functions (`BenchmarkRender`, `BenchmarkRenderComplex`,
+  `BenchmarkFromJSON`) covering all 7 chart types with basic and complex specs.
+- Browser qualification tests for all 7 chart types: Playwright + Chromium tests cover
+  tooltip on hover, keyboard navigation, legend toggle, and ARIA attributes.
+- Validation coverage expanded to 99%: 34 new edge-case assertions covering gradient
+  stops, pattern/marker/theme objects, scatter/bubble datum models, margin plot-area
+  checks, unknown chart types, and percent-stacking guards.
+- Python test coverage improved to 88% overall (140 tests).
+- Content-draft articles rewritten with governed YAML frontmatter.
+
+### Fixed
+
+- Area chart monotone spline parity: Go `area.go` now respects the per-series `curve`
+  property, matching Python's `_spline_d` dispatch for `curve: "monotone"`.
+- Bar chart margin parity: Go `cartesian.go` removed orientation-aware margin swap that
+  diverged from Python's always-use-axis-title logic.
+- Secondary-axis `ypix2` was mapping values to the wrong dimension (horizontal instead
+  of vertical) in `cartesian.go` and `_cartesian.py`.
+- `util._nice_num` could return `int` instead of `float`, causing downstream type
+  mismatches.
+- `verify/cli.py`: type annotation fixes and file handle context manager fix.
+- CI: updated stale CodeQL and golangci-lint action SHAs; replaced `bc -l` with `awk`
+  for Go coverage threshold (fixes Windows runner).
+- `check_docs.py`: 51 pre-existing issues resolved (content-draft frontmatter, backlog
+  schema `site` area, traceability cross-references, document ID patterns).
+
+## [0.0.0.4] - 2026-07-28
+
+### Added
+
+- `bubble` chart type (DEC-016): extends scatter's point model with `z` value and a
+  deterministic area-proportional size scale (`r = sqrt(z)`). Certified renderers in
+  Python and Go with byte-identical golden SVGs. No shared-frame changes required.
+- StoneVerify conformance workflow: installable `stoneverify` console script, semantic
+  difference categories, baseline comparison workflow, result-envelope helper with
+  stable `VERIFY.*` finding codes, resource limits and timeout exit codes, JUnit XML
+  output and GitHub Actions annotations.
+- StoneVerify evaluation-kit builder: creates a repo-independent zip with wheel, Go
+  adapter, sample spec, schemas, governed docs, and a demo runner.
+- StoneVerify pilot-readiness gate (`GATE-VERIFY-PILOT-001`): CI job with external
+  fixture, artifact upload, and annotation verification.
+- Competitor benchmark against Vega, Highcharts Export Server, and QuickChart
+  (`SC-QUAL-003`): measured determinism, cold-start, throughput, dependency surface.
+- Visual Integrity Infrastructure repositioning (DEC-017): paused broad expansion,
+  focused on insurance reporting validation segment.
+- Name-clearance due-diligence framework (DEC-012, WORK-GTM-014).
+- Prospect qualification scorecard, pilot-offer hypothesis, and GTM content drafts.
+
+## [0.0.0.3] - 2026-07-27
+
+### Added
+
+- `scatter` chart type (DEC-015): introduces the governed point model
+  (`series[].data` normalizes to `{x,y}` / `[x,y]` / bare-number) and a numeric
+  `linear` x-scale. Forces two generalizations shared across every chart type.
+  Certified renderers in Python and Go with byte-identical golden SVGs.
+
+## [0.0.0.2] - 2026-07-27
+
+### Added
+
+- `bar` chart type (DEC-014): pure orientation transpose of the column substrate.
+  Reuses column's band-layout, stacking, and shared chrome with no new data or point
+  model. Certified renderers in Python and Go with byte-identical golden SVGs.
+
+## [0.0.0.1] - 2026-07-24
+
 ### Added
 
 - Stage 0 product and engineering governance system.
@@ -18,45 +101,30 @@ not represented as Semantic Versioning.
 - Documentation and traceability validation tool plus CI quality workflow.
 - Governed GitHub Project backlog, workflow fields, and conformance controls.
 - ADR 0007 establishing `0.0.0.1` as the canonical first release identifier.
-- Stage 1 (`GATE-S1`): `area` chart renderer in both languages; reconciled schema/Python/Go
-  validation semantics; signed normal and percent stacking geometry; deterministic
-  validated manual margins; qualified runtime interaction semantics; deterministic
-  customization boundary.
-- Stage 2 (`GATE-S2`): canonical SVG byte-parity requalified across the full active
-  corpus (line, column, area) including a direct Python-Go cross-render sweep; browser
-  and manual accessibility qualification (live Chromium harness + Node DOM harness +
-  recorded ARIA-tree review); visual reproducibility profile review; untrusted
-  specification safety requalification (XSS/injection escaping, both languages);
-  reproducible performance qualification against the approved Small/Business/Dense/Stress
-  workload matrix (rewrote both language benchmark harnesses to implement it, replacing an
-  older, unrelated point-count/layout-style dimension).
-- `REQ-REL-001`: immutable release evidence pack (manifest, SBOM, provenance, hashes,
-  package install matrix) for candidate `rc.1`, validated against
-  `docs/releases/0.0.0.1/evidence/manifest.schema.json`.
-- Toward `GATE-S3`: qualified Python wheel install (built, installed into an isolated
-  venv, confirmed resolution from the installed copy rather than the source tree, on
-  3.14 locally and 3.9 in CI) and Go module consumption (via a separate consumer module
-  using a local `replace` directive).
+- `line` chart renderer (Python and Go): basic, styled, markers, spline, gradient,
+  dark theme. Certified with byte-identical golden SVGs.
+- `column` chart renderer (Python and Go): grouped, stacked, and percent-stacked
+  profiles. Certified with byte-identical golden SVGs.
+- `area` chart renderer (Python and Go): basic, stacked, and percent-stacked profiles.
+  Certified with byte-identical golden SVGs.
+- Shared Cartesian frame: axis rendering, grid lines, legend, runtime interactions
+  (tooltip, highlight, crosshair, keyboard navigation, legend toggle).
+- Self-contained interactive HTML runtime with governed interaction semantics.
+- Structured customization surface (DEC-004): themes (light/dark/custom), series
+  styling, gradients, patterns, sizing, layout controls. Arbitrary CSS, callbacks,
+  and DOM mutation rejected.
+- Immutable release evidence pack (`REQ-REL-001`): manifest, SBOM, provenance, hashes,
+  and qualification evidence.
+- Qualified Python wheel install and Go module consumption.
 
 ### Fixed
 
-- Removed `bar`, `arearange`, `combo`, `histogram`, and `scatter` renderer
-  implementations, golden fixtures, and schema/capability registrations that had been
-  added without an approved `DEC-*`/`REQ-*` decision, widening active scope beyond the
-  ratified `line`/`column`/`area` (`DEC-002`). Restored their pre-existing
-  `design.md`/`examples/` informative scaffolding.
-- CI `python` job was missing the `jsonschema` dependency `test_golden.py` imports,
-  failing test collection on every fresh run since it was introduced.
-- Documentation linked to `.gitignore`d, machine-specific benchmark output files as if
-  they were committed evidence; changed to plain references with an explanation.
-- CI workflow triggered `push` builds on the legacy `master` branch instead of the
-  canonical `main` (`DEC-006`).
-
-### Known release blockers
-
-- Release tag and publication are not yet performed (`DEC-011`: private until Stage 3
-  evidence is complete).
-- Public support channel sign-off is not yet recorded.
+- Removed unapproved chart type implementations (`bar`, `arearange`, `combo`,
+  `histogram`, `scatter`) that had been added without `DEC-*`/`REQ-*` decisions,
+  widening scope beyond the ratified `line`/`column`/`area` set (DEC-002).
+- CI `python` job was missing `jsonschema` dependency.
+- Documentation linked to `.gitignore`d benchmark output files as committed evidence.
+- CI workflow triggered `push` builds on the legacy `master` branch instead of `main`.
 
 ## [0.1.0] - Unreleased historical metadata
 

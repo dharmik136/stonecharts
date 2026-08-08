@@ -36,6 +36,7 @@ marketing, and pilot documents should link here instead of restating release sco
 | Bar | Certified | 0.0.0.2 | Orientation transpose of the column substrate, independently qualified. |
 | Scatter | Certified | 0.0.0.3 | Introduces the governed point model and numeric x-axis. |
 | Bubble | Certified | 0.0.0.4 | Extends the point model with `z` and a deterministic size scale. |
+| Combo | Certified | 0.0.0.5 | Per-series mark types (column + line) on shared axes with optional dual y-axis. |
 
 ## Commercial pilot scope
 
@@ -43,8 +44,8 @@ The next pilot scope is intentionally narrower than the full design roadmap:
 
 - insurance reporting and actuarial workflows;
 - Python and Go only;
-- line, column, bar, area, scatter, and bubble only unless a paid validation workflow
-  requires another chart type;
+- line, column, bar, area, scatter, bubble, and combo only unless a paid validation
+  workflow requires another chart type;
 - local evidence bundles stored by the customer, not hosted StoneVault storage;
 - StoneVerify-style conformance checks before new chart-family breadth.
 

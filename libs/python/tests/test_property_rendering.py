@@ -34,6 +34,19 @@ def _specs():
                 "xAxis": {"categories": [f"C{i}" for i in range(points)]},
                 "series": [{"name": f"S{s}", "data": _series_data(rng, points)} for s in range(series_count)],
             }
+    for case in range(8):
+        points = rng.randint(1, 12)
+        col_count = rng.randint(1, 3)
+        line_count = rng.randint(1, 2)
+        series = [
+            {"name": f"Col{s}", "type": "column", "data": _series_data(rng, points)} for s in range(col_count)
+        ] + [{"name": f"Line{s}", "type": "line", "data": _series_data(rng, points)} for s in range(line_count)]
+        yield {
+            "type": "combo",
+            "title": f"combo property {case}",
+            "xAxis": {"categories": [f"C{i}" for i in range(points)]},
+            "series": series,
+        }
     for chart_type, has_z in (("scatter", False), ("bubble", True)):
         for case in range(8):
             yield {

@@ -27,6 +27,7 @@ AREA_CASES = ["basic", "stacked", "percent", "themed-dark"]
 BAR_CASES = ["basic", "grouped", "stacked", "themed-dark", "adversarial"]
 SCATTER_CASES = ["basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"]
 BUBBLE_CASES = ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"]
+COMBO_CASES = ["basic", "dark", "dual-axis", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -34,6 +35,7 @@ ACTIVE_VALIDATION_CASES = {
     "bar": BAR_CASES,
     "scatter": SCATTER_CASES,
     "bubble": BUBBLE_CASES,
+    "combo": COMBO_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -105,6 +107,75 @@ def test_scatter_goldens():
 def test_bubble_goldens():
     for name in BUBBLE_CASES:
         _check("bubble", name)
+
+
+def test_combo_goldens():
+    for name in COMBO_CASES:
+        _check("combo", name)
+
+
+def test_combo_edge_cases():
+    for spec in [
+        {
+            "type": "combo",
+            "xAxis": {"categories": ["a", "b", "c"]},
+            "series": [
+                {"name": "bars", "type": "column", "data": [1, 2, 3]},
+                {"name": "trend", "type": "line", "data": [1.5, 2.0, 2.5]},
+            ],
+        },
+        {
+            "type": "combo",
+            "xAxis": {"categories": ["a"]},
+            "series": [{"name": "s", "type": "column", "data": [42]}],
+        },
+        {
+            "type": "combo",
+            "stacking": "normal",
+            "xAxis": {"categories": ["a", "b"]},
+            "series": [
+                {"name": "c1", "type": "column", "data": [5, 3]},
+                {"name": "c2", "type": "column", "data": [3, 7]},
+                {"name": "line", "type": "line", "data": [6, 8]},
+            ],
+        },
+        {
+            "type": "combo",
+            "xAxis": {"categories": ["x"]},
+            "series": [
+                {"name": "col", "type": "column", "data": [10]},
+                {"name": "line", "type": "line", "data": [5]},
+            ],
+            "secondaryYAxis": {"title": "Right"},
+        },
+        {
+            "type": "combo",
+            "stacking": "percent",
+            "xAxis": {"categories": ["zero", "nonzero"]},
+            "series": [
+                {"name": "c1", "type": "column", "data": [0, 3]},
+                {"name": "c2", "type": "column", "data": [0, 7]},
+                {"name": "line", "type": "line", "data": [1, 5]},
+            ],
+        },
+        {
+            "type": "combo",
+            "stacking": "normal",
+            "xAxis": {"categories": ["a", "b"]},
+            "series": [
+                {"name": "c1", "type": "column", "data": [-5, 10]},
+                {"name": "c2", "type": "column", "data": [-3, 7]},
+                {"name": "line", "type": "line", "data": [-2, 8]},
+            ],
+        },
+        {
+            "type": "combo",
+            "xAxis": {"categories": []},
+            "series": [{"name": "empty", "type": "column", "data": []}],
+        },
+    ]:
+        low = render_svg(ChartSpec.from_dict(spec)).lower()
+        assert "nan" not in low and "inf" not in low, spec
 
 
 def test_column_edge_cases():
@@ -323,6 +394,7 @@ def test_xss_escaping():
         "bar": [1, 2, 3],
         "scatter": [[1, 2], [3, 4]],
         "bubble": [[1, 2, 3], [4, 5, 6]],
+        "combo": [1, 2, 3],
     }
 
     from stonecharts.render import render_html
@@ -335,7 +407,9 @@ def test_xss_escaping():
                 "title": x,
                 "subtitle": x,
                 "theme": {"name": "light", "gridColor": "#e8e8ee", "palette": ["#2f7ed8"]},
-                "xAxis": {"title": x, "categories": [x, "b", "c"]} if chart_type not in ("scatter", "bubble") else {"title": x},
+                "xAxis": {"title": x, "categories": [x, "b", "c"]}
+                if chart_type not in ("scatter", "bubble")
+                else {"title": x},
                 "yAxis": {"title": x},
                 "series": [
                     {
@@ -413,7 +487,7 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == ["area", "bar", "bubble", "column", "line", "scatter"]
+    assert caps["chartTypes"] == ["area", "bar", "bubble", "combo", "column", "line", "scatter"]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
@@ -516,6 +590,368 @@ def test_spline_edge_cases():
         assert "nan" not in low and "inf" not in low, f"NaN/Inf in spline for {data}"
 
 
+def test_save_html(tmp_path):
+    spec = ChartSpec.from_dict(
+        {"type": "line", "xAxis": {"categories": ["a", "b"]}, "series": [{"name": "s", "data": [1, 2]}]}
+    )
+    from stonecharts.render import save_html
+
+    out = save_html(spec, str(tmp_path / "test.html"), "Test Page")
+    html = out.read_text(encoding="utf-8")
+    assert "<title>Test Page</title>" in html
+    assert "<svg" in html
+
+
+def test_step_interpolation_modes():
+    """Cover before/center step branches in _path_d."""
+    for step in ("before", "center", "after"):
+        spec = ChartSpec.from_dict(
+            {
+                "type": "line",
+                "xAxis": {"categories": ["a", "b", "c"]},
+                "series": [{"name": "s", "data": [1, 3, 2], "step": step}],
+            }
+        )
+        svg = render_svg(spec).lower()
+        assert "nan" not in svg and "inf" not in svg, f"NaN/Inf for step={step}"
+
+
+def test_validation_type_error_branches():
+    """Hit validation branches for wrong-typed fields that invalid fixtures don't cover."""
+    cases = [
+        (
+            {"type": "line", "series": [{"name": "s", "data": [1]}], "xAxis": {"categories": 42}},
+            "$.xAxis.categories: expected array, received number",
+        ),
+        (
+            {"type": "line", "series": [{"name": "s", "data": [1]}], "xAxis": {"gridLine": "bad"}},
+            "$.xAxis.gridLine: expected object, received string",
+        ),
+        (
+            {
+                "type": "line",
+                "series": [{"name": "s", "data": [1]}],
+                "xAxis": {"opposite": "yes", "binEdges": "bad"},
+            },
+            "$.xAxis.opposite: expected boolean, received string",
+        ),
+        (
+            {
+                "type": "line",
+                "series": [{"name": "s", "data": [1]}],
+                "xAxis": {"binEdges": [1, "two", 3]},
+            },
+            "$.xAxis.binEdges[1]: expected number, received string",
+        ),
+        (
+            {
+                "type": "line",
+                "series": [{"name": "s", "data": [1]}],
+                "layout": {"margin": "flat"},
+            },
+            "$.layout.margin: expected object, received string",
+        ),
+    ]
+    for spec, expected_fragment in cases:
+        errs = validate(spec)
+        assert any(expected_fragment in e for e in errs), (
+            f"Expected '{expected_fragment}' in validation errors, got: {errs}"
+        )
+
+
+def test_validation_deep_coverage():
+    """Cover remaining validate.py branches: type helpers, gradient/pattern/theme/datum edges,
+    margin plot-area check, unknown chart type, and percent-stacking guards."""
+    cases = [
+        # _jtype returns "array" / "object" for wrong-typed top-level fields
+        ({"type": ["line"], "series": [{"data": [1]}]}, "$.type: expected string, received array"),
+        ({"type": {}, "series": [{"data": [1]}]}, "$.type: expected string, received object"),
+        # _num with NaN / Infinity
+        ({"type": "line", "series": [{"data": [float("nan")]}]}, "received NaN"),
+        ({"type": "line", "series": [{"data": [float("inf")]}]}, "received Infinity"),
+        # _nonneg_num: bool and non-finite values skip the negative check (no crash)
+        (
+            {"type": "line", "stacking": "percent", "series": [{"type": "column", "data": [True]}]},
+            "expected number, received boolean",
+        ),
+        (
+            {"type": "line", "stacking": "percent", "series": [{"type": "column", "data": [float("inf")]}]},
+            "received Infinity",
+        ),
+        # _axis called with non-dict
+        ({"type": "line", "series": [{"data": [1]}], "xAxis": 42}, "$.xAxis: expected object, received number"),
+        # _layout non-dict
+        ({"type": "line", "series": [{"data": [1]}], "layout": "flat"}, "$.layout: expected object, received string"),
+        # _marker non-dict
+        (
+            {"type": "line", "series": [{"marker": "bad", "data": [1]}]},
+            "$.series[0].marker: expected object, received string",
+        ),
+        # _pattern non-dict
+        (
+            {"type": "line", "series": [{"pattern": 42, "data": [1]}]},
+            "$.series[0].pattern: expected object, received number",
+        ),
+        # _gradient: stops as non-array, stop as non-dict, stop with bad hex color
+        (
+            {"type": "line", "series": [{"color": {"stops": "bad"}, "data": [1]}]},
+            "$.series[0].color.stops: expected array, received string",
+        ),
+        (
+            {"type": "line", "series": [{"color": {"stops": [42]}, "data": [1]}]},
+            "$.series[0].color.stops[0]: expected object, received number",
+        ),
+        (
+            {"type": "line", "series": [{"color": {"stops": [{"offset": 0, "color": "bad"}]}, "data": [1]}]},
+            '$.series[0].color.stops[0].color: expected hex color, received "bad"',
+        ),
+        (
+            {"type": "line", "series": [{"color": {"stops": [{"opacity": "x"}]}, "data": [1]}]},
+            "$.series[0].color.stops[0].opacity: expected number, received string",
+        ),
+        # _color: non-string, non-dict
+        (
+            {"type": "line", "series": [{"color": 42, "data": [1]}]},
+            "$.series[0].color: expected string or gradient object, received number",
+        ),
+        # _theme: non-string, non-dict
+        ({"type": "line", "series": [{"data": [1]}], "theme": 42}, "expected string or theme object, received number"),
+        # _theme: dict with typed name field
+        (
+            {"type": "line", "series": [{"data": [1]}], "theme": {"name": 42}},
+            "$.theme.name: expected string, received number",
+        ),
+        # _datum: boolean (scatter)
+        ({"type": "scatter", "series": [{"data": [True]}]}, "received boolean"),
+        # _datum: dict missing x and y
+        ({"type": "scatter", "series": [{"data": [{"y": 1}]}]}, "$.series[0].data[0].x: required"),
+        ({"type": "scatter", "series": [{"data": [{"x": 1}]}]}, "$.series[0].data[0].y: required"),
+        # _datum: extra keys in dict
+        ({"type": "scatter", "series": [{"data": [{"x": 1, "y": 2, "z": 3}]}]}, ".z: unknown field"),
+        # _datum: non-number/list/dict/bool (null)
+        ({"type": "scatter", "series": [{"data": [None]}]}, "received null"),
+        # _datum_xyz: boolean (bubble)
+        ({"type": "bubble", "series": [{"data": [True]}]}, "received boolean"),
+        # _datum_xyz: else branch (null)
+        ({"type": "bubble", "series": [{"data": [None]}]}, "received null"),
+        # yAxis out of range (not 0 or 1)
+        (
+            {"type": "combo", "series": [{"data": [1], "yAxis": 2}]},
+            '$.series[0].yAxis: expected one of 0, 1, received "2"',
+        ),
+        # unknown chart type
+        ({"type": "histogram", "series": [{"data": [1]}]}, '$.type: unknown chart type "histogram"'),
+        # percent stacking: non-dict series item skipped
+        ({"type": "line", "stacking": "percent", "series": [42]}, "$.series[0]: expected object, received number"),
+        # percent stacking: non-list data skipped
+        (
+            {"type": "line", "stacking": "percent", "series": [{"data": "bad"}]},
+            "$.series[0].data: expected array, received string",
+        ),
+        # margin plot-area check: width squeezed to zero or negative
+        (
+            {
+                "type": "line",
+                "width": 100,
+                "height": 400,
+                "layout": {"margin": {"left": 60, "right": 60}},
+                "series": [{"data": [1]}],
+            },
+            "plot width must remain positive",
+        ),
+        # margin plot-area check: height squeezed to zero or negative
+        (
+            {
+                "type": "line",
+                "width": 400,
+                "height": 50,
+                "layout": {"margin": {"top": 30, "bottom": 30}},
+                "series": [{"data": [1]}],
+            },
+            "plot height must remain positive",
+        ),
+        # _marker dict with enabled (non-bool) — covers _marker.enabled branch
+        (
+            {"type": "line", "series": [{"marker": {"enabled": "yes"}, "data": [1]}]},
+            "$.series[0].marker.enabled: expected boolean, received string",
+        ),
+        # _theme dict with non-string background — covers _theme.background branch
+        (
+            {"type": "line", "series": [{"data": [1]}], "theme": {"background": 42}},
+            "$.theme.background: expected string, received number",
+        ),
+        # validate() called with non-dict — covers root-level type check
+        (42, "$: expected object, received number"),
+    ]
+    for spec, expected_fragment in cases:
+        errs = validate(spec)
+        assert any(expected_fragment in e for e in errs), (
+            f"Expected '{expected_fragment}' in validation errors, got: {errs}"
+        )
+
+
+def test_util_fmt_num_edge_cases():
+    """Cover fmt_num with non-finite values (NaN, Inf) and nice_ticks degenerate ranges."""
+    from stonecharts.util import fmt_num, nice_ticks
+
+    assert fmt_num(float("nan")) == "0"
+    assert fmt_num(float("inf")) == "0"
+    assert fmt_num(float("-inf")) == "0"
+    _, _, ticks = nice_ticks(5.0, 5.0)
+    assert len(ticks) > 0
+
+
+def test_capability_error_str_empty_path():
+    """Cover CapabilityError.__str__ when path is empty."""
+    err = CapabilityError("E_TEST", "", "something went wrong")
+    assert str(err) == "something went wrong"
+    err2 = CapabilityError("E_TEST", "$.type", "bad type")
+    assert str(err2) == "$.type: bad type"
+
+
+def test_limits_edge_cases():
+    """Cover enforce_spec_limits with non-dict (early return) and total-points limit."""
+    from stonecharts.limits import MAX_TOTAL_POINTS, ResourceLimitError, enforce_spec_limits
+
+    enforce_spec_limits(42)
+    enforce_spec_limits("not a dict")
+
+    from stonecharts.limits import MAX_POINTS_PER_SERIES
+
+    big_data = list(range(MAX_POINTS_PER_SERIES + 1))
+    try:
+        enforce_spec_limits({"series": [{"data": big_data}]})
+        raise AssertionError("should have raised per-series limit")
+    except ResourceLimitError as e:
+        assert e.code == "LIMIT.POINTS_PER_SERIES"
+
+    chunk = list(range(MAX_POINTS_PER_SERIES))
+    num_series = (MAX_TOTAL_POINTS // MAX_POINTS_PER_SERIES) + 1
+    try:
+        enforce_spec_limits({"series": [{"data": chunk} for _ in range(num_series)]})
+        raise AssertionError("should have raised total-points limit")
+    except ResourceLimitError as e:
+        assert e.code == "LIMIT.TOTAL_POINTS"
+
+
+def test_theme_resolve_edge_cases():
+    """Cover resolve_theme fallback paths: non-dict/non-string, and null background."""
+    from stonecharts.spec import THEMES, resolve_theme
+
+    fallback = resolve_theme(42)
+    assert fallback.name == THEMES["light"].name
+
+    custom = resolve_theme({"background": None, "titleColor": "#FF0000"})
+    assert custom.background is None
+    assert custom.title_color == "#FF0000"
+
+
+def test_scatter_direct_construction_normalizes():
+    """Cover ChartSpec.__post_init__ scatter data_points normalization."""
+    from stonecharts.spec import ChartSpec, Datum, Series
+
+    spec = ChartSpec(
+        type="scatter",
+        series=[Series(name="pts", data=[10.0, 20.0])],
+    )
+    assert spec.series[0].data_points is not None
+    assert len(spec.series[0].data_points) == 2
+    assert spec.series[0].data == []
+    assert isinstance(spec.series[0].data_points[0], Datum)
+
+
+def test_empty_series_data_renders():
+    """Cover n<=0 early returns in column, bar, and area marks functions."""
+    from stonecharts import Axis, ChartSpec, Series
+    from stonecharts.render import render_svg
+
+    for chart_type in ("column", "bar", "area"):
+        spec = ChartSpec(
+            type=chart_type,
+            x_axis=Axis(categories=[]),
+            series=[Series(name="empty", data=[])],
+        )
+        svg = render_svg(spec)
+        assert "<svg" in svg
+
+
+def test_verify_result_edge_cases():
+    """Cover check_schema_version below-minimum and build_finding validation."""
+    from stonecharts.verify.result import build_finding, check_schema_version
+
+    assert check_schema_version(0) is not None
+    assert "below minimum" in check_schema_version(0)
+    assert check_schema_version(999) is not None
+    assert "above maximum" in check_schema_version(999)
+    assert check_schema_version("bad") is not None
+
+    finding = build_finding(code="TEST", category="test", message="ok")
+    assert finding["equality"] == "unknown"
+
+    try:
+        build_finding(code="X", category="x", message="x", equality="bad")
+        raise AssertionError("should have raised")
+    except ValueError:
+        pass
+
+    try:
+        build_finding(code="X", category="x", message="x", confidence="bad")
+        raise AssertionError("should have raised")
+    except ValueError:
+        pass
+
+
+def test_cartesian_degenerate_geometry():
+    """Cover ypix2 degenerate case (all secondary data same value) and scatter same-x."""
+    from stonecharts import Axis, ChartSpec, Series
+    from stonecharts.render import render_svg
+
+    combo_spec = ChartSpec(
+        type="combo",
+        x_axis=Axis(categories=["A", "B"]),
+        series=[
+            Series(name="primary", data=[10.0, 20.0], type="column"),
+            Series(name="secondary", data=[5.0, 5.0], type="line", y_axis=1),
+        ],
+        secondary_y_axis=Axis(title="Sec"),
+    )
+    svg = render_svg(combo_spec)
+    assert "sc-series" in svg
+
+    scatter_spec = ChartSpec(
+        type="scatter",
+        series=[Series(name="pts", data=[3.0, 3.0, 3.0])],
+    )
+    svg2 = render_svg(scatter_spec)
+    assert "<svg" in svg2
+
+
+def test_combo_line_area_fill_and_data_overflow():
+    """Cover combo.py: line series with area fill, and data exceeding categories."""
+    from stonecharts import Axis, ChartSpec, Series
+    from stonecharts.render import render_svg
+
+    spec = ChartSpec(
+        type="combo",
+        x_axis=Axis(categories=["A", "B"]),
+        series=[
+            Series(name="trend", data=[1.0, 2.0], type="line", fill_opacity=0.3),
+        ],
+    )
+    svg = render_svg(spec)
+    assert "sc-series-area" in svg
+
+    spec2 = ChartSpec(
+        type="combo",
+        x_axis=Axis(categories=["A"]),
+        series=[
+            Series(name="over", data=[1.0, 2.0, 3.0], type="column"),
+        ],
+    )
+    svg2 = render_svg(spec2)
+    assert "<svg" in svg2
+
+
 if __name__ == "__main__":
     for _n in LINE_CASES:
         _check("line-basic", _n)
@@ -535,5 +971,8 @@ if __name__ == "__main__":
     for _n in BUBBLE_CASES:
         _check("bubble", _n)
         print(f"PASS: python bubble-{_n} golden")
+    for _n in COMBO_CASES:
+        _check("combo", _n)
+        print(f"PASS: python combo-{_n} golden")
     test_spline_edge_cases()
     print("PASS: python spline edge cases")

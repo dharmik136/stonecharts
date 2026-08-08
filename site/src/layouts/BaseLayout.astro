@@ -3,9 +3,19 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  noIndex?: boolean;
+  jsonLd?: object;
 }
 
-const { title, description = 'Deterministic chart rendering for regulated reporting.', ogImage } = Astro.props;
+const {
+  title,
+  description = 'Deterministic chart rendering for regulated reporting. Byte-identical SVG output from Python and Go with zero runtime dependencies.',
+  ogImage,
+  noIndex = false,
+  jsonLd,
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://example.com');
 ---
 <!doctype html>
 <html lang="en" data-theme="light">
@@ -14,18 +24,30 @@ const { title, description = 'Deterministic chart rendering for regulated report
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
   <meta name="description" content={description} />
-  <meta name="robots" content="index, follow" />
+  {noIndex ? (
+    <meta name="robots" content="noindex, nofollow" />
+  ) : (
+    <meta name="robots" content="index, follow" />
+  )}
+  <link rel="canonical" href={canonicalUrl.href} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalUrl.href} />
   {ogImage && <meta property="og:image" content={ogImage} />}
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  {jsonLd && (
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  )}
   <style is:global>
     @import '../assets/styles/global.css';
   </style>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
   <slot />
   <script is:inline>
     (function() {

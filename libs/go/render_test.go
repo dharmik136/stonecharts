@@ -24,6 +24,7 @@ func TestGolden(t *testing.T) {
 		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
 		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
 		"bubble":     {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
+		"combo":      {"basic", "dark", "dual-axis", "adversarial"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -165,6 +166,39 @@ func TestScatterEdgeCases(t *testing.T) {
 	}
 }
 
+func TestComboEdgeCases(t *testing.T) {
+	cases := []string{
+		// Column-only combo (all series default to column).
+		`{"type":"combo","xAxis":{"categories":["a","b","c"]},"series":[{"name":"col","data":[1,2,3]}]}`,
+		// Line-only combo.
+		`{"type":"combo","xAxis":{"categories":["a","b"]},"series":[{"name":"ln","type":"line","data":[10,20]}]}`,
+		// Mixed column + line.
+		`{"type":"combo","xAxis":{"categories":["a","b","c"]},"series":[{"name":"col","type":"column","data":[5,10,15]},{"name":"ln","type":"line","data":[3,8,12]}]}`,
+		// Dual y-axis.
+		`{"type":"combo","xAxis":{"categories":["a","b"]},"secondaryYAxis":{"title":"Right"},"series":[{"name":"col","type":"column","data":[100,200]},{"name":"ln","type":"line","yAxis":1,"data":[0.5,0.9]}]}`,
+		// Single data point.
+		`{"type":"combo","xAxis":{"categories":["x"]},"series":[{"name":"col","type":"column","data":[42]},{"name":"ln","type":"line","data":[7]}]}`,
+		// Many column series (band subdivision).
+		`{"type":"combo","xAxis":{"categories":["a","b"]},"series":[{"name":"c0","type":"column","data":[1,2]},{"name":"c1","type":"column","data":[3,4]},{"name":"c2","type":"column","data":[5,6]},{"name":"ln","type":"line","data":[2,4]}]}`,
+		// Negative values in both column and line series.
+		`{"type":"combo","xAxis":{"categories":["a","b"]},"series":[{"name":"col","type":"column","data":[-5,10]},{"name":"ln","type":"line","data":[-3,7]}]}`,
+		// Stacked combo columns with line overlay.
+		`{"type":"combo","stacking":"normal","xAxis":{"categories":["a","b"]},"series":[{"name":"c1","type":"column","data":[10,20]},{"name":"c2","type":"column","data":[5,15]},{"name":"ln","type":"line","data":[8,18]}]}`,
+		// Percent stacking combo with zero totals.
+		`{"type":"combo","stacking":"percent","xAxis":{"categories":["zero","nonzero"]},"series":[{"name":"c1","type":"column","data":[0,3]},{"name":"c2","type":"column","data":[0,7]},{"name":"ln","type":"line","data":[1,5]}]}`,
+	}
+	for _, specJSON := range cases {
+		spec, err := FromJSON([]byte(specJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+		low := strings.ToLower(mustSVG(t, spec))
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in combo render for %s", specJSON)
+		}
+	}
+}
+
 func TestBubbleEdgeCases(t *testing.T) {
 	cases := []string{
 		// Degenerate z-domain: every point shares the same z (size_scale must
@@ -276,6 +310,32 @@ func TestXSSEscaping(t *testing.T) {
 	}
 	if strings.Contains(mustHTML(t, spec, ""), "<script>alert(1)</script>") {
 		t.Error("raw <script> leaked into HTML")
+	}
+	typeData := map[string]string{
+		"column":  `[1,2,3]`,
+		"area":    `[1,2,3]`,
+		"bar":     `[1,2,3]`,
+		"scatter": `[[1,2],[3,4]]`,
+		"bubble":  `[[1,2,3],[4,5,6]]`,
+		"combo":   `[1,2,3]`,
+	}
+	for ct, data := range typeData {
+		cats := ""
+		if ct != "scatter" && ct != "bubble" {
+			cats = `,"xAxis":{"title":` + jsonStr(x) + `,"categories":[` + jsonStr(x) + `,"b","c"]}`
+		} else {
+			cats = `,"xAxis":{"title":` + jsonStr(x) + `}`
+		}
+		j := `{"type":` + jsonStr(ct) + `,"title":` + jsonStr(x) + cats +
+			`,"yAxis":{"title":` + jsonStr(x) + `},"series":[{"name":` + jsonStr(x) +
+			`,"data":` + data + `,"color":"#2f7ed8"}]}`
+		s, err := FromJSON([]byte(j))
+		if err != nil {
+			t.Fatalf("XSS %s: parse error: %v", ct, err)
+		}
+		if strings.Contains(mustSVG(t, s), "<script>alert(1)</script>") {
+			t.Errorf("raw <script> leaked into %s SVG", ct)
+		}
 	}
 }
 
@@ -389,6 +449,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
 		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
 		"bubble":     {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
+		"combo":      {"basic", "dark", "dual-axis", "adversarial"},
 	}
 	if len(cases) == 0 {
 		t.Fatal("no active release examples")
@@ -555,6 +616,54 @@ func TestRandomizedSpecsRenderValidSVG(t *testing.T) {
 			}
 		}
 	}
+	for caseIndex := 0; caseIndex < 8; caseIndex++ {
+		pointCount := rng.Intn(12) + 1
+		colCount := rng.Intn(3) + 1
+		lineCount := rng.Intn(2) + 1
+		categories := make([]string, pointCount)
+		for i := 0; i < pointCount; i++ {
+			categories[i] = fmt.Sprintf("C%d", i)
+		}
+		series := make([]map[string]interface{}, 0, colCount+lineCount)
+		for s := 0; s < colCount; s++ {
+			data := make([]float64, pointCount)
+			for i := 0; i < pointCount; i++ {
+				data[i] = float64(rng.Intn(200000)-100000) / 1000
+			}
+			series = append(series, map[string]interface{}{"name": fmt.Sprintf("Col%d", s), "type": "column", "data": data})
+		}
+		for s := 0; s < lineCount; s++ {
+			data := make([]float64, pointCount)
+			for i := 0; i < pointCount; i++ {
+				data[i] = float64(rng.Intn(200000)-100000) / 1000
+			}
+			series = append(series, map[string]interface{}{"name": fmt.Sprintf("Line%d", s), "type": "line", "data": data})
+		}
+		spec := map[string]interface{}{
+			"type":   "combo",
+			"title":  fmt.Sprintf("combo property %d", caseIndex),
+			"xAxis":  map[string]interface{}{"categories": categories},
+			"series": series,
+		}
+		payload, err := json.Marshal(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		parsed, err := FromJSON(payload)
+		if err != nil {
+			t.Fatalf("combo case %d failed parse: %v", caseIndex, err)
+		}
+		svg, err := RenderSVG(parsed)
+		if err != nil {
+			t.Fatalf("combo case %d failed render: %v", caseIndex, err)
+		}
+		if !strings.HasPrefix(svg, "<svg") || !strings.Contains(svg, `role="img"`) {
+			t.Fatalf("combo case %d did not render a chart SVG", caseIndex)
+		}
+		if strings.Contains(svg, "NaN") || strings.Contains(svg, "Infinity") {
+			t.Fatalf("combo case %d rendered non-finite output", caseIndex)
+		}
+	}
 }
 
 func TestCapabilityManifestAndError(t *testing.T) {
@@ -562,7 +671,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "bar", "bubble", "column", "line", "scatter"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "bar", "bubble", "combo", "column", "line", "scatter"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}
@@ -584,6 +693,200 @@ func TestCapabilityManifestAndError(t *testing.T) {
 		}
 		if ce.Message != `unsupported chart type "pie"` {
 			t.Fatalf("unexpected capability message: %+v", ce)
+		}
+	}
+}
+
+func TestSaveHTML(t *testing.T) {
+	spec, err := FromJSON([]byte(`{"type":"line","xAxis":{"categories":["a","b"]},"series":[{"name":"s","data":[1,2]}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(t.TempDir(), "test.html")
+	if err := SaveHTML(spec, path, "Test Page"); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	html := string(data)
+	if !strings.Contains(html, "<title>Test Page</title>") {
+		t.Error("expected page title in HTML output")
+	}
+	if !strings.Contains(html, "<svg") {
+		t.Error("expected SVG in HTML output")
+	}
+}
+
+func TestRenderHTMLPointModelDataTable(t *testing.T) {
+	cases := []struct {
+		name    string
+		specJSON string
+		wantCol  string
+	}{
+		{
+			"scatter",
+			`{"type":"scatter","series":[{"name":"pts","data":[[1,2],[3,4]]}]}`,
+			"</th><td>",
+		},
+		{
+			"bubble",
+			`{"type":"bubble","series":[{"name":"pts","data":[[1,2,5],[3,4,10]]}]}`,
+			`<th scope="col">Z</th>`,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			spec, err := FromJSON([]byte(tc.specJSON))
+			if err != nil {
+				t.Fatal(err)
+			}
+			html := mustHTML(t, spec, "test")
+			if !strings.Contains(html, `class="sc-visually-hidden"`) {
+				t.Error("expected accessible data table in HTML")
+			}
+			if !strings.Contains(html, tc.wantCol) {
+				t.Errorf("expected %q in data table", tc.wantCol)
+			}
+		})
+	}
+}
+
+func TestErrorMethods(t *testing.T) {
+	ce := &CapabilityError{Code: "E_CAPABILITY", Message: "test cap", Path: "$.type"}
+	if got := ce.Error(); got != "$.type: test cap" {
+		t.Errorf("CapabilityError.Error() = %q, want %q", got, "$.type: test cap")
+	}
+	ceNoPath := &CapabilityError{Code: "E_CAPABILITY", Message: "no path"}
+	if got := ceNoPath.Error(); got != "no path" {
+		t.Errorf("CapabilityError.Error() without path = %q, want %q", got, "no path")
+	}
+	var ceNil *CapabilityError
+	if got := ceNil.Error(); got != "" {
+		t.Errorf("nil CapabilityError.Error() = %q, want empty", got)
+	}
+	se := &SpecError{Errors: []string{"bad field"}}
+	if got := se.Error(); !strings.Contains(got, "bad field") {
+		t.Errorf("SpecError.Error() = %q, expected to contain 'bad field'", got)
+	}
+	rle := &ResourceLimitError{Code: "LIMIT.TEST", Path: "$.x", Limit: 10, Received: 20}
+	if got := rle.Error(); !strings.Contains(got, "LIMIT.TEST") {
+		t.Errorf("ResourceLimitError.Error() = %q, expected to contain code", got)
+	}
+}
+
+func FuzzFromJSON(f *testing.F) {
+	seeds := []struct {
+		dir  string
+		name string
+	}{
+		{"line-basic", "basic"},
+		{"line-basic", "adversarial"},
+		{"column", "basic"},
+		{"column", "stacked"},
+		{"area", "basic"},
+		{"bar", "basic"},
+		{"scatter", "basic"},
+		{"bubble", "basic"},
+		{"combo", "basic"},
+		{"combo", "dual-axis"},
+	}
+	for _, s := range seeds {
+		data, err := os.ReadFile("../../charts/" + s.dir + "/examples/" + s.name + ".json")
+		if err != nil {
+			f.Fatal(err)
+		}
+		f.Add(data)
+	}
+	f.Fuzz(func(t *testing.T, data []byte) {
+		spec, err := FromJSON(data)
+		if err != nil {
+			return
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			return
+		}
+		low := strings.ToLower(svg)
+		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+			t.Errorf("NaN/Inf in fuzz render output")
+		}
+	})
+}
+
+func loadBenchSpec(b *testing.B, chartDir, name string) *ChartSpec {
+	b.Helper()
+	data, err := os.ReadFile("../../charts/" + chartDir + "/examples/" + name + ".json")
+	if err != nil {
+		b.Fatal(err)
+	}
+	spec, err := FromJSON(data)
+	if err != nil {
+		b.Fatal(err)
+	}
+	return spec
+}
+
+func BenchmarkRender(b *testing.B) {
+	cases := []struct {
+		dir  string
+		name string
+	}{
+		{"line-basic", "basic"},
+		{"column", "basic"},
+		{"area", "basic"},
+		{"bar", "basic"},
+		{"scatter", "basic"},
+		{"bubble", "basic"},
+		{"combo", "basic"},
+	}
+	for _, tc := range cases {
+		spec := loadBenchSpec(b, tc.dir, tc.name)
+		b.Run(tc.dir, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				if _, err := RenderSVG(spec); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkRenderComplex(b *testing.B) {
+	cases := []struct {
+		dir  string
+		name string
+	}{
+		{"line-basic", "gradient"},
+		{"column", "stacked"},
+		{"area", "stacked"},
+		{"bar", "stacked"},
+		{"scatter", "correlation"},
+		{"bubble", "multi-series"},
+		{"combo", "dual-axis"},
+	}
+	for _, tc := range cases {
+		spec := loadBenchSpec(b, tc.dir, tc.name)
+		b.Run(tc.dir, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				if _, err := RenderSVG(spec); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkFromJSON(b *testing.B) {
+	data, err := os.ReadFile("../../charts/combo/examples/dual-axis.json")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if _, err := FromJSON(data); err != nil {
+			b.Fatal(err)
 		}
 	}
 }

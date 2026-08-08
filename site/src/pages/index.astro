@@ -1,30 +1,66 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Deterministic Chart Rendering System",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Cross-platform",
+  "description": "Byte-identical SVG chart rendering across Python and Go with zero runtime dependencies. Built for regulated reporting teams.",
+  "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/PreOrder",
+    "description": "Private preview — request early access"
+  }
+};
 ---
-<BaseLayout title="Deterministic Chart Rendering for Regulated Reporting">
+<BaseLayout
+  title="Deterministic Chart Rendering for Regulated Reporting"
+  description="Byte-identical SVG chart rendering across Python and Go. Zero runtime dependencies. 184x faster cold-start than Highcharts Export Server. Built for regulated reporting."
+  ogImage="/og-preview.svg"
+  jsonLd={jsonLd}
+>
+  <!-- Header -->
+  <header style="padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-tertiary);">Private Preview</span>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <a href="#request-access" style="font-size: 0.875rem; font-weight: 500;">Request access</a>
+        <button id="theme-toggle" class="btn btn-ghost" style="padding: 0.35rem 0.625rem; font-size: 0.75rem;" aria-label="Toggle light and dark theme">
+          Light / Dark
+        </button>
+      </div>
+    </div>
+  </header>
+
   <!-- Hero -->
-  <section style="padding: 6rem 0 4rem; text-align: center;">
+  <section id="main-content" style="padding: 5rem 0 2.5rem; text-align: center;">
     <div class="container">
       <p style="margin-bottom: 1.5rem;">
         <span class="badge">Private Preview</span>
       </p>
-      <h1 style="max-width: 720px; margin: 0 auto 1.5rem; font-size: 2.75rem; line-height: 1.15;">
-        When your Python pipeline and Go service render the same chart and the output
-        drifts — even by one pixel — someone has to explain&nbsp;it.
+      <h1 style="max-width: 740px; margin: 0 auto 1.5rem; font-size: 2.75rem; line-height: 1.12; letter-spacing: -0.02em;">
+        Same chart spec. Same bytes.<br/>Python or Go.
       </h1>
-      <p style="max-width: 560px; margin: 0 auto 2.5rem; font-size: 1.125rem; color: var(--text-secondary);">
-        A deterministic, multi-language chart system that makes every chart change
-        provable — so regulated reporting teams spend less time explaining visual
-        differences and more time shipping.
+      <p style="max-width: 540px; margin: 0 auto 2.5rem; font-size: 1.125rem; color: var(--text-secondary); line-height: 1.6;">
+        When your Python analysis pipeline and Go production service render the same
+        chart and the output drifts, someone has to explain it. We built a system
+        where that drift cannot happen.
       </p>
-      <a href="#request-access" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 2rem;">
-        Request early access
-      </a>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <a href="#request-access" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 2rem;">
+          Request early access
+        </a>
+        <a href="#how-it-works" class="btn btn-ghost" style="font-size: 1rem; padding: 0.75rem 1.5rem;">
+          How it works
+        </a>
+      </div>
     </div>
   </section>
 
-  <!-- Static chart preview -->
-  <section style="padding: 0 0 4rem;">
+  <!-- Chart preview -->
+  <section style="padding: 1.5rem 0 4rem;">
     <div class="container" style="max-width: 860px;">
       <div class="card" style="padding: 0; overflow: hidden;">
         <img
@@ -32,100 +68,156 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           alt="Line chart showing Monthly Average Temperature for Tokyo and London, rendered as deterministic SVG"
           width="820"
           height="460"
+          loading="eager"
           style="display: block; width: 100%; height: auto;"
-          loading="lazy"
         />
-        <p style="padding: 0.75rem 1.25rem; margin: 0; font-size: 0.8125rem; color: var(--text-tertiary); border-top: 1px solid var(--border);">
-          Deterministic SVG output. Same spec, same bytes, Python or Go. Zero runtime dependencies.
+        <div style="padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 1rem; border-top: 1px solid var(--border); flex-wrap: wrap;">
+          <span class="badge-success badge">Byte-identical</span>
+          <span style="font-size: 0.8125rem; color: var(--text-tertiary);">
+            This SVG was rendered server-side with zero runtime dependencies. Same spec, same bytes — Python or Go.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats bar -->
+  <section class="stats-bar" style="padding: 2rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Runtime dependencies</div>
+          <div class="stat-context">Python and Go</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">184x</div>
+          <div class="stat-label">Faster cold-start</div>
+          <div class="stat-context">vs. Highcharts Export Server</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">6,570</div>
+          <div class="stat-label">Renders / second</div>
+          <div class="stat-context">Python, sustained warm</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">2 / 5</div>
+          <div class="stat-label">Competitors failed</div>
+          <div class="stat-context">byte-identity test</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div style="text-align: center; max-width: 640px; margin: 0 auto 3rem;">
+        <h2>The problem with chart infrastructure</h2>
+        <p style="color: var(--text-secondary);">
+          Regulated reporting teams face three compounding risks that off-the-shelf
+          chart libraries were not designed to solve.
         </p>
       </div>
-    </div>
-  </section>
-
-  <!-- Pain points -->
-  <section class="section" style="background: var(--bg-surface);">
-    <div class="container">
-      <h2 style="text-align: center; margin-bottom: 3rem;">
-        Three problems regulated teams face with chart infrastructure
-      </h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+      <div class="problem-grid">
         <div class="card">
-          <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">01</div>
-          <h3>Inconsistent output</h3>
-          <p style="color: var(--text-secondary); margin: 0;">
-            The same chart spec produces different bytes depending on the language,
-            platform, or even the time of day. Two of five major chart libraries embed
-            random IDs in their SVG output, making byte-level comparison impossible.
+          <div style="font-size: 2rem; font-weight: 700; color: var(--danger); margin-bottom: 0.5rem;">01</div>
+          <h3 style="margin-bottom: 0.5rem;">Non-deterministic output</h3>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+            We tested five major chart libraries. Two — Highcharts and Plotly — embed
+            random IDs in every render. You cannot compare two outputs byte by byte.
+            The same spec, the same library, different bytes.
           </p>
         </div>
         <div class="card">
-          <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">02</div>
-          <h3>Unauditable changes</h3>
-          <p style="color: var(--text-secondary); margin: 0;">
-            When a chart in a quarterly filing looks different from the previous version,
-            there is no evidence trail showing whether the data changed, the renderer
-            changed, or both. The investigation is manual, and the cost is real.
+          <div style="font-size: 2rem; font-weight: 700; color: var(--warning); margin-bottom: 0.5rem;">02</div>
+          <h3 style="margin-bottom: 0.5rem;">No change evidence</h3>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+            When a chart in a quarterly filing looks different, there is no record
+            showing whether the data changed, the renderer changed, or both.
+            The investigation is manual. The cost is buried in review cycles.
           </p>
         </div>
         <div class="card">
-          <div style="font-size: 1.5rem; margin-bottom: 0.75rem;">03</div>
-          <h3>Dependency risk</h3>
-          <p style="color: var(--text-secondary); margin: 0;">
-            Server-side chart rendering typically requires headless browsers,
-            hundreds of npm dependencies, and large memory footprints. One popular
-            export server ships 261 dependencies and needs 550 MB of RAM to start.
+          <div style="font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem;">03</div>
+          <h3 style="margin-bottom: 0.5rem;">Heavyweight infrastructure</h3>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+            Server-side rendering means headless browsers, hundreds of npm
+            dependencies, and half a gigabyte of memory. One popular export server:
+            261 packages, 553 MB RAM, 13.6 seconds to first chart.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- How it works -->
-  <section class="section">
-    <div class="container" style="max-width: 720px; text-align: center;">
-      <h2 style="margin-bottom: 1rem;">A different approach</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 3rem;">
-        One shared specification. Certified renderers in Python and Go with zero runtime
-        dependencies. A conformance tool that proves cross-runtime parity for every release.
-      </p>
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; text-align: center;">
-        <div>
-          <div style="font-size: 2rem; font-weight: 700; color: var(--accent);">0</div>
-          <div style="font-size: 0.875rem; color: var(--text-secondary);">Runtime dependencies</div>
+  <!-- Solution -->
+  <section class="section" style="background: var(--bg-surface);">
+    <div class="container">
+      <div style="text-align: center; max-width: 640px; margin: 0 auto 3rem;">
+        <h2>A different architecture</h2>
+        <p style="color: var(--text-secondary);">
+          One shared specification. Certified native renderers. A conformance tool
+          that proves every chart change.
+        </p>
+      </div>
+      <div class="problem-grid">
+        <div class="card">
+          <h3 style="color: var(--accent); font-size: 1rem;">One contract</h3>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+            A versioned, language-neutral JSON specification defines the chart
+            completely. No ambiguity, no implicit defaults, no
+            "it works differently in Python."
+          </p>
         </div>
-        <div>
-          <div style="font-size: 2rem; font-weight: 700; color: var(--accent);">2</div>
-          <div style="font-size: 0.875rem; color: var(--text-secondary);">Certified languages</div>
+        <div class="card">
+          <h3 style="color: var(--accent); font-size: 1rem;">Verified runtimes</h3>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+            Certified renderers in Python and Go produce byte-identical SVG from the
+            same spec. No browser, no headless Chrome, no Puppeteer. Zero runtime
+            dependencies in either language.
+          </p>
         </div>
-        <div>
-          <div style="font-size: 2rem; font-weight: 700; color: var(--accent);">Byte-identical</div>
-          <div style="font-size: 0.875rem; color: var(--text-secondary);">Cross-runtime output</div>
+        <div class="card">
+          <h3 style="color: var(--accent); font-size: 1rem;">Audit evidence</h3>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">
+            A conformance tool generates SHA-256–verified evidence bundles for every
+            render. CI integration, JUnit reports, and GitHub Actions annotations
+            built in.
+          </p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Access request -->
-  <section id="request-access" class="section" style="background: var(--bg-surface);">
-    <div class="container" style="max-width: 560px; text-align: center;">
-      <h2 style="margin-bottom: 0.75rem;">Request early access</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-        The interactive demo includes a chart gallery with six certified chart types,
-        measured benchmark comparisons against five chart libraries, and a conformance
-        proof showing byte-identical output across Python and Go.
+  <section id="request-access" class="section">
+    <div class="container" style="max-width: 600px; text-align: center;">
+      <h2>See it working</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+        The interactive demo includes:
       </p>
-      <form id="access-form" style="display: flex; gap: 0.5rem; max-width: 420px; margin: 0 auto;">
+      <ul style="text-align: left; max-width: 420px; margin: 0 auto 2rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8;">
+        <li>Seven certified chart types with interactive tooltips, legend toggle, and keyboard navigation</li>
+        <li>Measured benchmarks against five chart rendering systems</li>
+        <li>A real conformance proof — byte-identical SVG from Python and Go, with SHA-256 hashes</li>
+      </ul>
+      <form id="access-form" aria-label="Request demo access" style="display: flex; gap: 0.5rem; max-width: 440px; margin: 0 auto;">
         <input
           type="email"
           name="email"
           placeholder="you@company.com"
           required
-          style="flex: 1; padding: 0.625rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.875rem; background: var(--bg-surface-raised); color: var(--text);"
+          autocomplete="email"
+          style="flex: 1; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.9rem; background: var(--bg-surface-raised); color: var(--text);"
         />
-        <button type="submit" class="btn btn-primary">Request</button>
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Request access</button>
       </form>
-      <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-tertiary);">
-        We will review requests and grant access within one business day.
+      <p id="form-success" style="display: none; margin-top: 0.75rem; font-size: 0.875rem; color: var(--success); font-weight: 500;">
+        Thanks — we'll be in touch within one business day.
+      </p>
+      <p id="form-hint" style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-tertiary);">
+        Access granted within one business day. No sales call required.
       </p>
     </div>
   </section>
@@ -133,7 +225,40 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <!-- Footer -->
   <footer style="border-top: 1px solid var(--border); padding: 2rem 0; text-align: center;">
     <div class="container" style="font-size: 0.8rem; color: var(--text-tertiary);">
-      Copyright 2026. All rights reserved. This product is in private preview.
+      <p style="margin: 0;">Copyright 2026. All rights reserved. Private preview — not open source.</p>
+      <p style="margin: 0.5rem 0 0; font-size: 0.7rem;">
+        Benchmark numbers from SC-QUAL-003. Single-host, vendor-run measurements. Not independently audited.
+      </p>
     </div>
   </footer>
+
+  <!-- Theme toggle + form handler -->
+  <script is:inline>
+    (function() {
+      var btn = document.getElementById('theme-toggle');
+      if (btn) {
+        btn.addEventListener('click', function() {
+          var html = document.documentElement;
+          var current = html.getAttribute('data-theme') || 'light';
+          var next = current === 'light' ? 'dark' : 'light';
+          html.setAttribute('data-theme', next);
+          localStorage.setItem('sc-theme', next);
+        });
+      }
+
+      var form = document.getElementById('access-form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var email = form.querySelector('[name="email"]').value;
+          var subject = encodeURIComponent('Demo access request');
+          var body = encodeURIComponent('Email: ' + email + '\nRequested: ' + new Date().toISOString());
+          window.location.href = 'mailto:demo-access@example.com?subject=' + subject + '&body=' + body;
+          document.getElementById('form-success').style.display = 'block';
+          document.getElementById('form-hint').style.display = 'none';
+          form.querySelector('[name="email"]').value = '';
+        });
+      }
+    })();
+  </script>
 </BaseLayout>

@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "node --check runtime/chart-interactions.js && npm run test:runtime-browser",
-    "test:runtime-browser": "node --test runtime/browser-qualification.test.js runtime/bar-browser-qualification.test.js runtime/scatter-browser-qualification.test.js runtime/bubble-browser-qualification.test.js"
+    "test:runtime-browser": "node --test runtime/browser-qualification.test.js runtime/bar-browser-qualification.test.js runtime/scatter-browser-qualification.test.js runtime/bubble-browser-qualification.test.js runtime/area-browser-qualification.test.js runtime/combo-browser-qualification.test.js"
   },
   "devDependencies": {
     "playwright": "^1.55.0"

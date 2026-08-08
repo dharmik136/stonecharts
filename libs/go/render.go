@@ -123,6 +123,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderAreaSVG(spec)
 	case "bar":
 		svg = renderBarSVG(spec)
+	case "combo":
+		svg = renderComboSVG(spec)
 	case "column":
 		svg = renderColumnSVG(spec)
 	case "line":
