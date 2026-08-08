@@ -127,6 +127,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderComboSVG(spec)
 	case "column":
 		svg = renderColumnSVG(spec)
+	case "histogram":
+		svg = renderHistogramSVG(spec)
 	case "line":
 		svg = renderLineSVG(spec)
 	case "scatter":

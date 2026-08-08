@@ -1,0 +1,15 @@
+{
+  "type": "histogram",
+  "title": "Adversarial <histogram> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "binning": { "count": 5 },
+  "xAxis": { "title": "x & <axis>" },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "bins <script>&\"'</script>",
+      "data": [10, 20, 30, 40, 50, 15, 25, 35, 45, 55, 12, 22, 32, 42, 52],
+      "color": "#2f7ed8"
+    }
+  ]
+}

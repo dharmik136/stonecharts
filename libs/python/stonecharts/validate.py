@@ -375,13 +375,15 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
 # 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4
-# admits bubble per DEC-016; 0.0.0.5 admits combo per DEC-017).
+# admits bubble per DEC-016; 0.0.0.5 admits combo per DEC-020;
+# 0.0.0.6 admits histogram per DEC-021).
 _KNOWN_TYPES = {
     "area",
     "bar",
     "bubble",
     "combo",
     "column",
+    "histogram",
     "line",
     "scatter",
 }
