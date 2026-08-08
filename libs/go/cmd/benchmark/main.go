@@ -69,9 +69,8 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 	}
 
 	series := make([]map[string]interface{}, nSeries)
-	if variant == "scatter" {
-		// Point-model data (positional [x,y] pairs), exercising the linear
-		// x-scale path, not just the bare-number fast path (§3.3 Rank 3).
+	switch variant {
+	case "scatter":
 		for s := 0; s < nSeries; s++ {
 			data := make([][2]float64, nCategories)
 			for i := range data {
@@ -82,9 +81,7 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 			}
 			series[s] = map[string]interface{}{"name": fmt.Sprintf("Series %d", s), "data": data}
 		}
-	} else if variant == "bubble" {
-		// Point-model data (positional [x,y,z] triples), exercising the
-		// size-scale path (§3.3 Rank 4).
+	case "bubble":
 		for s := 0; s < nSeries; s++ {
 			data := make([][3]float64, nCategories)
 			for i := range data {
@@ -96,7 +93,7 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 			}
 			series[s] = map[string]interface{}{"name": fmt.Sprintf("Series %d", s), "data": data}
 		}
-	} else {
+	default:
 		for s := 0; s < nSeries; s++ {
 			data := make([]float64, nCategories)
 			for i := range data {
@@ -107,13 +104,14 @@ func generateSpec(nSeries, nCategories int, variant string) (*stonecharts.ChartS
 	}
 
 	chartType := "line"
-	if variant == "grouped-column" || variant == "stacked-column" {
+	switch variant {
+	case "grouped-column", "stacked-column":
 		chartType = "column"
-	} else if variant == "bar" {
+	case "bar":
 		chartType = "bar"
-	} else if variant == "scatter" {
+	case "scatter":
 		chartType = "scatter"
-	} else if variant == "bubble" {
+	case "bubble":
 		chartType = "bubble"
 	}
 
@@ -334,7 +332,7 @@ func main() {
 	if os.Getenv("STONECHARTS_RUNTIME") == "" {
 		path, _ := filepath.Abs("../../runtime/chart-interactions.js")
 		if _, err := os.Stat(path); err == nil {
-			os.Setenv("STONECHARTS_RUNTIME", path)
+			_ = os.Setenv("STONECHARTS_RUNTIME", path)
 		}
 	}
 

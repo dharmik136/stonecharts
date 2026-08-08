@@ -62,7 +62,7 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 	running := make([]float64, f.n)
 	for si, s := range f.spec.Series {
 		st := f.styles[si]
-		p.WriteString(fmt.Sprintf(`<g class="sc-series" data-series="%d">`, si))
+		fmt.Fprintf(p, `<g class="sc-series" data-series="%d">`, si)
 
 		rawVals := make([]float64, 0, len(s.Data))
 		for i, v := range s.Data {
@@ -96,17 +96,17 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 				if fillOp == "" {
 					fillOp = ` fill-opacity="0.75"`
 				}
-				p.WriteString(fmt.Sprintf(
+				fmt.Fprintf(p,
 					`<path class="sc-series-area" data-series="%d" d="%s" fill="%s"%s stroke="none"/>`,
-					si, areaPath(topPts, bottomPts, s.Step, s.Curve), areaSeriesFill(st), fillOp))
+					si, areaPath(topPts, bottomPts, s.Step, s.Curve), areaSeriesFill(st), fillOp)
 				lineDash := dashArray(s.DashStyle)
 				lineDashAttr := ""
 				if lineDash != "" {
 					lineDashAttr = ` stroke-dasharray="` + lineDash + `"`
 				}
-				p.WriteString(fmt.Sprintf(
+				fmt.Fprintf(p,
 					`<path class="sc-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
-					si, areaTopPath(topPts, s.Step, s.Curve), st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
+					si, areaTopPath(topPts, s.Step, s.Curve), st.stroke, fmtNum(s.lineWidth()), lineDashAttr)
 			}
 		} else {
 			bottomPts := make([][2]float64, len(rawVals))
@@ -122,17 +122,17 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 				if fillOp == "" {
 					fillOp = ` fill-opacity="0.75"`
 				}
-				p.WriteString(fmt.Sprintf(
+				fmt.Fprintf(p,
 					`<path class="sc-series-area" data-series="%d" d="%s" fill="%s"%s stroke="none"/>`,
-					si, areaD, areaSeriesFill(st), fillOp))
+					si, areaD, areaSeriesFill(st), fillOp)
 				lineDash := dashArray(s.DashStyle)
 				lineDashAttr := ""
 				if lineDash != "" {
 					lineDashAttr = ` stroke-dasharray="` + lineDash + `"`
 				}
-				p.WriteString(fmt.Sprintf(
+				fmt.Fprintf(p,
 					`<path class="sc-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
-					si, areaTopPath(topPts, s.Step, s.Curve), st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
+					si, areaTopPath(topPts, s.Step, s.Curve), st.stroke, fmtNum(s.lineWidth()), lineDashAttr)
 			}
 		}
 
