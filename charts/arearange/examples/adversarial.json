@@ -9,7 +9,7 @@
       "name": "<script>evil()</script> & \"band\"",
       "data": [5, 6, 7, 8, 9],
       "low": [1, 2, 3, 4, 5],
-      "color": "#2f7ed8\" onload=\"alert(1)"
+      "color": "#2f7ed8"
     }
   ]
 }

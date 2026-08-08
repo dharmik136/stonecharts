@@ -46,10 +46,7 @@ def _columnrange_marks(fr: CartesianFrame, p: list) -> None:
 
     horiz = fr.orientation == "horizontal"
 
-    if horiz:
-        band = fr.band_height()
-    else:
-        band = fr.band_width()
+    band = fr.band_height() if horiz else fr.band_width()
     group_w = band * (1 - PAD)
     k = 1 if not fr.spec.grouping else max(len(fr.spec.series), 1)
     bar_w = group_w / k

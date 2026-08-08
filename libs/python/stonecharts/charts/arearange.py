@@ -57,11 +57,7 @@ def _arearange_marks(fr: CartesianFrame, p: list[str]) -> None:
 
         p.append(f'<g class="sc-series" data-series="{si}">')
 
-        # Band path: high L→R, low R→L, close
-        if spline:
-            top_d = _spline_d(hi_pts)
-        else:
-            top_d = _path_d(hi_pts, None)
+        top_d = _spline_d(hi_pts) if spline else _path_d(hi_pts, None)
 
         # Low boundary reversed
         lo_reversed = list(reversed(lo_pts))
@@ -82,24 +78,16 @@ def _arearange_marks(fr: CartesianFrame, p: list[str]) -> None:
         # Optional bounding strokes
         line_w = getattr(s, "line_width", None)
         if line_w is not None and line_w > 0:
-            stroke_dash = dash_array(getattr(s, "dash_style", None))
+            stroke_dash = dash_array(getattr(s, "dash_style", None) or "")
             dash_attr = f' stroke-dasharray="{stroke_dash}"' if stroke_dash else ""
-            # High boundary stroke
-            if spline:
-                hi_stroke_d = _spline_d(hi_pts)
-            else:
-                hi_stroke_d = _path_d(hi_pts, None)
+            hi_stroke_d = _spline_d(hi_pts) if spline else _path_d(hi_pts, None)
             p.append(
                 f'<path class="sc-series-line sc-range-hi" data-series="{si}"'
                 f' d="{hi_stroke_d}" fill="none" stroke="{st.stroke}"'
                 f' stroke-width="{fmt_num(line_w)}" stroke-linejoin="round"'
                 f' stroke-linecap="round"{dash_attr}/>'
             )
-            # Low boundary stroke
-            if spline:
-                lo_stroke_d = _spline_d(lo_pts)
-            else:
-                lo_stroke_d = _path_d(lo_pts, None)
+            lo_stroke_d = _spline_d(lo_pts) if spline else _path_d(lo_pts, None)
             p.append(
                 f'<path class="sc-series-line sc-range-lo" data-series="{si}"'
                 f' d="{lo_stroke_d}" fill="none" stroke="{st.stroke}"'
@@ -122,7 +110,7 @@ def _arearange_marks(fr: CartesianFrame, p: list[str]) -> None:
                 f' data-x="{esc(xlabel)}"'
                 f' data-low="{esc(fmt_num(lo_val))}"'
                 f' data-high="{esc(fmt_num(hi_val))}"'
-                f' data-y="{esc(fmt_num(lo_val) + "–" + fmt_num(hi_val))}"'
+                f' data-y="{esc(fmt_num(lo_val) + "–" + fmt_num(hi_val))}"'  # noqa: RUF001
                 f' data-color="{st.solid}"'
                 f' data-r="{fmt_num(radius)}" data-r-hover="{fmt_num(radius_hover)}"'
                 f' cx="{cx:.1f}" cy="{cy:.1f}" r="{fmt_num(radius)}"/>'
