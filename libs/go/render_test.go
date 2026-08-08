@@ -18,13 +18,16 @@ import (
 // If this and the Python test both pass, the two libraries are provably in sync.
 func TestGolden(t *testing.T) {
 	cases := map[string][]string{
-		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
-		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
-		"area":       {"basic", "stacked", "percent", "themed-dark"},
-		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
-		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
-		"bubble":     {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
-		"combo":      {"basic", "dark", "dual-axis", "adversarial"},
+		"line-basic":   {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
+		"column":       {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":         {"basic", "stacked", "percent", "themed-dark"},
+		"bar":          {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
+		"scatter":      {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
+		"bubble":       {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
+		"combo":        {"basic", "dark", "dual-axis", "adversarial"},
+		"histogram":    {"basic", "prebinned", "pareto", "themed-dark", "adversarial"},
+		"candlestick":  {"basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"},
+		"error-bar":    {"basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
