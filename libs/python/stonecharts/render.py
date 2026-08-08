@@ -16,6 +16,7 @@ from .charts import area as _area
 from .charts import arearange as _arearange
 from .charts import bar as _bar
 from .charts import bubble as _bubble
+from .charts import bullet as _bullet
 from .charts import candlestick as _candlestick
 from .charts import column as _column
 from .charts import columnrange as _columnrange
@@ -38,6 +39,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "area": _area.render_svg,
     "arearange": _arearange.render_svg,
     "bar": _bar.render_svg,
+    "bullet": _bullet.render_svg,
     "combo": _combo.render_svg,
     "column": _column.render_svg,
     "columnrange": _columnrange.render_svg,

@@ -232,6 +232,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderAreaRangeSVG(spec)
 	case "bar":
 		svg = renderBarSVG(spec)
+	case "bullet":
+		svg = renderBulletSVG(spec)
 	case "combo":
 		svg = renderComboSVG(spec)
 	case "candlestick":
