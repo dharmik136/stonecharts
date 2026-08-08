@@ -51,6 +51,7 @@ jobs:
   codeql:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       security-events: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -165,6 +166,7 @@ jobs:
       - run: go vet ./...
       - run: go test . -cover -covermode=atomic -coverprofile=coverage.out
       - name: Enforce Go coverage threshold
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           total=$(go tool cover -func=coverage.out | grep total: | awk '{print $3}' | tr -d '%')
