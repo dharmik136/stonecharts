@@ -590,25 +590,52 @@ def _chrome_tail(fr: CartesianFrame, p: list[str]) -> None:
 
     # Legend (bottom center).
     if spec.legend and spec.series:
-        gap = 22
-        est = [len(s.name) * 7 + 26 for s in spec.series]
-        total = sum(est) + gap * (len(spec.series) - 1)
-        lx = plot_x + (plot_w - total) / 2
-        ly = H - (10 + (18 if spec.x_axis.title else 0))
-        p.append('<g class="sc-legend">')
-        for si, s in enumerate(spec.series):
-            color = fr.styles[si].solid
-            p.append(f'<g class="sc-legend-item" data-series="{si}">')
-            if spec.type == "combo" and s.type == "line":
-                p.append(f'<rect x="{lx:.1f}" y="{ly - 8:.1f}" width="14" height="2" rx="1" fill="{color}"/>')
-            else:
+        if spec.type == "waterfall":
+            # Three-swatch direction key: Increase / Decrease / Total
+            up_color = getattr(spec, "up_color", "#3f9b6a")
+            down_color = getattr(spec, "down_color", "#d65f5f")
+            total_color = getattr(spec, "total_color", "#4b6cb7")
+            sum_idx = set(getattr(spec, "sum_indices", None) or [])
+            isum_idx = set(getattr(spec, "intermediate_sum_indices", None) or [])
+            has_total = bool(sum_idx or isum_idx)
+            items = [("Increase", up_color), ("Decrease", down_color)]
+            if has_total:
+                items.append(("Total", total_color))
+            gap = 22
+            est = [len(label) * 7 + 26 for label, _ in items]
+            total = sum(est) + gap * (len(items) - 1)
+            lx = plot_x + (plot_w - total) / 2
+            ly = H - (10 + (18 if spec.x_axis.title else 0))
+            p.append('<g class="sc-legend">')
+            for idx, (label, color) in enumerate(items):
+                p.append(f'<g class="sc-legend-item" data-series="{idx}">')
                 p.append(f'<rect x="{lx:.1f}" y="{ly - 9:.1f}" width="14" height="4" rx="2" fill="{color}"/>')
-            p.append(
-                f'<text x="{lx + 20:.1f}" y="{ly - 2:.1f}" font-size="12" fill="{theme.legend_text_color}">{esc(s.name)}</text>'
-            )
+                p.append(
+                    f'<text x="{lx + 20:.1f}" y="{ly - 2:.1f}" font-size="12" fill="{theme.legend_text_color}">{esc(label)}</text>'
+                )
+                p.append("</g>")
+                lx += est[idx] + gap
             p.append("</g>")
-            lx += est[si] + gap
-        p.append("</g>")
+        else:
+            gap = 22
+            est = [len(s.name) * 7 + 26 for s in spec.series]
+            total = sum(est) + gap * (len(spec.series) - 1)
+            lx = plot_x + (plot_w - total) / 2
+            ly = H - (10 + (18 if spec.x_axis.title else 0))
+            p.append('<g class="sc-legend">')
+            for si, s in enumerate(spec.series):
+                color = fr.styles[si].solid
+                p.append(f'<g class="sc-legend-item" data-series="{si}">')
+                if spec.type == "combo" and s.type == "line":
+                    p.append(f'<rect x="{lx:.1f}" y="{ly - 8:.1f}" width="14" height="2" rx="1" fill="{color}"/>')
+                else:
+                    p.append(f'<rect x="{lx:.1f}" y="{ly - 9:.1f}" width="14" height="4" rx="2" fill="{color}"/>')
+                p.append(
+                    f'<text x="{lx + 20:.1f}" y="{ly - 2:.1f}" font-size="12" fill="{theme.legend_text_color}">{esc(s.name)}</text>'
+                )
+                p.append("</g>")
+                lx += est[si] + gap
+            p.append("</g>")
 
     p.append("</svg>")
 

@@ -378,33 +378,42 @@ func (n *pxInt) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+type Connector struct {
+	Enabled   *bool  `json:"enabled,omitempty"`
+	DashStyle string `json:"dashStyle,omitempty"`
+}
+
 type ChartSpec struct {
-	Type           string          `json:"type"`
-	ID             string          `json:"id,omitempty"`
-	Theme          json.RawMessage `json:"theme,omitempty"` // name string OR theme object
-	theme          *Theme          // resolved (set in applyDefaults)
-	Title          string          `json:"title,omitempty"`
-	Subtitle       string          `json:"subtitle,omitempty"`
-	Width          pxInt           `json:"width,omitempty"`
-	Height         pxInt           `json:"height,omitempty"`
-	Legend         *bool           `json:"legend,omitempty"`
-	A11y           *bool           `json:"a11y,omitempty"` // nil -> true
-	Responsive     bool            `json:"responsive,omitempty"`
-	Layout         *Layout         `json:"layout,omitempty"`
-	Stacking       string          `json:"stacking,omitempty"`    // "" | "normal" | "percent"
-	Grouping       *bool           `json:"grouping,omitempty"`    // nil -> true
-	Orientation    string          `json:"orientation,omitempty"` // "" -> "vertical"; "horizontal" for bar-range
-	Binning        *Binning        `json:"binning,omitempty"`
-	PreBinned      bool            `json:"preBinned,omitempty"`
-	Normalization  string          `json:"normalization,omitempty"`
-	Overlay        string          `json:"overlay,omitempty"`
-	Subtype        string          `json:"subtype,omitempty"`
-	UpColor        string          `json:"upColor,omitempty"`
-	DownColor      string          `json:"downColor,omitempty"`
-	XAxis          Axis            `json:"xAxis"`
-	YAxis          Axis            `json:"yAxis"`
-	SecondaryYAxis *Axis           `json:"secondaryYAxis,omitempty"`
-	Series         []Series        `json:"series"`
+	Type                   string          `json:"type"`
+	ID                     string          `json:"id,omitempty"`
+	Theme                  json.RawMessage `json:"theme,omitempty"` // name string OR theme object
+	theme                  *Theme          // resolved (set in applyDefaults)
+	Title                  string          `json:"title,omitempty"`
+	Subtitle               string          `json:"subtitle,omitempty"`
+	Width                  pxInt           `json:"width,omitempty"`
+	Height                 pxInt           `json:"height,omitempty"`
+	Legend                 *bool           `json:"legend,omitempty"`
+	A11y                   *bool           `json:"a11y,omitempty"` // nil -> true
+	Responsive             bool            `json:"responsive,omitempty"`
+	Layout                 *Layout         `json:"layout,omitempty"`
+	Stacking               string          `json:"stacking,omitempty"`    // "" | "normal" | "percent"
+	Grouping               *bool           `json:"grouping,omitempty"`    // nil -> true
+	Orientation            string          `json:"orientation,omitempty"` // "" -> "vertical"; "horizontal" for bar-range
+	Binning                *Binning        `json:"binning,omitempty"`
+	PreBinned              bool            `json:"preBinned,omitempty"`
+	Normalization          string          `json:"normalization,omitempty"`
+	Overlay                string          `json:"overlay,omitempty"`
+	Subtype                string          `json:"subtype,omitempty"`
+	UpColor                string          `json:"upColor,omitempty"`
+	DownColor              string          `json:"downColor,omitempty"`
+	TotalColor             string          `json:"totalColor,omitempty"`
+	SumIndices             []int           `json:"sumIndices,omitempty"`
+	IntermediateSumIndices []int           `json:"intermediateSumIndices,omitempty"`
+	Connector              *Connector      `json:"connector,omitempty"`
+	XAxis                  Axis            `json:"xAxis"`
+	YAxis                  Axis            `json:"yAxis"`
+	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
+	Series                 []Series        `json:"series"`
 }
 
 // applyDefaults mirrors the Python ChartSpec defaults so the two libraries

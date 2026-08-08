@@ -1,0 +1,21 @@
+{
+  "type": "waterfall",
+  "title": "Adversarial <waterfall> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "intermediateSumIndices": [2],
+  "sumIndices": [4],
+  "upColor": "#2e9e5b",
+  "downColor": "#d9534f",
+  "totalColor": "#4b6cb7",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3", "sub<total>", "tot\"al"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "deltas <script>&\"'</script>",
+      "data": [50, -18, 0, 15, 0]
+    }
+  ]
+}

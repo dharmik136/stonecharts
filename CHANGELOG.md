@@ -9,6 +9,15 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.10] - 2026-08-08
+
+### Added
+
+- **Waterfall chart** (`type: "waterfall"`) — signed deltas as floating bars
+  with running-total transform and connector lines (DEC-026).
+  New spec fields: `totalColor`, `sumIndices`, `intermediateSumIndices`,
+  `connector`.
+
 ## [0.0.0.9] - 2026-08-08
 
 ### Added

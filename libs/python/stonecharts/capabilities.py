@@ -21,6 +21,7 @@ _CAPABILITIES: dict[str, Any] = {
         "histogram",
         "line",
         "scatter",
+        "waterfall",
     ],
     "column": {
         "grouping": ["grouped", "overlay"],
