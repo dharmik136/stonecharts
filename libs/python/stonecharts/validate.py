@@ -377,7 +377,8 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 # 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4
 # admits bubble per DEC-016; 0.0.0.5 admits combo per DEC-020;
 # 0.0.0.6 admits histogram per DEC-021;
-# 0.0.0.7 admits candlestick per DEC-022).
+# 0.0.0.7 admits candlestick per DEC-022;
+# 0.0.0.8 admits error-bar per DEC-023).
 _KNOWN_TYPES = {
     "area",
     "bar",
@@ -385,6 +386,7 @@ _KNOWN_TYPES = {
     "candlestick",
     "combo",
     "column",
+    "error-bar",
     "histogram",
     "line",
     "scatter",

@@ -25,6 +25,9 @@ const cssBlock = `.sc-chart-wrap{position:relative;display:inline-block;line-hei
 // dataTable mirrors render.py _data_table: a visually-hidden HTML data table, the
 // accessible alternative to the SVG (which is role="img").
 func dataTable(spec *ChartSpec) string {
+	if spec.Type == "error-bar" {
+		return errorBarDataTable(spec)
+	}
 	if spec.Type == "candlestick" {
 		return candlestickDataTable(spec)
 	}
@@ -128,6 +131,39 @@ func candlestickDataTable(spec *ChartSpec) string {
 	return b.String()
 }
 
+func errorBarDataTable(spec *ChartSpec) string {
+	var b strings.Builder
+	b.WriteString(`<table class="sc-visually-hidden">`)
+	if spec.Title != "" {
+		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
+	}
+	b.WriteString(`<thead><tr><th scope="col">Category</th><th scope="col">Series</th>` +
+		`<th scope="col">Y</th><th scope="col">Low</th>` +
+		`<th scope="col">High</th></tr></thead><tbody>`)
+	cats := spec.XAxis.Categories
+	for _, s := range spec.Series {
+		for i, yVal := range s.Data {
+			cat := strconv.Itoa(i)
+			if i < len(cats) {
+				cat = cats[i]
+			}
+			loVal := yVal
+			hiVal := yVal
+			if i < len(s.Low) {
+				loVal = s.Low[i]
+			}
+			if i < len(s.High) {
+				hiVal = s.High[i]
+			}
+			b.WriteString(`<tr><th scope="row">` + esc(cat) + `</th><td>` +
+				esc(s.Name) + `</td><td>` + esc(fmtNum(yVal)) + `</td><td>` +
+				esc(fmtNum(loVal)) + `</td><td>` + esc(fmtNum(hiVal)) + `</td></tr>`)
+		}
+	}
+	b.WriteString("</tbody></table>")
+	return b.String()
+}
+
 func capabilityError(received string) error {
 	return &CapabilityError{
 		Code:    "E_CAPABILITY",
@@ -158,6 +194,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderCandlestickSVG(spec)
 	case "column":
 		svg = renderColumnSVG(spec)
+	case "error-bar":
+		svg = renderErrorBarSVG(spec)
 	case "histogram":
 		svg = renderHistogramSVG(spec)
 	case "line":
