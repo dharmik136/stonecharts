@@ -18,7 +18,9 @@ def render_svg(spec: ChartSpec) -> str:
     edges, heights, counts, totals = _compute_bins(spec)
     mod = _prepare_spec(spec, edges, heights)
     return render_cartesian(
-        mod, "Histogram", "linear",
+        mod,
+        "Histogram",
+        "linear",
         lambda fr, p: _histogram_marks(fr, p, edges, heights, counts, totals, spec),
     )
 
