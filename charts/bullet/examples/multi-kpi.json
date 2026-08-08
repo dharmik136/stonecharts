@@ -1,0 +1,13 @@
+{
+  "type": "bullet",
+  "title": "Quarterly KPI Dashboard",
+  "xAxis": {
+    "categories": ["Q1", "Q2", "Q3", "Q4"]
+  },
+  "yAxis": { "title": "Performance" },
+  "series": [
+    { "name": "2024", "data": [220, 270, 310, 275] }
+  ],
+  "bulletTarget": 300,
+  "bulletRanges": [150, 225, 350]
+}
