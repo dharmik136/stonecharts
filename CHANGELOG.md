@@ -9,6 +9,19 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.7] - 2026-08-08
+
+### Added
+
+- `candlestick` chart type (DEC-022): OHLC financial chart with 5 subtypes
+  (candlestick, ohlc, hlc, heikin-ashi, hollow). Band x-scale with floating-bar
+  primitive, price-driven y-axis (`include_zero=False`), doji min-1px rule, and
+  configurable up/down colors. Certified renderers in both Python and Go with
+  byte-identical golden SVGs across 5 examples (basic, ohlc, heikin-ashi,
+  themed-dark, adversarial). Approved as validation infrastructure under DEC-017.
+- Schema extended with `candlestick` in the type enum.
+- Cross-render corpus expanded to 48 examples across 9 chart types.
+
 ## [0.0.0.6] - 2026-08-08
 
 ### Added

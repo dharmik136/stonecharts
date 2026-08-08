@@ -15,6 +15,7 @@ from .capabilities import CapabilityError, capabilities
 from .charts import area as _area
 from .charts import bar as _bar
 from .charts import bubble as _bubble
+from .charts import candlestick as _candlestick
 from .charts import column as _column
 from .charts import combo as _combo
 from .charts import histogram as _histogram
@@ -38,6 +39,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "line": _line.render_svg,
     "scatter": _scatter.render_svg,
     "bubble": _bubble.render_svg,
+    "candlestick": _candlestick.render_svg,
 }
 _CAPABILITIES = capabilities()
 
@@ -62,6 +64,28 @@ def _data_table(spec: ChartSpec) -> str:
     """A visually-hidden HTML data table: the accessible, keyboard-navigable
     alternative to the SVG (which is role="img"). Screen readers read this."""
     caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
+    if spec.type == "candlestick":
+        cats = spec.x_axis.categories or []
+        rows = []
+        for s in spec.series:
+            ohlc = getattr(s, "ohlc", None) or []
+            for i, bar in enumerate(ohlc):
+                cat = cats[i] if i < len(cats) else str(i)
+                rows.append(
+                    f'<tr><th scope="row">{esc(cat)}</th>'
+                    f"<td>{esc(s.name)}</td>"
+                    f"<td>{esc(fmt_num(bar['open']))}</td>"
+                    f"<td>{esc(fmt_num(bar['high']))}</td>"
+                    f"<td>{esc(fmt_num(bar['low']))}</td>"
+                    f"<td>{esc(fmt_num(bar['close']))}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
+            '<th scope="col">Open</th><th scope="col">High</th>'
+            '<th scope="col">Low</th><th scope="col">Close</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
     if spec.type in ("scatter", "bubble"):
         # Point-model data (scatter §3.3 Rank 3 / bubble §3.3 Rank 4, §5.4b-DT):
         # data is (x, y) or (x, y, z), not a coerced single number per shared
