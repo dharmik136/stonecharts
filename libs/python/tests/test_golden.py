@@ -33,6 +33,7 @@ CANDLESTICK_CASES = ["basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial
 ERROR_BAR_CASES = ["basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"]
 AREARANGE_CASES = ["basic", "spline-range", "themed-dark", "adversarial"]
 COLUMNRANGE_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
+WATERFALL_CASES = ["basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -46,6 +47,7 @@ ACTIVE_VALIDATION_CASES = {
     "error-bar": ERROR_BAR_CASES,
     "arearange": AREARANGE_CASES,
     "columnrange": COLUMNRANGE_CASES,
+    "waterfall": WATERFALL_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -211,6 +213,11 @@ def test_arearange_goldens():
 def test_columnrange_goldens():
     for name in COLUMNRANGE_CASES:
         _check("columnrange", name)
+
+
+def test_waterfall_goldens():
+    for name in WATERFALL_CASES:
+        _check("waterfall", name)
 
 
 def test_column_edge_cases():
@@ -535,6 +542,7 @@ def test_capability_manifest_and_error():
         "histogram",
         "line",
         "scatter",
+        "waterfall",
     ]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
