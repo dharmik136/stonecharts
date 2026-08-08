@@ -7,3 +7,9 @@ linters:
     - staticcheck
     - ineffassign
     - unused
+  settings:
+    staticcheck:
+      checks:
+        - "all"
+        - "-QF*"
+        - "-ST*"
