@@ -513,5 +513,7 @@ class ChartSpec:
             intermediate_sum_indices=[int(v) for v in d.get("intermediateSumIndices", [])] or None,
             connector=connector_obj,
             bullet_target=_opt_float(d, "bulletTarget"),
-            bullet_ranges=[float(v) for v in d["bulletRanges"]] if "bulletRanges" in d and isinstance(d.get("bulletRanges"), list) else None,
+            bullet_ranges=[float(v) for v in d["bulletRanges"]]
+            if "bulletRanges" in d and isinstance(d.get("bulletRanges"), list)
+            else None,
         )
