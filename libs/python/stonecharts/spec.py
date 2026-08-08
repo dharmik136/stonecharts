@@ -118,6 +118,7 @@ class Series:
     regression: bool = False
     low: list[float] | None = None
     data_points: list[Datum] | None = None  # scatter only — see Datum
+    ohlc: list[dict] | None = None  # candlestick only — [{open,high,low,close}, ...]
 
 
 @dataclass
@@ -288,6 +289,10 @@ class ChartSpec:
 
     overlay: str | None = None
 
+    subtype: str | None = None  # candlestick: candlestick|ohlc|hlc|heikin-ashi|hollow
+    up_color: str = "#3f9b6a"  # candlestick up (close >= open) color
+    down_color: str = "#d65f5f"  # candlestick down (close < open) color
+
     width: int = 820
     height: int = 460
     legend: bool = True
@@ -375,6 +380,7 @@ class ChartSpec:
                     marker=marker,
                     regression=bool(s.get("regression", False)),
                     low=[float(v) for v in s["low"]] if "low" in s and s["low"] is not None else None,
+                    ohlc=s.get("ohlc"),
                 )
             )
         xa = d.get("xAxis") or {}
@@ -467,6 +473,9 @@ class ChartSpec:
             pre_binned=bool(d.get("preBinned", False)),
             normalization=d.get("normalization") or "frequency",
             overlay=d.get("overlay"),
+            subtype=d.get("subtype"),
+            up_color=d.get("upColor") or "#3f9b6a",
+            down_color=d.get("downColor") or "#d65f5f",
             width=int(d.get("width", 820)),
             height=int(d.get("height", 460)),
             legend=bool(d.get("legend", True)),

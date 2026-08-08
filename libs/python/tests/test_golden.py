@@ -29,6 +29,7 @@ SCATTER_CASES = ["basic", "correlation", "regression", "themed-dark", "adversari
 BUBBLE_CASES = ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"]
 COMBO_CASES = ["basic", "dark", "dual-axis", "adversarial"]
 HISTOGRAM_CASES = ["basic", "prebinned", "pareto", "themed-dark", "adversarial"]
+CANDLESTICK_CASES = ["basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -38,6 +39,7 @@ ACTIVE_VALIDATION_CASES = {
     "bubble": BUBBLE_CASES,
     "combo": COMBO_CASES,
     "histogram": HISTOGRAM_CASES,
+    "candlestick": CANDLESTICK_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -178,6 +180,16 @@ def test_combo_edge_cases():
     ]:
         low = render_svg(ChartSpec.from_dict(spec)).lower()
         assert "nan" not in low and "inf" not in low, spec
+
+
+def test_histogram_goldens():
+    for name in HISTOGRAM_CASES:
+        _check("histogram", name)
+
+
+def test_candlestick_goldens():
+    for name in CANDLESTICK_CASES:
+        _check("candlestick", name)
 
 
 def test_column_edge_cases():
@@ -489,7 +501,17 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == ["area", "bar", "bubble", "combo", "column", "histogram", "line", "scatter"]
+    assert caps["chartTypes"] == [
+        "area",
+        "bar",
+        "bubble",
+        "candlestick",
+        "combo",
+        "column",
+        "histogram",
+        "line",
+        "scatter",
+    ]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:

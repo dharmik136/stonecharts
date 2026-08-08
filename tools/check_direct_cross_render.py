@@ -32,6 +32,7 @@ ACTIVE = {
     "bubble": ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"],
     "combo": ["basic", "dark", "dual-axis", "adversarial"],
     "histogram": ["basic", "prebinned", "pareto", "themed-dark", "adversarial"],
+    "candlestick": ["basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"],
 }
 
 

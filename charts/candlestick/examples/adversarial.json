@@ -1,0 +1,24 @@
+{
+  "type": "candlestick",
+  "title": "Adversarial <candlestick> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "subtype": "candlestick",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3", "cat'4", "cat<5>"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "candles <script>&\"'</script>",
+      "data": [103.4, 102.6, 99.0, 101.2, 105.1],
+      "ohlc": [
+        { "open": 100.0, "high": 104.2, "low": 99.1, "close": 103.4 },
+        { "open": 103.4, "high": 106.0, "low": 102.0, "close": 102.6 },
+        { "open": 102.6, "high": 103.1, "low": 98.4, "close": 99.0 },
+        { "open": 99.0, "high": 101.8, "low": 98.2, "close": 101.2 },
+        { "open": 101.2, "high": 105.5, "low": 100.9, "close": 105.1 }
+      ]
+    }
+  ]
+}
