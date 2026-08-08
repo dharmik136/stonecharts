@@ -131,8 +131,8 @@ class CartesianFrame:
 
     def ypix2(self, v: float) -> float:
         if self.y2_max == self.y2_min:
-            return self.plot_x + self.plot_w / 2
-        return self.plot_x + self.plot_w * (v - self.y2_min) / (self.y2_max - self.y2_min)
+            return self.plot_y + self.plot_h / 2
+        return self.plot_y + self.plot_h * (1 - (v - self.y2_min) / (self.y2_max - self.y2_min))
 
 
 # A chart supplies ONLY this: append its marks for one plot into the accumulator p.
@@ -220,14 +220,16 @@ def build_frame(
 
     # Margins adapt to which chrome is present unless a validated manual layout
     # margin overrides the deterministic default for that edge.
-    m_top = 20
+    m_top: float = 20
     if spec.title:
         m_top += 26
     if spec.subtitle:
         m_top += 18
-    m_left = 62 if spec.y_axis.title else 52
-    m_right = 22
-    m_bottom = 46 + (18 if spec.legend else 0) + (18 if spec.x_axis.title else 0)
+    m_left: float = 62 if spec.y_axis.title else 52
+    has_secondary = spec.secondary_y_axis is not None
+    sec = spec.secondary_y_axis
+    m_right: float = 62 if sec is not None and sec.title else (52 if has_secondary else 22)
+    m_bottom: float = 46 + (18 if spec.legend else 0) + (18 if spec.x_axis.title else 0)
     if spec.layout and spec.layout.margin:
         m = spec.layout.margin
         if m.top is not None:
@@ -300,6 +302,15 @@ def build_frame(
             hi = spec.y_axis.max if spec.y_axis.max is not None else (max(values) if values else 0.0)
     y_min, y_max, y_ticks = nice_ticks(lo, hi)
 
+    # Secondary y-axis domain (combo dual-axis).
+    y2_min = y2_max = 0.0
+    y2_ticks: list[float] = []
+    if has_secondary and sec is not None:
+        y2_values = [v for s in spec.series if s.y_axis == 1 for v in s.data]
+        y2_lo = sec.min if sec.min is not None else min([*y2_values, 0.0])
+        y2_hi = sec.max if sec.max is not None else max([*y2_values, 0.0])
+        y2_min, y2_max, y2_ticks = nice_ticks(y2_lo, y2_hi)
+
     # Resolve per-series styling and collect <defs> (gradients/patterns). Defs are
     # emitted ONLY when something needs them, so default output stays byte-identical.
     cid = esc(spec.id)  # namespaces <defs> ids; escaped so a hostile id can't inject
@@ -359,6 +370,10 @@ def build_frame(
         x_min=x_min,
         x_max=x_max,
         x_ticks=x_ticks,
+        secondary_axis=spec.secondary_y_axis if has_secondary else None,
+        y2_min=y2_min,
+        y2_max=y2_max,
+        y2_ticks=y2_ticks,
     )
 
 
@@ -584,7 +599,10 @@ def _chrome_tail(fr: CartesianFrame, p: list[str]) -> None:
         for si, s in enumerate(spec.series):
             color = fr.styles[si].solid
             p.append(f'<g class="sc-legend-item" data-series="{si}">')
-            p.append(f'<rect x="{lx:.1f}" y="{ly - 9:.1f}" width="14" height="4" rx="2" fill="{color}"/>')
+            if spec.type == "combo" and s.type == "line":
+                p.append(f'<rect x="{lx:.1f}" y="{ly - 8:.1f}" width="14" height="2" rx="1" fill="{color}"/>')
+            else:
+                p.append(f'<rect x="{lx:.1f}" y="{ly - 9:.1f}" width="14" height="4" rx="2" fill="{color}"/>')
             p.append(
                 f'<text x="{lx + 20:.1f}" y="{ly - 2:.1f}" font-size="12" fill="{theme.legend_text_color}">{esc(s.name)}</text>'
             )

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0f1a"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Chart line decoration -->
+  <path d="M60 480 L200 380 L340 420 L480 300 L620 340 L760 220 L900 260 L1040 160 L1140 200" fill="none" stroke="#2f7ed8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+  <path d="M60 500 L200 450 L340 470 L480 400 L620 430 L760 360 L900 380 L1040 310 L1140 340" fill="none" stroke="#5aa2f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.2"/>
+  <!-- Title -->
+  <text x="80" y="200" font-family="Segoe UI, system-ui, sans-serif" font-size="56" font-weight="700" fill="#f5f5fa" letter-spacing="-1">Same chart spec. Same bytes.</text>
+  <text x="80" y="270" font-family="Segoe UI, system-ui, sans-serif" font-size="56" font-weight="700" fill="#5aa2f0" letter-spacing="-1">Python or Go.</text>
+  <!-- Subtitle -->
+  <text x="80" y="340" font-family="Segoe UI, system-ui, sans-serif" font-size="22" fill="#a0a0b8">Deterministic chart rendering for regulated reporting</text>
+  <!-- Stats -->
+  <text x="80" y="440" font-family="Segoe UI, system-ui, sans-serif" font-size="18" fill="#6b6b80">0 dependencies</text>
+  <circle cx="230" cy="435" r="2.5" fill="#45455a"/>
+  <text x="245" y="440" font-family="Segoe UI, system-ui, sans-serif" font-size="18" fill="#6b6b80">184x faster cold-start</text>
+  <circle cx="465" cy="435" r="2.5" fill="#45455a"/>
+  <text x="480" y="440" font-family="Segoe UI, system-ui, sans-serif" font-size="18" fill="#6b6b80">byte-identical SVG</text>
+  <!-- Badge -->
+  <rect x="80" y="110" width="140" height="32" rx="16" fill="#1a2a4a"/>
+  <text x="150" y="132" font-family="Segoe UI, system-ui, sans-serif" font-size="14" font-weight="600" fill="#5aa2f0" text-anchor="middle">Private Preview</text>
+</svg>

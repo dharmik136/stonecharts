@@ -1,5 +1,5 @@
 ---
-id: SC-GOV-NAME-DD-001
+id: SC-GOV-006
 title: StoneCharts Name Clearance Due Diligence
 status: draft
 classification: informative

@@ -109,7 +109,7 @@
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "enum": ["spec", "python", "go", "runtime", "docs", "release", "security"] }
+          "items": { "enum": ["spec", "python", "go", "runtime", "docs", "release", "security", "site"] }
         },
         "acceptance": {
           "type": "array",

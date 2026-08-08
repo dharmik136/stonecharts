@@ -17,9 +17,10 @@
         "area",
         "bar",
         "scatter",
-        "bubble"
+        "bubble",
+        "combo"
       ],
-      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016); maps to the released chart design and renderer pair."
+      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo); maps to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",
@@ -115,6 +116,10 @@
     },
     "yAxis": {
       "$ref": "#/definitions/yAxis"
+    },
+    "secondaryYAxis": {
+      "$ref": "#/definitions/yAxis",
+      "description": "Optional second value axis (dual units), drawn on the right. Same shape as yAxis. Series bind to it with series[].yAxis: 1."
     },
     "series": {
       "type": "array",
@@ -563,6 +568,18 @@
               "default": 3.5
             }
           }
+        },
+        "type": {
+          "type": "string",
+          "enum": ["line", "column"],
+          "default": "column",
+          "description": "Per-series mark kind for combo charts. 'column' = baseline-anchored rect; 'line' = path + markers."
+        },
+        "yAxis": {
+          "type": "integer",
+          "enum": [0, 1],
+          "default": 0,
+          "description": "Which value axis this series is measured against: 0 = primary yAxis (default), 1 = secondaryYAxis."
         }
       }
     }

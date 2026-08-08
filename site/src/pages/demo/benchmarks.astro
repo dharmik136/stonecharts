@@ -15,7 +15,99 @@ import BenchmarkTable from '../../components/BenchmarkTable.astro';
     section below for full caveats.
   </div>
 
-  <!-- Cold-start latency -->
+  <!-- Visual summary -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+    <div class="card">
+      <h3 style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Cold-start: time to first chart</h3>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>StoneCharts (Go)</span>
+          <span style="font-weight: 600; color: var(--accent);">0.074 s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill success" style="width: 0.5%;"></div></div>
+      </div>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>Vega / Vega-Lite</span>
+          <span>1.057 s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill" style="width: 7.8%;"></div></div>
+      </div>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>Plotly / Kaleido</span>
+          <span>3.882 s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill" style="width: 28.5%;"></div></div>
+      </div>
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>Highcharts Export Server</span>
+          <span style="color: var(--danger);">13.607 s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill danger" style="width: 100%;"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Warm throughput: renders per second</h3>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>StoneCharts (Python)</span>
+          <span style="font-weight: 600; color: var(--accent);">6,570 / s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill success" style="width: 100%;"></div></div>
+      </div>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>StoneCharts (Go)</span>
+          <span style="font-weight: 600; color: var(--accent);">5,274 / s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill success" style="width: 80.3%;"></div></div>
+      </div>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>Vega / Vega-Lite</span>
+          <span>173 / s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill" style="width: 2.6%;"></div></div>
+      </div>
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>Highcharts Export Server</span>
+          <span style="color: var(--danger);">~19 / s</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill danger" style="width: 0.3%;"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">Dependencies: supply-chain surface</h3>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>StoneCharts</span>
+          <span style="font-weight: 600; color: var(--success);">0 packages</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill success" style="width: 0%;"></div></div>
+      </div>
+      <div style="margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>Vega + Vega-Lite</span>
+          <span>84 packages</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill" style="width: 32.2%;"></div></div>
+      </div>
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8125rem; margin-bottom: 0.25rem;">
+          <span>Highcharts Export Server</span>
+          <span style="color: var(--danger);">261 packages</span>
+        </div>
+        <div class="bar-meter"><div class="bar-meter-fill danger" style="width: 100%;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed tables -->
+  <h2 style="margin-bottom: 1.5rem;">Detailed measurements</h2>
+
   <BenchmarkTable
     title="Cold-start latency (line chart)"
     headers={['Target', 'Median cold-start', 'Peak RSS', 'Factor vs fastest']}
@@ -27,10 +119,9 @@ import BenchmarkTable from '../../components/BenchmarkTable.astro';
       { cells: ['Plotly / Kaleido (Python)', '3.882 s', '588.6 MB', '52x'] },
       { cells: ['Highcharts Export Server', '13.607 s', '552.9 MB', '184x'], dangers: [1, 2] },
     ]}
-    footnote="Cold-start = time from process launch to first rendered SVG on disk. Orders-of-magnitude gaps hold consistently across all six tested chart shapes."
+    footnote="Cold-start = time from process launch to first rendered SVG on disk. Orders-of-magnitude gaps hold consistently across all seven certified chart shapes."
   />
 
-  <!-- Warm throughput -->
   <BenchmarkTable
     title="Sustained warm throughput (line chart)"
     headers={['Target', 'Warm median latency', 'Renders / second', 'Factor vs fastest']}
@@ -43,7 +134,6 @@ import BenchmarkTable from '../../components/BenchmarkTable.astro';
     footnote="Warm = renderer already loaded, repeated renders of the same spec."
   />
 
-  <!-- Concurrent load -->
   <BenchmarkTable
     title="Concurrent load (16 simultaneous requests, line chart)"
     headers={['Target', 'Result', 'Effective req/s']}
@@ -58,7 +148,6 @@ import BenchmarkTable from '../../components/BenchmarkTable.astro';
     footnote="Highcharts Export Server dropped 10 of 16 requests on first cold burst. All subsequent warm bursts succeeded."
   />
 
-  <!-- Cross-invocation consistency -->
   <BenchmarkTable
     title="Cross-invocation determinism"
     headers={['Target', 'Byte-identical on re-render?', 'Notes']}
@@ -73,7 +162,6 @@ import BenchmarkTable from '../../components/BenchmarkTable.astro';
     footnote="Non-deterministic output makes raw-byte conformance checking impossible without preprocessing."
   />
 
-  <!-- Dependency surface -->
   <BenchmarkTable
     title="Dependency and CVE surface"
     headers={['Target', 'Dependencies', 'Audit findings']}
@@ -103,7 +191,7 @@ import BenchmarkTable from '../../components/BenchmarkTable.astro';
       </li>
       <li style="margin-bottom: 0.5rem;">
         <strong>Disclosure:</strong> These measurements do not establish results for chart
-        shapes beyond the six tested, or for ECharts/Plotly beyond the line chart shape.
+        shapes beyond the seven certified, or for ECharts/Plotly beyond the line chart shape.
       </li>
       <li style="margin-bottom: 0.5rem;">
         <strong>Docker correction:</strong> The Highcharts Docker image produced a median

@@ -12,17 +12,20 @@ func renderAreaSVG(spec *ChartSpec) string {
 	return renderCartesian(spec, "Area", "point", areaMarks, true)
 }
 
-func areaTopPath(pts [][2]float64, step string) string {
+func areaTopPath(pts [][2]float64, step string, curve string) string {
+	if curve == "monotone" {
+		return splineD(pts)
+	}
 	return pathD(pts, step)
 }
 
-func areaPath(topPts, bottomPts [][2]float64, step string) string {
-	topD := areaTopPath(topPts, step)
+func areaPath(topPts, bottomPts [][2]float64, step string, curve string) string {
+	topD := areaTopPath(topPts, step, curve)
 	bottomRev := make([][2]float64, len(bottomPts))
 	for i := range bottomPts {
 		bottomRev[i] = bottomPts[len(bottomPts)-1-i]
 	}
-	bottomD := areaTopPath(bottomRev, step)
+	bottomD := areaTopPath(bottomRev, step, curve)
 	if strings.HasPrefix(bottomD, "M") {
 		bottomD = "L" + bottomD[1:]
 	}
@@ -95,7 +98,7 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 				}
 				p.WriteString(fmt.Sprintf(
 					`<path class="sc-series-area" data-series="%d" d="%s" fill="%s"%s stroke="none"/>`,
-					si, areaPath(topPts, bottomPts, s.Step), areaSeriesFill(st), fillOp))
+					si, areaPath(topPts, bottomPts, s.Step, s.Curve), areaSeriesFill(st), fillOp))
 				lineDash := dashArray(s.DashStyle)
 				lineDashAttr := ""
 				if lineDash != "" {
@@ -103,7 +106,7 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 				}
 				p.WriteString(fmt.Sprintf(
 					`<path class="sc-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
-					si, areaTopPath(topPts, s.Step), st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
+					si, areaTopPath(topPts, s.Step, s.Curve), st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
 			}
 		} else {
 			bottomPts := make([][2]float64, len(rawVals))
@@ -113,7 +116,7 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 			}
 			if len(topPts) > 0 {
 				base := f.ypix(0.0)
-				areaD := areaTopPath(topPts, s.Step) + " L" + f1(topPts[len(topPts)-1][0]) + " " + f1(base) +
+				areaD := areaTopPath(topPts, s.Step, s.Curve) + " L" + f1(topPts[len(topPts)-1][0]) + " " + f1(base) +
 					" L" + f1(topPts[0][0]) + " " + f1(base) + " Z"
 				fillOp := st.areaOp
 				if fillOp == "" {
@@ -129,7 +132,7 @@ func areaMarks(f *cartesianFrame, p *strings.Builder) {
 				}
 				p.WriteString(fmt.Sprintf(
 					`<path class="sc-series-line" data-series="%d" d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round"%s/>`,
-					si, areaTopPath(topPts, s.Step), st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
+					si, areaTopPath(topPts, s.Step, s.Curve), st.stroke, fmtNum(s.lineWidth()), lineDashAttr))
 			}
 		}
 

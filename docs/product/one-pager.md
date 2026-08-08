@@ -76,8 +76,8 @@ do and do not establish.
   ([`SC-CON-020`](../contracts/commercial-terms-policy.md); see `DEC-018`).
 - Not a completed sale, case study, or reference customer — no paid pilot exists yet.
 - Not a claim about every chart type or every competitor; scope is the certified
-  `line`/`column`/`area`/`bar`/`scatter`/`bubble` set against the three named
-  competitors, as measured.
+  `line`/`column`/`area`/`bar`/`scatter`/`bubble`/`combo` set against the three
+  named competitors, as measured.
 
 ## Next step for a qualified prospect
 

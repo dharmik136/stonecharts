@@ -3,47 +3,78 @@ import DemoLayout from '../../layouts/DemoLayout.astro';
 ---
 <DemoLayout title="Overview" activeNav="overview">
   <h1 style="margin-bottom: 0.5rem;">StoneCharts Demo</h1>
-  <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 3rem;">
-    Visual Integrity Infrastructure — deterministic, multi-language chart rendering
-    where every chart change is provable.
+  <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 2rem;">
+    Deterministic, multi-language chart rendering where every chart change is
+    provable. Explore rendered outputs, measured benchmarks, and a real
+    conformance proof below.
   </p>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
-    <a href="/demo/gallery/" class="card" style="text-decoration: none; color: var(--text); transition: box-shadow 0.15s;">
-      <h3 style="color: var(--accent);">Chart Gallery</h3>
+  <!-- Quick stats -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem;">
+    <div class="stat card" style="padding: 1.5rem;">
+      <div class="stat-value">7</div>
+      <div class="stat-label">Certified chart types</div>
+      <div class="stat-context">Line, column, area, bar, scatter, bubble, combo</div>
+    </div>
+    <div class="stat card" style="padding: 1.5rem;">
+      <div class="stat-value">2</div>
+      <div class="stat-label">Verified runtimes</div>
+      <div class="stat-context">Python 3.14.4 &amp; Go 1.26.4</div>
+    </div>
+    <div class="stat card" style="padding: 1.5rem;">
+      <div class="stat-value" style="color: var(--success);">PASS</div>
+      <div class="stat-label">Byte-identity status</div>
+      <div class="stat-context">Same spec, same SHA-256</div>
+    </div>
+  </div>
+
+  <!-- Navigation cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+    <a href="/demo/gallery/" class="card" style="text-decoration: none; color: var(--text);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <h3 style="color: var(--accent); margin: 0;">Chart Gallery</h3>
+        <span class="badge">Interactive</span>
+      </div>
       <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
-        Interactive charts across six certified types — line, column, area, bar, scatter,
-        and bubble. Toggle between light and dark themes. Hover for tooltips, click
-        legends, use keyboard navigation.
+        Seven chart types with tooltips, crosshair, legend toggle, and keyboard
+        navigation. Light and dark themes. Every SVG is actual golden output from
+        certified renderers.
       </p>
     </a>
-    <a href="/demo/benchmarks/" class="card" style="text-decoration: none; color: var(--text); transition: box-shadow 0.15s;">
-      <h3 style="color: var(--accent);">Benchmarks</h3>
+    <a href="/demo/benchmarks/" class="card" style="text-decoration: none; color: var(--text);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <h3 style="color: var(--accent); margin: 0;">Benchmarks</h3>
+        <span class="badge">SC-QUAL-003</span>
+      </div>
       <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
-        Measured performance against Highcharts Export Server, Vega/Vega-Lite, QuickChart,
-        ECharts, and Plotly/Kaleido. Cold-start, warm throughput, concurrent load,
-        determinism, and dependency surface.
+        Cold-start, throughput, concurrent load, determinism, and dependency
+        surface — measured against Highcharts, Vega, ECharts, Plotly, and
+        QuickChart.
       </p>
     </a>
-    <a href="/demo/verify/" class="card" style="text-decoration: none; color: var(--text); transition: box-shadow 0.15s;">
-      <h3 style="color: var(--accent);">StoneVerify</h3>
+    <a href="/demo/verify/" class="card" style="text-decoration: none; color: var(--text);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <h3 style="color: var(--accent); margin: 0;">StoneVerify</h3>
+        <span class="badge-success badge">PASS</span>
+      </div>
       <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
-        A real conformance proof: the same chart spec rendered by the Python and Go
-        runtimes, producing byte-identical SVG. Evidence bundle with SHA-256 hashes,
-        structural comparison, and CI integration.
+        A real conformance proof: same spec rendered by Python and Go, producing
+        byte-identical SVG. SHA-256 evidence, structural comparison, and CI
+        integration template.
       </p>
     </a>
   </div>
 
+  <!-- Disclosure -->
   <div class="card" style="background: var(--accent-subtle); border-color: var(--accent);">
     <h3 style="font-size: 0.875rem; color: var(--accent); margin-bottom: 0.25rem;">
       What this demo shows
     </h3>
     <p style="margin: 0; font-size: 0.8125rem; color: var(--text-secondary);">
-      This demo contains rendered chart outputs (golden SVGs), measured benchmark data
-      (from SC-QUAL-003), and StoneVerify conformance evidence. No source code, packages,
-      or installable artifacts are distributed. All benchmark numbers are single-host,
-      vendor-run measurements — reproducible and disclosed, not independently audited.
+      Rendered chart outputs (golden SVGs), measured benchmark data from SC-QUAL-003,
+      and StoneVerify conformance evidence. No source code, packages, or installable
+      artifacts are distributed. All benchmark numbers are single-host, vendor-run
+      measurements — reproducible and disclosed, not independently audited.
     </p>
   </div>
 </DemoLayout>

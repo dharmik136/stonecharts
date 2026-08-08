@@ -721,7 +721,7 @@ def compare_outputs(outputs: dict[str, bytes]) -> dict[str, Any]:
             "pairs": [],
         }
 
-    pairs = []
+    pairs: list[dict] = []
     overall_equal = True
     for left_name, right_name in zip(names, names[1:]):
         check_comparison_deadline(deadline)
@@ -733,7 +733,7 @@ def compare_outputs(outputs: dict[str, bytes]) -> dict[str, Any]:
             f"{left_name}-output.svg",
             f"{right_name}-output.svg",
         )
-        enforce_finding_limit(sum(len(pair.get("findings", [])) for pair in pairs))
+        enforce_finding_limit(sum(len(pair.get("findings", [])) for pair in pairs))  # type: ignore[arg-type]
         equal = difference["equal"]
         overall_equal = overall_equal and equal
         pairs.append(
@@ -916,7 +916,8 @@ def compare_evidence_bundles(left_evidence: pathlib.Path, right_evidence: pathli
     right = check_evidence_bundle(right_evidence)
 
     def load_manifest(evidence: pathlib.Path) -> dict[str, Any]:
-        return json.loads((evidence / "manifest.json").read_text(encoding="utf-8"))
+        result: dict[str, Any] = json.loads((evidence / "manifest.json").read_text(encoding="utf-8"))
+        return result
 
     left_manifest = load_manifest(left_evidence)
     right_manifest = load_manifest(right_evidence)
@@ -1371,7 +1372,8 @@ def emit_github_actions_output(
         ]
         for case in failed:
             lines.append(f"- `{case['name']}`: {case['message']}")
-        summary.open("a", encoding="utf-8").write("\n".join(lines) + "\n")
+        with summary.open("a", encoding="utf-8") as fh:
+            fh.write("\n".join(lines) + "\n")
 
 
 REPORT_STYLE = """

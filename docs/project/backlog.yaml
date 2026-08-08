@@ -1453,7 +1453,7 @@ items:
     workstream: WS-03 Conformance
     stage: S5 Expansion
     target: Unscheduled
-    outcome: StoneVerify and the certified renderers hold up against inputs an external customer might actually supply - cross-language invalid-input parity, randomized property tests across all six certified chart types, resource limits on adversarial specs, malformed Unicode and escaping, and deterministic output verified across more than one OS or container profile - closing gaps the current test suite does not cover.
+    outcome: StoneVerify and the certified renderers hold up against inputs an external customer might actually supply - cross-language invalid-input parity, randomized property tests across all seven certified chart types, resource limits on adversarial specs, malformed Unicode and escaping, and deterministic output verified across more than one OS or container profile - closing gaps the current test suite does not cover.
     traceability: [SC-PROD-003, SC-PROD-004, REQ-VERIFY-004]
     risks: []
     evidence: [TEST-DOCS-CONTROL]
@@ -1461,7 +1461,7 @@ items:
     compatibility: Adds test coverage and defensive limits only; does not change certified renderer output for any currently-valid spec.
     areas: [python, go, docs]
     acceptance:
-      - Every certified chart type (line, column, area, bar, scatter, bubble) has a randomized property test in both Python and Go asserting the shared invariants, including valid SVG output and byte-parity where applicable.
+      - Every certified chart type (line, column, area, bar, scatter, bubble, combo) has a randomized property test in both Python and Go asserting the shared invariants, including valid SVG output and byte-parity where applicable.
       - Cross-language invalid-input parity tests exist for every documented validation error class in docs/contracts/validation-and-capabilities.md.
       - A specification with pathological size or nesting is rejected with a stable, documented error rather than unbounded resource consumption or a crash.
       - Concrete limits are documented and enforced for maximum series count, maximum points per series, maximum total points, maximum input specification size, maximum label length, maximum generated SVG size, and a render timeout, identically in both languages.
@@ -1860,7 +1860,7 @@ items:
     workstream: WS-07 Docs & DX
     stage: S5 Expansion
     target: Unscheduled
-    outcome: A static Astro site at site/ with five pages (public landing, demo overview, interactive chart gallery with all 6 certified types, benchmark comparison tables, and StoneVerify conformance proof), buildable via npm run build in under 2 seconds, deployable to any static host with Cloudflare Access gating the /demo/* path.
+    outcome: A static Astro site at site/ with five pages (public landing, demo overview, interactive chart gallery with all 7 certified types, benchmark comparison tables, and StoneVerify conformance proof), buildable via npm run build in under 2 seconds, deployable to any static host with Cloudflare Access gating the /demo/* path.
     traceability: [DEC-019, SC-PROD-003, SC-QUAL-003]
     risks: []
     evidence: []
@@ -1869,7 +1869,7 @@ items:
     areas: [site]
     acceptance:
       - npm run build in site/ completes without errors and produces dist/ with 5 HTML pages.
-      - The gallery page embeds all 6 certified chart types with working chart-interactions.js (tooltips, crosshair, legend toggle, keyboard navigation).
+      - The gallery page embeds all 7 certified chart types with working chart-interactions.js (tooltips, crosshair, legend toggle, keyboard navigation).
       - Light/dark theme toggle swaps all chart SVGs and persists preference in localStorage.
       - The benchmarks page displays cold-start, warm throughput, concurrent load, determinism, and dependency tables with SC-QUAL-003 disclosure.
       - The verify page shows the real StoneVerify evidence bundle with matching SHA-256 hashes for Python and Go outputs.

@@ -6,6 +6,7 @@ on:
     paths:
       - 'site/**'
       - 'charts/*/golden/**'
+      - 'charts/*/examples/**'
       - 'runtime/chart-interactions.js'
       - 'docs/quality/stoneverify-sample-evidence/**'
   workflow_dispatch:

@@ -6,6 +6,7 @@ build/
 dist/
 .venv/
 venv/
+.coverage
 
 # Generated example outputs (goldens under charts/*/golden are committed)
 *.out.html

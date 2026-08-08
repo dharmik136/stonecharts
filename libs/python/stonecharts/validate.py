@@ -369,15 +369,18 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         )
     if "marker" in v:
         _marker(v["marker"], f"{path}.marker", errs)
+    if "type" in v:
+        _str(v["type"], f"{path}.type", errs)
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
 # 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4
-# admits bubble per DEC-016).
+# admits bubble per DEC-016; 0.0.0.5 admits combo per DEC-017).
 _KNOWN_TYPES = {
     "area",
     "bar",
     "bubble",
+    "combo",
     "column",
     "line",
     "scatter",
@@ -435,8 +438,10 @@ def validate(d: Any) -> list[str]:
     if isinstance(d.get("layout"), dict) and isinstance(d["layout"].get("margin"), dict):
         m = d["layout"]["margin"]
         if isinstance(d.get("width"), (int, float)) and isinstance(d.get("height"), (int, float)):
-            ya = d.get("yAxis") if isinstance(d.get("yAxis"), dict) else {}
-            xa = d.get("xAxis") if isinstance(d.get("xAxis"), dict) else {}
+            ya_raw = d.get("yAxis")
+            xa_raw = d.get("xAxis")
+            ya = ya_raw if isinstance(ya_raw, dict) else {}
+            xa = xa_raw if isinstance(xa_raw, dict) else {}
             left = _num_or_default(m.get("left"), 62 if ya.get("title") else 52)
             right = _num_or_default(m.get("right"), 22)
             top = _num_or_default(m.get("top"), 20 + (26 if d.get("title") else 0) + (18 if d.get("subtitle") else 0))

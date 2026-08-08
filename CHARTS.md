@@ -29,6 +29,7 @@ schema), and the one render call — nothing more is needed.
 | Trend **plus magnitude/volume** under the line | `area` |
 | Composition + **volume flow** of many series over ordered time (theme river) | `streamgraph` |
 | **Part-to-whole** of a single total | `pie` / `donut` _(planned)_ |
+| Two measures on the same x — **magnitude (columns) + trend (line)**, optionally on dual y-axes | `combo` |
 | **Correlation** between two continuous variables (x,y points) | `scatter` |
 | Correlation + a third value as size | `bubble` |
 | Value across a **2-D grid** (matrix) | `heatmap` _(planned)_ |
@@ -47,7 +48,7 @@ schema), and the one render call — nothing more is needed.
 | `columnrange` | categories[N] + a (low,high) band per category (interim encoding: `data`=low + parallel `high[]`) | show a min–max / low–high band per category as floating bars (grouped; vertical or horizontal) | single-value comparison (use `column`), band over continuous x (use `arearange`), OHLC (use `candlestick`) | Design ✅ · render deferred | [design.md](charts/columnrange/design.md) |
 | `scatter` | series of (x,y) numeric points | correlation / spread / clustering between two continuous variables | trend (use line), category ranking (use column/bar), one-variable distribution (use histogram) | Design ✅ · render ✅ (certified, 0.0.0.3) | [design.md](charts/scatter/design.md) |
 | `bubble` | series of [x,y,z] coordinates | correlation + bubble size representing volume | simple comparison | Design ✅ · render ✅ (targeting 0.0.0.4, DEC-016) | [design.md](charts/bubble/design.md) |
-| `combo` | categories[N] + series of numbers, each tagged `type`∈{line,column} | overlay two mark kinds (throughput bars + latency/trend line) on a shared or dual y-axis | single-mark data (use line or column), x/y correlation (use scatter), part-to-whole (use pie) | Design ✅ · render deferred | [design.md](charts/combo/design.md) |
+| `combo` | categories[N] + series of numbers, each tagged `type`∈{line,column} | overlay two mark kinds (throughput bars + latency/trend line) on a shared or dual y-axis | single-mark data (use line or column), x/y correlation (use scatter), part-to-whole (use pie) | Design ✅ · render ✅ (certified, 0.0.0.5) | [design.md](charts/combo/design.md) |
 | `candlestick` | window[N] + {open,high,low,close} per window | show OHLC min/max/first/last per time window (direction + range at a glance) | plain trend (use line), category counts (use column), (low,high) band (use arearange/columnrange) | Design ✅ · render deferred | [design.md](charts/candlestick/design.md) |
 | `error-bar` | categories[N] + series of center `y` plus parallel `low`/`high` bounds | show a magnitude and its uncertainty (CI / std error / percentile spread), often overlaid on column/line/scatter | pure range with no center (arearange/columnrange), full distribution (boxplot), plain trend (line) | Design ✅ · render deferred | [design.md](charts/error-bar/design.md) |
 | `boxplot` | 5-number distributions per category | statistical summary of latency distributions | single trends | Design ✅ · render deferred | [design.md](charts/boxplot/design.md) |

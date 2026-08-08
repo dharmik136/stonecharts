@@ -367,7 +367,7 @@ def main() -> int:
         item_id = row.get("id", "<unknown>")
         traceability = row.get("traceability", [])
         for reference in traceability:
-            if reference not in requirement_ids and reference not in artifact_ids:
+            if reference not in requirement_ids and reference not in artifact_ids and reference not in backlog_ids:
                 errors.append(f"{rel(PROJECT_BACKLOG_FILE)}:{item_id}: unknown traceability reference `{reference}`")
         for risk_id in row.get("risks", []):
             if risk_id not in risk_ids:
