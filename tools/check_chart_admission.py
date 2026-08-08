@@ -100,7 +100,8 @@ def check_example_specs(chart_type: str) -> str | None:
 def check_python_renderer(chart_type: str) -> str | None:
     """Phase 3: Python renderer module must exist."""
     type_id = _schema_type(chart_type)
-    path = PYTHON_CHARTS_DIR / f"{type_id}.py"
+    py_id = type_id.replace("-", "_")
+    path = PYTHON_CHARTS_DIR / f"{py_id}.py"
     if not path.is_file():
         return f"Python renderer {path.relative_to(ROOT)} does not exist"
     return None
@@ -109,7 +110,8 @@ def check_python_renderer(chart_type: str) -> str | None:
 def check_go_renderer(chart_type: str) -> str | None:
     """Phase 3: Go renderer file must exist."""
     type_id = _schema_type(chart_type)
-    path = GO_DIR / f"{type_id}.go"
+    go_id = type_id.replace("-", "")
+    path = GO_DIR / f"{go_id}.go"
     if not path.is_file():
         return f"Go renderer {path.relative_to(ROOT)} does not exist"
     return None
