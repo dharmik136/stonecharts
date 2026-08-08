@@ -12,45 +12,56 @@ const manifest = JSON.parse(await readFile(join(evidenceDir, 'manifest.json'), '
 const hash = manifest.evidence.artifacts['python-output.svg'].value;
 const goHash = manifest.evidence.artifacts['go-output.svg'].value;
 const specHash = manifest.evidence.inputSpec.value;
+const hashesMatch = hash === goHash;
 ---
 <DemoLayout title="StoneVerify" activeNav="verify">
   <h1 style="margin-bottom: 0.5rem;">StoneVerify Conformance Proof</h1>
   <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 2rem;">
-    The same chart specification was rendered by the Python and Go runtimes. Both
-    produced byte-identical SVG output — 4,152 bytes, same SHA-256 hash.
+    One chart specification. Two runtimes. Byte-identical output.
+    This is not a claim — it is a verifiable proof.
   </p>
 
-  <!-- Status -->
-  <div class="card" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+  <!-- Status banner -->
+  <div class="card" style="margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
     <div class="verify-status">PASS</div>
     <div style="flex: 1; min-width: 200px;">
-      <div style="font-size: 0.8125rem; color: var(--text-secondary);">
-        All requested runtime outputs are byte-identical.
+      <div style="font-size: 0.875rem; font-weight: 500;">
+        Python and Go renderers produced identical SVG output.
       </div>
       <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.25rem;">
         Generated: {manifest.generatedAt}
       </div>
     </div>
-    <div>
+    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
       <span class="badge">StoneVerify {manifest.environment.stoneverifyVersion}</span>
-      <span class="badge" style="margin-left: 0.35rem;">v{manifest.environment.stonechartsVersion}</span>
+      <span class="badge">v{manifest.environment.stonechartsVersion}</span>
     </div>
   </div>
 
   <!-- Side-by-side renderings -->
-  <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Rendered outputs</h2>
+  <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Rendered outputs</h2>
+  <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+    Both charts below are rendered from the same JSON specification —
+    one by the Python runtime, one by Go.
+  </p>
   <div class="evidence-grid">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
-        Python {manifest.environment.pythonVersion}
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+          Python {manifest.environment.pythonVersion}
+        </span>
+        {hashesMatch && <span class="badge-success badge" style="font-size: 0.625rem;">Matched</span>}
       </div>
       <div class="sc-chart-wrap">
         <div class="sc-chart-light" set:html={pythonSvg} />
       </div>
     </div>
     <div>
-      <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
-        Go {manifest.environment.goVersion.replace('go version ', '')}
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+          Go {manifest.environment.goVersion.replace('go version ', '')}
+        </span>
+        {hashesMatch && <span class="badge-success badge" style="font-size: 0.625rem;">Matched</span>}
       </div>
       <div class="sc-chart-wrap">
         <div class="sc-chart-light" set:html={goSvg} />
@@ -59,8 +70,12 @@ const specHash = manifest.evidence.inputSpec.value;
   </div>
 
   <!-- Hash proof -->
-  <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">SHA-256 proof</h2>
-  <div class="card" style="margin-bottom: 2rem;">
+  <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">SHA-256 proof</h2>
+  <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+    The hash of each output file. Identical hashes prove the SVG bytes are identical —
+    not just visually similar, but exactly the same data.
+  </p>
+  <div class="card" style="margin-bottom: 2.5rem;">
     <table class="data-table" style="margin-bottom: 0;">
       <thead>
         <tr>
@@ -85,16 +100,34 @@ const specHash = manifest.evidence.inputSpec.value;
         </tr>
       </tbody>
     </table>
-    {hash === goHash && (
-      <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--accent-subtle); border-radius: var(--radius); font-size: 0.8125rem; color: var(--accent);">
-        Hashes match — the Python and Go renderers produced identical output from the same specification.
+    {hashesMatch && (
+      <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--accent-subtle); border-radius: var(--radius); display: flex; align-items: center; gap: 0.5rem;">
+        <span class="badge-success badge">Identical</span>
+        <span style="font-size: 0.8125rem; color: var(--text-secondary);">
+          Both runtimes produced the same {manifest.runtimes[0].bytes} bytes from the same specification.
+        </span>
       </div>
     )}
   </div>
 
+  <!-- Input spec hash -->
+  <div class="card" style="margin-bottom: 2.5rem; background: var(--bg-surface);">
+    <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem;">
+      Input Specification SHA-256
+    </div>
+    <code style="font-size: 0.75rem; word-break: break-all; color: var(--text-tertiary);">{specHash}</code>
+    <div style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.5rem;">
+      This hash identifies the exact input specification that was fed to both runtimes.
+    </div>
+  </div>
+
   <!-- Evidence bundle structure -->
-  <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Evidence bundle structure</h2>
-  <div class="card" style="margin-bottom: 2rem;">
+  <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Evidence bundle</h2>
+  <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+    Every StoneVerify run produces a self-contained evidence directory that can be
+    stored, versioned, or attached to a CI artifact.
+  </p>
+  <div class="card" style="margin-bottom: 2.5rem;">
     <pre style="margin: 0; border: 0; background: transparent;"><code>stoneverify-evidence/
   manifest.json         ← Provenance: environment, timestamps, SHA-256 hashes
   input-spec.json       ← The chart specification that was rendered
@@ -107,7 +140,7 @@ const specHash = manifest.evidence.inputSpec.value;
 
   <!-- Environment -->
   <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Environment</h2>
-  <div class="card" style="margin-bottom: 2rem;">
+  <div class="card" style="margin-bottom: 2.5rem;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.875rem;">
       <div>
         <div style="color: var(--text-tertiary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em;">Python</div>
@@ -129,12 +162,11 @@ const specHash = manifest.evidence.inputSpec.value;
   </div>
 
   <!-- CI integration -->
-  <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">CI integration</h2>
+  <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">CI integration</h2>
+  <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">
+    StoneVerify runs as a CI gate — fail the build if chart output drifts.
+  </p>
   <div class="card">
-    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
-      StoneVerify integrates with GitHub Actions via exit codes, JUnit XML reports,
-      step summary annotations, and artifact uploads.
-    </p>
     <pre style="margin: 0;"><code>- name: StoneVerify conformance gate
   run: |
     stoneverify chart-spec.json \
@@ -147,9 +179,9 @@ const specHash = manifest.evidence.inputSpec.value;
   with:
     name: stoneverify-evidence
     path: evidence/</code></pre>
-    <p style="font-size: 0.75rem; color: var(--text-tertiary); margin: 0.75rem 0 0;">
+    <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-tertiary);">
       Exit codes: 0 = pass, 1 = differences found, 2 = CLI usage error, 3 = invalid spec,
       4 = renderer failure, 5 = resource limit, 70 = internal error.
-    </p>
+    </div>
   </div>
 </DemoLayout>

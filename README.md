@@ -233,12 +233,13 @@ checkout with `go run`.
 | Bar (`bar`) | ✅ certified (0.0.0.2) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 | Scatter (`scatter`) | ✅ certified (0.0.0.3) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 | Bubble (`bubble`) | ✅ certified (0.0.0.4) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+| Combo (`combo`) | ✅ certified (0.0.0.5) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
 
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
 tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
 
 The released scope is line, column, and area (0.0.0.1), bar (0.0.0.2), scatter
-(0.0.0.3), and bubble (0.0.0.4). See
+(0.0.0.3), bubble (0.0.0.4), and combo (0.0.0.5). See
 [`docs/product/capability-matrix.md`](docs/product/capability-matrix.md) for the
 authoritative distinction between certified technical capability, commercial pilot
 scope, and design-only roadmap material.

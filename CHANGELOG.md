@@ -9,6 +9,37 @@ not represented as Semantic Versioning.
 
 ### Added
 
+- `combo` chart type: per-series mark types (column + line) on shared Cartesian axes
+  with optional dual y-axis (`secondaryYAxis`). Certified renderers in both Python and
+  Go with byte-identical golden SVGs. Schema extended with `series[].type` and
+  `series[].yAxis` fields. Legend swatch differentiates column (rect) vs line (thin bar).
+  Release target: 0.0.0.5.
+- Go fuzz test (`FuzzFromJSON`) with 10 seed corpus entries from all 7 chart types.
+- Go benchmark functions (`BenchmarkRender`, `BenchmarkRenderComplex`, `BenchmarkFromJSON`)
+  covering all 7 chart types with basic and complex specs.
+- Cross-language fuzz property check now reports actual case count (120) including combo.
+- Browser qualification tests for all 7 chart types (line, column, bar, scatter, bubble,
+  area, combo): Playwright + Chromium tests cover tooltip on hover, keyboard navigation
+  (ArrowRight, ArrowDown, Escape), legend toggle, and ARIA attributes.
+- Validation coverage expanded to 99% (`validate.py`): 34 new edge-case assertions covering
+  gradient stops, pattern/marker/theme objects, scatter/bubble datum models, margin
+  plot-area checks, unknown chart types, and percent-stacking guards.
+- Python test coverage improved to 88% overall (140 tests, 6 skipped) with targeted tests
+  for `util.fmt_num`, `CapabilityError`, resource limits, theme resolution, scatter
+  `__post_init__` normalization, and empty-data renderer paths. `capabilities.py` at 100%.
+
+### Fixed
+
+- CI `quality.yml`: updated wheel install and pilot gate jobs from `0.0.0.4` to `0.0.0.5`;
+  added combo to evidence-regression chart type list and wheel-install smoke test.
+
+- Area chart monotone spline parity: Go `area.go` now respects the per-series `curve`
+  property, matching Python's `_spline_d` dispatch for `curve: "monotone"`.
+- Bar chart margin parity: Go `cartesian.go` removed orientation-aware margin swap that
+  diverged from Python's always-use-axis-title logic.
+- `__init__.py` version bumped to `0.0.0.5` (was stale at `0.0.0.4`).
+- `check_docs.py`: 51 pre-existing issues resolved (content-draft frontmatter, backlog
+  schema `site` area, traceability cross-references, document ID patterns).
 - Stage 0 product and engineering governance system.
 - Controlled document metadata, requirements, evidence, risk, and role registries.
 - Product thesis, first-release scope, renderer constitution, guarantee contracts, security

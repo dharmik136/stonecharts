@@ -18,7 +18,7 @@ def _nice_num(x: float, round_: bool) -> float:
         nf = 1 if frac < 1.5 else 2 if frac < 3 else 5 if frac < 7 else 10
     else:
         nf = 1 if frac <= 1 else 2 if frac <= 2 else 5 if frac <= 5 else 10
-    return nf * (10**exp)
+    return float(nf * (10**exp))
 
 
 def nice_ticks(lo: float, hi: float, target: int = 6) -> tuple[float, float, list[float]]:

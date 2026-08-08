@@ -11,6 +11,7 @@ const CHART_TYPES = [
   { id: 'bar', label: 'Bar', desc: 'Horizontal bar charts with grouped and stacked variants.' },
   { id: 'scatter', label: 'Scatter', desc: 'XY point charts with correlation and regression line support.' },
   { id: 'bubble', label: 'Bubble', desc: 'Three-dimensional data mapped to position and bubble size.' },
+  { id: 'combo', label: 'Combo', desc: 'Per-series mark types (column + line) on shared axes with optional dual y-axis.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
@@ -49,17 +50,20 @@ for (const ct of CHART_TYPES) {
 }
 ---
 <DemoLayout title="Chart Gallery" activeNav="gallery">
-  <div style="margin-bottom: 2rem;">
+  <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
-    <p style="color: var(--text-secondary); max-width: 640px;">
-      Six certified chart types, rendered identically in Python and Go.
-      Every SVG below is actual golden output. Hover for tooltips, click legends
-      to toggle series, use arrow keys for keyboard navigation.
+    <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
+      Seven certified chart types, each rendered identically in Python and Go.
+      Every SVG below is actual golden output from the certified renderers —
+      not a screenshot, not a mockup.
     </p>
-    <p style="margin-top: 0.5rem;">
-      <span class="badge">0 runtime dependencies</span>
-      <span class="badge" style="margin-left: 0.5rem;">Byte-identical across runtimes</span>
-    </p>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+      <span class="badge-success badge">0 dependencies</span>
+      <span class="badge">Byte-identical</span>
+      <span style="font-size: 0.8125rem; color: var(--text-tertiary);">
+        Hover for tooltips · Click legends to toggle · Arrow keys for keyboard nav
+      </span>
+    </div>
   </div>
 
   {charts.map((chart) => (

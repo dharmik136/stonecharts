@@ -16,6 +16,7 @@ from .charts import area as _area
 from .charts import bar as _bar
 from .charts import bubble as _bubble
 from .charts import column as _column
+from .charts import combo as _combo
 from .charts import line as _line
 from .charts import scatter as _scatter
 from .limits import enforce_svg_limit
@@ -30,6 +31,7 @@ _RUNTIME_PATH = Path(__file__).resolve().parents[3] / "runtime" / "chart-interac
 _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "area": _area.render_svg,
     "bar": _bar.render_svg,
+    "combo": _combo.render_svg,
     "column": _column.render_svg,
     "line": _line.render_svg,
     "scatter": _scatter.render_svg,

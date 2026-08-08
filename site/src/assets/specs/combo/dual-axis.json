@@ -1,0 +1,27 @@
+{
+  "type": "combo",
+  "title": "Throughput and Latency",
+  "subtitle": "Requests/s (columns, left) with p95 latency (line, right)",
+  "xAxis": {
+    "title": "Hour",
+    "categories": ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]
+  },
+  "yAxis": { "title": "Requests/s" },
+  "secondaryYAxis": {
+    "title": "p95 latency (ms)",
+    "opposite": true,
+    "min": 0
+  },
+  "series": [
+    { "name": "Requests/s", "type": "column", "yAxis": 0, "data": [1200, 1450, 1610, 1580, 1390, 1240] },
+    {
+      "name": "p95 latency",
+      "type": "line",
+      "yAxis": 1,
+      "data": [180, 205, 260, 240, 210, 190],
+      "color": "#e0703c",
+      "lineWidth": 2.5,
+      "marker": { "symbol": "diamond", "radius": 4 }
+    }
+  ]
+}

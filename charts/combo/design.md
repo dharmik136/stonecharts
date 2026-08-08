@@ -11,10 +11,8 @@
 - **Chart id:** `combo`
 - **Spec `type`:** `"combo"`
 - **Class:** `sibling` (Family A — Cartesian/XY) · **Build rank 6** · **Src:** HC
-- **Status:** design-complete + examples validated · renderers deferred (only
-  `line` has a live renderer today; combo rides the shared cartesian frame once
-  extraction lands — see [`docs/roadmap/chart-families.md`](../../docs/roadmap/chart-families.md) §3.3 Rank 6, §4, §5)
-- **Renderers (planned):** `libs/python/stonecharts/charts/combo.py` · `libs/go/combo.go`
+- **Status:** design-complete + renderers certified (0.0.0.5)
+- **Renderers:** `libs/python/stonecharts/charts/combo.py` · `libs/go/combo.go`
 - **Substrate:** [`charts/_cartesian/README.md`](../_cartesian/README.md) — the shared frame
 - **Reuses:** [`charts/column`](../column/design.md) (rect-mark + band-layout + stacking) · [`charts/line-basic`](../line-basic/design.md) (path + markers + area)
 - **Contract:** [`spec/svg-contract.md`](../../spec/svg-contract.md) · binding build contract
