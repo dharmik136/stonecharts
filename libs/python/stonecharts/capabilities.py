@@ -13,6 +13,7 @@ _CAPABILITIES: dict[str, Any] = {
         "arearange",
         "bar",
         "bubble",
+        "bullet",
         "candlestick",
         "column",
         "columnrange",

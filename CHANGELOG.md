@@ -9,6 +9,16 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.11] - 2026-08-09
+
+### Added
+
+- **Bullet chart** (`type: "bullet"`) — horizontal KPI bars with a comparative
+  target tick and qualitative range bands (DEC-027). New spec fields:
+  `bulletTarget` (comparison value), `bulletRanges` (qualitative bounds).
+  Rides bar's horizontal orientation and shared Cartesian chrome. Certified
+  renderers in both Python and Go with byte-identical golden SVGs.
+
 ## [0.0.0.10] - 2026-08-08
 
 ### Added

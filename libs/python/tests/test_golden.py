@@ -34,6 +34,7 @@ ERROR_BAR_CASES = ["basic", "overlay-grouped", "asymmetric", "themed-dark", "adv
 AREARANGE_CASES = ["basic", "spline-range", "themed-dark", "adversarial"]
 COLUMNRANGE_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
 WATERFALL_CASES = ["basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"]
+BULLET_CASES = ["basic", "multi-kpi", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -48,6 +49,7 @@ ACTIVE_VALIDATION_CASES = {
     "arearange": AREARANGE_CASES,
     "columnrange": COLUMNRANGE_CASES,
     "waterfall": WATERFALL_CASES,
+    "bullet": BULLET_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -218,6 +220,11 @@ def test_columnrange_goldens():
 def test_waterfall_goldens():
     for name in WATERFALL_CASES:
         _check("waterfall", name)
+
+
+def test_bullet_goldens():
+    for name in BULLET_CASES:
+        _check("bullet", name)
 
 
 def test_column_edge_cases():
@@ -534,6 +541,7 @@ def test_capability_manifest_and_error():
         "arearange",
         "bar",
         "bubble",
+        "bullet",
         "candlestick",
         "column",
         "columnrange",

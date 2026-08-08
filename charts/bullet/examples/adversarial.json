@@ -1,0 +1,18 @@
+{
+  "type": "bullet",
+  "title": "Adversarial <bullet> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "measure <script>&\"'</script>",
+      "data": [75, 60]
+    }
+  ],
+  "bulletTarget": 80,
+  "bulletRanges": [40, 70, 100]
+}

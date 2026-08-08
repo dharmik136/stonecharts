@@ -1,0 +1,14 @@
+{
+  "type": "bullet",
+  "title": "Revenue Q4",
+  "theme": "dark",
+  "xAxis": {
+    "categories": ["Revenue"]
+  },
+  "yAxis": { "title": "USD (thousands)" },
+  "series": [
+    { "name": "2024 Actual", "data": [275] }
+  ],
+  "bulletTarget": 250,
+  "bulletRanges": [150, 225, 300]
+}

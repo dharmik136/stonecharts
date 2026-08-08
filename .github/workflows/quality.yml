@@ -156,6 +156,10 @@ jobs:
           wf_spec = ChartSpec.from_dict({'type':'waterfall','title':'WF Smoke','xAxis':{'categories':['Rev','Cost','Profit']},'series':[{'name':'S','data':[100.0,-60.0,40.0]}],'sumIndices':[2]})
           wf_svg = render_svg(wf_spec)
           assert wf_svg.startswith('<svg'), 'waterfall render failed'
+          from stonecharts.charts import bullet
+          bu_spec = ChartSpec.from_dict({'type':'bullet','title':'BU Smoke','xAxis':{'categories':['Revenue']},'series':[{'name':'S','data':[275.0]}],'bulletTarget':250.0,'bulletRanges':[150.0,225.0,300.0]})
+          bu_svg = render_svg(bu_spec)
+          assert bu_svg.startswith('<svg'), 'bullet render failed'
           try:
               from stonecharts.charts import boxplot
               raise AssertionError('unapproved boxplot module present in installed package')
@@ -340,7 +344,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area arearange bar bubble candlestick column columnrange combo error-bar histogram line-basic scatter waterfall; do
+          for chart_type in area arearange bar bubble bullet candlestick column columnrange combo error-bar histogram line-basic scatter waterfall; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
