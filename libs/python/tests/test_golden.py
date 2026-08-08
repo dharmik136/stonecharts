@@ -28,6 +28,7 @@ BAR_CASES = ["basic", "grouped", "stacked", "themed-dark", "adversarial"]
 SCATTER_CASES = ["basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"]
 BUBBLE_CASES = ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"]
 COMBO_CASES = ["basic", "dark", "dual-axis", "adversarial"]
+HISTOGRAM_CASES = ["basic", "prebinned", "pareto", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -36,6 +37,7 @@ ACTIVE_VALIDATION_CASES = {
     "scatter": SCATTER_CASES,
     "bubble": BUBBLE_CASES,
     "combo": COMBO_CASES,
+    "histogram": HISTOGRAM_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -487,7 +489,7 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == ["area", "bar", "bubble", "combo", "column", "line", "scatter"]
+    assert caps["chartTypes"] == ["area", "bar", "bubble", "combo", "column", "histogram", "line", "scatter"]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
@@ -740,7 +742,7 @@ def test_validation_deep_coverage():
             '$.series[0].yAxis: expected one of 0, 1, received "2"',
         ),
         # unknown chart type
-        ({"type": "histogram", "series": [{"data": [1]}]}, '$.type: unknown chart type "histogram"'),
+        ({"type": "pie", "series": [{"data": [1]}]}, '$.type: unknown chart type "pie"'),
         # percent stacking: non-dict series item skipped
         ({"type": "line", "stacking": "percent", "series": [42]}, "$.series[0]: expected object, received number"),
         # percent stacking: non-list data skipped
