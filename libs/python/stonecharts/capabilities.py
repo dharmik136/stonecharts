@@ -8,7 +8,18 @@ from typing import Any
 _CAPABILITIES: dict[str, Any] = {
     "specVersion": "0.0.0.1",
     "svgContractVersion": "0.0.0.1",
-    "chartTypes": ["area", "bar", "bubble", "candlestick", "combo", "column", "histogram", "line", "scatter"],
+    "chartTypes": [
+        "area",
+        "bar",
+        "bubble",
+        "candlestick",
+        "combo",
+        "column",
+        "error-bar",
+        "histogram",
+        "line",
+        "scatter",
+    ],
     "column": {
         "grouping": ["grouped", "overlay"],
         "stacking": ["none", "normal", "percent-nonnegative"],

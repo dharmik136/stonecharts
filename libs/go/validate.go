@@ -538,8 +538,8 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 // knownTypes — active release scope (0.0.0.1: area/column/line; 0.0.0.2 admits
 // bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble
 // per DEC-016; 0.0.0.5 admits combo per DEC-020; 0.0.0.6 admits histogram
-// per DEC-021; 0.0.0.7 admits candlestick per DEC-022). Mirrors _KNOWN_TYPES
-// in validate.py.
+// per DEC-021; 0.0.0.7 admits candlestick per DEC-022;
+// 0.0.0.8 admits error-bar per DEC-023). Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"area":        true,
 	"bar":         true,
@@ -547,6 +547,7 @@ var knownTypes = map[string]bool{
 	"candlestick": true,
 	"combo":       true,
 	"column":      true,
+	"error-bar":   true,
 	"histogram":   true,
 	"line":        true,
 	"scatter":     true,
