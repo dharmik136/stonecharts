@@ -108,7 +108,7 @@ jobs:
       - run: python -m pip install "build>=1,<2"
       - run: python -m build --wheel --outdir dist libs/python
       - run: python -m venv /tmp/install-test-venv
-      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.6-py3-none-any.whl
+      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.7-py3-none-any.whl
       - name: Smoke-test the installed wheel from a neutral directory
         working-directory: /tmp
         run: |
@@ -136,6 +136,10 @@ jobs:
           combo_spec = ChartSpec(type='combo', title='Combo Smoke Test', x_axis=Axis(categories=['Jan','Feb']), series=[Series(name='Rev', data=[10.0,20.0], type='column'), Series(name='Trend', data=[12.0,18.0], type='line')])
           combo_svg = render_svg(combo_spec)
           assert combo_svg.startswith('<svg'), 'combo render failed'
+          from stonecharts.charts import candlestick
+          candlestick_spec = ChartSpec.from_dict({'type':'candlestick','title':'Candle Smoke','xAxis':{'categories':['Mon','Tue']},'series':[{'name':'S','data':[1.0,2.0],'ohlc':[{'open':10.0,'high':15.0,'low':8.0,'close':12.0},{'open':12.0,'high':16.0,'low':11.0,'close':14.0}]}]})
+          candlestick_svg = render_svg(candlestick_spec)
+          assert candlestick_svg.startswith('<svg'), 'candlestick render failed'
           try:
               from stonecharts.charts import boxplot
               raise AssertionError('unapproved boxplot module present in installed package')
@@ -198,7 +202,7 @@ jobs:
       - run: go build -o /tmp/stoneverify-go-render ./cmd/stoneverify-go-render
         working-directory: libs/go
       - run: python -m venv /tmp/stoneverify-pilot-venv
-      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.6
+      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.7
       - name: Create external pilot fixture
         run: |
           cat > /tmp/stoneverify-external-fixture.json <<'JSON'
@@ -317,7 +321,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area bar bubble column combo line-basic scatter; do
+          for chart_type in area bar bubble candlestick column combo histogram line-basic scatter; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
