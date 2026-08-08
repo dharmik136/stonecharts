@@ -35,8 +35,12 @@ def render_svg(spec: ChartSpec) -> str:
 
     orientation = getattr(mod, "orientation", "vertical")
     return render_cartesian(
-        mod, "Column range", "band", _columnrange_marks,
-        include_zero=False, orientation=orientation,
+        mod,
+        "Column range",
+        "band",
+        _columnrange_marks,
+        include_zero=False,
+        orientation=orientation,
     )
 
 
