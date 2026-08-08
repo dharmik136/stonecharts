@@ -410,6 +410,8 @@ type ChartSpec struct {
 	SumIndices             []int           `json:"sumIndices,omitempty"`
 	IntermediateSumIndices []int           `json:"intermediateSumIndices,omitempty"`
 	Connector              *Connector      `json:"connector,omitempty"`
+	BulletTarget           *float64        `json:"bulletTarget,omitempty"`
+	BulletRanges           []float64       `json:"bulletRanges,omitempty"`
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`

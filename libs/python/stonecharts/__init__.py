@@ -32,7 +32,7 @@ from .spec import (
 )
 from .validate import SpecError, validate
 
-__version__ = "0.0.0.10"
+__version__ = "0.0.0.11"
 __all__ = [
     "THEMES",
     "Axis",
