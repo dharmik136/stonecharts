@@ -61,6 +61,8 @@ jobs:
           languages: python, go
       - uses: github/codeql-action/autobuild@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
       - uses: github/codeql-action/analyze@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
+        with:
+          upload: never
 
   documentation:
     runs-on: ubuntu-latest
