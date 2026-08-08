@@ -84,7 +84,7 @@ def _compute_bins(spec):
             if v == data_hi:
                 b = k - 1
             else:
-                b = int(math.floor((float(v) - lo) / w))
+                b = math.floor((float(v) - lo) / w)
                 b = max(0, min(k - 1, b))
             sc[b] += 1.0
         counts.append(sc)
