@@ -30,6 +30,7 @@ BUBBLE_CASES = ["basic", "multi-series", "themed-dark", "uniform-z", "adversaria
 COMBO_CASES = ["basic", "dark", "dual-axis", "adversarial"]
 HISTOGRAM_CASES = ["basic", "prebinned", "pareto", "themed-dark", "adversarial"]
 CANDLESTICK_CASES = ["basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"]
+ERROR_BAR_CASES = ["basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -40,6 +41,7 @@ ACTIVE_VALIDATION_CASES = {
     "combo": COMBO_CASES,
     "histogram": HISTOGRAM_CASES,
     "candlestick": CANDLESTICK_CASES,
+    "error-bar": ERROR_BAR_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -190,6 +192,11 @@ def test_histogram_goldens():
 def test_candlestick_goldens():
     for name in CANDLESTICK_CASES:
         _check("candlestick", name)
+
+
+def test_error_bar_goldens():
+    for name in ERROR_BAR_CASES:
+        _check("error-bar", name)
 
 
 def test_column_edge_cases():
@@ -508,6 +515,7 @@ def test_capability_manifest_and_error():
         "candlestick",
         "combo",
         "column",
+        "error-bar",
         "histogram",
         "line",
         "scatter",

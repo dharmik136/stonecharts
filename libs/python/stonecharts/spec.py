@@ -117,6 +117,7 @@ class Series:
     marker: Marker | None = None
     regression: bool = False
     low: list[float] | None = None
+    high: list[float] | None = None
     data_points: list[Datum] | None = None  # scatter only — see Datum
     ohlc: list[dict] | None = None  # candlestick only — [{open,high,low,close}, ...]
 
@@ -380,6 +381,7 @@ class ChartSpec:
                     marker=marker,
                     regression=bool(s.get("regression", False)),
                     low=[float(v) for v in s["low"]] if "low" in s and s["low"] is not None else None,
+                    high=[float(v) for v in s["high"]] if "high" in s and s["high"] is not None else None,
                     ohlc=s.get("ohlc"),
                 )
             )

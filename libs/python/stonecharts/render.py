@@ -18,6 +18,7 @@ from .charts import bubble as _bubble
 from .charts import candlestick as _candlestick
 from .charts import column as _column
 from .charts import combo as _combo
+from .charts import error_bar as _error_bar
 from .charts import histogram as _histogram
 from .charts import line as _line
 from .charts import scatter as _scatter
@@ -35,6 +36,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "bar": _bar.render_svg,
     "combo": _combo.render_svg,
     "column": _column.render_svg,
+    "error-bar": _error_bar.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
     "scatter": _scatter.render_svg,
@@ -64,6 +66,30 @@ def _data_table(spec: ChartSpec) -> str:
     """A visually-hidden HTML data table: the accessible, keyboard-navigable
     alternative to the SVG (which is role="img"). Screen readers read this."""
     caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
+    if spec.type == "error-bar":
+        cats = spec.x_axis.categories or []
+        rows = []
+        for s in spec.series:
+            low_arr = getattr(s, "low", None) or []
+            high_arr = getattr(s, "high", None) or []
+            for i, y_val in enumerate(s.data):
+                cat = cats[i] if i < len(cats) else str(i)
+                lo_val = low_arr[i] if i < len(low_arr) else y_val
+                hi_val = high_arr[i] if i < len(high_arr) else y_val
+                rows.append(
+                    f'<tr><th scope="row">{esc(cat)}</th>'
+                    f"<td>{esc(s.name)}</td>"
+                    f"<td>{esc(fmt_num(y_val))}</td>"
+                    f"<td>{esc(fmt_num(lo_val))}</td>"
+                    f"<td>{esc(fmt_num(hi_val))}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
+            '<th scope="col">Y</th><th scope="col">Low</th>'
+            '<th scope="col">High</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
     if spec.type == "candlestick":
         cats = spec.x_axis.categories or []
         rows = []

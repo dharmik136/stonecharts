@@ -108,6 +108,7 @@ type Series struct {
 	Marker      *Marker         `json:"marker,omitempty"`
 	Regression  bool            `json:"regression,omitempty"`
 	Low         []float64       `json:"low,omitempty"`
+	High        []float64       `json:"high,omitempty"`
 	OHLC        []OHLCDatum     `json:"ohlc,omitempty"`
 }
 
