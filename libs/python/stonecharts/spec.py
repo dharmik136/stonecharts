@@ -302,6 +302,7 @@ class ChartSpec:
     layout: Layout | None = None
     stacking: str | None = None  # None | "normal" | "percent"
     grouping: bool = True  # True = grouped side-by-side; False = overlaid
+    orientation: str | None = None  # None -> "vertical"; "horizontal" for bar-range
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -486,4 +487,5 @@ class ChartSpec:
             layout=layout,
             stacking=d.get("stacking"),
             grouping=bool(d.get("grouping", True)),
+            orientation=d.get("orientation"),
         )
