@@ -9,6 +9,30 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.9] - 2026-08-08
+
+### Added
+
+- `arearange` chart type (DEC-024): pure `{low,high}` point model with band-fill
+  between two data paths. Point x-scale with `include_zero=True`, high boundary L→R
+  via `_path_d`/`_spline_d`, low boundary R→L, closed band path with configurable
+  fill-opacity (default 0.5). Optional bounding strokes when lineWidth > 0 and
+  `.sc-point` markers at high edge. Supports monotone spline interpolation.
+  Certified renderers in both Python and Go with byte-identical golden SVGs across
+  4 examples (basic, spline-range, themed-dark, adversarial). Approved as validation
+  infrastructure under DEC-017.
+- `columnrange` chart type (DEC-025): floating-bar `{low,high}` mark over discrete
+  categories with non-zero-anchored value axis (`include_zero=False`). Band x-scale
+  with PAD=0.2 sub-band layout, floating rect from `ypix(max(lo,hi))` with
+  `height = max(abs(ypix(lo)-ypix(hi)), 1.0)` min-1px degenerate rule. Supports
+  horizontal orientation and grouped multi-series layout. Certified renderers in both
+  Python and Go with byte-identical golden SVGs across 5 examples (basic, grouped,
+  horizontal, themed-dark, adversarial). Approved as validation infrastructure under
+  DEC-017.
+- Schema extended with `arearange` and `columnrange` in the type enum.
+- Cross-render corpus expanded to 62 examples across 12 chart types.
+- A11y data table generalized for range types: Category/Series/Low/High columns.
+
 ## [0.0.0.8] - 2026-08-08
 
 ### Added

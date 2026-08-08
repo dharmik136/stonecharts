@@ -25,6 +25,9 @@ const cssBlock = `.sc-chart-wrap{position:relative;display:inline-block;line-hei
 // dataTable mirrors render.py _data_table: a visually-hidden HTML data table, the
 // accessible alternative to the SVG (which is role="img").
 func dataTable(spec *ChartSpec) string {
+	if spec.Type == "arearange" || spec.Type == "columnrange" {
+		return rangeDataTable(spec)
+	}
 	if spec.Type == "error-bar" {
 		return errorBarDataTable(spec)
 	}
@@ -131,6 +134,45 @@ func candlestickDataTable(spec *ChartSpec) string {
 	return b.String()
 }
 
+func rangeDataTable(spec *ChartSpec) string {
+	isCR := spec.Type == "columnrange"
+	var b strings.Builder
+	b.WriteString(`<table class="sc-visually-hidden">`)
+	if spec.Title != "" {
+		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
+	}
+	b.WriteString(`<thead><tr><th scope="col">Category</th><th scope="col">Series</th>` +
+		`<th scope="col">Low</th><th scope="col">High</th></tr></thead><tbody>`)
+	cats := spec.XAxis.Categories
+	for _, s := range spec.Series {
+		for i := range s.Data {
+			cat := strconv.Itoa(i)
+			if i < len(cats) {
+				cat = cats[i]
+			}
+			var loVal, hiVal float64
+			if isCR {
+				loVal = s.Data[i]
+				hiVal = loVal
+				if i < len(s.High) {
+					hiVal = s.High[i]
+				}
+			} else {
+				hiVal = s.Data[i]
+				loVal = hiVal
+				if i < len(s.Low) {
+					loVal = s.Low[i]
+				}
+			}
+			b.WriteString(`<tr><th scope="row">` + esc(cat) + `</th><td>` +
+				esc(s.Name) + `</td><td>` + esc(fmtNum(loVal)) + `</td><td>` +
+				esc(fmtNum(hiVal)) + `</td></tr>`)
+		}
+	}
+	b.WriteString("</tbody></table>")
+	return b.String()
+}
+
 func errorBarDataTable(spec *ChartSpec) string {
 	var b strings.Builder
 	b.WriteString(`<table class="sc-visually-hidden">`)
@@ -186,6 +228,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 	switch typ {
 	case "area":
 		svg = renderAreaSVG(spec)
+	case "arearange":
+		svg = renderAreaRangeSVG(spec)
 	case "bar":
 		svg = renderBarSVG(spec)
 	case "combo":
@@ -194,6 +238,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderCandlestickSVG(spec)
 	case "column":
 		svg = renderColumnSVG(spec)
+	case "columnrange":
+		svg = renderColumnRangeSVG(spec)
 	case "error-bar":
 		svg = renderErrorBarSVG(spec)
 	case "histogram":

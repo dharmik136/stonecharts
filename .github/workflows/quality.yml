@@ -108,7 +108,7 @@ jobs:
       - run: python -m pip install "build>=1,<2"
       - run: python -m build --wheel --outdir dist libs/python
       - run: python -m venv /tmp/install-test-venv
-      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.8-py3-none-any.whl
+      - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-0.0.0.9-py3-none-any.whl
       - name: Smoke-test the installed wheel from a neutral directory
         working-directory: /tmp
         run: |
@@ -144,6 +144,14 @@ jobs:
           eb_spec = ChartSpec.from_dict({'type':'error-bar','title':'EB Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','data':[10.0,20.0],'low':[8.0,17.0],'high':[12.0,23.0]}]})
           eb_svg = render_svg(eb_spec)
           assert eb_svg.startswith('<svg'), 'error-bar render failed'
+          from stonecharts.charts import arearange
+          ar_spec = ChartSpec.from_dict({'type':'arearange','title':'AR Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[12.0,23.0,18.0],'low':[8.0,17.0,14.0]}]})
+          ar_svg = render_svg(ar_spec)
+          assert ar_svg.startswith('<svg'), 'arearange render failed'
+          from stonecharts.charts import columnrange
+          cr_spec = ChartSpec.from_dict({'type':'columnrange','title':'CR Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[5.0,10.0,8.0],'high':[15.0,25.0,20.0]}]})
+          cr_svg = render_svg(cr_spec)
+          assert cr_svg.startswith('<svg'), 'columnrange render failed'
           try:
               from stonecharts.charts import boxplot
               raise AssertionError('unapproved boxplot module present in installed package')
@@ -206,7 +214,7 @@ jobs:
       - run: go build -o /tmp/stoneverify-go-render ./cmd/stoneverify-go-render
         working-directory: libs/go
       - run: python -m venv /tmp/stoneverify-pilot-venv
-      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.8
+      - run: /tmp/stoneverify-pilot-venv/bin/python -m pip install --no-index --find-links dist stonecharts==0.0.0.9
       - name: Create external pilot fixture
         run: |
           cat > /tmp/stoneverify-external-fixture.json <<'JSON'
@@ -325,7 +333,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area bar bubble candlestick column combo error-bar histogram line-basic scatter; do
+          for chart_type in area arearange bar bubble candlestick column columnrange combo error-bar histogram line-basic scatter; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"

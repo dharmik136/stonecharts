@@ -13,10 +13,12 @@ from typing import Callable
 
 from .capabilities import CapabilityError, capabilities
 from .charts import area as _area
+from .charts import arearange as _arearange
 from .charts import bar as _bar
 from .charts import bubble as _bubble
 from .charts import candlestick as _candlestick
 from .charts import column as _column
+from .charts import columnrange as _columnrange
 from .charts import combo as _combo
 from .charts import error_bar as _error_bar
 from .charts import histogram as _histogram
@@ -33,9 +35,11 @@ _RUNTIME_PATH = Path(__file__).resolve().parents[3] / "runtime" / "chart-interac
 # chart type -> SVG renderer. New chart types register here.
 _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "area": _area.render_svg,
+    "arearange": _arearange.render_svg,
     "bar": _bar.render_svg,
     "combo": _combo.render_svg,
     "column": _column.render_svg,
+    "columnrange": _columnrange.render_svg,
     "error-bar": _error_bar.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
@@ -66,6 +70,33 @@ def _data_table(spec: ChartSpec) -> str:
     """A visually-hidden HTML data table: the accessible, keyboard-navigable
     alternative to the SVG (which is role="img"). Screen readers read this."""
     caption = f"<caption>{esc(spec.title)}</caption>" if spec.title else ""
+    if spec.type in ("arearange", "columnrange"):
+        cats = spec.x_axis.categories or []
+        rows = []
+        for s in spec.series:
+            low_arr = getattr(s, "low", None) or []
+            high_arr = getattr(s, "high", None) or []
+            is_cr = spec.type == "columnrange"
+            for i in range(len(s.data)):
+                cat = cats[i] if i < len(cats) else str(i)
+                if is_cr:
+                    lo_val = s.data[i]
+                    hi_val = high_arr[i] if i < len(high_arr) else lo_val
+                else:
+                    hi_val = s.data[i]
+                    lo_val = low_arr[i] if i < len(low_arr) else hi_val
+                rows.append(
+                    f'<tr><th scope="row">{esc(cat)}</th>'
+                    f"<td>{esc(s.name)}</td>"
+                    f"<td>{esc(fmt_num(lo_val))}</td>"
+                    f"<td>{esc(fmt_num(hi_val))}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
+            '<th scope="col">Low</th><th scope="col">High</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
     if spec.type == "error-bar":
         cats = spec.x_axis.categories or []
         rows = []

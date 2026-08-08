@@ -34,6 +34,8 @@ ACTIVE = {
     "histogram": ["basic", "prebinned", "pareto", "themed-dark", "adversarial"],
     "candlestick": ["basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"],
     "error-bar": ["basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"],
+    "arearange": ["basic", "spline-range", "themed-dark", "adversarial"],
+    "columnrange": ["basic", "grouped", "horizontal", "themed-dark", "adversarial"],
 }
 
 

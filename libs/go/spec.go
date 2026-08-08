@@ -391,8 +391,9 @@ type ChartSpec struct {
 	A11y           *bool           `json:"a11y,omitempty"` // nil -> true
 	Responsive     bool            `json:"responsive,omitempty"`
 	Layout         *Layout         `json:"layout,omitempty"`
-	Stacking       string          `json:"stacking,omitempty"` // "" | "normal" | "percent"
-	Grouping       *bool           `json:"grouping,omitempty"` // nil -> true
+	Stacking       string          `json:"stacking,omitempty"`    // "" | "normal" | "percent"
+	Grouping       *bool           `json:"grouping,omitempty"`    // nil -> true
+	Orientation    string          `json:"orientation,omitempty"` // "" -> "vertical"; "horizontal" for bar-range
 	Binning        *Binning        `json:"binning,omitempty"`
 	PreBinned      bool            `json:"preBinned,omitempty"`
 	Normalization  string          `json:"normalization,omitempty"`
