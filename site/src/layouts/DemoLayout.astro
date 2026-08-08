@@ -15,13 +15,13 @@ const navLinks = [
   { href: '/demo/verify/', label: 'Verify', key: 'verify' },
 ];
 ---
-<BaseLayout title={`${title} — StoneCharts Demo`}>
+<BaseLayout title={`${title} — StoneCharts Demo`} noIndex={true}>
   <header style="background: var(--bg-surface); border-bottom: 1px solid var(--border);">
     <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; padding-bottom: 0.75rem;">
       <a href="/demo/" style="font-weight: 700; font-size: 1.1rem; color: var(--text);">
         StoneCharts <span style="color: var(--text-tertiary); font-weight: 400; font-size: 0.8rem;">demo</span>
       </a>
-      <button id="theme-toggle" class="btn btn-ghost" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;">
+      <button id="theme-toggle" class="btn btn-ghost" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" aria-label="Toggle light and dark theme">
         Light / Dark
       </button>
     </div>
@@ -36,13 +36,14 @@ const navLinks = [
     </div>
   </header>
 
-  <main class="container section">
+  <main id="main-content" class="container section">
     <slot />
   </main>
 
   <footer style="border-top: 1px solid var(--border); padding: 2rem 0; text-align: center; font-size: 0.8rem; color: var(--text-tertiary);">
     <div class="container">
-      This demo contains rendered chart outputs and measured benchmark data only. No source code or packages are distributed.
+      <p style="margin: 0 0 0.5rem;">This demo contains rendered chart outputs and measured benchmark data only. No source code or packages are distributed.</p>
+      <p style="margin: 0;"><a href="/" style="color: var(--text-tertiary);">Back to main site</a></p>
     </div>
   </footer>
 

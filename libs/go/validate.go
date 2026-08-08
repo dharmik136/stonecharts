@@ -520,6 +520,9 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	if x, ok := has(m, "marker"); ok {
 		vmarker(x, path+".marker", errs)
 	}
+	if x, ok := has(m, "type"); ok {
+		vstr(x, path+".type", errs)
+	}
 }
 
 func vnonneg(v interface{}, path string, errs *[]string) {
@@ -533,12 +536,14 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 }
 
 // knownTypes — active release scope (0.0.0.1: area/column/line; 0.0.0.2 admits
-// bar per DEC-014; 0.0.0.3 admits scatter per DEC-015). Mirrors _KNOWN_TYPES
-// in validate.py.
+// bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble
+// per DEC-016; 0.0.0.5 admits combo per DEC-017). Mirrors _KNOWN_TYPES in
+// validate.py.
 var knownTypes = map[string]bool{
 	"area":    true,
 	"bar":     true,
 	"bubble":  true,
+	"combo":   true,
 	"column":  true,
 	"line":    true,
 	"scatter": true,

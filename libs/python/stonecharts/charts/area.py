@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from ..spec import Marker
 from ..util import esc, fmt_num
-from ._cartesian import CartesianFrame, dash_array, render_cartesian
+from ._cartesian import CartesianFrame, SeriesStyle, dash_array, render_cartesian
 from .line import _marker, _path_d, _spline_d
 
 
@@ -28,7 +28,7 @@ def _area_path(top_pts, bottom_pts, step, curve) -> str:
     return f"{top_d} {bottom_d} Z"
 
 
-def _series_fill(st) -> str:
+def _series_fill(st: SeriesStyle) -> str:
     if st.area_fill is not None:
         return st.area_fill
     if st.stroke.startswith("url("):

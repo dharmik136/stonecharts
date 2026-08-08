@@ -39,7 +39,7 @@ def _normalize_datum(v: object, index: int) -> Datum:
     if isinstance(v, list):
         z = float(v[2]) if len(v) > 2 else None
         return Datum(x=float(v[0]), y=float(v[1]), z=z)
-    return Datum(x=float(index), y=float(v))
+    return Datum(x=float(index), y=float(v))  # type: ignore[arg-type]
 
 
 @dataclass

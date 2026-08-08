@@ -1,0 +1,36 @@
+{
+  "type": "combo",
+  "theme": "dark",
+  "title": "CPU Time by Stage with Total Trend",
+  "subtitle": "Grouped columns (parse, compile) + total line, dark theme",
+  "grouping": true,
+  "xAxis": {
+    "title": "Build",
+    "categories": ["v1.2", "v1.3", "v1.4", "v1.5", "v1.6"]
+  },
+  "yAxis": { "title": "CPU time (s)" },
+  "series": [
+    { "name": "parse", "type": "column", "data": [120, 138, 145, 160, 152] },
+    {
+      "name": "compile",
+      "type": "column",
+      "data": [300, 280, 265, 240, 235],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      }
+    },
+    {
+      "name": "total",
+      "type": "line",
+      "data": [420, 418, 410, 400, 387],
+      "color": "#f2b134",
+      "dashStyle": "dashed",
+      "marker": { "symbol": "diamond", "radius": 4 }
+    }
+  ]
+}

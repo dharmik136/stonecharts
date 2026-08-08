@@ -14,9 +14,9 @@
 - Cross-language byte-parity (Python ≡ Go)
 - Optional interactivity layer (tooltip, legend toggle, crosshair, keyboard nav, a11y)
 
-### Current Scope (Release 0.0.0.4, certified)
+### Current Scope (Release 0.0.0.5, certified)
 
-**Chart Types:** `line`, `column`, `area`, `bar`, `scatter`, `bubble` — see
+**Chart Types:** `line`, `column`, `area`, `bar`, `scatter`, `bubble`, `combo` — see
 `docs/product/capability-matrix.md` for the authoritative table; do not restate it
 here or let this list drift again.
 **Languages:** Python, Go (only certified implementations)
@@ -62,7 +62,7 @@ resolved — see `docs/project/decisions.md`; its "Open decisions" table is curr
 empty. Do not treat any DEC-001..018 as pending; check `decisions.md` directly if in
 doubt, this brief is not the source of truth for decision status.
 
-**Current phase:** post-0.0.0.4, Visual Integrity Infrastructure validation
+**Current phase:** post-0.0.0.5, Visual Integrity Infrastructure validation
 (DEC-017). Engineering breadth is intentionally paused; see
 `docs/product/visual-integrity-strategy.md` for the validation gate that must be met
 before it resumes.
@@ -187,7 +187,7 @@ npm test
 
 ---
 
-## PART 5: CURRENT PROJECT STATE (As of 2026-07-29)
+## PART 5: CURRENT PROJECT STATE (As of 2026-08-08)
 
 Do not trust this section's specifics for long — re-verify against
 `docs/project/backlog.yaml`, `docs/project/decisions.md`, and
@@ -197,12 +197,12 @@ This section rots; those sources do not.
 ### Repository Status
 - **Branches:** exactly one — `main`, local and on `origin`. Every other local and
   remote branch was reviewed for unmerged work (none found) and deleted 2026-07-29.
-- **Repo:** Private git at `C:\Users\Dharmik Shingala\stonecharts`
+- **Repo:** Private git at `C:\Users\remoteadmin\stonecharts`
 - **GitHub Project:** [StoneCharts #2](https://github.com/users/dharmik136/projects/2) — kept in sync via `python tools/check_github_project.py --apply`
-- **Latest work:** 0.0.0.1-0.0.0.4 chart admissions and releases, the DEC-017 Visual
-  Integrity Infrastructure repositioning, StoneVerify (`tools/stonecharts_verify.py`),
-  and a measured (not hypothetical) competitor benchmark against Vega,
-  Highcharts Export Server, and QuickChart (`docs/quality/competitor-benchmark-results-2026-07.md`).
+- **Latest work:** 0.0.0.1-0.0.0.4 chart admissions and releases, combo chart
+  (0.0.0.5), the DEC-017 Visual Integrity Infrastructure repositioning,
+  StoneVerify (`tools/stonecharts_verify.py`), gated demo site (`site/`), and a
+  measured competitor benchmark (`docs/quality/competitor-benchmark-results-2026-07.md`).
 
 ### Implementation Status
 | Chart | First certified release | Python | Go | Interactivity |
@@ -213,23 +213,26 @@ This section rots; those sources do not.
 | `bar` | 0.0.0.2 | complete | complete | tooltip, highlight, legend, crosshair |
 | `scatter` | 0.0.0.3 | complete | complete | tooltip, highlight, legend, crosshair |
 | `bubble` | 0.0.0.4 | complete | complete | tooltip, highlight, legend, crosshair |
+| `combo` | 0.0.0.5 | complete | complete | tooltip, highlight, legend, crosshair |
 
 **Byte-parity:** Python and Go render identical SVG for every certified chart type
-(verified by golden tests, and independently by StoneVerify's cross-runtime check).
-No further chart type is certified without a new DEC + REQ per the admission
-checklist, and DEC-017 currently pauses that path by default.
+(verified by golden tests, cross-language fuzz property check (120 specs), and
+independently by StoneVerify's cross-runtime check). No further chart type is
+certified without a new DEC + REQ per the admission checklist, and DEC-017
+currently pauses that path by default.
 
 ### Known Gaps
-- All backlog items are `Done` (64 governed items as of 2026-07-29). The real open
-  work is the DEC-017 validation gate: 20 qualified interviews, real production
-  fixtures, and paid pilots — none of which an agent can complete unilaterally.
+- GTM work items (WORK-GTM-012 pilot, WORK-GTM-014 name clearance, WORK-GTM-015
+  content publishing) are the active backlog. The real open work is the DEC-017
+  validation gate: 20 qualified interviews, real production fixtures, and paid
+  pilots — none of which an agent can complete unilaterally.
 - Test coverage: see `docs/quality/test-strategy.md`.
 
 ### Documentation Status
 - Normative docs: all `approved` for anything currently load-bearing; `docs/project/decisions.md`'s open-decisions table is empty.
 - Schema validation: passing (`python tools/check_docs.py`)
 - Project conformance: passing (`python tools/check_github_project.py`)
-- Release evidence: complete and immutable for 0.0.0.1 through 0.0.0.4
+- Release evidence: complete and immutable for 0.0.0.1 through 0.0.0.4; 0.0.0.5 artifacts built but not yet released
 
 ---
 
@@ -287,7 +290,7 @@ You are operating as a **development + documentation assistant** under this gove
 
 ---
 
-**Last Updated:** 2026-08-03
+**Last Updated:** 2026-08-08
 **Written for:** Claude (Claude Code Agent)
 **Status:** Reference guide (informative). This file duplicates ground already covered
 by `AGENTS.md`; if the two ever disagree, `AGENTS.md` and the actual governed docs win

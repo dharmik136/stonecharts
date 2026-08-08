@@ -1,3 +1,5 @@
+version: "2"
+
 linters:
   enable:
     - errcheck
@@ -5,4 +7,9 @@ linters:
     - staticcheck
     - ineffassign
     - unused
-    - gosimple
+  settings:
+    staticcheck:
+      checks:
+        - "all"
+        - "-QF*"
+        - "-ST*"
