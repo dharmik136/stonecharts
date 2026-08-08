@@ -20,9 +20,10 @@
         "bubble",
         "combo",
         "histogram",
-        "candlestick"
+        "candlestick",
+        "error-bar"
       ],
-      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022); maps to the released chart design and renderer pair."
+      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023); maps to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",

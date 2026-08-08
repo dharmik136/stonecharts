@@ -9,6 +9,22 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.8] - 2026-08-08
+
+### Added
+
+- `error-bar` chart type (DEC-023): vertical whisker marks (stem + two caps) with
+  center-value markers on top. Band x-scale with sub-band centering for grouped
+  multi-series layout, y-axis spanning `min(low)..max(high)` whisker extents,
+  fixed CAP=6.0 half-width and stroke-width=1.5 constants. Supports all four
+  marker symbols (circle/square/triangle/diamond). Certified renderers in both
+  Python and Go with byte-identical golden SVGs across 5 examples (basic,
+  overlay-grouped, asymmetric, themed-dark, adversarial). Approved as validation
+  infrastructure under DEC-017.
+- Schema extended with `error-bar` in the type enum.
+- Cross-render corpus expanded to 53 examples across 10 chart types.
+- A11y data table generalized for error-bar: Y/Low/High columns per datum.
+
 ## [0.0.0.7] - 2026-08-08
 
 ### Added
