@@ -11,7 +11,7 @@ import math
 
 from ..spec import Axis, ChartSpec
 from ..util import esc, fmt_num
-from ._cartesian import CartesianFrame, render_cartesian
+from ._cartesian import render_cartesian
 
 
 def render_svg(spec: ChartSpec) -> str:
@@ -68,10 +68,7 @@ def _compute_bins(spec):
     else:
         k = max(1, math.ceil(math.sqrt(n_total)))
 
-    if bn is not None and bn.width is not None:
-        w = bn.width
-    else:
-        w = (hi - lo) / k if k > 0 and hi > lo else 1.0
+    w = bn.width if bn is not None and bn.width is not None else (hi - lo) / k if k > 0 and hi > lo else 1.0
 
     if bn is not None and bn.start is not None and bn.width is not None:
         lo = bn.start
@@ -145,7 +142,7 @@ def _histogram_marks(fr, p, edges, heights, counts, totals, orig_spec):
             y_top = fr.ypix(h_val)
             bar_h = baseline - y_top
             cx = (x_left + x_right) / 2
-            label = f"{fmt_num(edges[b])}–{fmt_num(edges[b + 1])}"
+            label = f"{fmt_num(edges[b])}–{fmt_num(edges[b + 1])}"  # noqa: RUF001
             common = (
                 f'class="sc-bar sc-point" data-series="{si}" data-series-name="{esc(s.name)}" '
                 f'data-x="{esc(label)}" data-y="{esc(fmt_num(h_val))}" '
@@ -191,7 +188,7 @@ def _emit_pareto(fr, p, edges, counts, totals, spec):
         for j in range(b + 1):
             cum_pct += counts[0][j]
         cum_pct = 100.0 * cum_pct / total
-        label = f"{fmt_num(edges[b])}–{fmt_num(edges[b + 1])}"
+        label = f"{fmt_num(edges[b])}–{fmt_num(edges[b + 1])}"  # noqa: RUF001
         common = (
             f'class="sc-point" data-series="{si}" data-series-name="{esc("Cumulative %")}" '
             f'data-x="{esc(label)}" data-y="{esc(fmt_num(cum_pct))}" '
@@ -226,10 +223,7 @@ def _emit_bellcurve(fr, p, edges, counts, totals, spec):
         x = x_lo + (x_hi - x_lo) * i / (n_pts - 1)
         z = (x - mean) / std
         pdf = math.exp(-z * z / 2) / (std * math.sqrt(2 * math.pi))
-        if spec.normalization == "density":
-            y = pdf
-        else:
-            y = n * w * pdf
+        y = pdf if spec.normalization == "density" else n * w * pdf
         px = fr.xpix(x)
         py = fr.ypix(y)
         pts.append((px, py))

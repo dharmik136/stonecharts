@@ -18,9 +18,7 @@ func renderHistogramSVG(spec *ChartSpec) string {
 func computeHistBins(spec *ChartSpec) (edges []float64, heights [][]float64, counts [][]float64, totals []int) {
 	if spec.PreBinned {
 		edges = make([]float64, len(spec.XAxis.BinEdges))
-		for i, e := range spec.XAxis.BinEdges {
-			edges[i] = e
-		}
+		copy(edges, spec.XAxis.BinEdges)
 		k := len(edges) - 1
 		if k <= 0 {
 			return []float64{0, 1}, [][]float64{{0}}, [][]float64{{0}}, []int{0}
@@ -60,9 +58,7 @@ func computeHistBins(spec *ChartSpec) (edges []float64, heights [][]float64, cou
 	// Raw mode
 	var allSamples []float64
 	for _, s := range spec.Series {
-		for _, v := range s.Data {
-			allSamples = append(allSamples, v)
-		}
+		allSamples = append(allSamples, s.Data...)
 	}
 	if len(allSamples) == 0 {
 		empty := make([][]float64, len(spec.Series))
