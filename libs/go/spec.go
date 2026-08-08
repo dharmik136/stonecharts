@@ -84,6 +84,14 @@ type Datum struct {
 	Z *float64 // bubble only (§3.3 Rank 4); nil for scatter, always set for bubble
 }
 
+// OHLCDatum is one Open-High-Low-Close observation for candlestick charts.
+type OHLCDatum struct {
+	Open  float64 `json:"open"`
+	High  float64 `json:"high"`
+	Low   float64 `json:"low"`
+	Close float64 `json:"close"`
+}
+
 type Series struct {
 	Name        string          `json:"name"`
 	Data        []float64       `json:"data"`
@@ -100,6 +108,7 @@ type Series struct {
 	Marker      *Marker         `json:"marker,omitempty"`
 	Regression  bool            `json:"regression,omitempty"`
 	Low         []float64       `json:"low,omitempty"`
+	OHLC        []OHLCDatum     `json:"ohlc,omitempty"`
 }
 
 // UnmarshalJSON normalizes the point model (§3.3 Rank 3 / §5.4b lockstep):
@@ -387,6 +396,9 @@ type ChartSpec struct {
 	PreBinned      bool            `json:"preBinned,omitempty"`
 	Normalization  string          `json:"normalization,omitempty"`
 	Overlay        string          `json:"overlay,omitempty"`
+	Subtype        string          `json:"subtype,omitempty"`
+	UpColor        string          `json:"upColor,omitempty"`
+	DownColor      string          `json:"downColor,omitempty"`
 	XAxis          Axis            `json:"xAxis"`
 	YAxis          Axis            `json:"yAxis"`
 	SecondaryYAxis *Axis           `json:"secondaryYAxis,omitempty"`
