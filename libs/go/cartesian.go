@@ -119,7 +119,7 @@ type cartesianFrame struct {
 	y2Max                      float64
 	y2Ticks                    []float64
 	secondaryAxis              *Axis
-	xMin, xMax                 float64   // LINEAR scale only (scatter) — free numeric x-domain
+	xMin, xMax                 float64 // LINEAR scale only (scatter) — free numeric x-domain
 	xTicks                     []float64
 }
 
@@ -544,9 +544,9 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		includeZero: includeZero,
 		orientation: orientation,
 		stacking:    spec.Stacking,
-		xMin: xMin, xMax: xMax, xTicks: xTicks,
+		xMin:        xMin, xMax: xMax, xTicks: xTicks,
 		secondaryAxis: spec.SecondaryYAxis,
-		y2Min: y2Min, y2Max: y2Max, y2Ticks: y2Ticks,
+		y2Min:         y2Min, y2Max: y2Max, y2Ticks: y2Ticks,
 	}
 }
 
@@ -777,7 +777,57 @@ func chromeTail(f *cartesianFrame, p *strings.Builder) {
 	spec, theme := f.spec, f.theme
 
 	// Legend.
-	if spec.legendOn() && len(spec.Series) > 0 {
+	if spec.legendOn() && len(spec.Series) > 0 && spec.Type == "waterfall" {
+		// Three-swatch direction key: Increase / Decrease / Total
+		upColor := spec.UpColor
+		if upColor == "" {
+			upColor = "#3f9b6a"
+		}
+		downColor := spec.DownColor
+		if downColor == "" {
+			downColor = "#d65f5f"
+		}
+		totalColor := spec.TotalColor
+		if totalColor == "" {
+			totalColor = "#4b6cb7"
+		}
+		hasTotal := len(spec.SumIndices) > 0 || len(spec.IntermediateSumIndices) > 0
+
+		type legendEntry struct{ label, color string }
+		items := []legendEntry{{"Increase", upColor}, {"Decrease", downColor}}
+		if hasTotal {
+			items = append(items, legendEntry{"Total", totalColor})
+		}
+
+		gap := 22.0
+		est := make([]float64, len(items))
+		total := 0.0
+		for i, item := range items {
+			est[i] = float64(utf8.RuneCountInString(item.label)*7 + 26)
+			total += est[i]
+		}
+		total += gap * float64(len(items)-1)
+		lx := f.plotX + (f.plotW-total)/2
+		lyBase := 10
+		if spec.XAxis.Title != "" {
+			lyBase += 18
+		}
+		ly := float64(f.H - lyBase)
+
+		p.WriteString(`<g class="sc-legend">`)
+		for idx, item := range items {
+			p.WriteString(fmt.Sprintf(`<g class="sc-legend-item" data-series="%d">`, idx))
+			p.WriteString(fmt.Sprintf(
+				`<rect x="%s" y="%s" width="14" height="4" rx="2" fill="%s"/>`,
+				f1(lx), f1(ly-9), item.color))
+			p.WriteString(fmt.Sprintf(
+				`<text x="%s" y="%s" font-size="12" fill="%s">%s</text>`,
+				f1(lx+20), f1(ly-2), theme.LegendTextColor, esc(item.label)))
+			p.WriteString(`</g>`)
+			lx += est[idx] + gap
+		}
+		p.WriteString(`</g>`)
+	} else if spec.legendOn() && len(spec.Series) > 0 {
 		gap := 22.0
 		est := make([]float64, len(spec.Series))
 		total := 0.0

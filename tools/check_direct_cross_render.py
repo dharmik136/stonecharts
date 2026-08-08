@@ -36,6 +36,7 @@ ACTIVE = {
     "error-bar": ["basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"],
     "arearange": ["basic", "spline-range", "themed-dark", "adversarial"],
     "columnrange": ["basic", "grouped", "horizontal", "themed-dark", "adversarial"],
+    "waterfall": ["basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"],
 }
 
 

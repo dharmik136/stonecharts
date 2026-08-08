@@ -78,6 +78,12 @@ class Pattern:
 
 
 @dataclass
+class Connector:
+    enabled: bool = True
+    dash_style: str = "dashed"
+
+
+@dataclass
 class Binning:
     count: int | None = None
     width: float | None = None
@@ -303,6 +309,10 @@ class ChartSpec:
     stacking: str | None = None  # None | "normal" | "percent"
     grouping: bool = True  # True = grouped side-by-side; False = overlaid
     orientation: str | None = None  # None -> "vertical"; "horizontal" for bar-range
+    total_color: str = "#4b6cb7"
+    sum_indices: list[int] | None = None
+    intermediate_sum_indices: list[int] | None = None
+    connector: Connector | None = None
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -450,6 +460,14 @@ class ChartSpec:
                 grid_line=sgrid,
                 opposite=sy.get("opposite", True),
             )
+        conn_raw = d.get("connector")
+        connector_obj = None
+        if conn_raw is not None and isinstance(conn_raw, dict):
+            connector_obj = Connector(
+                enabled=conn_raw.get("enabled", True),
+                dash_style=conn_raw.get("dashStyle", "dashed"),
+            )
+
         return ChartSpec(
             series=series,
             type=d.get("type") or "line",
@@ -488,4 +506,8 @@ class ChartSpec:
             stacking=d.get("stacking"),
             grouping=bool(d.get("grouping", True)),
             orientation=d.get("orientation"),
+            total_color=d.get("totalColor") or "#4b6cb7",
+            sum_indices=[int(v) for v in d.get("sumIndices", [])] or None,
+            intermediate_sum_indices=[int(v) for v in d.get("intermediateSumIndices", [])] or None,
+            connector=connector_obj,
         )
