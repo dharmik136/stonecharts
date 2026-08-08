@@ -31,6 +31,8 @@ COMBO_CASES = ["basic", "dark", "dual-axis", "adversarial"]
 HISTOGRAM_CASES = ["basic", "prebinned", "pareto", "themed-dark", "adversarial"]
 CANDLESTICK_CASES = ["basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"]
 ERROR_BAR_CASES = ["basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"]
+AREARANGE_CASES = ["basic", "spline-range", "themed-dark", "adversarial"]
+COLUMNRANGE_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -42,6 +44,8 @@ ACTIVE_VALIDATION_CASES = {
     "histogram": HISTOGRAM_CASES,
     "candlestick": CANDLESTICK_CASES,
     "error-bar": ERROR_BAR_CASES,
+    "arearange": AREARANGE_CASES,
+    "columnrange": COLUMNRANGE_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -197,6 +201,16 @@ def test_candlestick_goldens():
 def test_error_bar_goldens():
     for name in ERROR_BAR_CASES:
         _check("error-bar", name)
+
+
+def test_arearange_goldens():
+    for name in AREARANGE_CASES:
+        _check("arearange", name)
+
+
+def test_columnrange_goldens():
+    for name in COLUMNRANGE_CASES:
+        _check("columnrange", name)
 
 
 def test_column_edge_cases():
@@ -510,11 +524,13 @@ def test_capability_manifest_and_error():
     assert caps["svgContractVersion"] == "0.0.0.1"
     assert caps["chartTypes"] == [
         "area",
+        "arearange",
         "bar",
         "bubble",
         "candlestick",
-        "combo",
         "column",
+        "columnrange",
+        "combo",
         "error-bar",
         "histogram",
         "line",

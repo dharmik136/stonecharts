@@ -1,0 +1,18 @@
+{
+  "type": "columnrange",
+  "title": "Adversarial <columnrange> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3", "cat'4", "cat<5>"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "range <script>&\"'</script>",
+      "data": [12.4, 11.8, 13.1, 14.6, 13.9],
+      "high": [22.1, 21.4, 24.3, 26.0, 25.2],
+      "color": "#ff5733"
+    }
+  ]
+}

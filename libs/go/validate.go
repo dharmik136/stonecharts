@@ -539,14 +539,18 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 // bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble
 // per DEC-016; 0.0.0.5 admits combo per DEC-020; 0.0.0.6 admits histogram
 // per DEC-021; 0.0.0.7 admits candlestick per DEC-022;
-// 0.0.0.8 admits error-bar per DEC-023). Mirrors _KNOWN_TYPES in validate.py.
+// 0.0.0.8 admits error-bar per DEC-023;
+// 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025).
+// Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"area":        true,
+	"arearange":   true,
 	"bar":         true,
 	"bubble":      true,
 	"candlestick": true,
-	"combo":       true,
 	"column":      true,
+	"columnrange": true,
+	"combo":       true,
 	"error-bar":   true,
 	"histogram":   true,
 	"line":        true,
