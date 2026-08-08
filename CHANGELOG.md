@@ -9,6 +9,21 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.6] - 2026-08-08
+
+### Added
+
+- `histogram` chart type (DEC-021): binning transform (sqrt-rule default, explicit
+  count/width, pre-binned mode with density normalization), contiguous bars with
+  numeric linear x-scale and en-dash edge labels, optional overlays (pareto cumulative
+  line on secondary y-axis, bellcurve normal-distribution fit). Certified renderers in
+  both Python and Go with byte-identical golden SVGs across 5 examples (basic,
+  prebinned, pareto, themed-dark, adversarial). Approved as validation infrastructure
+  under DEC-017.
+- Schema extended with `histogram` in the type enum.
+- Cross-render corpus expanded to 43 examples across 8 chart types.
+- Python test coverage expanded to 146 tests.
+
 ## [0.0.0.5] - 2026-08-08
 
 ### Added
