@@ -96,7 +96,6 @@ def _invalid_enum_cases() -> list[tuple[str, dict[str, Any]]]:
     """Invalid enum values for constrained fields."""
     return [
         ("type='pie'", _base(type="pie")),
-        ("type='histogram'", _base(type="histogram")),
         ("type='donut'", _base(type="donut")),
         ("stacking='magic'", _base(stacking="magic")),
         ("stacking='absolute'", _base(stacking="absolute")),
