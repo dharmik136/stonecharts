@@ -1,0 +1,29 @@
+{
+  "type": "dumbbell",
+  "title": "Response-Time Spread by Service",
+  "subtitle": "p50–p99 range, last week vs this week, grouped dumbbells",
+  "grouping": true,
+  "xAxis": {
+    "title": "Service",
+    "categories": ["auth", "catalog", "cart", "payments", "shipping"]
+  },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    {
+      "name": "Last week",
+      "lowName": "p50",
+      "highName": "p99",
+      "data": [28, 41, 35, 58, 47],
+      "high": [96, 148, 121, 224, 176],
+      "marker": { "symbol": "circle", "radius": 5 }
+    },
+    {
+      "name": "This week",
+      "lowName": "p50",
+      "highName": "p99",
+      "data": [24, 37, 31, 49, 44],
+      "high": [78, 121, 104, 182, 159],
+      "marker": { "symbol": "diamond", "radius": 5 }
+    }
+  ]
+}
