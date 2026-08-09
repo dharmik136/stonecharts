@@ -9,6 +9,18 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.13] - 2026-08-09
+
+### Added
+
+- **Lollipop chart** (`type: "lollipop"`) — thin stems from the baseline capped
+  with marker heads. Reuses column's band layout and line's marker shapes
+  (DEC-029). Supports vertical and horizontal orientation, single and grouped
+  (multi-series) lollipops, all four marker symbols (circle/square/triangle/
+  diamond), dark theme. Certified renderers in both Python and Go with
+  byte-identical golden SVGs.
+- Cross-render corpus expanded to 73 examples across 16 chart types.
+
 ## [0.0.0.12] - 2026-08-09
 
 ### Added

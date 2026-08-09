@@ -384,7 +384,8 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 # 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025;
 # 0.0.0.10 admits waterfall per DEC-026;
 # 0.0.0.11 admits bullet per DEC-027;
-# 0.0.0.12 admits boxplot per DEC-028).
+# 0.0.0.12 admits boxplot per DEC-028;
+# 0.0.0.13 admits lollipop per DEC-029).
 _KNOWN_TYPES = {
     "area",
     "arearange",
@@ -399,6 +400,7 @@ _KNOWN_TYPES = {
     "error-bar",
     "histogram",
     "line",
+    "lollipop",
     "scatter",
     "waterfall",
 }
