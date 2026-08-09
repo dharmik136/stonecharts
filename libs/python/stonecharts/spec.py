@@ -139,6 +139,7 @@ class Series:
     box_data: list[BoxDatum] | None = None  # boxplot only — 5-number summary per category
     widths: list[float] | None = None  # variwide only — per-datum width metric
     labels: list[str] | None = None  # timeline only — per-event label text
+    direction: list[float] | None = None  # windbarb only — per-point wind direction (degrees)
 
 
 @dataclass
@@ -331,6 +332,11 @@ class ChartSpec:
     neck_width: float = 0.3
     neck_height: float = 0.25
     min_width: float = 0.0
+    speed_unit: str = "kt"
+    calm_threshold: float = 2.0
+    hemisphere: str = "N"
+    barb_length: float = 20.0
+    y_offset: float = 0.0
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -432,6 +438,7 @@ class ChartSpec:
                     box_data=box_data,
                     widths=[float(v) for v in s["widths"]] if "widths" in s and s["widths"] is not None else None,
                     labels=[str(v) for v in s["labels"]] if "labels" in s and s["labels"] is not None else None,
+                    direction=[float(v) for v in s["direction"]] if "direction" in s and s["direction"] is not None else None,
                 )
             )
         xa = d.get("xAxis") or {}
@@ -555,4 +562,9 @@ class ChartSpec:
             neck_width=float(d.get("neckWidth", 0.3)),
             neck_height=float(d.get("neckHeight", 0.25)),
             min_width=float(d.get("minWidth", 0.0)),
+            speed_unit=d.get("speedUnit") or "kt",
+            calm_threshold=float(d.get("calmThreshold", 2)),
+            hemisphere=d.get("hemisphere") or "N",
+            barb_length=float(d.get("barbLength", 20)),
+            y_offset=float(d.get("yOffset", 0)),
         )

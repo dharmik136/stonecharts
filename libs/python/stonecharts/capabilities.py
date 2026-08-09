@@ -29,6 +29,7 @@ _CAPABILITIES: dict[str, Any] = {
         "timeline",
         "variwide",
         "waterfall",
+        "windbarb",
     ],
     "column": {
         "grouping": ["grouped", "overlay"],

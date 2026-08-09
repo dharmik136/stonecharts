@@ -375,6 +375,12 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         _str(v["type"], f"{path}.type", errs)
     if "labels" in v:
         _str_array(v["labels"], f"{path}.labels", errs)
+    if "direction" in v:
+        if not isinstance(v["direction"], list):
+            errs.append(f"{path}.direction: expected array, received {_jtype(v['direction'])}")
+        else:
+            for i, e in enumerate(v["direction"]):
+                _num(e, f"{path}.direction[{i}]", errs)
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
@@ -391,7 +397,8 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 # 0.0.0.14 admits dumbbell per DEC-030;
 # 0.0.0.15 admits funnel per DEC-031;
 # 0.0.0.16 admits variwide per DEC-032;
-# 0.0.0.17 admits timeline per DEC-033).
+# 0.0.0.17 admits timeline per DEC-033;
+# 0.0.0.18 admits windbarb per DEC-034).
 _KNOWN_TYPES = {
     "area",
     "arearange",
@@ -413,6 +420,7 @@ _KNOWN_TYPES = {
     "timeline",
     "variwide",
     "waterfall",
+    "windbarb",
 }
 
 
