@@ -20,6 +20,7 @@ from .render import render_html, render_svg, save_html
 from .spec import (
     THEMES,
     Axis,
+    BoxDatum,
     ChartSpec,
     Gradient,
     GradientStop,
@@ -32,10 +33,11 @@ from .spec import (
 )
 from .validate import SpecError, validate
 
-__version__ = "0.0.0.11"
+__version__ = "0.0.0.12"
 __all__ = [
     "THEMES",
     "Axis",
+    "BoxDatum",
     "CapabilityError",
     "ChartSpec",
     "Gradient",

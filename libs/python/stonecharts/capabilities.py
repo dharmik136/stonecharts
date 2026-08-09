@@ -12,6 +12,7 @@ _CAPABILITIES: dict[str, Any] = {
         "area",
         "arearange",
         "bar",
+        "boxplot",
         "bubble",
         "bullet",
         "candlestick",

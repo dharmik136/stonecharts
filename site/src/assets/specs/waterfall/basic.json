@@ -1,0 +1,13 @@
+{
+  "type": "waterfall",
+  "title": "Monthly Cash Flow",
+  "subtitle": "Signed deltas per driver, running balance",
+  "xAxis": {
+    "title": "Driver",
+    "categories": ["Opening", "Sales", "Refunds", "Payroll", "Marketing", "Interest"]
+  },
+  "yAxis": { "title": "Cash (USD, thousands)" },
+  "series": [
+    { "name": "Cash flow", "data": [120, 85, -18, -46, -22, 9] }
+  ]
+}

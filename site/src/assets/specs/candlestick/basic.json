@@ -1,0 +1,27 @@
+{
+  "type": "candlestick",
+  "title": "ACME Corp — Daily Price",
+  "subtitle": "Candlestick, one bar per trading day",
+  "subtype": "candlestick",
+  "xAxis": {
+    "title": "Session",
+    "categories": ["Jan 2", "Jan 3", "Jan 4", "Jan 5", "Jan 8", "Jan 9", "Jan 10", "Jan 11"]
+  },
+  "yAxis": { "title": "Price (USD)" },
+  "series": [
+    {
+      "name": "ACME",
+      "data": [153.4, 152.6, 149.0, 151.2, 155.1, 153.8, 157.6, 156.4],
+      "ohlc": [
+        { "open": 150.0, "high": 154.2, "low": 149.1, "close": 153.4 },
+        { "open": 153.4, "high": 156.0, "low": 152.0, "close": 152.6 },
+        { "open": 152.6, "high": 153.1, "low": 148.4, "close": 149.0 },
+        { "open": 149.0, "high": 151.8, "low": 148.2, "close": 151.2 },
+        { "open": 151.2, "high": 155.5, "low": 150.9, "close": 155.1 },
+        { "open": 155.1, "high": 156.3, "low": 153.0, "close": 153.8 },
+        { "open": 153.8, "high": 158.0, "low": 153.5, "close": 157.6 },
+        { "open": 157.6, "high": 159.2, "low": 156.1, "close": 156.4 }
+      ]
+    }
+  ]
+}

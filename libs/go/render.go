@@ -31,6 +31,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "error-bar" {
 		return errorBarDataTable(spec)
 	}
+	if spec.Type == "boxplot" {
+		return boxplotDataTable(spec)
+	}
 	if spec.Type == "candlestick" {
 		return candlestickDataTable(spec)
 	}
@@ -102,6 +105,41 @@ func pointModelDataTable(spec *ChartSpec, hasZ bool) string {
 				b.WriteString(`<td>` + esc(fmtNum(z)) + `</td>`)
 			}
 			b.WriteString(`</tr>`)
+		}
+	}
+	b.WriteString("</tbody></table>")
+	return b.String()
+}
+
+func boxplotDataTable(spec *ChartSpec) string {
+	var b strings.Builder
+	b.WriteString(`<table class="sc-visually-hidden">`)
+	if spec.Title != "" {
+		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
+	}
+	b.WriteString(`<thead><tr><th scope="col">Category</th><th scope="col">Series</th>` +
+		`<th scope="col">Low</th><th scope="col">Q1</th>` +
+		`<th scope="col">Median</th><th scope="col">Q3</th>` +
+		`<th scope="col">High</th><th scope="col">Outliers</th></tr></thead><tbody>`)
+	cats := spec.XAxis.Categories
+	for _, s := range spec.Series {
+		for i, bd := range s.BoxData {
+			cat := strconv.Itoa(i)
+			if i < len(cats) {
+				cat = cats[i]
+			}
+			outliers := ""
+			for j, o := range bd.Outliers {
+				if j > 0 {
+					outliers += ", "
+				}
+				outliers += fmtNum(o)
+			}
+			b.WriteString(`<tr><th scope="row">` + esc(cat) + `</th><td>` +
+				esc(s.Name) + `</td><td>` + esc(fmtNum(bd.Low)) + `</td><td>` +
+				esc(fmtNum(bd.Q1)) + `</td><td>` + esc(fmtNum(bd.Median)) + `</td><td>` +
+				esc(fmtNum(bd.Q3)) + `</td><td>` + esc(fmtNum(bd.High)) + `</td><td>` +
+				esc(outliers) + `</td></tr>`)
 		}
 	}
 	b.WriteString("</tbody></table>")
@@ -232,6 +270,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderAreaRangeSVG(spec)
 	case "bar":
 		svg = renderBarSVG(spec)
+	case "boxplot":
+		svg = renderBoxplotSVG(spec)
 	case "bullet":
 		svg = renderBulletSVG(spec)
 	case "combo":

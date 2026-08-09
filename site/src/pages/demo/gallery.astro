@@ -12,6 +12,14 @@ const CHART_TYPES = [
   { id: 'scatter', label: 'Scatter', desc: 'XY point charts with correlation and regression line support.' },
   { id: 'bubble', label: 'Bubble', desc: 'Three-dimensional data mapped to position and bubble size.' },
   { id: 'combo', label: 'Combo', desc: 'Per-series mark types (column + line) on shared axes with optional dual y-axis.' },
+  { id: 'histogram', label: 'Histogram', desc: 'Frequency distribution with binning transform, optional pareto line and bellcurve overlay.' },
+  { id: 'candlestick', label: 'Candlestick', desc: 'OHLC financial chart with candlestick, ohlc, hlc, heikin-ashi, and hollow subtypes.' },
+  { id: 'error-bar', label: 'Error Bar', desc: 'Whisker marks showing center value with low/high uncertainty bounds.' },
+  { id: 'arearange', label: 'Area Range', desc: 'Band-fill between low and high data paths for intervals and envelopes.' },
+  { id: 'columnrange', label: 'Column Range', desc: 'Floating bars between low and high values per category.' },
+  { id: 'waterfall', label: 'Waterfall', desc: 'Signed deltas as floating bars with running-total transform and connector lines.' },
+  { id: 'bullet', label: 'Bullet', desc: 'Compact KPI bar against qualitative range bands and a comparison target.' },
+  { id: 'boxplot', label: 'Boxplot', desc: 'Box-and-whisker glyphs showing 5-number summary with optional outliers per category.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
@@ -53,7 +61,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Seven certified chart types, each rendered identically in Python and Go.
+      Fifteen certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>

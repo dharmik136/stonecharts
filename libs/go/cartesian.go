@@ -388,6 +388,22 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 					hi = v
 				}
 			}
+			for _, v := range s.Low {
+				if v < lo {
+					lo = v
+				}
+				if v > hi {
+					hi = v
+				}
+			}
+			for _, v := range s.High {
+				if v < lo {
+					lo = v
+				}
+				if v > hi {
+					hi = v
+				}
+			}
 		}
 		if spec.YAxis.Min != nil {
 			lo = *spec.YAxis.Min
@@ -425,6 +441,32 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		first := true
 		for _, s := range spec.Series {
 			for _, v := range s.Data {
+				if first {
+					lo, hi = v, v
+					first = false
+					continue
+				}
+				if v < lo {
+					lo = v
+				}
+				if v > hi {
+					hi = v
+				}
+			}
+			for _, v := range s.Low {
+				if first {
+					lo, hi = v, v
+					first = false
+					continue
+				}
+				if v < lo {
+					lo = v
+				}
+				if v > hi {
+					hi = v
+				}
+			}
+			for _, v := range s.High {
 				if first {
 					lo, hi = v, v
 					first = false

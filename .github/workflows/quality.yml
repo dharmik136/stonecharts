@@ -160,11 +160,10 @@ jobs:
           bu_spec = ChartSpec.from_dict({'type':'bullet','title':'BU Smoke','xAxis':{'categories':['Revenue']},'series':[{'name':'S','data':[275.0]}],'bulletTarget':250.0,'bulletRanges':[150.0,225.0,300.0]})
           bu_svg = render_svg(bu_spec)
           assert bu_svg.startswith('<svg'), 'bullet render failed'
-          try:
-              from stonecharts.charts import boxplot
-              raise AssertionError('unapproved boxplot module present in installed package')
-          except ImportError:
-              pass
+          from stonecharts.charts import boxplot
+          bp_spec = ChartSpec.from_dict({'type':'boxplot','title':'BP Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','boxData':[{'low':1.0,'q1':3.0,'median':5.0,'q3':7.0,'high':9.0},{'low':2.0,'q1':4.0,'median':6.0,'q3':8.0,'high':10.0}]}]})
+          bp_svg = render_svg(bp_spec)
+          assert bp_svg.startswith('<svg'), 'boxplot render failed'
           print('installed-wheel smoke test OK,', len(svg), 'bytes')
           "
       - name: Smoke-test installed stoneverify console script
@@ -344,7 +343,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area arearange bar bubble bullet candlestick column columnrange combo error-bar histogram line-basic scatter waterfall; do
+          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo error-bar histogram line-basic scatter waterfall; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
