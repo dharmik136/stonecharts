@@ -41,6 +41,7 @@ DUMBBELL_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"
 FUNNEL_CASES = ["basic", "adversarial", "neck", "pyramid", "themed-dark"]
 VARIWIDE_CASES = ["basic", "adversarial", "dark", "negative"]
 TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
+WINDBARB_CASES = ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -62,6 +63,7 @@ ACTIVE_VALIDATION_CASES = {
     "funnel": FUNNEL_CASES,
     "variwide": VARIWIDE_CASES,
     "timeline": TIMELINE_CASES,
+    "windbarb": WINDBARB_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -267,6 +269,11 @@ def test_variwide_goldens():
 def test_timeline_goldens():
     for name in TIMELINE_CASES:
         _check("timeline", name)
+
+
+def test_windbarb_goldens():
+    for name in WINDBARB_CASES:
+        _check("windbarb", name)
 
 
 def test_column_edge_cases():
@@ -599,6 +606,7 @@ def test_capability_manifest_and_error():
         "timeline",
         "variwide",
         "waterfall",
+        "windbarb",
     ]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")

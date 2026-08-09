@@ -9,6 +9,22 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.18] - 2026-08-10
+
+### Added
+
+- **Windbarb chart** (`type: "windbarb"`) — meteorological wind-barb glyphs on a
+  fixed lane, each encoding speed (feathers/flags) and direction (SVG rotate
+  transform — no trig) (DEC-034). New spec fields: `series[].direction`
+  (per-point wind direction in degrees), `speedUnit`, `calmThreshold`,
+  `hemisphere`, `barbLength`, `yOffset`. Uses band x-scale with
+  `include_zero=True` (0-based speed reference axis). Supports Northern and
+  Southern hemisphere feather placement, calm glyph, pennant flags for 50+ kt
+  speeds, dark theme. Certified renderers in both Python and Go with
+  byte-identical golden SVGs.
+- Cross-render corpus expanded to 96 examples across 21 chart types.
+- Site gallery expanded to 21 chart types.
+
 ## [0.0.0.17] - 2026-08-10
 
 ### Added

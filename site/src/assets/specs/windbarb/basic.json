@@ -1,0 +1,20 @@
+{
+  "type": "windbarb",
+  "title": "Coastal Wind — Station KBOS",
+  "subtitle": "Hourly wind barbs (speed + direction), knots",
+  "speedUnit": "kt",
+  "calmThreshold": 2,
+  "hemisphere": "N",
+  "xAxis": {
+    "title": "Hour (local)",
+    "categories": ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00"]
+  },
+  "yAxis": { "title": "Wind speed (kt)" },
+  "series": [
+    {
+      "name": "KBOS surface wind",
+      "data":      [5, 12, 18, 25, 33, 0, 47, 55],
+      "direction": [200, 210, 225, 220, 240, 0, 260, 255]
+    }
+  ]
+}
