@@ -123,6 +123,7 @@ type Series struct {
 	BoxData     []BoxDatum      `json:"boxData,omitempty"`
 	Widths      []float64       `json:"widths,omitempty"`
 	Labels      []string        `json:"labels,omitempty"`
+	Direction   []float64       `json:"direction,omitempty"`
 }
 
 // UnmarshalJSON normalizes the point model (§3.3 Rank 3 / §5.4b lockstep):
@@ -428,6 +429,11 @@ type ChartSpec struct {
 	NeckWidth              *float64        `json:"neckWidth,omitempty"`
 	NeckHeight             *float64        `json:"neckHeight,omitempty"`
 	MinWidth               *float64        `json:"minWidth,omitempty"`
+	SpeedUnit              string          `json:"speedUnit,omitempty"`
+	CalmThreshold          *float64        `json:"calmThreshold,omitempty"`
+	Hemisphere             string          `json:"hemisphere,omitempty"`
+	BarbLength             *float64        `json:"barbLength,omitempty"`
+	YOffset                *float64        `json:"yOffset,omitempty"`
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
