@@ -1,0 +1,33 @@
+[
+  {
+    "description": "series.data missing",
+    "spec": {
+      "type": "timeline",
+      "series": [{ "name": "s", "labels": ["a"] }]
+    },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "description": "series.data contains string",
+    "spec": {
+      "type": "timeline",
+      "series": [{ "name": "s", "data": ["x"], "labels": ["a"] }]
+    },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "description": "series.labels contains number",
+    "spec": {
+      "type": "timeline",
+      "series": [{ "name": "s", "data": [1], "labels": [42] }]
+    },
+    "errors": ["$.series[0].labels[0]: expected string, received number"]
+  },
+  {
+    "description": "series missing entirely",
+    "spec": {
+      "type": "timeline"
+    },
+    "errors": ["$.series: required"]
+  }
+]

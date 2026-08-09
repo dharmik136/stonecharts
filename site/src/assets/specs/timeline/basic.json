@@ -1,0 +1,24 @@
+{
+  "type": "timeline",
+  "title": "Production Deploys — Q2 2026",
+  "subtitle": "Release timeline on a datetime axis, with labels and leaders",
+  "orientation": "horizontal",
+  "leaders": true,
+  "xAxis": {
+    "type": "datetime",
+    "title": "Date"
+  },
+  "series": [
+    {
+      "name": "Deploys",
+      "data": [1775088000000, 1776729600000, 1778716800000, 1780444800000, 1782345600000],
+      "labels": [
+        "v4.2.0 — API gateway",
+        "v4.3.0 — auth revamp",
+        "v4.4.0 — cache layer",
+        "v4.5.0 — query planner",
+        "v4.6.0 — cold-start fix"
+      ]
+    }
+  ]
+}

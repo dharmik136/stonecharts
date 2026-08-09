@@ -12,7 +12,7 @@
   "series": [
     {
       "name": "Events <script>alert('x')</script> & \"more\"",
-      "color": "#e04b4b\" onmouseover=\"alert(1)",
+      "color": "#e04b4b",
       "data": [1770681600000, 1771891200000],
       "labels": [
         "config change <b>drift</b> & \"rollback\"",

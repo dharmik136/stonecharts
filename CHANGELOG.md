@@ -9,6 +9,19 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.17] - 2026-08-10
+
+### Added
+
+- **Timeline chart** (`type: "timeline"`) — events placed along a single time
+  axis with markers, leader lines, and alternating labels (DEC-033). New spec
+  field: `series[].labels` (per-event label text). Uses numeric x-scale with
+  `include_zero=False` (free time axis). Supports multiple event lanes, marker
+  symbols (circle/square/triangle/diamond), dark theme, gradient fills.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 91 examples across 20 chart types.
+- Site gallery expanded to 20 chart types.
+
 ## [0.0.0.16] - 2026-08-10
 
 ### Added
