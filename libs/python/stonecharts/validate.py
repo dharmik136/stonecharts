@@ -386,7 +386,8 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 # 0.0.0.11 admits bullet per DEC-027;
 # 0.0.0.12 admits boxplot per DEC-028;
 # 0.0.0.13 admits lollipop per DEC-029;
-# 0.0.0.14 admits dumbbell per DEC-030).
+# 0.0.0.14 admits dumbbell per DEC-030;
+# 0.0.0.15 admits funnel per DEC-031).
 _KNOWN_TYPES = {
     "area",
     "arearange",
@@ -400,6 +401,7 @@ _KNOWN_TYPES = {
     "combo",
     "dumbbell",
     "error-bar",
+    "funnel",
     "histogram",
     "line",
     "lollipop",

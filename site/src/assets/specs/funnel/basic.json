@@ -1,0 +1,10 @@
+{
+  "type": "funnel",
+  "title": "Signup Conversion Funnel",
+  "subtitle": "Stage-by-stage drop-off, last 30 days",
+  "legend": false,
+  "xAxis": { "categories": ["Visitors", "Signups", "Trials", "Active", "Paid"] },
+  "series": [
+    { "name": "Conversion", "data": [18400, 9200, 5100, 2600, 1180] }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "type": "funnel",
+  "title": "Adversarial <funnel> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3"]
+  },
+  "series": [
+    {
+      "name": "stage <script>&\"'</script>",
+      "data": [500, 300, 150]
+    }
+  ]
+}

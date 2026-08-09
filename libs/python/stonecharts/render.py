@@ -24,6 +24,7 @@ from .charts import columnrange as _columnrange
 from .charts import combo as _combo
 from .charts import dumbbell as _dumbbell
 from .charts import error_bar as _error_bar
+from .charts import funnel as _funnel
 from .charts import histogram as _histogram
 from .charts import line as _line
 from .charts import lollipop as _lollipop
@@ -49,6 +50,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "dumbbell": _dumbbell.render_svg,
     "columnrange": _columnrange.render_svg,
     "error-bar": _error_bar.render_svg,
+    "funnel": _funnel.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
     "lollipop": _lollipop.render_svg,

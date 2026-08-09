@@ -35,6 +35,7 @@ func TestGolden(t *testing.T) {
 		"bullet":       {"basic", "multi-kpi", "themed-dark", "adversarial"},
 		"lollipop":     {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
 		"dumbbell":     {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"funnel":       {"basic", "adversarial", "neck", "pyramid", "themed-dark"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -681,7 +682,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "histogram", "line", "lollipop", "scatter", "waterfall"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "funnel", "histogram", "line", "lollipop", "scatter", "waterfall"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}

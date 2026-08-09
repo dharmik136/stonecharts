@@ -423,6 +423,9 @@ type ChartSpec struct {
 	Connector              *Connector      `json:"connector,omitempty"`
 	BulletTarget           *float64        `json:"bulletTarget,omitempty"`
 	BulletRanges           []float64       `json:"bulletRanges,omitempty"`
+	NeckWidth              *float64        `json:"neckWidth,omitempty"`
+	NeckHeight             *float64        `json:"neckHeight,omitempty"`
+	MinWidth               *float64        `json:"minWidth,omitempty"`
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
