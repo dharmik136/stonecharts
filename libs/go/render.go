@@ -298,6 +298,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderScatterSVG(spec)
 	case "bubble":
 		svg = renderBubbleSVG(spec)
+	case "variwide":
+		svg = renderVariwideSVG(spec)
 	case "waterfall":
 		svg = renderWaterfallSVG(spec)
 	default:

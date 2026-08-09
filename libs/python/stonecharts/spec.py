@@ -137,6 +137,7 @@ class Series:
     data_points: list[Datum] | None = None  # scatter only — see Datum
     ohlc: list[dict] | None = None  # candlestick only — [{open,high,low,close}, ...]
     box_data: list[BoxDatum] | None = None  # boxplot only — 5-number summary per category
+    widths: list[float] | None = None  # variwide only — per-datum width metric
 
 
 @dataclass
@@ -428,6 +429,7 @@ class ChartSpec:
                     high=[float(v) for v in s["high"]] if "high" in s and s["high"] is not None else None,
                     ohlc=s.get("ohlc"),
                     box_data=box_data,
+                    widths=[float(v) for v in s["widths"]] if "widths" in s and s["widths"] is not None else None,
                 )
             )
         xa = d.get("xAxis") or {}

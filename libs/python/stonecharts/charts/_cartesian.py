@@ -80,6 +80,8 @@ class CartesianFrame:
     x_min: float = 0.0  # LINEAR scale only (scatter) — free numeric x-domain
     x_max: float = 0.0
     x_ticks: list[float] = field(default_factory=list)
+    slot_lefts: list[float] = field(default_factory=list)  # variwide only
+    slot_widths: list[float] = field(default_factory=list)  # variwide only
 
     def xpix(self, i: float) -> float:
         """Category index (or, under LINEAR scale, a numeric x-VALUE) -> pixel x.
@@ -99,6 +101,10 @@ class CartesianFrame:
             return self.plot_x + self.plot_w * (i - self.x_min) / (self.x_max - self.x_min)
         if self.scale == "band":
             return self.plot_x + self.band_width() * i + self.band_width() / 2
+        if self.scale == "variwide":
+            if i < 0 or i >= len(self.slot_lefts):
+                return self.plot_x + self.plot_w / 2
+            return self.slot_lefts[int(i)] + self.slot_widths[int(i)] / 2
         if self.n <= 1:
             return self.plot_x + self.plot_w / 2
         return self.plot_x + self.plot_w * i / (self.n - 1)
@@ -109,6 +115,12 @@ class CartesianFrame:
     def band_width(self) -> float:
         """BAND scale only — the per-category slot width. PINNED: plot_w / n."""
         return self.plot_w / self.n
+
+    def slot_width(self, i: int) -> float:
+        """VARIWIDE scale — per-category slot width. Returns 0 if out of range."""
+        if i < 0 or i >= len(self.slot_widths):
+            return 0.0
+        return self.slot_widths[i]
 
     def band_height(self) -> float:
         """BAND scale only — the per-category slot height for horizontal charts."""
@@ -347,6 +359,30 @@ def build_frame(
             fill = fill_color  # bar paint: url(#grad) or solid hex
         styles.append(SeriesStyle(stroke, solid, area_fill, area_op, fill))
 
+    slot_lefts: list[float] = []
+    slot_ws: list[float] = []
+    if x_scale == "variwide":
+        raw_widths = spec.series[0].widths if spec.series and spec.series[0].widths else None
+        if raw_widths:
+            clamped = [max(0.0, w) for w in raw_widths[:n]]
+            while len(clamped) < n:
+                clamped.append(0.0)
+            total_z = sum(clamped)
+            if total_z <= 0:
+                clamped = [1.0] * n
+                total_z = float(n)
+            cum = 0.0
+            for z in clamped:
+                sw = plot_w * z / total_z
+                slot_lefts.append(plot_x + cum)
+                slot_ws.append(sw)
+                cum += sw
+        else:
+            sw = plot_w / n if n > 0 else 0.0
+            for i in range(n):
+                slot_lefts.append(plot_x + sw * i)
+                slot_ws.append(sw)
+
     return CartesianFrame(
         spec=spec,
         W=W,
@@ -377,6 +413,8 @@ def build_frame(
         y2_min=y2_min,
         y2_max=y2_max,
         y2_ticks=y2_ticks,
+        slot_lefts=slot_lefts,
+        slot_widths=slot_ws,
     )
 
 
