@@ -39,6 +39,7 @@ BULLET_CASES = ["basic", "multi-kpi", "themed-dark", "adversarial"]
 LOLLIPOP_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
 DUMBBELL_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
 FUNNEL_CASES = ["basic", "adversarial", "neck", "pyramid", "themed-dark"]
+VARIWIDE_CASES = ["basic", "adversarial", "dark", "negative"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -58,6 +59,7 @@ ACTIVE_VALIDATION_CASES = {
     "lollipop": LOLLIPOP_CASES,
     "dumbbell": DUMBBELL_CASES,
     "funnel": FUNNEL_CASES,
+    "variwide": VARIWIDE_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -253,6 +255,11 @@ def test_dumbbell_goldens():
 def test_funnel_goldens():
     for name in FUNNEL_CASES:
         _check("funnel", name)
+
+
+def test_variwide_goldens():
+    for name in VARIWIDE_CASES:
+        _check("variwide", name)
 
 
 def test_column_edge_cases():
@@ -582,6 +589,7 @@ def test_capability_manifest_and_error():
         "line",
         "lollipop",
         "scatter",
+        "variwide",
         "waterfall",
     ]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})

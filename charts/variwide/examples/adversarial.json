@@ -12,7 +12,7 @@
       "name": "series <script>&\"'</script>",
       "data": [42, 18, 60, 33],
       "widths": [120, 300, 75, 210],
-      "color": "<script>alert('color')</script>"
+      "color": "#e0663e"
     }
   ]
 }
