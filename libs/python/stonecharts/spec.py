@@ -385,6 +385,9 @@ class ChartSpec:
             if chart_type in ("scatter", "bubble"):
                 data_points = [_normalize_datum(v, j) for j, v in enumerate(s["data"])]
                 data_field: list[float] = []
+            elif "data" not in s:
+                data_points = None
+                data_field = []
             else:
                 data_points = None
                 data_field = [float(v) for v in s["data"]]

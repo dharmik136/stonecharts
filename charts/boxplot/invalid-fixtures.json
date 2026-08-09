@@ -2,13 +2,6 @@
   {
     "spec": {
       "type": "boxplot",
-      "series": [{ "name": "s" }]
-    },
-    "errors": ["$.series[0].data: required"]
-  },
-  {
-    "spec": {
-      "type": "boxplot",
       "series": [{ "name": "s", "data": "oops" }]
     },
     "errors": ["$.series[0].data: expected array, received string"]

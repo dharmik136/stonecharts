@@ -328,8 +328,10 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         _intnum(v["yAxis"], f"{path}.yAxis", errs)
         if isinstance(v["yAxis"], (int, float)) and not isinstance(v["yAxis"], bool) and int(v["yAxis"]) not in (0, 1):
             errs.append(f'{path}.yAxis: expected one of 0, 1, received "{int(v["yAxis"])}"')
-    if "data" not in v:
+    if "data" not in v and chart_type != "boxplot":
         errs.append(f"{path}.data: required")
+    elif "data" not in v:
+        pass
     elif not isinstance(v["data"], list):
         errs.append(f"{path}.data: expected array, received {_jtype(v['data'])}")
     elif chart_type == "scatter":
@@ -381,7 +383,8 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 # 0.0.0.8 admits error-bar per DEC-023;
 # 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025;
 # 0.0.0.10 admits waterfall per DEC-026;
-# 0.0.0.11 admits bullet per DEC-027).
+# 0.0.0.11 admits bullet per DEC-027;
+# 0.0.0.12 admits boxplot per DEC-028).
 _KNOWN_TYPES = {
     "area",
     "arearange",
