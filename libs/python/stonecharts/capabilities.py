@@ -26,6 +26,7 @@ _CAPABILITIES: dict[str, Any] = {
         "line",
         "lollipop",
         "scatter",
+        "timeline",
         "variwide",
         "waterfall",
     ],

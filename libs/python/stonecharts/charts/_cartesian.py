@@ -95,7 +95,7 @@ class CartesianFrame:
         BAND scale (column/bar) — §4.3 pinned formula, this operation order:
             xpix(i) = plot_x + band_width()*i + band_width()/2   (band center)
         """
-        if self.scale == "linear":
+        if self.scale in ("linear", "numeric"):
             if self.x_max == self.x_min:
                 return self.plot_x + self.plot_w / 2
             return self.plot_x + self.plot_w * (i - self.x_min) / (self.x_max - self.x_min)
@@ -276,6 +276,11 @@ def build_frame(
         x_lo = spec.x_axis.min if spec.x_axis.min is not None else (min(xs) if xs else 0.0)
         x_hi = spec.x_axis.max if spec.x_axis.max is not None else (max(xs) if xs else 0.0)
         x_min, x_max, x_ticks = nice_ticks(x_lo, x_hi)
+    elif x_scale == "numeric":
+        xs = [v for s in spec.series for v in s.data]
+        x_lo = spec.x_axis.min if spec.x_axis.min is not None else (min(xs) if xs else 0.0)
+        x_hi = spec.x_axis.max if spec.x_axis.max is not None else (max(xs) if xs else 0.0)
+        x_min, x_max, x_ticks = nice_ticks(x_lo, x_hi)
 
     # Value-axis domain — owned by the frame, never by the marks.
     stacking = spec.stacking
@@ -316,6 +321,9 @@ def build_frame(
             lo = spec.y_axis.min if spec.y_axis.min is not None else (min(values) if values else 0.0)
             hi = spec.y_axis.max if spec.y_axis.max is not None else (max(values) if values else 0.0)
     y_min, y_max, y_ticks = nice_ticks(lo, hi)
+
+    if x_scale == "numeric":
+        y_ticks = []
 
     # Secondary y-axis domain (combo dual-axis).
     y2_min = y2_max = 0.0
@@ -544,7 +552,7 @@ def _chrome_head(fr: CartesianFrame, p: list[str]) -> None:
         # X labels. LINEAR scale (scatter, §3.3 Rank 3) draws numeric ticks +
         # optional vertical gridlines, mirroring the y-axis; every other scale
         # keeps the original categorical-label loop unchanged.
-        if fr.scale == "linear":
+        if fr.scale in ("linear", "numeric"):
             xgl = spec.x_axis.grid_line or GridLine(enabled=False)
             xgrid_color = xgl.color or theme.grid_color
             xgrid_dash = dash_array(xgl.dash_style)

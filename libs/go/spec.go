@@ -122,6 +122,7 @@ type Series struct {
 	OHLC        []OHLCDatum     `json:"ohlc,omitempty"`
 	BoxData     []BoxDatum      `json:"boxData,omitempty"`
 	Widths      []float64       `json:"widths,omitempty"`
+	Labels      []string        `json:"labels,omitempty"`
 }
 
 // UnmarshalJSON normalizes the point model (§3.3 Rank 3 / §5.4b lockstep):
