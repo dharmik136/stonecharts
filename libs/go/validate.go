@@ -528,6 +528,15 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	if x, ok := has(m, "labels"); ok {
 		vstrArray(x, path+".labels", errs)
 	}
+	if x, ok := has(m, "direction"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".direction: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".direction["+itoa(i)+"]", errs)
+			}
+		}
+	}
 	if x, ok := has(m, "widths"); ok {
 		if arr, ok := x.([]interface{}); !ok {
 			*errs = append(*errs, path+".widths: expected array, received "+jtype(x))
@@ -562,7 +571,8 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 // 0.0.0.14 admits dumbbell per DEC-030;
 // 0.0.0.15 admits funnel per DEC-031;
 // 0.0.0.16 admits variwide per DEC-032;
-// 0.0.0.17 admits timeline per DEC-033).
+// 0.0.0.17 admits timeline per DEC-033;
+// 0.0.0.18 admits windbarb per DEC-034).
 // Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"area":        true,
@@ -585,6 +595,7 @@ var knownTypes = map[string]bool{
 	"timeline":    true,
 	"variwide":    true,
 	"waterfall":   true,
+	"windbarb":    true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.

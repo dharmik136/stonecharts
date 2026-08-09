@@ -304,6 +304,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderVariwideSVG(spec)
 	case "waterfall":
 		svg = renderWaterfallSVG(spec)
+	case "windbarb":
+		svg = renderWindbarbSVG(spec)
 	default:
 		return "", capabilityError(typ)
 	}

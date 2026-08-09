@@ -1,0 +1,22 @@
+[
+  {
+    "name": "missing data",
+    "spec": { "type": "windbarb", "series": [{ "name": "s" }] },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "name": "string data",
+    "spec": { "type": "windbarb", "series": [{ "data": ["a"] }] },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "name": "string direction",
+    "spec": { "type": "windbarb", "series": [{ "data": [10], "direction": ["N"] }] },
+    "errors": ["$.series[0].direction[0]: expected number, received string"]
+  },
+  {
+    "name": "missing series",
+    "spec": { "type": "windbarb" },
+    "errors": ["$.series: required"]
+  }
+]
