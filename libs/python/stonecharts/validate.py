@@ -373,6 +373,8 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         _marker(v["marker"], f"{path}.marker", errs)
     if "type" in v:
         _str(v["type"], f"{path}.type", errs)
+    if "labels" in v:
+        _str_array(v["labels"], f"{path}.labels", errs)
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
@@ -388,7 +390,8 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 # 0.0.0.13 admits lollipop per DEC-029;
 # 0.0.0.14 admits dumbbell per DEC-030;
 # 0.0.0.15 admits funnel per DEC-031;
-# 0.0.0.16 admits variwide per DEC-032).
+# 0.0.0.16 admits variwide per DEC-032;
+# 0.0.0.17 admits timeline per DEC-033).
 _KNOWN_TYPES = {
     "area",
     "arearange",
@@ -407,6 +410,7 @@ _KNOWN_TYPES = {
     "line",
     "lollipop",
     "scatter",
+    "timeline",
     "variwide",
     "waterfall",
 }

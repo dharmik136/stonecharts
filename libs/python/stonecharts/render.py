@@ -29,6 +29,7 @@ from .charts import histogram as _histogram
 from .charts import line as _line
 from .charts import lollipop as _lollipop
 from .charts import scatter as _scatter
+from .charts import timeline as _timeline
 from .charts import variwide as _variwide
 from .charts import waterfall as _waterfall
 from .limits import enforce_svg_limit
@@ -58,6 +59,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "scatter": _scatter.render_svg,
     "bubble": _bubble.render_svg,
     "candlestick": _candlestick.render_svg,
+    "timeline": _timeline.render_svg,
     "variwide": _variwide.render_svg,
     "waterfall": _waterfall.render_svg,
 }

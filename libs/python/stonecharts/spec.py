@@ -138,6 +138,7 @@ class Series:
     ohlc: list[dict] | None = None  # candlestick only — [{open,high,low,close}, ...]
     box_data: list[BoxDatum] | None = None  # boxplot only — 5-number summary per category
     widths: list[float] | None = None  # variwide only — per-datum width metric
+    labels: list[str] | None = None  # timeline only — per-event label text
 
 
 @dataclass
@@ -430,6 +431,7 @@ class ChartSpec:
                     ohlc=s.get("ohlc"),
                     box_data=box_data,
                     widths=[float(v) for v in s["widths"]] if "widths" in s and s["widths"] is not None else None,
+                    labels=[str(v) for v in s["labels"]] if "labels" in s and s["labels"] is not None else None,
                 )
             )
         xa = d.get("xAxis") or {}
