@@ -217,9 +217,9 @@ def render_svg(spec: ChartSpec) -> str:
 
         p.append("</g>")
 
-    if spec.legend and spec.series:
+    if spec.legend and spec.series and s0 is not None:
         gap = 22
-        est = [len(s0.name) * 7 + 26] if s0 else []
+        est = [len(s0.name) * 7 + 26]
         total = sum(est) + gap * (len(est) - 1) if est else 0
         lx = plot_x + (plot_w - total) / 2
         ly = H - 10
