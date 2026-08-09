@@ -25,6 +25,7 @@ from .charts import combo as _combo
 from .charts import error_bar as _error_bar
 from .charts import histogram as _histogram
 from .charts import line as _line
+from .charts import lollipop as _lollipop
 from .charts import scatter as _scatter
 from .charts import waterfall as _waterfall
 from .limits import enforce_svg_limit
@@ -48,6 +49,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "error-bar": _error_bar.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
+    "lollipop": _lollipop.render_svg,
     "scatter": _scatter.render_svg,
     "bubble": _bubble.render_svg,
     "candlestick": _candlestick.render_svg,

@@ -36,6 +36,7 @@ COLUMNRANGE_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversari
 WATERFALL_CASES = ["basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"]
 BOXPLOT_CASES = ["basic", "outliers", "grouped", "themed-dark", "adversarial"]
 BULLET_CASES = ["basic", "multi-kpi", "themed-dark", "adversarial"]
+LOLLIPOP_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -52,6 +53,7 @@ ACTIVE_VALIDATION_CASES = {
     "waterfall": WATERFALL_CASES,
     "boxplot": BOXPLOT_CASES,
     "bullet": BULLET_CASES,
+    "lollipop": LOLLIPOP_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -232,6 +234,11 @@ def test_boxplot_goldens():
 def test_bullet_goldens():
     for name in BULLET_CASES:
         _check("bullet", name)
+
+
+def test_lollipop_goldens():
+    for name in LOLLIPOP_CASES:
+        _check("lollipop", name)
 
 
 def test_column_edge_cases():
@@ -557,6 +564,7 @@ def test_capability_manifest_and_error():
         "error-bar",
         "histogram",
         "line",
+        "lollipop",
         "scatter",
         "waterfall",
     ]

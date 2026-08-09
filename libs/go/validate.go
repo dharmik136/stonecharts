@@ -545,7 +545,8 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 // 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025;
 // 0.0.0.10 admits waterfall per DEC-026;
 // 0.0.0.11 admits bullet per DEC-027;
-// 0.0.0.12 admits boxplot per DEC-028).
+// 0.0.0.12 admits boxplot per DEC-028;
+// 0.0.0.13 admits lollipop per DEC-029).
 // Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"area":        true,
@@ -561,6 +562,7 @@ var knownTypes = map[string]bool{
 	"error-bar":   true,
 	"histogram":   true,
 	"line":        true,
+	"lollipop":    true,
 	"scatter":     true,
 	"waterfall":   true,
 }

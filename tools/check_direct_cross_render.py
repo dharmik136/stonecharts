@@ -39,6 +39,7 @@ ACTIVE = {
     "waterfall": ["basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"],
     "bullet": ["basic", "multi-kpi", "themed-dark", "adversarial"],
     "boxplot": ["basic", "grouped", "outliers", "themed-dark", "adversarial"],
+    "lollipop": ["basic", "grouped", "horizontal", "themed-dark", "adversarial"],
 }
 
 

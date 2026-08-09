@@ -22,6 +22,7 @@ _CAPABILITIES: dict[str, Any] = {
         "error-bar",
         "histogram",
         "line",
+        "lollipop",
         "scatter",
         "waterfall",
     ],
