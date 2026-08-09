@@ -525,6 +525,15 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	if x, ok := has(m, "type"); ok {
 		vstr(x, path+".type", errs)
 	}
+	if x, ok := has(m, "widths"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".widths: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".widths["+itoa(i)+"]", errs)
+			}
+		}
+	}
 }
 
 func vnonneg(v interface{}, path string, errs *[]string) {
@@ -548,7 +557,8 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 // 0.0.0.12 admits boxplot per DEC-028;
 // 0.0.0.13 admits lollipop per DEC-029;
 // 0.0.0.14 admits dumbbell per DEC-030;
-// 0.0.0.15 admits funnel per DEC-031).
+// 0.0.0.15 admits funnel per DEC-031;
+// 0.0.0.16 admits variwide per DEC-032).
 // Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"area":        true,
@@ -568,6 +578,7 @@ var knownTypes = map[string]bool{
 	"line":        true,
 	"lollipop":    true,
 	"scatter":     true,
+	"variwide":    true,
 	"waterfall":   true,
 }
 
