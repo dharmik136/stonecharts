@@ -1,0 +1,30 @@
+[
+  {
+    "spec": {
+      "type": "variwide",
+      "series": [{ "name": "s" }]
+    },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "spec": {
+      "type": "variwide",
+      "series": [{ "name": "s", "data": "oops" }]
+    },
+    "errors": ["$.series[0].data: expected array, received string"]
+  },
+  {
+    "spec": {
+      "type": "variwide",
+      "series": [{ "name": "s", "data": ["abc"] }]
+    },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "spec": {
+      "type": "variwide",
+      "series": "oops"
+    },
+    "errors": ["$.series: expected array, received string"]
+  }
+]

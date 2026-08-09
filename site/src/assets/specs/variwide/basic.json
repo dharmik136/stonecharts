@@ -1,0 +1,17 @@
+{
+  "type": "variwide",
+  "title": "p95 Latency by Service, Weighted by Traffic",
+  "subtitle": "Bar height = p95 latency (ms); bar width = request share (k req/min)",
+  "xAxis": {
+    "title": "Service",
+    "categories": ["auth", "catalog", "cart", "payments", "search"]
+  },
+  "yAxis": { "title": "p95 latency (ms)" },
+  "series": [
+    {
+      "name": "p95 latency",
+      "data": [88, 142, 119, 210, 176],
+      "widths": [320, 540, 180, 90, 610]
+    }
+  ]
+}

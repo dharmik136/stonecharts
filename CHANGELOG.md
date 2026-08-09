@@ -9,6 +9,19 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.16] - 2026-08-10
+
+### Added
+
+- **Variwide chart** (`type: "variwide"`) — column chart where each bar's width
+  also encodes a value (DEC-032). New spec field: `series[].widths` (per-datum
+  width metric). Cumulative-width x-layout replaces column's equal bands.
+  Supports negative y-values (bars drop below baseline), dark theme, gradient
+  and pattern fills. Certified renderers in both Python and Go with
+  byte-identical golden SVGs.
+- Cross-render corpus expanded to 87 examples across 19 chart types.
+- Site gallery expanded to 19 chart types.
+
 ## [0.0.0.15] - 2026-08-09
 
 ### Added

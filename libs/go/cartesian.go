@@ -121,6 +121,8 @@ type cartesianFrame struct {
 	secondaryAxis              *Axis
 	xMin, xMax                 float64 // LINEAR scale only (scatter) — free numeric x-domain
 	xTicks                     []float64
+	slotLefts                  []float64 // variwide only — per-category slot left edge
+	slotWidths                 []float64 // variwide only — per-category slot width
 }
 
 // xpix maps a category index (or, under LINEAR scale, a numeric x-VALUE) to a
@@ -149,6 +151,13 @@ func (f *cartesianFrame) xpix(i float64) float64 {
 	if f.scale == "band" {
 		return f.plotX + f.bandWidth()*i + f.bandWidth()/2
 	}
+	if f.scale == "variwide" {
+		idx := int(i)
+		if idx < 0 || idx >= len(f.slotLefts) {
+			return f.plotX + f.plotW/2
+		}
+		return f.slotLefts[idx] + f.slotWidths[idx]/2
+	}
 	if f.n <= 1 {
 		return f.plotX + f.plotW/2
 	}
@@ -165,6 +174,14 @@ func (f *cartesianFrame) ypix(v float64) float64 {
 // (PAD = 0.2, K = len(series)), evaluated in exactly the pinned order.
 func (f *cartesianFrame) bandWidth() float64 {
 	return f.plotW / float64(f.n)
+}
+
+// slotWidth returns the variwide per-category slot width. Returns 0 if out of range.
+func (f *cartesianFrame) slotWidth(i int) float64 {
+	if i < 0 || i >= len(f.slotWidths) {
+		return 0.0
+	}
+	return f.slotWidths[i]
 }
 
 // bandHeight is the BAND scale per-category slot height for horizontal charts.
@@ -569,6 +586,57 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		styles[si] = seriesStyle{stroke: stroke, solid: solid, areaFill: areaFill, areaOp: areaOp, fill: fill}
 	}
 
+	// Variwide slot layout — cumulative-width x-scale (mirrors Python build_frame).
+	var slotLefts, slotWidths []float64
+	if xScale == "variwide" {
+		var rawWidths []float64
+		if len(spec.Series) > 0 && len(spec.Series[0].Widths) > 0 {
+			rawWidths = spec.Series[0].Widths
+		}
+		if rawWidths != nil {
+			clamped := make([]float64, n)
+			for i := 0; i < n; i++ {
+				if i < len(rawWidths) {
+					v := rawWidths[i]
+					if v < 0 {
+						v = 0
+					}
+					clamped[i] = v
+				}
+			}
+			totalZ := 0.0
+			for _, z := range clamped {
+				totalZ += z
+			}
+			if totalZ <= 0 {
+				for i := range clamped {
+					clamped[i] = 1.0
+				}
+				totalZ = float64(n)
+			}
+			slotLefts = make([]float64, n)
+			slotWidths = make([]float64, n)
+			cum := 0.0
+			for i, z := range clamped {
+				sw := plotW * z / totalZ
+				slotLefts[i] = plotX + cum
+				slotWidths[i] = sw
+				cum += sw
+			}
+		} else {
+			slotLefts = make([]float64, n)
+			slotWidths = make([]float64, n)
+			sw := 0.0
+			if n > 0 {
+				sw = plotW / float64(n)
+			}
+			for i := 0; i < n; i++ {
+				slotLefts[i] = plotX + sw*float64(i)
+				slotWidths[i] = sw
+			}
+		}
+	}
+
 	return &cartesianFrame{
 		spec:  spec,
 		W:     W,
@@ -587,6 +655,8 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		orientation: orientation,
 		stacking:    spec.Stacking,
 		xMin:        xMin, xMax: xMax, xTicks: xTicks,
+		slotLefts:  slotLefts,
+		slotWidths: slotWidths,
 		secondaryAxis: spec.SecondaryYAxis,
 		y2Min:         y2Min, y2Max: y2Max, y2Ticks: y2Ticks,
 	}
