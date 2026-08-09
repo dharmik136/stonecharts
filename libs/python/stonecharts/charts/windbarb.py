@@ -79,7 +79,7 @@ def _windbarb_marks(fr: CartesianFrame, p: list[str]) -> None:
                     f'stroke="{color}" stroke-width="{fmt_num(STAFF_W)}"/>'
                 )
 
-                s5 = int(math.floor(speed / 5 + 0.5)) * 5
+                s5 = math.floor(speed / 5 + 0.5) * 5
                 n_flags = s5 // 50
                 n_full = (s5 % 50) // 10
                 n_half = (s5 % 10) // 5
