@@ -326,6 +326,9 @@ class ChartSpec:
     connector: Connector | None = None
     bullet_target: float | None = None
     bullet_ranges: list[float] | None = None
+    neck_width: float = 0.3
+    neck_height: float = 0.25
+    min_width: float = 0.0
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -545,4 +548,7 @@ class ChartSpec:
             bullet_ranges=[float(v) for v in d["bulletRanges"]]
             if "bulletRanges" in d and isinstance(d.get("bulletRanges"), list)
             else None,
+            neck_width=float(d.get("neckWidth", 0.3)),
+            neck_height=float(d.get("neckHeight", 0.25)),
+            min_width=float(d.get("minWidth", 0.0)),
         )

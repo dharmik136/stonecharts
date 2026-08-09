@@ -21,6 +21,7 @@ _CAPABILITIES: dict[str, Any] = {
         "combo",
         "dumbbell",
         "error-bar",
+        "funnel",
         "histogram",
         "line",
         "lollipop",

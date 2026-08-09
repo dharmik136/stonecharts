@@ -278,6 +278,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderComboSVG(spec)
 	case "dumbbell":
 		svg = renderDumbbellSVG(spec)
+	case "funnel":
+		svg = renderFunnelSVG(spec)
 	case "candlestick":
 		svg = renderCandlestickSVG(spec)
 	case "column":
