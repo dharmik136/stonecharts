@@ -84,6 +84,16 @@ type Datum struct {
 	Z *float64 // bubble only (§3.3 Rank 4); nil for scatter, always set for bubble
 }
 
+// BoxDatum is a 5-number summary for one category in a boxplot chart.
+type BoxDatum struct {
+	Low      float64   `json:"low"`
+	Q1       float64   `json:"q1"`
+	Median   float64   `json:"median"`
+	Q3       float64   `json:"q3"`
+	High     float64   `json:"high"`
+	Outliers []float64 `json:"outliers,omitempty"`
+}
+
 // OHLCDatum is one Open-High-Low-Close observation for candlestick charts.
 type OHLCDatum struct {
 	Open  float64 `json:"open"`
@@ -110,6 +120,7 @@ type Series struct {
 	Low         []float64       `json:"low,omitempty"`
 	High        []float64       `json:"high,omitempty"`
 	OHLC        []OHLCDatum     `json:"ohlc,omitempty"`
+	BoxData     []BoxDatum      `json:"boxData,omitempty"`
 }
 
 // UnmarshalJSON normalizes the point model (§3.3 Rank 3 / §5.4b lockstep):

@@ -1,0 +1,21 @@
+{
+  "type": "boxplot",
+  "title": "Adversarial <boxplot> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "dist <script>&\"'</script>",
+      "data": [50, 80, 65],
+      "boxData": [
+        { "low": 20, "q1": 35, "median": 50, "q3": 68, "high": 90, "outliers": [120] },
+        { "low": 40, "q1": 60, "median": 80, "q3": 100, "high": 130 },
+        { "low": 30, "q1": 50, "median": 65, "q3": 85, "high": 110, "outliers": [150, 170] }
+      ]
+    }
+  ]
+}

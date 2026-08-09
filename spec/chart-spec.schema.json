@@ -25,9 +25,10 @@
         "arearange",
         "columnrange",
         "waterfall",
-        "bullet"
+        "bullet",
+        "boxplot"
       ],
-      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027); maps to the released chart design and renderer pair."
+      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027; 0.0.0.12 admits boxplot per DEC-028); maps to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",
@@ -142,6 +143,17 @@
       "type": "array",
       "items": { "type": "number" },
       "description": "Bullet chart: qualitative range bounds (sorted ascending). Defines graded background bands from 0 to each bound."
+    },
+    "orientation": {
+      "type": "string",
+      "enum": ["vertical", "horizontal"],
+      "default": "vertical",
+      "description": "Coordinate orientation. 'vertical' (default) = categories on x, values on y. 'horizontal' = categories on y, values on x."
+    },
+    "scatterOverlay": {
+      "type": "boolean",
+      "default": false,
+      "description": "Boxplot: when true and samples are present, jittered raw sample points are drawn over each box."
     }
   },
   "allOf": [
@@ -596,6 +608,33 @@
           "enum": [0, 1],
           "default": 0,
           "description": "Which value axis this series is measured against: 0 = primary yAxis (default), 1 = secondaryYAxis."
+        },
+        "boxData": {
+          "type": "array",
+          "description": "Boxplot: 5-number summary per category. Each element is {low, q1, median, q3, high, outliers?}.",
+          "items": {
+            "type": "object",
+            "required": ["low", "q1", "median", "q3", "high"],
+            "properties": {
+              "low": { "type": "number" },
+              "q1": { "type": "number" },
+              "median": { "type": "number" },
+              "q3": { "type": "number" },
+              "high": { "type": "number" },
+              "outliers": {
+                "type": "array",
+                "items": { "type": "number" }
+              }
+            }
+          }
+        },
+        "samples": {
+          "type": "array",
+          "description": "Boxplot: raw sample arrays per category (renderer computes the 5-number summary).",
+          "items": {
+            "type": "array",
+            "items": { "type": "number" }
+          }
         }
       }
     }

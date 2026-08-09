@@ -108,6 +108,16 @@ class Datum:
 
 
 @dataclass
+class BoxDatum:
+    low: float
+    q1: float
+    median: float
+    q3: float
+    high: float
+    outliers: list[float] = field(default_factory=list)
+
+
+@dataclass
 class Series:
     name: str
     data: list[float]
@@ -126,6 +136,7 @@ class Series:
     high: list[float] | None = None
     data_points: list[Datum] | None = None  # scatter only — see Datum
     ohlc: list[dict] | None = None  # candlestick only — [{open,high,low,close}, ...]
+    box_data: list[BoxDatum] | None = None  # boxplot only — 5-number summary per category
 
 
 @dataclass
@@ -374,9 +385,26 @@ class ChartSpec:
             if chart_type in ("scatter", "bubble"):
                 data_points = [_normalize_datum(v, j) for j, v in enumerate(s["data"])]
                 data_field: list[float] = []
+            elif "data" not in s:
+                data_points = None
+                data_field = []
             else:
                 data_points = None
                 data_field = [float(v) for v in s["data"]]
+            box_data_raw = s.get("boxData")
+            box_data = None
+            if isinstance(box_data_raw, list):
+                box_data = [
+                    BoxDatum(
+                        low=float(bd["low"]),
+                        q1=float(bd["q1"]),
+                        median=float(bd["median"]),
+                        q3=float(bd["q3"]),
+                        high=float(bd["high"]),
+                        outliers=[float(v) for v in bd.get("outliers", [])],
+                    )
+                    for bd in box_data_raw
+                ]
             series.append(
                 Series(
                     name=s.get("name") or f"Series {i + 1}",
@@ -396,6 +424,7 @@ class ChartSpec:
                     low=[float(v) for v in s["low"]] if "low" in s and s["low"] is not None else None,
                     high=[float(v) for v in s["high"]] if "high" in s and s["high"] is not None else None,
                     ohlc=s.get("ohlc"),
+                    box_data=box_data,
                 )
             )
         xa = d.get("xAxis") or {}

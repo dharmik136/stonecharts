@@ -34,6 +34,7 @@ ERROR_BAR_CASES = ["basic", "overlay-grouped", "asymmetric", "themed-dark", "adv
 AREARANGE_CASES = ["basic", "spline-range", "themed-dark", "adversarial"]
 COLUMNRANGE_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
 WATERFALL_CASES = ["basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"]
+BOXPLOT_CASES = ["basic", "outliers", "grouped", "themed-dark", "adversarial"]
 BULLET_CASES = ["basic", "multi-kpi", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
@@ -49,6 +50,7 @@ ACTIVE_VALIDATION_CASES = {
     "arearange": AREARANGE_CASES,
     "columnrange": COLUMNRANGE_CASES,
     "waterfall": WATERFALL_CASES,
+    "boxplot": BOXPLOT_CASES,
     "bullet": BULLET_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
@@ -220,6 +222,11 @@ def test_columnrange_goldens():
 def test_waterfall_goldens():
     for name in WATERFALL_CASES:
         _check("waterfall", name)
+
+
+def test_boxplot_goldens():
+    for name in BOXPLOT_CASES:
+        _check("boxplot", name)
 
 
 def test_bullet_goldens():
@@ -540,6 +547,7 @@ def test_capability_manifest_and_error():
         "area",
         "arearange",
         "bar",
+        "boxplot",
         "bubble",
         "bullet",
         "candlestick",

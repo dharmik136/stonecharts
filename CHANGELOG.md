@@ -9,6 +9,20 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.12] - 2026-08-09
+
+### Added
+
+- **Boxplot chart** (`type: "boxplot"`) — box-and-whisker glyphs showing a
+  5-number summary (low, q1, median, q3, high) plus optional outliers per
+  category (DEC-028). New spec field: `boxData` (summary-mode array of
+  `{low, q1, median, q3, high, outliers?}` per category). Supports vertical
+  and horizontal orientation, single and grouped (multi-series) boxes, dark
+  theme, and gradient fills. Certified renderers in both Python and Go with
+  byte-identical golden SVGs.
+- Cross-render corpus expanded to 68 examples across 15 chart types.
+- Site gallery expanded from 7 to 15 chart types.
+
 ## [0.0.0.11] - 2026-08-09
 
 ### Added

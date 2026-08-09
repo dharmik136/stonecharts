@@ -468,8 +468,10 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 			}
 		}
 	}
-	if x, ok := has(m, "data"); !ok {
+	if x, ok := has(m, "data"); !ok && chartType != "boxplot" {
 		*errs = append(*errs, path+".data: required")
+	} else if !ok {
+		// boxplot uses boxData instead of data
 	} else if arr, ok := x.([]interface{}); !ok {
 		*errs = append(*errs, path+".data: expected array, received "+jtype(x))
 	} else if chartType == "scatter" {
@@ -542,12 +544,14 @@ func vnonneg(v interface{}, path string, errs *[]string) {
 // 0.0.0.8 admits error-bar per DEC-023;
 // 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025;
 // 0.0.0.10 admits waterfall per DEC-026;
-// 0.0.0.11 admits bullet per DEC-027).
+// 0.0.0.11 admits bullet per DEC-027;
+// 0.0.0.12 admits boxplot per DEC-028).
 // Mirrors _KNOWN_TYPES in validate.py.
 var knownTypes = map[string]bool{
 	"area":        true,
 	"arearange":   true,
 	"bar":         true,
+	"boxplot":     true,
 	"bubble":      true,
 	"bullet":      true,
 	"candlestick": true,
