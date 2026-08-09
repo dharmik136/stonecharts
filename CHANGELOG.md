@@ -20,6 +20,8 @@ No unreleased changes.
   and horizontal orientation, single and grouped (multi-series) boxes, dark
   theme, and gradient fills. Certified renderers in both Python and Go with
   byte-identical golden SVGs.
+- Cross-render corpus expanded to 68 examples across 15 chart types.
+- Site gallery expanded from 7 to 15 chart types.
 
 ## [0.0.0.11] - 2026-08-09
 
