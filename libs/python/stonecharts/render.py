@@ -22,6 +22,7 @@ from .charts import candlestick as _candlestick
 from .charts import column as _column
 from .charts import columnrange as _columnrange
 from .charts import combo as _combo
+from .charts import dumbbell as _dumbbell
 from .charts import error_bar as _error_bar
 from .charts import histogram as _histogram
 from .charts import line as _line
@@ -45,6 +46,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "bullet": _bullet.render_svg,
     "combo": _combo.render_svg,
     "column": _column.render_svg,
+    "dumbbell": _dumbbell.render_svg,
     "columnrange": _columnrange.render_svg,
     "error-bar": _error_bar.render_svg,
     "histogram": _histogram.render_svg,

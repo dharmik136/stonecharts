@@ -9,6 +9,18 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.14] - 2026-08-09
+
+### Added
+
+- **Dumbbell chart** (`type: "dumbbell"`) — connected-dot plot with two marker
+  heads (low + high) joined by a thin connector per category (DEC-030). Uses
+  `data` for low values and `high` array for high values with `include_zero=False`.
+  Supports vertical and horizontal orientation, single and grouped (multi-series)
+  dumbbells, all four marker symbols, dark theme. Certified renderers in both
+  Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 78 examples across 17 chart types.
+
 ## [0.0.0.13] - 2026-08-09
 
 ### Added

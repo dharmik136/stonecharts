@@ -168,6 +168,10 @@ jobs:
           lo_spec = ChartSpec.from_dict({'type':'lollipop','title':'LO Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[10.0,20.0,15.0]}]})
           lo_svg = render_svg(lo_spec)
           assert lo_svg.startswith('<svg'), 'lollipop render failed'
+          from stonecharts.charts import dumbbell
+          db_spec = ChartSpec.from_dict({'type':'dumbbell','title':'DB Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','data':[10.0,20.0],'high':[30.0,40.0]}]})
+          db_svg = render_svg(db_spec)
+          assert db_svg.startswith('<svg'), 'dumbbell render failed'
           print('installed-wheel smoke test OK,', len(svg), 'bytes')
           "
       - name: Smoke-test installed stoneverify console script
@@ -347,7 +351,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo error-bar histogram line-basic lollipop scatter waterfall; do
+          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo dumbbell error-bar histogram line-basic lollipop scatter waterfall; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
