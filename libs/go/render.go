@@ -276,6 +276,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderBulletSVG(spec)
 	case "combo":
 		svg = renderComboSVG(spec)
+	case "dumbbell":
+		svg = renderDumbbellSVG(spec)
 	case "candlestick":
 		svg = renderCandlestickSVG(spec)
 	case "column":

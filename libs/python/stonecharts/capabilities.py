@@ -19,6 +19,7 @@ _CAPABILITIES: dict[str, Any] = {
         "column",
         "columnrange",
         "combo",
+        "dumbbell",
         "error-bar",
         "histogram",
         "line",

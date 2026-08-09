@@ -21,6 +21,7 @@ const CHART_TYPES = [
   { id: 'bullet', label: 'Bullet', desc: 'Compact KPI bar against qualitative range bands and a comparison target.' },
   { id: 'boxplot', label: 'Boxplot', desc: 'Box-and-whisker glyphs showing 5-number summary with optional outliers per category.' },
   { id: 'lollipop', label: 'Lollipop', desc: 'Thin stems from the baseline capped with marker heads for low-ink category comparison.' },
+  { id: 'dumbbell', label: 'Dumbbell', desc: 'Connected-dot plot with two marker heads (low + high) joined by a thin connector per category.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
@@ -62,7 +63,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Sixteen certified chart types, each rendered identically in Python and Go.
+      Seventeen certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>
