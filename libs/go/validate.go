@@ -548,6 +548,7 @@ var knownTypes = map[string]bool{
 	"area":        true,
 	"arearange":   true,
 	"bar":         true,
+	"boxplot":     true,
 	"bubble":      true,
 	"bullet":      true,
 	"candlestick": true,

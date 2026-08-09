@@ -386,6 +386,7 @@ _KNOWN_TYPES = {
     "area",
     "arearange",
     "bar",
+    "boxplot",
     "bubble",
     "bullet",
     "candlestick",

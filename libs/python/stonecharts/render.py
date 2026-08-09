@@ -15,6 +15,7 @@ from .capabilities import CapabilityError, capabilities
 from .charts import area as _area
 from .charts import arearange as _arearange
 from .charts import bar as _bar
+from .charts import boxplot as _boxplot
 from .charts import bubble as _bubble
 from .charts import bullet as _bullet
 from .charts import candlestick as _candlestick
@@ -39,6 +40,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "area": _area.render_svg,
     "arearange": _arearange.render_svg,
     "bar": _bar.render_svg,
+    "boxplot": _boxplot.render_svg,
     "bullet": _bullet.render_svg,
     "combo": _combo.render_svg,
     "column": _column.render_svg,
@@ -123,6 +125,31 @@ def _data_table(spec: ChartSpec) -> str:
             '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
             '<th scope="col">Y</th><th scope="col">Low</th>'
             '<th scope="col">High</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "boxplot":
+        cats = spec.x_axis.categories or []
+        rows = []
+        for s in spec.series:
+            for i, bd in enumerate(s.box_data or []):
+                cat = cats[i] if i < len(cats) else str(i)
+                outliers_str = ", ".join(fmt_num(o) for o in bd.outliers) if bd.outliers else ""
+                rows.append(
+                    f'<tr><th scope="row">{esc(cat)}</th>'
+                    f"<td>{esc(s.name)}</td>"
+                    f"<td>{esc(fmt_num(bd.low))}</td>"
+                    f"<td>{esc(fmt_num(bd.q1))}</td>"
+                    f"<td>{esc(fmt_num(bd.median))}</td>"
+                    f"<td>{esc(fmt_num(bd.q3))}</td>"
+                    f"<td>{esc(fmt_num(bd.high))}</td>"
+                    f"<td>{esc(outliers_str)}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
+            '<th scope="col">Low</th><th scope="col">Q1</th>'
+            '<th scope="col">Median</th><th scope="col">Q3</th>'
+            '<th scope="col">High</th><th scope="col">Outliers</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
     if spec.type == "candlestick":

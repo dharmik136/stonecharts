@@ -294,6 +294,9 @@ def build_frame(
             low = getattr(s, "low", None)
             if low is not None:
                 values.extend(low)
+            high = getattr(s, "high", None)
+            if high is not None:
+                values.extend(high)
         if include_zero:
             lo = spec.y_axis.min if spec.y_axis.min is not None else min([*values, 0.0])
             hi = spec.y_axis.max if spec.y_axis.max is not None else max([*values, 0.0])
