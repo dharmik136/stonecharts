@@ -9,6 +9,21 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.15] - 2026-08-09
+
+### Added
+
+- **Funnel chart** (`type: "funnel"`) — centered trapezoid stack with
+  value-to-width scaling for conversion and drop-off visualization (DEC-031).
+  Subtypes: `funnel` (default, each stage tapers to the next), `pyramid`
+  (reversed draw order for hierarchy), `neck` (tapers to a fixed-width neck
+  at the bottom). New spec fields: `neckWidth`, `neckHeight`, `minWidth`.
+  Does NOT use render_cartesian — funnel is the declared substrate exception
+  (no axes, own SVG shell). Certified renderers in both Python and Go with
+  byte-identical golden SVGs.
+- Cross-render corpus expanded to 83 examples across 18 chart types.
+- Site gallery expanded to 18 chart types.
+
 ## [0.0.0.14] - 2026-08-09
 
 ### Added
