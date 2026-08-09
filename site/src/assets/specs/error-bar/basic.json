@@ -1,0 +1,19 @@
+{
+  "type": "error-bar",
+  "title": "Mean Request Latency with 95% CI",
+  "subtitle": "Aggregated over the last 24h, by endpoint",
+  "xAxis": {
+    "title": "Endpoint",
+    "categories": ["/login", "/search", "/checkout", "/profile", "/feed"]
+  },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    {
+      "name": "p50 latency",
+      "data": [182, 240, 355, 128, 210],
+      "low":  [168, 219, 331, 119, 193],
+      "high": [201, 268, 384, 140, 233],
+      "marker": { "enabled": true, "symbol": "circle", "radius": 4 }
+    }
+  ]
+}
