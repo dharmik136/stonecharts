@@ -288,6 +288,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderHistogramSVG(spec)
 	case "line":
 		svg = renderLineSVG(spec)
+	case "lollipop":
+		svg = renderLollipopSVG(spec)
 	case "scatter":
 		svg = renderScatterSVG(spec)
 	case "bubble":

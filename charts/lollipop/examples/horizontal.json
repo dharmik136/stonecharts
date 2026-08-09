@@ -1,0 +1,25 @@
+{
+  "type": "lollipop",
+  "title": "Slowest Queries This Hour",
+  "subtitle": "Horizontal ranked lollipops (orientation transpose)",
+  "orientation": "horizontal",
+  "xAxis": {
+    "title": "Query",
+    "categories": [
+      "SELECT orders join",
+      "REFRESH mv_revenue",
+      "UPDATE inventory bulk",
+      "SELECT sessions scan",
+      "DELETE expired carts"
+    ]
+  },
+  "yAxis": { "title": "Mean execution time (ms)" },
+  "series": [
+    {
+      "name": "Mean time",
+      "data": [1840, 1275, 960, 705, 430],
+      "lineWidth": 3,
+      "marker": { "symbol": "circle", "radius": 6 }
+    }
+  ]
+}

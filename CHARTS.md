@@ -40,6 +40,7 @@ schema), and the one render call — nothing more is needed.
 | **Stage-by-stage deltas** with running totals (bridge chart) | `waterfall` |
 | A single **KPI bar** against qualitative ranges and a target | `bullet` |
 | **5-number summary** per category (median, IQR, whiskers, outliers) | `boxplot` |
+| **Rank / compare** categories with a light stem+dot (many categories) | `lollipop` |
 | Value across a **2-D grid** (matrix) | `heatmap` _(planned)_ |
 | A single KPI against a range | `gauge` _(planned)_ |
 
@@ -63,6 +64,7 @@ schema), and the one render call — nothing more is needed.
 | `waterfall` | categories[N] + series of signed deltas + `sumIndices` for running-total bars | budget or latency breakdowns with running totals, bridge charts | raw distributions (use histogram), plain comparison (use column) | Design ✅ · render ✅ (certified, 0.0.0.10) | [design.md](charts/waterfall/design.md) |
 | `histogram` | raw sample list (number[]) or pre-binned counts + binEdges | show the distribution / shape of one continuous variable (binned); optional pareto line and bellcurve overlay | category ranking (use column), correlation (use scatter), 5-number summary (use boxplot) | Design ✅ · render ✅ (certified, 0.0.0.6) | [design.md](charts/histogram/design.md) |
 | `bullet` | categories[N] + series of KPI values + `bulletTarget` + `bulletRanges` | compact KPI bar against qualitative range bands and a comparison target | trend (use line), multi-category ranking (use bar), full distribution (use boxplot) | Design ✅ · render ✅ (certified, 0.0.0.11) | [design.md](charts/bullet/design.md) |
+| `lollipop` | categories[N] + series of numbers | rank/compare categories with a light stem+dot (many categories, or a ranking) | trend (use line), part-to-whole (use pie), magnitude-as-area (use column) | Design ✅ · render ✅ (certified, 0.0.0.13) | [design.md](charts/lollipop/design.md) |
 | `timeline` | series of dated events (datetime position + label) | show WHEN deploys/incidents/releases/milestones happened along a time axis | magnitude over time (use line/column), spans with start+end (use xrange/Gantt), per-bucket counts (use histogram) | Design ✅ · render deferred | [design.md](charts/timeline/design.md) |
 | `xrange` | series of spans `{x:start, x2:end, y:lane}` across category lanes on a datetime x-axis (+ Gantt milestones & dependencies) | Gantt charts, distributed-trace span waterfalls, per-thread swimlanes over time | single magnitude per category (use column/bar), a value band with no time semantics (use columnrange), single-point events (use timeline), aggregated flame graphs (Hierarchy) | Design ✅ · render deferred | [design.md](charts/xrange/design.md) |
 | `funnel` | one series of N stage values + stage labels (categories[N]) | conversion / drop-off across ordered pipeline stages | trend (line), category ranking (column/bar), true part-to-whole of one total (pie/donut) | Design ✅ · render deferred | [design.md](charts/funnel/design.md) |

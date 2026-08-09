@@ -1,0 +1,17 @@
+{
+  "type": "lollipop",
+  "title": "Adversarial <lollipop> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "stem <script>&\"'</script>",
+      "data": [50, 80, 65],
+      "marker": { "symbol": "circle", "radius": 5 }
+    }
+  ]
+}

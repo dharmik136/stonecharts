@@ -164,6 +164,10 @@ jobs:
           bp_spec = ChartSpec.from_dict({'type':'boxplot','title':'BP Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','boxData':[{'low':1.0,'q1':3.0,'median':5.0,'q3':7.0,'high':9.0},{'low':2.0,'q1':4.0,'median':6.0,'q3':8.0,'high':10.0}]}]})
           bp_svg = render_svg(bp_spec)
           assert bp_svg.startswith('<svg'), 'boxplot render failed'
+          from stonecharts.charts import lollipop
+          lo_spec = ChartSpec.from_dict({'type':'lollipop','title':'LO Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[10.0,20.0,15.0]}]})
+          lo_svg = render_svg(lo_spec)
+          assert lo_svg.startswith('<svg'), 'lollipop render failed'
           print('installed-wheel smoke test OK,', len(svg), 'bytes')
           "
       - name: Smoke-test installed stoneverify console script
@@ -343,7 +347,7 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo error-bar histogram line-basic scatter waterfall; do
+          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo error-bar histogram line-basic lollipop scatter waterfall; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
             evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
