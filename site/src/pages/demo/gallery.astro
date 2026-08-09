@@ -24,6 +24,7 @@ const CHART_TYPES = [
   { id: 'dumbbell', label: 'Dumbbell', desc: 'Connected-dot plot with two marker heads (low + high) joined by a thin connector per category.' },
   { id: 'funnel', label: 'Funnel', desc: 'Centered trapezoid stack with value-to-width scaling for conversion and drop-off visualization.' },
   { id: 'variwide', label: 'Variwide', desc: 'Column chart where each bar width also encodes a value via cumulative-width x-layout.' },
+  { id: 'timeline', label: 'Timeline', desc: 'Events placed along a time axis with markers, leader lines, and alternating labels.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
@@ -65,7 +66,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Nineteen certified chart types, each rendered identically in Python and Go.
+      Twenty certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>

@@ -40,6 +40,7 @@ LOLLIPOP_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"
 DUMBBELL_CASES = ["basic", "grouped", "horizontal", "themed-dark", "adversarial"]
 FUNNEL_CASES = ["basic", "adversarial", "neck", "pyramid", "themed-dark"]
 VARIWIDE_CASES = ["basic", "adversarial", "dark", "negative"]
+TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -60,6 +61,7 @@ ACTIVE_VALIDATION_CASES = {
     "dumbbell": DUMBBELL_CASES,
     "funnel": FUNNEL_CASES,
     "variwide": VARIWIDE_CASES,
+    "timeline": TIMELINE_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -260,6 +262,11 @@ def test_funnel_goldens():
 def test_variwide_goldens():
     for name in VARIWIDE_CASES:
         _check("variwide", name)
+
+
+def test_timeline_goldens():
+    for name in TIMELINE_CASES:
+        _check("timeline", name)
 
 
 def test_column_edge_cases():
@@ -589,6 +596,7 @@ def test_capability_manifest_and_error():
         "line",
         "lollipop",
         "scatter",
+        "timeline",
         "variwide",
         "waterfall",
     ]

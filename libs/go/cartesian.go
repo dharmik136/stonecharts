@@ -142,7 +142,7 @@ type cartesianFrame struct {
 // The x-label loop calls xpix(i), so labels land under points (point) or band
 // centers (band) with no per-chart label code.
 func (f *cartesianFrame) xpix(i float64) float64 {
-	if f.scale == "linear" {
+	if f.scale == "linear" || f.scale == "numeric" {
 		if f.xMax == f.xMin {
 			return f.plotX + f.plotW/2
 		}
@@ -353,6 +353,31 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 			xHi = *spec.XAxis.Max
 		}
 		xMin, xMax, xTicks = niceTicks(xLo, xHi, 6)
+	} else if xScale == "numeric" {
+		xFirst := true
+		xLo, xHi := 0.0, 0.0
+		for _, s := range spec.Series {
+			for _, v := range s.Data {
+				if xFirst {
+					xLo, xHi = v, v
+					xFirst = false
+					continue
+				}
+				if v < xLo {
+					xLo = v
+				}
+				if v > xHi {
+					xHi = v
+				}
+			}
+		}
+		if spec.XAxis.Min != nil {
+			xLo = *spec.XAxis.Min
+		}
+		if spec.XAxis.Max != nil {
+			xHi = *spec.XAxis.Max
+		}
+		xMin, xMax, xTicks = niceTicks(xLo, xHi, 6)
 	}
 
 	// Value-axis range. Stacking changes the domain to per-category totals.
@@ -505,6 +530,10 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		}
 	}
 	yMin, yMax, yTicks := niceTicks(lo, hi, 6)
+
+	if xScale == "numeric" {
+		yTicks = nil
+	}
 
 	// Secondary y-axis domain (combo dual-axis).
 	y2Min, y2Max := 0.0, 0.0
@@ -790,7 +819,7 @@ func chromeHead(f *cartesianFrame, p *strings.Builder) {
 		// X labels. LINEAR scale (scatter, §3.3 Rank 3) draws numeric ticks +
 		// optional vertical gridlines, mirroring the y-axis; every other scale
 		// keeps the original categorical-label loop unchanged.
-		if f.scale == "linear" {
+		if f.scale == "linear" || f.scale == "numeric" {
 			xGridEnabled := spec.XAxis.GridLine != nil && spec.XAxis.GridLine.Enabled != nil && *spec.XAxis.GridLine.Enabled
 			xGridColor := theme.GridColor
 			if spec.XAxis.GridLine != nil && spec.XAxis.GridLine.Color != "" {
