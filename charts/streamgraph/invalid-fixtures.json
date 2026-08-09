@@ -1,0 +1,22 @@
+[
+  {
+    "name": "missing data",
+    "spec": { "type": "streamgraph", "series": [{ "name": "s" }] },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "name": "string data",
+    "spec": { "type": "streamgraph", "series": [{ "data": ["a"] }] },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "name": "invalid offset",
+    "spec": { "type": "streamgraph", "offset": "expand", "series": [{ "data": [1] }] },
+    "errors": ["$.offset: expected one of \"wiggle\", \"silhouette\", received \"expand\""]
+  },
+  {
+    "name": "missing series",
+    "spec": { "type": "streamgraph" },
+    "errors": ["$.series: required"]
+  }
+]

@@ -123,6 +123,9 @@ type cartesianFrame struct {
 	xTicks                     []float64
 	slotLefts                  []float64 // variwide only — per-category slot left edge
 	slotWidths                 []float64 // variwide only — per-category slot width
+	sgBaseline                 []float64   // streamgraph only
+	sgCumBottom                [][]float64 // streamgraph only
+	sgCumTop                   [][]float64 // streamgraph only
 }
 
 // xpix maps a category index (or, under LINEAR scale, a numeric x-VALUE) to a
@@ -529,6 +532,106 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 			hi = *spec.YAxis.Max
 		}
 	}
+	// Streamgraph baseline-offset: pre-compute so chrome renders correct y-domain.
+	var sgBaseline []float64
+	var sgCumBottom, sgCumTop [][]float64
+	if spec.Type == "streamgraph" && n > 0 {
+		K := len(spec.Series)
+		allVals := make([][]float64, K)
+		for k := 0; k < K; k++ {
+			vals := make([]float64, 0, n)
+			for i, v := range spec.Series[k].Data {
+				if i >= n {
+					break
+				}
+				vals = append(vals, v)
+			}
+			allVals[k] = vals
+		}
+		sgTotals := make([]float64, n)
+		for k := 0; k < K; k++ {
+			for i := 0; i < len(allVals[k]); i++ {
+				sgTotals[i] += allVals[k][i]
+			}
+		}
+		running := make([]float64, n)
+		sgCumBottom = make([][]float64, K)
+		sgCumTop = make([][]float64, K)
+		for k := 0; k < K; k++ {
+			bot := make([]float64, n)
+			copy(bot, running)
+			top := make([]float64, len(allVals[k]))
+			for i := range allVals[k] {
+				top[i] = running[i] + allVals[k][i]
+			}
+			sgCumBottom[k] = bot
+			sgCumTop[k] = top
+			copy(running, top)
+		}
+		offsetMode := spec.Offset
+		if offsetMode == "" {
+			offsetMode = "wiggle"
+		}
+		sgBaseline = make([]float64, n)
+		if offsetMode == "silhouette" {
+			for i := 0; i < n; i++ {
+				sgBaseline[i] = -sgTotals[i] / 2.0
+			}
+		} else {
+			sgBaseline[0] = 0.0
+			yAcc := 0.0
+			for i := 1; i < n; i++ {
+				numW := 0.0
+				denW := 0.0
+				for k := 0; k < K; k++ {
+					ctI := 0.0
+					if i < len(sgCumTop[k]) {
+						ctI = sgCumTop[k][i]
+					}
+					ctPrev := 0.0
+					if i-1 < len(sgCumTop[k]) {
+						ctPrev = sgCumTop[k][i-1]
+					}
+					moveK := ctI - ctPrev
+					weightK := moveK / 2.0
+					for j := 0; j < k; j++ {
+						ctJI := 0.0
+						if i < len(sgCumTop[j]) {
+							ctJI = sgCumTop[j][i]
+						}
+						ctJPrev := 0.0
+						if i-1 < len(sgCumTop[j]) {
+							ctJPrev = sgCumTop[j][i-1]
+						}
+						weightK += ctJI - ctJPrev
+					}
+					numW += weightK * moveK
+					denW += moveK
+				}
+				if denW != 0.0 {
+					yAcc -= numW / denW
+				}
+				sgBaseline[i] = yAcc
+			}
+		}
+		if spec.YAxis.Min == nil {
+			lo = sgBaseline[0]
+			for i := 1; i < n; i++ {
+				if sgBaseline[i] < lo {
+					lo = sgBaseline[i]
+				}
+			}
+		}
+		if spec.YAxis.Max == nil {
+			hi = sgBaseline[0] + sgTotals[0]
+			for i := 1; i < n; i++ {
+				if sgBaseline[i]+sgTotals[i] > hi {
+					hi = sgBaseline[i] + sgTotals[i]
+				}
+			}
+		}
+	}
+
 	yMin, yMax, yTicks := niceTicks(lo, hi, 6)
 
 	if xScale == "numeric" {
@@ -686,6 +789,9 @@ func buildFrame(spec *ChartSpec, noun, xScale string, includeZero bool, orientat
 		xMin:        xMin, xMax: xMax, xTicks: xTicks,
 		slotLefts:  slotLefts,
 		slotWidths: slotWidths,
+		sgBaseline:  sgBaseline,
+		sgCumBottom: sgCumBottom,
+		sgCumTop:    sgCumTop,
 		secondaryAxis: spec.SecondaryYAxis,
 		y2Min:         y2Min, y2Max: y2Max, y2Ticks: y2Ticks,
 	}

@@ -595,7 +595,8 @@ var knownTypes = map[string]bool{
 	"timeline":    true,
 	"variwide":    true,
 	"waterfall":   true,
-	"windbarb":    true,
+	"windbarb":     true,
+	"streamgraph":  true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
@@ -629,6 +630,12 @@ func validate(v interface{}) []string {
 		vstr(x, "$.stacking", &errs)
 		if s, ok := x.(string); ok && s != "normal" && s != "percent" {
 			errs = append(errs, `$.stacking: expected one of "normal", "percent", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(d, "offset"); ok {
+		vstr(x, "$.offset", &errs)
+		if s, ok := x.(string); ok && s != "wiggle" && s != "silhouette" {
+			errs = append(errs, `$.offset: expected one of "wiggle", "silhouette", received "`+s+`"`)
 		}
 	}
 	if x, ok := has(d, "grouping"); ok {

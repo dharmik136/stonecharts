@@ -434,6 +434,7 @@ type ChartSpec struct {
 	Hemisphere             string          `json:"hemisphere,omitempty"`
 	BarbLength             *float64        `json:"barbLength,omitempty"`
 	YOffset                *float64        `json:"yOffset,omitempty"`
+	Offset                 string          `json:"offset,omitempty"` // streamgraph: "wiggle" | "silhouette"
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
