@@ -3429,12 +3429,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
   target: 0.0.0.4
   outcome: Implement combo in Python and Go with byte-parity.
   traceability:
-  - DEC-020
   - DEC-017
   risks: []
   evidence: []
@@ -3457,12 +3456,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.5
+  target: Post-0.0.0.1
   outcome: Implement histogram in Python and Go with byte-parity.
   traceability:
-  - DEC-021
   - DEC-017
   risks: []
   evidence: []
@@ -3485,12 +3483,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.7
+  target: Post-0.0.0.1
   outcome: Implement error-bar in Python and Go with byte-parity.
   traceability:
-  - DEC-023
   - DEC-017
   risks: []
   evidence: []
@@ -3513,12 +3510,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.8
+  target: Post-0.0.0.1
   outcome: Implement arearange in Python and Go with byte-parity.
   traceability:
-  - DEC-024
   - DEC-017
   risks: []
   evidence: []
@@ -3541,12 +3537,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.8
+  target: Post-0.0.0.1
   outcome: Implement columnrange in Python and Go with byte-parity.
   traceability:
-  - DEC-025
   - DEC-017
   risks: []
   evidence: []
@@ -3569,12 +3564,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.9
+  target: Post-0.0.0.1
   outcome: Implement waterfall in Python and Go with byte-parity.
   traceability:
-  - DEC-026
   - DEC-017
   risks: []
   evidence: []
@@ -3597,12 +3591,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.6
+  target: Post-0.0.0.1
   outcome: Implement candlestick in Python and Go with byte-parity.
   traceability:
-  - DEC-022
   - DEC-017
   risks: []
   evidence: []
@@ -3625,12 +3618,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.10
+  target: Post-0.0.0.1
   outcome: Implement bullet in Python and Go with byte-parity.
   traceability:
-  - DEC-027
   - DEC-017
   risks: []
   evidence: []
@@ -3653,12 +3645,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.11
+  target: Post-0.0.0.1
   outcome: Implement boxplot in Python and Go with byte-parity.
   traceability:
-  - DEC-028
   - DEC-017
   risks: []
   evidence: []
@@ -3681,12 +3672,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.12
+  target: Post-0.0.0.1
   outcome: Implement lollipop in Python and Go with byte-parity.
   traceability:
-  - DEC-029
   - DEC-017
   risks: []
   evidence: []
@@ -3709,12 +3699,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.13
+  target: Post-0.0.0.1
   outcome: Implement dumbbell in Python and Go with byte-parity.
   traceability:
-  - DEC-030
   - DEC-017
   risks: []
   evidence: []
@@ -3737,12 +3726,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.14
+  target: Post-0.0.0.1
   outcome: Implement funnel in Python and Go with byte-parity.
   traceability:
-  - DEC-031
   - DEC-017
   risks: []
   evidence: []
@@ -3765,12 +3753,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.15
+  target: Post-0.0.0.1
   outcome: Implement variwide in Python and Go with byte-parity.
   traceability:
-  - DEC-032
   - DEC-017
   risks: []
   evidence: []
@@ -3793,12 +3780,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.16
+  target: Post-0.0.0.1
   outcome: Implement timeline in Python and Go with byte-parity.
   traceability:
-  - DEC-033
   - DEC-017
   risks: []
   evidence: []
@@ -3821,12 +3807,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.17
+  target: Post-0.0.0.1
   outcome: Implement windbarb in Python and Go with byte-parity.
   traceability:
-  - DEC-034
   - DEC-017
   risks: []
   evidence: []
@@ -3849,12 +3834,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.18
+  target: Post-0.0.0.1
   outcome: Implement streamgraph in Python and Go with byte-parity.
   traceability:
-  - DEC-035
   - DEC-017
   risks: []
   evidence: []
@@ -3877,12 +3861,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.19
+  target: Post-0.0.0.1
   outcome: Implement vector-plot in Python and Go with byte-parity.
   traceability:
-  - DEC-036
   - DEC-017
   risks: []
   evidence: []
@@ -3905,12 +3888,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.20
+  target: Post-0.0.0.1
   outcome: Implement xrange in Python and Go with byte-parity.
   traceability:
-  - DEC-037
   - DEC-017
   risks: []
   evidence: []
@@ -3933,12 +3915,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.21
+  target: Post-0.0.0.1
   outcome: Implement technical-indicators in Python and Go with byte-parity.
   traceability:
-  - DEC-038
   - DEC-017
   risks: []
   evidence: []
@@ -3961,12 +3942,11 @@ items:
   item_type: Work Package
   status: Done
   priority: P2
-  workstream: WS-08 Chart and language expansion
+  workstream: WS-08 Expansion
   stage: S5 Expansion
-  target: 0.0.0.22
+  target: Post-0.0.0.1
   outcome: Implement flame-chart in Python and Go with byte-parity.
   traceability:
-  - DEC-039
   - DEC-017
   risks: []
   evidence: []

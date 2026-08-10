@@ -471,7 +471,8 @@ def _emit_overlay(fr: CartesianFrame, p: list[str], s, ind, si: int, ypix_fn, th
                 cy = ypix_fn((u + lower) / 2)
                 xlabel = fr.cats[i] if i < len(fr.cats) else str(i)
                 m_val = mid_vals[i]
-                if m_val is None: m_val = 0.0
+                if m_val is None:
+                    m_val = 0.0
                 common = (
                     f'class="sc-point" data-series="{si}" data-series-name="{esc(band_name)}" '
                     f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(m_val))}" '
