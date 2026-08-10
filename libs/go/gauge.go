@@ -242,8 +242,7 @@ func renderGaugeSVG(spec *ChartSpec) string {
 
 	if spec.legendOn() && len(spec.Series) > 0 && s0 != nil {
 		gap := 22.0
-		var est []float64
-		est = []float64{float64(utf8.RuneCountInString(s0.Name)*7 + 26)}
+		est := []float64{float64(utf8.RuneCountInString(s0.Name)*7 + 26)}
 		totalW := 0.0
 		if len(est) > 0 {
 			for _, e := range est {
