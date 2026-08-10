@@ -79,6 +79,33 @@ RENDER REFUSED
 
 This is more valuable than a chart that renders but lies.
 
+## Market context
+
+**Regulatory reporting demands data lineage, not silent degradation.** IFRS 17
+requires transparency across the actuarial modeling and financial reporting chain.
+Solvency II reinforces this from a prudential angle — the ORSA process needs
+granular, high-quality data. Both frameworks require that regulators can trace
+every reported figure back to its source. A renderer that silently absorbs
+out-of-range claims into edge bins breaks this lineage.
+
+**SR 26-2 (April 2026) requires reproducible, explainable model outputs.** U.S.
+interagency guidance from the Federal Reserve, OCC, and FDIC now requires that
+models produce outputs that can be validated and explained. A histogram that
+silently misplaces observations produces an output that cannot be reconciled with
+the input data — failing the explainability requirement.
+
+**"Loud failure" is a competitive differentiator.** Competing chart libraries
+(Highcharts, Chart.js, Vega) silently render whatever they receive. None refuse to
+render a misleading chart. For regulated buyers who face audit risk, a library that
+says "this data is structurally invalid, I will not render it" is more valuable than
+one that renders something wrong without complaint.
+
+**The insurance analytics market ($15.4B in 2026) is moving toward automation.**
+Automated actuarial reporting pipelines need validation gates, not silent
+degradation. When a pipeline produces a chart from model output, the chart library
+is the last line of defense before the visual reaches a regulator or board member.
+Silent fallbacks in that position create undetectable errors.
+
 ## Recommendation
 
 Accept strict input validation as a project-wide policy:
