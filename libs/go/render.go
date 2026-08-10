@@ -40,6 +40,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "flame-chart" {
 		return flameChartDataTable(spec)
 	}
+	if spec.Type == "pie" {
+		return pieDataTable(spec)
+	}
 	if spec.Type == "technical-indicators" {
 		return tiDataTable(spec)
 	}
@@ -378,6 +381,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderLineSVG(spec)
 	case "lollipop":
 		svg = renderLollipopSVG(spec)
+	case "pie":
+		svg = renderPieSVG(spec)
 	case "scatter":
 		svg = renderScatterSVG(spec)
 	case "streamgraph":

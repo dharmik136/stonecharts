@@ -495,6 +495,7 @@ _KNOWN_TYPES = {
     "histogram",
     "line",
     "lollipop",
+    "pie",
     "scatter",
     "technical-indicators",
     "timeline",

@@ -1,0 +1,6 @@
+{
+  "type": "pie",
+  "title": "Monopoly",
+  "xAxis": { "categories": ["Dominant"] },
+  "series": [{ "name": "Share", "data": [100] }]
+}

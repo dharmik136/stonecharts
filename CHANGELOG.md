@@ -9,6 +9,20 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.24] - 2026-08-10
+
+### Added
+
+- **Pie chart** (`type: "pie"`) — part-to-whole composition with sector arcs
+  (DEC-040). First Family B (Polar/radial) chart type, paying the polar
+  foundation tax: arc/sector SVG path geometry, value-to-angle mapping, and
+  centered layout without Cartesian axes. Uses `xAxis.categories` for slice
+  labels and `series[0].data` for values. Single-slice 100% renders as
+  `<circle>`. 27th chart type overall, 1st polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 133 examples across 27 chart types.
+- Site gallery expanded to 27 chart types.
+
 ## [0.0.0.23] - 2026-08-10
 
 ### Added

@@ -29,6 +29,7 @@ const CHART_TYPES = [
   { id: 'streamgraph', label: 'Streamgraph', desc: 'Stacked filled-area ribbons over a floating baseline (wiggle or silhouette) showing volume composition over time.' },
   { id: 'vector-plot', label: 'Vector Plot', desc: 'Arrow glyphs on a numeric x/y plane encoding direction (heading) and magnitude (arrow length) at each anchor point.' },
   { id: 'flame-chart', label: 'Flame Chart', desc: 'Time-ordered stack frames as horizontal floating bars at depth levels with inverted depth mapping for profiling views.' },
+  { id: 'pie', label: 'Pie', desc: 'Part-to-whole composition with sector arcs proportional to value, centered layout without Cartesian axes.' },
   { id: 'technical-indicators', label: 'Technical Indicators', desc: 'Base metric line with derived overlays (SMA, EMA, Bollinger, VWAP, RSI) plus plot bands/lines, oscillator panes, and event flags.' },
   { id: 'xrange', label: 'X-Range', desc: 'Horizontal span bars on lane categories with optional milestones and dependency connectors for Gantt charts and trace waterfalls.' },
 ];
@@ -72,7 +73,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Twenty-six certified chart types, each rendered identically in Python and Go.
+      Twenty-seven certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>
