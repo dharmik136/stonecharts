@@ -7,8 +7,12 @@ import (
 )
 
 func renderVectorPlotSVG(spec *ChartSpec) string {
-	for i := range spec.Series {
-		s := &spec.Series[i]
+	mod := *spec
+	mod.Series = make([]Series, len(spec.Series))
+	copy(mod.Series, spec.Series)
+
+	for i := range mod.Series {
+		s := &mod.Series[i]
 		xArr := s.X
 		if len(xArr) == 0 {
 			xArr = make([]float64, len(s.Data))
@@ -25,7 +29,7 @@ func renderVectorPlotSVG(spec *ChartSpec) string {
 			s.DataPoints[j] = Datum{X: xArr[j], Y: s.Data[j]}
 		}
 	}
-	return renderCartesian(spec, "Vector plot", "linear", vectorPlotMarks, false)
+	return renderCartesian(&mod, "Vector plot", "linear", vectorPlotMarks, false)
 }
 
 const (

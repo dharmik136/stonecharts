@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-019
 title: DEC-049 Renderer Purity Invariant
-status: proposed
+status: accepted
 classification: informative
 owner: product-owner
 approver: maintainer

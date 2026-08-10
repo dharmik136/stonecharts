@@ -925,3 +925,71 @@ func min(a, b int) int {
 	}
 	return b
 }
+
+// TestRendererPurity verifies that RenderSVG does not mutate the input ChartSpec (SC-CERT-03).
+func TestRendererPurity(t *testing.T) {
+	cases := map[string][]string{
+		"line-basic":            {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
+		"column":                {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":                  {"basic", "stacked", "percent", "themed-dark"},
+		"bar":                   {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
+		"scatter":               {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
+		"bubble":                {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
+		"combo":                 {"basic", "dark", "dual-axis", "adversarial"},
+		"histogram":             {"basic", "prebinned", "pareto", "themed-dark", "adversarial"},
+		"candlestick":           {"basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"},
+		"error-bar":             {"basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"},
+		"arearange":             {"basic", "spline-range", "themed-dark", "adversarial"},
+		"columnrange":           {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"waterfall":             {"basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"},
+		"boxplot":               {"basic", "outliers", "grouped", "themed-dark", "adversarial"},
+		"bullet":                {"basic", "multi-kpi", "themed-dark", "adversarial"},
+		"lollipop":              {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"dumbbell":              {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"funnel":                {"basic", "adversarial", "neck", "pyramid", "themed-dark"},
+		"variwide":              {"basic", "adversarial", "dark", "negative"},
+		"timeline":              {"basic", "multi", "vertical", "adversarial"},
+		"streamgraph":           {"basic", "silhouette", "themed-dark", "adversarial"},
+		"windbarb":              {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
+		"vector-plot":           {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
+		"flame-chart":           {"basic", "multi-series", "deep-stack", "themed-dark", "adversarial"},
+		"pie":                   {"basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"},
+		"gauge":                 {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
+		"solid-gauge":           {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
+		"radar":                 {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
+		"polar":                 {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
+		"nightingale":           {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"parliament":            {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"radial-bar":            {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"wind-rose":             {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
+		"technical-indicators":  {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
+		"xrange":                {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
+	}
+	for chartDir, names := range cases {
+		for _, name := range names {
+			specBytes, err := os.ReadFile("../../charts/" + chartDir + "/examples/" + name + ".json")
+			if err != nil {
+				t.Fatal(err)
+			}
+			spec, err := FromJSON(specBytes)
+			if err != nil {
+				t.Fatal(err)
+			}
+			before, err := json.Marshal(spec)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = RenderSVG(spec)
+			if err != nil {
+				t.Fatal(err)
+			}
+			after, err := json.Marshal(spec)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(before) != string(after) {
+				t.Errorf("renderer mutated spec for %s/%s", chartDir, name)
+			}
+		}
+	}
+}

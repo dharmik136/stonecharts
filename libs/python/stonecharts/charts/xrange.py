@@ -7,30 +7,39 @@ orientation="horizontal", x_scale="band", include_zero=False.
 
 from __future__ import annotations
 
+import copy
+
 from ..util import esc, fmt_num
 from ._cartesian import CartesianFrame, render_cartesian
 
 
 def render_svg(spec) -> str:
-    lane_cats = spec.y_axis.categories or []
-    lane_count = len(lane_cats)
-    spec.x_axis.categories = lane_cats
+    mod = copy.copy(spec)
+    mod.x_axis = copy.copy(spec.x_axis)
+    mod.y_axis = copy.copy(spec.y_axis)
+    mod.series = [copy.copy(s) for s in spec.series]
+    for s in mod.series:
+        s.data = list(s.data)
 
-    for s in spec.series:
+    lane_cats = mod.y_axis.categories or []
+    lane_count = len(lane_cats)
+    mod.x_axis.categories = lane_cats
+
+    for s in mod.series:
         while len(s.data) < lane_count:
             s.data.append(0.0)
 
     all_times: list[float] = []
-    for s in spec.series:
+    for s in mod.series:
         for sp in s.spans or []:
             all_times.append(sp.x)
             all_times.append(sp.x2)
-    if spec.y_axis.min is None:
-        spec.y_axis.min = spec.x_axis.min if spec.x_axis.min is not None else (min(all_times) if all_times else 0.0)
-    if spec.y_axis.max is None:
-        spec.y_axis.max = spec.x_axis.max if spec.x_axis.max is not None else (max(all_times) if all_times else 0.0)
+    if mod.y_axis.min is None:
+        mod.y_axis.min = mod.x_axis.min if mod.x_axis.min is not None else (min(all_times) if all_times else 0.0)
+    if mod.y_axis.max is None:
+        mod.y_axis.max = mod.x_axis.max if mod.x_axis.max is not None else (max(all_times) if all_times else 0.0)
 
-    return render_cartesian(spec, "X-range", "band", _xrange_marks, include_zero=False, orientation="horizontal")
+    return render_cartesian(mod, "X-range", "band", _xrange_marks, include_zero=False, orientation="horizontal")
 
 
 PAD = 0.2
