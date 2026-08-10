@@ -150,12 +150,6 @@ PANE_GAP = 24.0
 
 
 def render_svg(spec) -> str:
-    has_osc = False
-    for s in spec.series:
-        for ind in s.indicators or []:
-            if ind.type in ("macd", "rsi"):
-                has_osc = True
-
     all_overlay_vals: list[float] = []
     for s in spec.series:
         all_overlay_vals.extend(v for v in s.data if v is not None)
@@ -211,7 +205,6 @@ def _compute_indicator_values(s, ind) -> list[float | None]:
 def _ti_marks(fr: CartesianFrame, p: list[str]) -> None:
     spec = fr.spec
     theme = fr.theme
-    n = fr.n
 
     has_osc = False
     osc_frac = 0.30
@@ -240,10 +233,7 @@ def _ti_marks(fr: CartesianFrame, p: list[str]) -> None:
             return base_top + base_h / 2
         return base_top + base_h - (v - fr.y_min) / (fr.y_max - fr.y_min) * base_h
 
-    if not has_osc:
-        base_ypix_fn = fr.ypix
-    else:
-        base_ypix_fn = base_ypix
+    base_ypix_fn = fr.ypix if not has_osc else base_ypix
 
     _emit_plot_bands_lines(fr, p, base_ypix_fn, base_top, base_h)
 
@@ -457,7 +447,7 @@ def _emit_overlay(fr: CartesianFrame, p: list[str], s, ind, si: int, ypix_fn, th
         ]
         if defined:
             upper_pts = [(fr.xpix(i), ypix_fn(u)) for i, u, _ in defined]
-            lower_pts = [(fr.xpix(i), ypix_fn(l)) for i, _, l in defined]
+            lower_pts = [(fr.xpix(i), ypix_fn(lower)) for i, _, lower in defined]
             upper_d = _path_d(upper_pts, None)
             lower_rev = list(reversed(lower_pts))
             lower_d = " ".join(f"L{x:.1f} {y:.1f}" for x, y in lower_rev)
@@ -472,14 +462,14 @@ def _emit_overlay(fr: CartesianFrame, p: list[str], s, ind, si: int, ypix_fn, th
             radius = 3.5
             radius_hover = 6.0
             band_name = f"{s.name} Bollinger({period},{fmt_num(k)})"
-            for i, u, l in defined:
+            for i, u, lower in defined:
                 x = fr.xpix(i)
-                cy = ypix_fn((u + l) / 2)
+                cy = ypix_fn((u + lower) / 2)
                 xlabel = fr.cats[i] if i < len(fr.cats) else str(i)
                 common = (
                     f'class="sc-point" data-series="{si}" data-series-name="{esc(band_name)}" '
                     f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(mid_vals[i]))}" '
-                    f'data-low="{esc(fmt_num(l))}" data-high="{esc(fmt_num(u))}" '
+                    f'data-low="{esc(fmt_num(lower))}" data-high="{esc(fmt_num(u))}" '
                     f'data-color="{esc(color)}" data-r="{fmt_num(radius)}" '
                     f'data-r-hover="{fmt_num(radius_hover)}"'
                 )
@@ -541,10 +531,10 @@ def _emit_osc_pane(
                 if pane.max is not None:
                     osc_max = pane.max
 
-            def osc_ypix(v: float) -> float:
-                if osc_max == osc_min:
+            def osc_ypix(v: float, o_max=osc_max, o_min=osc_min) -> float:
+                if o_max == o_min:
                     return osc_top + osc_h / 2
-                return osc_top + osc_h - (v - osc_min) / (osc_max - osc_min) * osc_h
+                return osc_top + osc_h - (v - o_min) / (o_max - o_min) * osc_h
 
             if fr.spec.panes and len(fr.spec.panes) > 1:
                 pane = fr.spec.panes[1]
