@@ -6,22 +6,25 @@ import (
 	"strings"
 )
 
-func renderHistogramSVG(spec *ChartSpec) string {
-	edges, heights, counts, totals := computeHistBins(spec)
+func renderHistogramSVG(spec *ChartSpec) (string, error) {
+	edges, heights, counts, totals, err := computeHistBins(spec)
+	if err != nil {
+		return "", err
+	}
 	mod := prepareHistSpec(spec, edges, heights)
 	marks := func(f *cartesianFrame, p *strings.Builder) {
 		histogramMarks(f, p, edges, heights, counts, totals, spec)
 	}
-	return renderCartesian(mod, "Histogram", "linear", marks, true)
+	return renderCartesian(mod, "Histogram", "linear", marks, true), nil
 }
 
-func computeHistBins(spec *ChartSpec) (edges []float64, heights [][]float64, counts [][]float64, totals []int) {
+func computeHistBins(spec *ChartSpec) (edges []float64, heights [][]float64, counts [][]float64, totals []int, err error) {
 	if spec.PreBinned {
 		edges = make([]float64, len(spec.XAxis.BinEdges))
 		copy(edges, spec.XAxis.BinEdges)
 		k := len(edges) - 1
 		if k <= 0 {
-			return []float64{0, 1}, [][]float64{{0}}, [][]float64{{0}}, []int{0}
+			return []float64{0, 1}, [][]float64{{0}}, [][]float64{{0}}, []int{0}, nil
 		}
 		for _, s := range spec.Series {
 			sc := make([]float64, k)
@@ -66,7 +69,7 @@ func computeHistBins(spec *ChartSpec) (edges []float64, heights [][]float64, cou
 		for i := range spec.Series {
 			empty[i] = []float64{0}
 		}
-		return []float64{0, 1}, empty, empty, emptyT
+		return []float64{0, 1}, empty, empty, emptyT, nil
 	}
 
 	lo := allSamples[0]
@@ -125,11 +128,19 @@ func computeHistBins(spec *ChartSpec) (edges []float64, heights [][]float64, cou
 				b = k - 1
 			} else {
 				b = int(math.Floor((v - lo) / w))
-				if b < 0 {
-					b = 0
-				}
-				if b > k-1 {
-					b = k - 1
+				if b < 0 || b >= k {
+					if spec.OutOfRange == "clip" {
+						if b < 0 {
+							b = 0
+						}
+						if b > k-1 {
+							b = k - 1
+						}
+					} else {
+						return nil, nil, nil, nil, fmt.Errorf(
+							"histogram: observation %s is outside bin range [%s, %s]; set outOfRange to \"clip\" to clamp into edge bins",
+							fmtNum(v), fmtNum(lo), fmtNum(lo+w*float64(k)))
+					}
 				}
 			}
 			sc[b] += 1.0

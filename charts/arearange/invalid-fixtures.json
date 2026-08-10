@@ -37,7 +37,8 @@
       ]
     },
     "errors": [
-      "$.series[0].data[0]: expected number, received string"
+      "$.series[0].data[0]: expected number, received string",
+      "$.series[0].low: required for arearange, received 0 values for 1 data points"
     ]
   },
   {

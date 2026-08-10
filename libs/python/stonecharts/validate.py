@@ -643,4 +643,88 @@ def validate(d: Any) -> list[str]:
                 errs.append(f"$.layout.margin: plot width must remain positive, received {fmt_num(plot_w)}")
             if plot_h <= 0:
                 errs.append(f"$.layout.margin: plot height must remain positive, received {fmt_num(plot_h)}")
+    ct = d.get("type") if isinstance(d.get("type"), str) else ""
+    if ct == "pie" and isinstance(d.get("series"), list):
+        for i, s in enumerate(d["series"]):
+            if not isinstance(s, dict):
+                continue
+            data = s.get("data")
+            if not isinstance(data, list):
+                continue
+            for j, v in enumerate(data):
+                if isinstance(v, (int, float)) and not isinstance(v, bool) and v < 0:
+                    errs.append(f"$.series[{i}].data[{j}]: pie data must be non-negative, received {fmt_num(float(v))}")
+    if ct in ("gauge", "solid-gauge"):
+        g_min = d.get("gaugeMin")
+        g_max = d.get("gaugeMax")
+        if (
+            isinstance(g_min, (int, float))
+            and not isinstance(g_min, bool)
+            and isinstance(g_max, (int, float))
+            and not isinstance(g_max, bool)
+            and float(g_min) >= float(g_max)
+        ):
+            errs.append(
+                f"$.gaugeMin/gaugeMax: gaugeMin must be less than gaugeMax,"
+                f" received {fmt_num(float(g_min))} >= {fmt_num(float(g_max))}"
+            )
+    if ct == "boxplot" and isinstance(d.get("series"), list):
+        for i, s in enumerate(d["series"]):
+            if not isinstance(s, dict):
+                continue
+            bd = s.get("boxData")
+            if not isinstance(bd, list):
+                continue
+            for j, b in enumerate(bd):
+                if not isinstance(b, dict):
+                    continue
+                keys = ("low", "q1", "median", "q3", "high")
+                vals = [b.get(k) for k in keys]
+                if all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in vals):
+                    fv = [float(v) for v in vals]
+                    for k in range(len(fv) - 1):
+                        if fv[k] > fv[k + 1]:
+                            errs.append(
+                                f"$.series[{i}].boxData[{j}]: {keys[k]} ({fmt_num(fv[k])})"
+                                f" must be <= {keys[k + 1]} ({fmt_num(fv[k + 1])})"
+                            )
+    if ct in ("arearange", "columnrange", "error-bar", "dumbbell") and isinstance(d.get("series"), list):
+        for i, s in enumerate(d["series"]):
+            if not isinstance(s, dict):
+                continue
+            data = s.get("data")
+            if not isinstance(data, list):
+                continue
+            data_len = len(data)
+            low = s.get("low")
+            high = s.get("high")
+            if ct == "arearange":
+                if low is None or (isinstance(low, list) and len(low) == 0):
+                    errs.append(f"$.series[{i}].low: required for arearange, received {len(low) if isinstance(low, list) else 0} values for {data_len} data points")
+                elif isinstance(low, list) and len(low) != data_len:
+                    errs.append(f"$.series[{i}].low: length ({len(low)}) must match data length ({data_len})")
+            if ct in ("columnrange", "dumbbell"):
+                if high is None or (isinstance(high, list) and len(high) == 0):
+                    errs.append(f"$.series[{i}].high: required for {ct}, received {len(high) if isinstance(high, list) else 0} values for {data_len} data points")
+                elif isinstance(high, list) and len(high) != data_len:
+                    errs.append(f"$.series[{i}].high: length ({len(high)}) must match data length ({data_len})")
+            if ct == "error-bar":
+                if low is None or (isinstance(low, list) and len(low) == 0):
+                    errs.append(f"$.series[{i}].low: required for error-bar, received {len(low) if isinstance(low, list) else 0} values for {data_len} data points")
+                elif isinstance(low, list) and len(low) != data_len:
+                    errs.append(f"$.series[{i}].low: length ({len(low)}) must match data length ({data_len})")
+                if high is None or (isinstance(high, list) and len(high) == 0):
+                    errs.append(f"$.series[{i}].high: required for error-bar, received {len(high) if isinstance(high, list) else 0} values for {data_len} data points")
+                elif isinstance(high, list) and len(high) != data_len:
+                    errs.append(f"$.series[{i}].high: length ({len(high)}) must match data length ({data_len})")
+            if isinstance(low, list):
+                for j, v in enumerate(low):
+                    _num(v, f"$.series[{i}].low[{j}]", errs)
+            if isinstance(high, list):
+                for j, v in enumerate(high):
+                    _num(v, f"$.series[{i}].high[{j}]", errs)
+    if "outOfRange" in d:
+        _str(d["outOfRange"], "$.outOfRange", errs)
+        if isinstance(d["outOfRange"], str) and d["outOfRange"] not in ("error", "clip"):
+            errs.append(f'$.outOfRange: expected one of "error", "clip", received "{d["outOfRange"]}"')
     return errs
