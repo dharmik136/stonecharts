@@ -1,0 +1,10 @@
+{
+  "type": "polar",
+  "title": "Activity by Hour",
+  "xAxis": {
+    "categories": ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"]
+  },
+  "series": [
+    {"name": "Requests", "data": [10, 5, 30, 80, 95, 70, 45, 25], "fillOpacity": 0.25}
+  ]
+}

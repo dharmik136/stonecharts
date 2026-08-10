@@ -1,0 +1,11 @@
+{
+  "type": "polar",
+  "title": "Wind Speed by Direction",
+  "xAxis": {
+    "categories": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+  },
+  "series": [
+    {"name": "Summer", "data": [12, 8, 15, 20, 18, 10, 14, 11]},
+    {"name": "Winter", "data": [25, 18, 10, 8, 12, 22, 30, 28]}
+  ]
+}

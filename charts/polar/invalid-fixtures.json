@@ -1,0 +1,47 @@
+[
+  {
+    "description": "series is missing",
+    "spec": {"type": "polar"},
+    "errors": ["$.series: required"]
+  },
+  {
+    "description": "series is not an array",
+    "spec": {"type": "polar", "series": "bad"},
+    "errors": ["$.series: expected array, received string"]
+  },
+  {
+    "description": "series element is not an object",
+    "spec": {"type": "polar", "series": [42]},
+    "errors": ["$.series[0]: expected object, received number"]
+  },
+  {
+    "description": "series element missing data",
+    "spec": {"type": "polar", "series": [{"name": "A"}]},
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "description": "series data is not an array",
+    "spec": {"type": "polar", "series": [{"data": "bad"}]},
+    "errors": ["$.series[0].data: expected array, received string"]
+  },
+  {
+    "description": "series data element is not a number",
+    "spec": {"type": "polar", "series": [{"data": ["oops"]}]},
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "description": "xAxis.categories is not an array",
+    "spec": {"type": "polar", "series": [{"data": [1,2,3]}], "xAxis": {"categories": 42}},
+    "errors": ["$.xAxis.categories: expected array, received number"]
+  },
+  {
+    "description": "xAxis.categories element is not a string",
+    "spec": {"type": "polar", "series": [{"data": [1,2,3]}], "xAxis": {"categories": [1]}},
+    "errors": ["$.xAxis.categories[0]: expected string, received number"]
+  },
+  {
+    "description": "fillOpacity is not a number",
+    "spec": {"type": "polar", "series": [{"data": [1,2,3], "fillOpacity": "high"}]},
+    "errors": ["$.series[0].fillOpacity: expected number, received string"]
+  }
+]
