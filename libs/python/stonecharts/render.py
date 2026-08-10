@@ -20,6 +20,7 @@ from .charts import bubble as _bubble
 from .charts import bullet as _bullet
 from .charts import candlestick as _candlestick
 from .charts import column as _column
+from .charts import development_triangle as _development_triangle
 from .charts import columnrange as _columnrange
 from .charts import combo as _combo
 from .charts import dumbbell as _dumbbell
@@ -64,6 +65,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "bullet": _bullet.render_svg,
     "combo": _combo.render_svg,
     "column": _column.render_svg,
+    "development-triangle": _development_triangle.render_svg,
     "dumbbell": _dumbbell.render_svg,
     "columnrange": _columnrange.render_svg,
     "error-bar": _error_bar.render_svg,
@@ -319,6 +321,21 @@ def _data_table(spec: ChartSpec) -> str:
             '<thead><tr><th scope="col">Series</th><th scope="col">X</th>'
             '<th scope="col">Y</th><th scope="col">Direction</th>'
             '<th scope="col">Length</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "development-triangle" and spec.triangle:
+        tri = spec.triangle
+        head = "".join(f'<th scope="col">{esc(fmt_num(float(p)))}</th>' for p in tri.periods)
+        rows = []
+        for i, origin in enumerate(tri.origins):
+            row = tri.values[i] if i < len(tri.values) else []
+            cells = "".join(
+                f"<td>{esc(fmt_num(row[j]))}</td>" if j < len(row) else "<td></td>" for j in range(len(tri.periods))
+            )
+            rows.append(f'<tr><th scope="row">{esc(origin)}</th>{cells}</tr>')
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            f"<thead><tr><td></td>{head}</tr></thead>"
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
     if spec.type in ("scatter", "bubble"):

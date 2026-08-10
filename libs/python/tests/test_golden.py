@@ -66,6 +66,7 @@ PARLIAMENT_CASES = ["basic", "multi-series", "single-series", "themed-dark", "ad
 RADIAL_BAR_CASES = ["basic", "multi-series", "single-series", "themed-dark", "adversarial"]
 WIND_ROSE_CASES = ["basic", "many-directions", "single-series", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
+DEVELOPMENT_TRIANGLE_CASES = ["basic", "diagonal", "factors", "annotated", "themed-dark"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -102,6 +103,7 @@ ACTIVE_VALIDATION_CASES = {
     "windbarb": WINDBARB_CASES,
     "vector-plot": VECTOR_PLOT_CASES,
     "xrange": XRANGE_CASES,
+    "development-triangle": DEVELOPMENT_TRIANGLE_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -327,6 +329,11 @@ def test_vector_plot_goldens():
 def test_xrange_goldens():
     for name in XRANGE_CASES:
         _check("xrange", name)
+
+
+def test_development_triangle_goldens():
+    for name in DEVELOPMENT_TRIANGLE_CASES:
+        _check("development-triangle", name)
 
 
 def test_pie_goldens():
@@ -705,6 +712,7 @@ def test_capability_manifest_and_error():
         "column",
         "columnrange",
         "combo",
+        "development-triangle",
         "dumbbell",
         "error-bar",
         "flame-chart",

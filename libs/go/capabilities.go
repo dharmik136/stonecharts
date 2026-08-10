@@ -72,7 +72,8 @@ var activeCapabilities = CapabilityManifest{
 		"waterfall":            {Tier: "candidate", Since: "0.0.0.10"},
 		"wind-rose":            {Tier: "experimental", Since: "0.0.0.29"},
 		"windbarb":             {Tier: "experimental", Since: "0.0.0.18"},
-		"xrange":               {Tier: "experimental", Since: "0.0.0.21"},
+		"xrange":                  {Tier: "experimental", Since: "0.0.0.21"},
+		"development-triangle":    {Tier: "certified", Since: "0.0.0.33"},
 	},
 	Column: map[string][]string{
 		"grouping": {"grouped", "overlay"},

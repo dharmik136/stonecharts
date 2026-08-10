@@ -44,6 +44,7 @@ _CAPABILITIES: dict[str, Any] = {
         "wind-rose":             {"tier": "experimental", "since": "0.0.0.29"},
         "windbarb":              {"tier": "experimental", "since": "0.0.0.18"},
         "xrange":                {"tier": "experimental", "since": "0.0.0.21"},
+        "development-triangle":  {"tier": "certified",    "since": "0.0.0.33"},
     },
     "column": {
         "grouping": ["grouped", "overlay"],

@@ -1,0 +1,26 @@
+{
+  "type": "development-triangle",
+  "title": "Dark Theme Triangle",
+  "triangle": {
+    "origins": ["2023", "2024", "2025"],
+    "periods": [12, 24, 36],
+    "values": [
+      [80, 120, 140],
+      [90, 130],
+      [95]
+    ]
+  },
+  "theme": {
+    "palette": ["#4fc3f7", "#81c784", "#ffb74d", "#e57373"],
+    "background": "#1e1e2e",
+    "titleColor": "#e0e0e0",
+    "subtitleColor": "#b0b0c0",
+    "axisColor": "#888",
+    "gridColor": "#333",
+    "legendTextColor": "#b0b0c0",
+    "tooltipBackground": "#2a2a3e",
+    "tooltipTextColor": "#e0e0e0",
+    "crosshairColor": "#555"
+  },
+  "colorScale": {"type": "sequential", "domain": "auto"}
+}

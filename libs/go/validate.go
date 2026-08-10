@@ -733,6 +733,7 @@ var knownTypes = map[string]bool{
 	"streamgraph":           true,
 	"technical-indicators":  true,
 	"xrange":                true,
+	"development-triangle":  true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
@@ -872,13 +873,18 @@ func validate(v interface{}) []string {
 	chartType, _ := has(d, "type")
 	chartTypeStr, _ := chartType.(string)
 	if x, ok := has(d, "series"); !ok {
-		errs = append(errs, "$.series: required")
+		if chartTypeStr != "development-triangle" {
+			errs = append(errs, "$.series: required")
+		}
 	} else if arr, ok := x.([]interface{}); !ok {
 		errs = append(errs, "$.series: expected array, received "+jtype(x))
 	} else {
 		for i, s := range arr {
 			vseries(s, "$.series["+itoa(i)+"]", &errs, chartTypeStr)
 		}
+	}
+	if chartTypeStr == "development-triangle" {
+		vTriangle(d, &errs)
 	}
 	if x, ok := has(d, "stacking"); ok {
 		if s, ok := x.(string); ok && s == "percent" {
@@ -1182,4 +1188,95 @@ func validate(v interface{}) []string {
 		}
 	}
 	return errs
+}
+
+func vTriangle(d map[string]interface{}, errs *[]string) {
+	raw, ok := has(d, "triangle")
+	if !ok {
+		*errs = append(*errs, "$.triangle: required for development-triangle")
+		return
+	}
+	tri, ok := raw.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, "$.triangle: required for development-triangle")
+		return
+	}
+	p := "$.triangle"
+	origRaw, origOk := has(tri, "origins")
+	var origins []interface{}
+	if origOk {
+		origins, ok = origRaw.([]interface{})
+		if !ok || len(origins) == 0 {
+			*errs = append(*errs, p+".origins: required non-empty array of strings")
+			origins = nil
+		} else {
+			for _, o := range origins {
+				if _, ok := o.(string); !ok {
+					*errs = append(*errs, p+".origins: all elements must be strings")
+					break
+				}
+			}
+		}
+	} else {
+		*errs = append(*errs, p+".origins: required non-empty array of strings")
+	}
+	perRaw, perOk := has(tri, "periods")
+	var periods []interface{}
+	if perOk {
+		periods, ok = perRaw.([]interface{})
+		if !ok || len(periods) == 0 {
+			*errs = append(*errs, p+".periods: required non-empty array of numbers")
+			periods = nil
+		} else {
+			for _, pv := range periods {
+				if _, ok := pv.(float64); !ok {
+					*errs = append(*errs, p+".periods: all elements must be numbers")
+					break
+				}
+			}
+		}
+	} else {
+		*errs = append(*errs, p+".periods: required non-empty array of numbers")
+	}
+	valRaw, valOk := has(tri, "values")
+	if valOk {
+		values, ok := valRaw.([]interface{})
+		if !ok || len(values) == 0 {
+			*errs = append(*errs, p+".values: required non-empty array")
+		} else if origins != nil && len(values) != len(origins) {
+			*errs = append(*errs, p+".values: length must equal origins length")
+		} else if periods != nil {
+			for i, rowRaw := range values {
+				rp := p + ".values[" + itoa(i) + "]"
+				row, ok := rowRaw.([]interface{})
+				if !ok {
+					*errs = append(*errs, rp+": expected array")
+					continue
+				}
+				maxCols := len(periods) - i
+				if len(row) > maxCols {
+					*errs = append(*errs, rp+": at most "+itoa(maxCols)+" values allowed (triangular shape)")
+				}
+				for j, v := range row {
+					if _, ok := v.(float64); !ok {
+						*errs = append(*errs, rp+"["+itoa(j)+"]: expected number")
+					}
+				}
+			}
+		}
+	} else {
+		*errs = append(*errs, p+".values: required non-empty array")
+	}
+	if vw, ok := has(tri, "view"); ok {
+		vstr(vw, p+".view", errs)
+		if s, ok := vw.(string); ok && s != "cumulative" && s != "incremental" {
+			*errs = append(*errs, p+`.view: expected "cumulative" or "incremental"`)
+		}
+	}
+	if vt, ok := has(tri, "valueType"); ok {
+		vstr(vt, p+".valueType", errs)
+		if s, ok := vt.(string); ok && s != "incurred" && s != "paid" {
+			*errs = append(*errs, p+`.valueType: expected "incurred" or "paid"`)
+		}
+	}
 }

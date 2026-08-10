@@ -49,6 +49,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "pie" {
 		return pieDataTable(spec)
 	}
+	if spec.Type == "development-triangle" && spec.Triangle != nil {
+		return devTriangleDataTable(spec)
+	}
 	if spec.Type == "technical-indicators" {
 		return tiDataTable(spec)
 	}
@@ -380,6 +383,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderCandlestickSVG(spec)
 	case "column":
 		svg = renderColumnSVG(spec)
+	case "development-triangle":
+		svg = renderDevelopmentTriangleSVG(spec)
 	case "columnrange":
 		svg = renderColumnRangeSVG(spec)
 	case "error-bar":
