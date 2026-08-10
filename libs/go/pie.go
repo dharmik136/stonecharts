@@ -170,11 +170,41 @@ func renderPieSVG(spec *ChartSpec) string {
 
 	cx := plotX + plotW/2
 	cy := plotY + plotH/2
-	r := plotW / 2
-	if plotH/2 < r {
-		r = plotH / 2
+	rMax := plotW / 2
+	if plotH/2 < rMax {
+		rMax = plotH / 2
 	}
+	r := rMax
 	ri := r * fdef(spec.InnerSize, 0)
+
+	var zVals []float64
+	if s0 != nil {
+		zVals = s0.Z
+	}
+	zMin, zMax := 0.0, 0.0
+	if len(zVals) >= n && n > 0 {
+		zMin = zVals[0]
+		zMax = zVals[0]
+		for _, zv := range zVals[:n] {
+			if zv < zMin {
+				zMin = zv
+			}
+			if zv > zMax {
+				zMax = zv
+			}
+		}
+	}
+	minSizeFrac := fdef(spec.MinSize, 0.2)
+	sliceR := func(i int) float64 {
+		if len(zVals) == 0 || i >= len(zVals) || zMax <= zMin {
+			return rMax
+		}
+		t := 0.5
+		if zMax > zMin {
+			t = (zVals[i] - zMin) / (zMax - zMin)
+		}
+		return rMax * (minSizeFrac + (1-minSizeFrac)*t)
+	}
 
 	if n > 0 && s0 != nil && total > 0 {
 		p.WriteString(`<g class="sc-series" data-series="0">`)
@@ -234,11 +264,12 @@ func renderPieSVG(spec *ChartSpec) string {
 					continue
 				}
 				sweep := (v / total) * 2 * math.Pi
-				ox1 := cx + r*math.Cos(angle)
-				oy1 := cy + r*math.Sin(angle)
+				sr := sliceR(i)
+				ox1 := cx + sr*math.Cos(angle)
+				oy1 := cy + sr*math.Sin(angle)
 				endAngle := angle + sweep
-				ox2 := cx + r*math.Cos(endAngle)
-				oy2 := cy + r*math.Sin(endAngle)
+				ox2 := cx + sr*math.Cos(endAngle)
+				oy2 := cy + sr*math.Sin(endAngle)
 				largeArc := 0
 				if sweep > math.Pi {
 					largeArc = 1
@@ -264,19 +295,19 @@ func renderPieSVG(spec *ChartSpec) string {
 					iy2 := cy + ri*math.Sin(endAngle)
 					dStr = fmt.Sprintf(
 						"M %s %s A %s %s 0 %d 1 %s %s L %s %s A %s %s 0 %d 0 %s %s Z",
-						f1(ox1), f1(oy1), f1(r), f1(r), largeArc, f1(ox2), f1(oy2),
+						f1(ox1), f1(oy1), f1(sr), f1(sr), largeArc, f1(ox2), f1(oy2),
 						f1(ix2), f1(iy2), f1(ri), f1(ri), largeArc, f1(ix1), f1(iy1))
 				} else {
 					dStr = fmt.Sprintf(
 						"M %s %s L %s %s A %s %s 0 %d 1 %s %s Z",
 						f1(cx), f1(cy), f1(ox1), f1(oy1),
-						f1(r), f1(r), largeArc, f1(ox2), f1(oy2))
+						f1(sr), f1(sr), largeArc, f1(ox2), f1(oy2))
 				}
 
 				p.WriteString(fmt.Sprintf(
 					`<path class="sc-slice sc-point" data-series="0" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-index="%d" data-percentage="%s" data-r="%s" data-r-hover="%s" cx="%s" cy="%s" d="%s" fill="%s" stroke="%s" stroke-width="2"/>`,
 					esc(s0.Name), esc(cat), esc(fmtNum(v)), fill,
-					i, pct, f1(r), f1(r+4),
+					i, pct, f1(sr), f1(sr+4),
 					f1(cx), f1(cy), dStr,
 					fill, strokeColor))
 
