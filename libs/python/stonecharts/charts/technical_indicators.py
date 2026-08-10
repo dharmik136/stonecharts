@@ -7,6 +7,7 @@ flags, and oscillator panes ride the shared cartesian frame.
 
 from __future__ import annotations
 
+import copy
 import math
 
 from ..spec import Marker
@@ -154,8 +155,11 @@ PANE_GAP = 24.0
 
 
 def render_svg(spec) -> str:
+    mod = copy.copy(spec)
+    mod.y_axis = copy.copy(spec.y_axis)
+
     all_overlay_vals: list[float] = []
-    for s in spec.series:
+    for s in mod.series:
         all_overlay_vals.extend(v for v in s.data if v is not None)
         for ind in s.indicators or []:
             vals = _compute_indicator_values(s, ind)
@@ -166,12 +170,12 @@ def render_svg(spec) -> str:
     if all_overlay_vals:
         lo = min(all_overlay_vals)
         hi = max(all_overlay_vals)
-        if spec.y_axis.min is None:
-            spec.y_axis.min = lo
-        if spec.y_axis.max is None:
-            spec.y_axis.max = hi
+        if mod.y_axis.min is None:
+            mod.y_axis.min = lo
+        if mod.y_axis.max is None:
+            mod.y_axis.max = hi
 
-    return render_cartesian(spec, "Technical indicators", "point", _ti_marks, include_zero=False)
+    return render_cartesian(mod, "Technical indicators", "point", _ti_marks, include_zero=False)
 
 
 def _compute_indicator_values(s, ind) -> list[float | None]:

@@ -187,8 +187,10 @@ func tiMACD(data []float64, fast, slow, signalPeriod int) ([]*float64, []*float6
 const paneGap = 24.0
 
 func renderTechnicalIndicatorsSVG(spec *ChartSpec) string {
+	mod := *spec
+
 	hasOsc := false
-	for _, s := range spec.Series {
+	for _, s := range mod.Series {
 		for _, ind := range s.Indicators {
 			if ind.Type == "macd" || ind.Type == "rsi" {
 				hasOsc = true
@@ -198,7 +200,7 @@ func renderTechnicalIndicatorsSVG(spec *ChartSpec) string {
 	_ = hasOsc
 
 	var allOverlayVals []float64
-	for _, s := range spec.Series {
+	for _, s := range mod.Series {
 		if len(s.Data) > 0 {
 			allOverlayVals = append(allOverlayVals, s.Data...)
 		}
@@ -223,15 +225,15 @@ func renderTechnicalIndicatorsSVG(spec *ChartSpec) string {
 				hi = v
 			}
 		}
-		if spec.YAxis.Min == nil {
-			spec.YAxis.Min = &lo
+		if mod.YAxis.Min == nil {
+			mod.YAxis.Min = &lo
 		}
-		if spec.YAxis.Max == nil {
-			spec.YAxis.Max = &hi
+		if mod.YAxis.Max == nil {
+			mod.YAxis.Max = &hi
 		}
 	}
 
-	return renderCartesian(spec, "Technical indicators", "point", tiMarks, false)
+	return renderCartesian(&mod, "Technical indicators", "point", tiMarks, false)
 }
 
 func tiComputeIndicatorValues(s *Series, ind *Indicator) []*float64 {

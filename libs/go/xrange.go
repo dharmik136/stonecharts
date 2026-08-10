@@ -7,27 +7,35 @@ import (
 )
 
 func renderXRangeSVG(spec *ChartSpec) string {
-	laneCats := spec.YAxis.Categories
-	laneCount := len(laneCats)
-	spec.XAxis.Categories = laneCats
+	mod := *spec
+	mod.Series = make([]Series, len(spec.Series))
+	copy(mod.Series, spec.Series)
+	for i := range mod.Series {
+		d := make([]float64, len(spec.Series[i].Data))
+		copy(d, spec.Series[i].Data)
+		mod.Series[i].Data = d
+	}
 
-	for i := range spec.Series {
-		s := &spec.Series[i]
-		for len(s.Data) < laneCount {
-			s.Data = append(s.Data, 0.0)
+	laneCats := mod.YAxis.Categories
+	laneCount := len(laneCats)
+	mod.XAxis.Categories = laneCats
+
+	for i := range mod.Series {
+		for len(mod.Series[i].Data) < laneCount {
+			mod.Series[i].Data = append(mod.Series[i].Data, 0.0)
 		}
 	}
 
 	allTimes := []float64{}
-	for _, s := range spec.Series {
+	for _, s := range mod.Series {
 		for _, sp := range s.Spans {
 			allTimes = append(allTimes, sp.X, sp.X2)
 		}
 	}
-	if spec.YAxis.Min == nil && len(allTimes) > 0 {
-		if spec.XAxis.Min != nil {
-			v := *spec.XAxis.Min
-			spec.YAxis.Min = &v
+	if mod.YAxis.Min == nil && len(allTimes) > 0 {
+		if mod.XAxis.Min != nil {
+			v := *mod.XAxis.Min
+			mod.YAxis.Min = &v
 		} else {
 			v := allTimes[0]
 			for _, t := range allTimes[1:] {
@@ -35,13 +43,13 @@ func renderXRangeSVG(spec *ChartSpec) string {
 					v = t
 				}
 			}
-			spec.YAxis.Min = &v
+			mod.YAxis.Min = &v
 		}
 	}
-	if spec.YAxis.Max == nil && len(allTimes) > 0 {
-		if spec.XAxis.Max != nil {
-			v := *spec.XAxis.Max
-			spec.YAxis.Max = &v
+	if mod.YAxis.Max == nil && len(allTimes) > 0 {
+		if mod.XAxis.Max != nil {
+			v := *mod.XAxis.Max
+			mod.YAxis.Max = &v
 		} else {
 			v := allTimes[0]
 			for _, t := range allTimes[1:] {
@@ -49,11 +57,11 @@ func renderXRangeSVG(spec *ChartSpec) string {
 					v = t
 				}
 			}
-			spec.YAxis.Max = &v
+			mod.YAxis.Max = &v
 		}
 	}
 
-	return renderCartesian(spec, "X-range", "band", xrangeMarks, false, "horizontal")
+	return renderCartesian(&mod, "X-range", "band", xrangeMarks, false, "horizontal")
 }
 
 const xrPAD = 0.2
