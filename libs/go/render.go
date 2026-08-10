@@ -341,7 +341,7 @@ func capabilityError(received string) error {
 		Path:    "$.type",
 		Message: fmt.Sprintf("unsupported chart type %q", received),
 		Details: map[string]interface{}{
-			"expected": Capabilities().ChartTypes,
+			"expected": Capabilities().ChartTypeNames(),
 			"received": received,
 		},
 	}
