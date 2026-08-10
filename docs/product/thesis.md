@@ -50,15 +50,15 @@ The exact boundary of each promise is defined by
 [`SC-CON-001`](../contracts/guarantees-and-limits.md). Product language MUST NOT turn
 an internal byte-parity oracle into an unsupported claim of universal pixel identity.
 
-The thesis is intentionally aligned with the current baseline: `line`, `column`,
-`area`, `bar`, `scatter`, and `bubble` are certified across releases `0.0.0.1`
-through `0.0.0.4` (see [`SC-PROD-004`](capability-matrix.md) for the authoritative
-capability table). All other chart recipes under `charts/<id>/design.md` remain
-informative until each passes the chart admission checklist. Per
-[`DEC-017`](../project/decisions.md), broad chart-family expansion is paused after
-`0.0.0.4`; new chart types, languages, hosted services, or document-generation
-capabilities require paid customer evidence or explicit approval as necessary
-validation infrastructure.
+The thesis is intentionally aligned with the current baseline: 35 chart types are
+certified across releases `0.0.0.1` through `0.0.0.32`, covering two complete
+families — Family A (Cartesian, 26 types) and Family B (Polar/radial, 9 types)
+(see [`SC-PROD-004`](capability-matrix.md) for the authoritative capability table).
+Per [`DEC-017`](../project/decisions.md), chart expansion beyond `0.0.0.4` required
+explicit approval as necessary validation infrastructure; decisions DEC-020 through
+DEC-048 admitted the remaining types under that clause. Language expansion beyond
+Python and Go, hosted services, and document-generation capabilities require paid
+customer evidence or explicit approval.
 
 ## Primary users
 

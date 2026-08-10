@@ -1,0 +1,10 @@
+{
+  "type": "wind-rose",
+  "title": "Directional Frequency",
+  "xAxis": {
+    "categories": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+  },
+  "series": [
+    {"name": "Events", "data": [12, 8, 15, 5, 10, 20, 18, 9]}
+  ]
+}

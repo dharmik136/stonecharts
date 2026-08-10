@@ -9,7 +9,7 @@ review_mode: self
 applies_to: roadmap
 requirements: [REQ-PROD-001]
 evidence: []
-last_reviewed: "2026-07-18"
+last_reviewed: "2026-08-10"
 review_due: "2026-10-18"
 supersedes: null
 superseded_by: null
@@ -17,8 +17,8 @@ superseded_by: null
 
 # StoneCharts — Chart Families Blueprint & Cartesian Build Roadmap
 
-> **Status:** Long-range engineering roadmap. Approved requirements, contracts, and
-> ADRs take precedence. Chart and language expansion is paused for Stage 0 and 0.0.0.1.
+> **Status:** Long-range engineering roadmap. Family A (Cartesian, 26 types) and
+> Family B (Polar/radial, 9 types) are complete as of 0.0.0.32. Families C–H remain planned.
 > **Location:** `docs/roadmap/chart-families.md`
 > **Audience:** Anyone planning chart-catalog expansion. Sections 4–5 preserve the
 > detailed implementation procedure that produced Column. Future work must first
@@ -78,61 +78,59 @@ Rationale: the foundation tax is the expensive, risky part. Once paid, siblings 
 **Src (Call #2 provenance):** **HC** = Highcharts baseline · **PS** = profiling superset (not in Highcharts; added for observability/profiling) · **EXT** = beyond-baseline extra (not in Highcharts, not profiling-specific).
 Every family lists its **foundation tax** — the one-time substrate cost paid by its `new-family` opener.
 
-### Family A — Cartesian / XY  *(CURRENT SUBSTRATE)*
+### Family A — Cartesian / XY  *(COMPLETE — 26 types)*
 
 **Substrate:** Cartesian x/y plane — linear + category scales (+ log, datetime to add), rectangular plot area; marks = polyline/path, rect/bar, point/symbol, whisker.
-**Foundation tax:** **ALREADY PAID.** `charts/line-basic` is done through P1–P5. Every cartesian sibling rides the existing axes/scales/legend/tooltip/crosshair/themes/a11y/defs/runtime/golden harness. This is the family we exhaust first (Call #1).
+**Foundation tax:** **ALREADY PAID.** `charts/line-basic` is done through P1–P5. Every cartesian sibling rides the existing axes/scales/legend/tooltip/crosshair/themes/a11y/defs/runtime/golden harness. All 26 Cartesian types are certified (0.0.0.1–0.0.0.23).
 
 | Type | Class | Src | Subtypes | Profiling superset use / notes |
 |---|---|---|---|---|
 | **Line** | done | HC | multi-series, spline, step (before/after/middle), datetime axis, log axis, zoom/pan, annotations, plot bands/lines, negative-color zones, inverted axes, null/gap handling, marker symbols, dashed | Metric time-series (CPU/mem/latency over time). Reference implementation; spline+step already shipped as variants. |
 | **Area** | done | HC | area (fillOpacity, done), area-spline, stepped area, stacked area, percent (100%) stacked area, negative area, area w/ nulls, inverted | Stacked resource usage over time. Fill and stacked/percent are implemented on the shared cartesian substrate. |
-| **Streamgraph** | variant | HC | wiggle baseline, silhouette / inside-out | Theme-river of event/log volume over time. Stacked area + a wiggle/silhouette baseline-offset transform; same area renderer + offset flag. |
-| **Range area (arearange)** | sibling | HC | arearange, areasplinerange, area-range + line | p50–p95 latency band over time. First driver of the **pure `{low,high}` point model** (no center y — distinct from the error-bar `{y,low,high}` center+range model; see §3.3). |
-| **Column** | sibling | HC | basic, grouped, stacked, percent-stacked, negative, rotated labels, drilldown, inverted, column pyramid | Per-interval counts (throughput, GC pauses). **FIRST sibling to build** — forces the shared-chrome extraction + stacking + band-layout + orientation concept. |
-| **Bar (horizontal)** | sibling | HC | basic, stacked, percent, negative-stack population pyramid | Column transposed → the single **orientation** concept (axes swapped); bar ideally delegates to column. |
-| **Column range (columnrange)** | sibling | HC | vertical, horizontal | Min–max range per time bucket. (low,high) rect mark; rides the range point model + floating-bar primitive. |
-| **Waterfall** | sibling | HC | vertical, horizontal, with intermediate sums | Budget/latency deltas across stages. Running-total column + connector lines. |
-| **Histogram** | sibling | HC | frequency, density-normalized, pareto (histogram + cumulative line), bell-curve fit overlay | Latency / alloc-size distribution. Binning transform → column renderer on a numeric x-axis. Pareto & bellcurve are derived-series overlays. |
-| **Scatter** | sibling | HC | basic, regression/trend line, categorized, polygon/hull overlay, 3D scatter | Latency vs payload-size correlation. Forces the **numeric x-scale** (generalize nice_ticks to x) + (x,y) point model. |
-| **Bubble** | variant | HC | bubble, 3D bubble | Variant of the scatter sibling: z → marker radius (size-scale). |
-| **Combo** | sibling | HC | line+column, dual axis, multiple axes, meteogram (spline+column+windbarb+errorbar) | Throughput bars + latency line on a shared time axis. Composition layer: multiple mark types on one plot / multiple y-axes. |
-| **Financial (candlestick / OHLC)** | sibling | HC | candlestick, OHLC bar, HLC, hollow candlestick, Heikin-Ashi, flags/events | Min/max/first/last per window. (o,h,l,c) point model + wick/body floating-bar mark + datetime x-axis. |
-| **Error bar** | sibling | HC | vertical whiskers, horizontal, on column/line | Confidence interval on aggregated latency. `{y,low,high}` center+range mark (a center y **plus** low/high — distinct from area/column range's pure `{low,high}`), usually overlaid on column/scatter. |
-| **Boxplot** | sibling | HC | vertical, horizontal, with outliers, with scatter overlay | **Latency distribution per endpoint** (p25/median/p75 + whiskers + outliers). Cartesian axes + 5-number-summary transform + box/whisker mark. (Violin is the density upgrade — Statistical family.) |
-| **Lollipop** | sibling | HC | vertical, horizontal | Stem line + marker; column-family mark (highcharts-more). |
-| **Dumbbell** | sibling | HC | horizontal, vertical | Before/after latency per service. Two markers + connecting bar; (low,high) range model. |
-| **Timeline** | sibling | HC | horizontal, vertical, with labels/leaders | Deploy / incident / release event timeline. Datetime axis + event markers along a single line. |
-| **X-range / Gantt** | sibling | HC | xrange, Gantt (dependencies, milestones), swimlanes / per-thread lanes | **Span/Gantt trace waterfall** — distributed-tracing spans (Jaeger/Tempo), per-thread task bars. Horizontal bars spanning x1..x2 per category row on a datetime axis — core observability span-timeline substrate. |
-| **Flame chart (time-ordered)** | sibling | PS | per-thread lanes, wall-clock x-axis | **Per-thread stack over wall-clock time** (Chrome DevTools / Perfetto style). Plots actual call intervals as floating bars at [start,end] against a datetime x-axis with a depth y — a depth-lane span timeline. Reuses the X-range/Gantt datetime-axis + floating-bar primitive; does **NOT** use the Hierarchy squarify/partition layout (it is time-ordered, not aggregated by self+children width). The aggregated flame graph + icicle/partition live in Hierarchy (Family D). |
-| **Variwide** | sibling | HC | variable-width column | Column where bar WIDTH also encodes a value; needs a cumulative-width x-layout. |
-| **Vector plot** | sibling | HC | vector field | Per-(x,y): direction + length → arrow glyph. |
-| **Windbarb** | sibling | HC | meteorological barbs | Datetime axis + wind-barb glyph (speed + direction). |
-| **Funnel / pyramid** | sibling (does NOT inherit axis chrome) | HC | funnel, inverted pyramid, area/neck funnel, funnel3d, pyramid3d | Conversion / drop-off across pipeline stages. Centered stacked trapezoids; value→width linear scale (cartesian-lite). **Exception to the Family A substrate contract:** it uses none of the x/y axis chrome, no gridlines, and neither the point nor band x-scale — it brings its **own** centered-trapezoid mark + value→width centering layout. Highcharts derives it from the pie/part-to-whole module. Alt home: part-to-whole with pie (Polar). |
-| **Technical indicators & overlays** | sibling | HC | SMA/EMA, Bollinger bands, MACD, RSI, VWAP, plot bands/lines, flags | Moving-average / anomaly overlays on metric series. Derived-series transforms producing extra cartesian series/panes; **NOT a new substrate**. |
+| **Streamgraph** | done | HC | wiggle baseline, silhouette / inside-out | Theme-river of event/log volume over time. Stacked area + a wiggle/silhouette baseline-offset transform; same area renderer + offset flag. |
+| **Range area (arearange)** | done | HC | arearange, areasplinerange, area-range + line | p50–p95 latency band over time. First driver of the **pure `{low,high}` point model** (no center y — distinct from the error-bar `{y,low,high}` center+range model; see §3.3). |
+| **Column** | done | HC | basic, grouped, stacked, percent-stacked, negative, rotated labels, drilldown, inverted, column pyramid | Per-interval counts (throughput, GC pauses). Forces the shared-chrome extraction + stacking + band-layout + orientation concept. |
+| **Bar (horizontal)** | done | HC | basic, stacked, percent, negative-stack population pyramid | Column transposed → the single **orientation** concept (axes swapped); bar ideally delegates to column. |
+| **Column range (columnrange)** | done | HC | vertical, horizontal | Min–max range per time bucket. (low,high) rect mark; rides the range point model + floating-bar primitive. |
+| **Waterfall** | done | HC | vertical, horizontal, with intermediate sums | Budget/latency deltas across stages. Running-total column + connector lines. |
+| **Histogram** | done | HC | frequency, density-normalized, pareto (histogram + cumulative line), bell-curve fit overlay | Latency / alloc-size distribution. Binning transform → column renderer on a numeric x-axis. Pareto & bellcurve are derived-series overlays. |
+| **Scatter** | done | HC | basic, regression/trend line, categorized, polygon/hull overlay, 3D scatter | Latency vs payload-size correlation. Forces the **numeric x-scale** (generalize nice_ticks to x) + (x,y) point model. |
+| **Bubble** | done | HC | bubble, 3D bubble | Variant of the scatter sibling: z → marker radius (size-scale). |
+| **Combo** | done | HC | line+column, dual axis, multiple axes, meteogram (spline+column+windbarb+errorbar) | Throughput bars + latency line on a shared time axis. Composition layer: multiple mark types on one plot / multiple y-axes. |
+| **Financial (candlestick / OHLC)** | done | HC | candlestick, OHLC bar, HLC, hollow candlestick, Heikin-Ashi, flags/events | Min/max/first/last per window. (o,h,l,c) point model + wick/body floating-bar mark + datetime x-axis. |
+| **Error bar** | done | HC | vertical whiskers, horizontal, on column/line | Confidence interval on aggregated latency. `{y,low,high}` center+range mark (a center y **plus** low/high — distinct from area/column range's pure `{low,high}`), usually overlaid on column/scatter. |
+| **Boxplot** | done | HC | vertical, horizontal, with outliers, with scatter overlay | **Latency distribution per endpoint** (p25/median/p75 + whiskers + outliers). Cartesian axes + 5-number-summary transform + box/whisker mark. (Violin is the density upgrade — Statistical family.) |
+| **Lollipop** | done | HC | vertical, horizontal | Stem line + marker; column-family mark (highcharts-more). |
+| **Dumbbell** | done | HC | horizontal, vertical | Before/after latency per service. Two markers + connecting bar; (low,high) range model. |
+| **Timeline** | done | HC | horizontal, vertical, with labels/leaders | Deploy / incident / release event timeline. Datetime axis + event markers along a single line. |
+| **X-range / Gantt** | done | HC | xrange, Gantt (dependencies, milestones), swimlanes / per-thread lanes | **Span/Gantt trace waterfall** — distributed-tracing spans (Jaeger/Tempo), per-thread task bars. Horizontal bars spanning x1..x2 per category row on a datetime axis — core observability span-timeline substrate. |
+| **Flame chart (time-ordered)** | done | PS | per-thread lanes, wall-clock x-axis | **Per-thread stack over wall-clock time** (Chrome DevTools / Perfetto style). Plots actual call intervals as floating bars at [start,end] against a datetime x-axis with a depth y — a depth-lane span timeline. Reuses the X-range/Gantt datetime-axis + floating-bar primitive; does **NOT** use the Hierarchy squarify/partition layout (it is time-ordered, not aggregated by self+children width). The aggregated flame graph + icicle/partition live in Hierarchy (Family D). |
+| **Variwide** | done | HC | variable-width column | Column where bar WIDTH also encodes a value; needs a cumulative-width x-layout. |
+| **Vector plot** | done | HC | vector field | Per-(x,y): direction + length → arrow glyph. |
+| **Windbarb** | done | HC | meteorological barbs | Datetime axis + wind-barb glyph (speed + direction). |
+| **Funnel / pyramid** | done | HC | funnel, inverted pyramid, area/neck funnel, funnel3d, pyramid3d | Conversion / drop-off across pipeline stages. Centered stacked trapezoids; value→width linear scale (cartesian-lite). **Exception to the Family A substrate contract:** it uses none of the x/y axis chrome, no gridlines, and neither the point nor band x-scale — it brings its **own** centered-trapezoid mark + value→width centering layout. Highcharts derives it from the pie/part-to-whole module. Alt home: part-to-whole with pie (Polar). |
+| **Technical indicators & overlays** | done | HC | SMA/EMA, Bollinger bands, MACD, RSI, VWAP, plot bands/lines, flags | Moving-average / anomaly overlays on metric series. Derived-series transforms producing extra cartesian series/panes; **NOT a new substrate**. |
 | **3D isometric (column / scatter / cylinder)** | new-family | HC | 3D column, 3D scatter, cylinder, 3D area | Isometric z-projection over cartesian — a genuine new foundation (depth sorting, projection). **Conflicts with static-first byte-parity — out of scope for v1.** (3D pie rides polar+projection.) |
 
 > **Family A substrate contract:** every cartesian sibling rides the existing axes/scales/legend/tooltip/crosshair/themes/a11y/defs/runtime/golden harness — **with one declared exception: funnel/pyramid** (see its row), which brings its own centered-trapezoid mark + value→width layout and inherits none of the x/y axis chrome.
 
-### Family B — Polar / radial
+### Family B — Polar / radial  *(COMPLETE — 9 types)*
 
 **Substrate:** Polar coordinates (angle θ + radius r); arc/sector path geometry (SVG `A` commands); angular + radial axes instead of x/y.
-**Foundation tax:** Polar coordinate system (θ,r ↔ x,y) + arc/sector path builder + angular & radial axes/gridlines + start-angle/end-angle & inner-radius handling.
+**Foundation tax:** **PAID by pie (0.0.0.24).** Polar coordinate system (θ,r ↔ x,y) + arc/sector path builder + angular & radial axes/gridlines + start-angle/end-angle & inner-radius handling. All 9 polar types are certified (0.0.0.24–0.0.0.32).
 
 | Type | Class | Src | Subtypes | Profiling superset use / notes |
 |---|---|---|---|---|
-| **Pie** | new-family | HC | basic, with legend, exploded/sliced, gradient/monochrome, drilldown, small-multiple pies | **Opens the family** (pays the polar foundation tax once). Part-to-whole. |
-| **Donut / doughnut** | variant | HC | donut (innerSize), semi-circle donut, nested / multi-level | Pie with an inner radius. |
-| **Variable-radius pie** | variant | HC | radius-encoded 2nd metric | Slice angle = share, slice radius = a second metric. |
-| **Gauge / dial** | sibling | HC | angular gauge, VU meter, clock, dual / multi-pointer | Single live metric vs thresholds. Value→angle pointer + colored bands. |
-| **Solid gauge** | sibling | HC | radial fill, activity gauge (multi-ring), radial progress | **Utilization / SLO gauges** (CPU%, error-budget burn, saturation). Filled arc from start-angle to value-angle. |
-| **Radar / spider** | sibling | HC | line radar, filled radar, multi-series, spiderweb vs circular grid | Multi-dimension service scorecard (RED/USE per service). Cartesian line/area on a polar category grid. |
-| **Polar / radial (generic)** | sibling | HC | polar line, polar column, polar scatter, polar range | The general polar wrapper — any cartesian series re-projected onto the polar grid. |
-| **Wind rose** | variant | HC | stacked polar column by direction | Polar stacked column; direction = angle, frequency = radius. |
-| **Nightingale / rose / coxcomb** | variant | HC | area rose, radius-value polar column | Polar column where radius encodes value at equal angles. |
-| **Radial bar (racetrack)** | sibling | HC | concentric progress rings, radial stacked bar | Bars along the angular axis / concentric progress rings. |
-| **Funnel / pyramid (part-to-whole)** | sibling | HC | funnel, inverted pyramid, area/neck funnel | Conversion / drop-off across pipeline stages. Grouped here as **part-to-whole** (Highcharts derives it from the pie module). Brings its own centered-trapezoid mark + value→width centering layout — it does **not** use the polar arc geometry either; it is filed here for the part-to-whole intent, not for substrate reuse. Primary listing is its Family A row. |
-| **Item / parliament (hemicycle)** | sibling | HC | rectangular item grid, circular parliament | Unit/pictorial: one symbol per item packed into a wedge/grid; part-to-whole by count. **Only the circular hemicycle is polar**; the **rectangular item-grid** subtype uses no polar coordinates — it is a unit/pictorial grid that belongs with Waffle / unit chart in **Family H (KPI)**. |
+| **Pie** | done | HC | basic, with legend, exploded/sliced, gradient/monochrome, drilldown, small-multiple pies | **Opens the family** (pays the polar foundation tax once). Part-to-whole. Donut variant via `innerSize`. Variable-radius variant via `series[0].z`. |
+| **Gauge / dial** | done | HC | angular gauge, VU meter, clock, dual / multi-pointer | Single live metric vs thresholds. Value→angle pointer + colored bands. |
+| **Solid gauge** | done | HC | radial fill, activity gauge (multi-ring), radial progress | **Utilization / SLO gauges** (CPU%, error-budget burn, saturation). Filled arc from start-angle to value-angle. |
+| **Radar / spider** | done | HC | line radar, filled radar, multi-series, spiderweb vs circular grid | Multi-dimension service scorecard (RED/USE per service). Cartesian line/area on a polar category grid. |
+| **Polar / radial (generic)** | done | HC | polar line, polar column, polar scatter, polar range | The general polar wrapper — circular gridlines variant of radar. |
+| **Wind rose** | done | HC | stacked polar column by direction | Polar stacked column; direction = angle, frequency = radius. |
+| **Nightingale / rose / coxcomb** | done | HC | area rose, radius-value polar column | Polar column where radius encodes value at equal angles. |
+| **Radial bar (racetrack)** | done | HC | concentric progress rings, radial stacked bar | Bars along the angular axis / concentric progress rings. |
+| **Parliament (hemicycle)** | done | HC | circular parliament | Unit-dot hemicycle: one dot per item packed into concentric semicircular arcs; part-to-whole by count. **Last Family B type.** |
+| **Funnel / pyramid (part-to-whole)** | done (Family A) | HC | funnel, inverted pyramid, area/neck funnel | Conversion / drop-off across pipeline stages. Grouped here as **part-to-whole** (Highcharts derives it from the pie module). Brings its own centered-trapezoid mark + value→width centering layout — it does **not** use the polar arc geometry either; it is filed here for the part-to-whole intent, not for substrate reuse. Primary listing is its Family A row. |
 
 ### Family C — Matrix / grid
 

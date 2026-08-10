@@ -44,8 +44,14 @@ schema), and the one render call — nothing more is needed.
 | Per-thread **stack-frame profiling** over wall-clock time | `flame-chart` |
 | **Conversion / drop-off** across ordered pipeline stages | `funnel` |
 | Compare a value where each category has a **meaningful width** (two metrics) | `variwide` |
+| **Multi-dimensional** comparison (scorecards, risk profiles) on N radial axes | `radar` / `polar` |
+| **Directional distribution** (wind speed by compass bearing, seasonal patterns) | `wind-rose` |
+| Categorical magnitude as **radius-proportional sectors** (rose/coxcomb) | `nightingale` |
+| Categorical **progress/completion** as concentric rings | `radial-bar` |
+| Proportional **seat allocation** as a semicircular hemicycle of dots | `parliament` |
+| A single **KPI against a scale** with colored range bands | `gauge` / `solid-gauge` |
+| **Before/after** or min–max gap across categories | `dumbbell` |
 | Value across a **2-D grid** (matrix) | `heatmap` _(planned)_ |
-| A single KPI against a range | `gauge` |
 
 ## Catalog
 
@@ -85,8 +91,14 @@ schema), and the one render call — nothing more is needed.
 | `pie` | categories[N] + one series of N non-negative values | part-to-whole composition of a single total (market share, budget allocation). Add `innerSize: 0.5` for donut variant | trend (line), category ranking (column/bar), many slices > 8 (consider bar), stacked composition over time (area) | Design ✅ · render ✅ (certified, 0.0.0.24) | [design.md](charts/pie/design.md) |
 | `gauge` | single series with one value + gaugeMin/gaugeMax + optional gaugeBands | single KPI against a scale with colored range bands (SLA compliance, loss ratios, reserve adequacy) | trend (line), multi-category ranking (bar), full distribution (boxplot) | Design ✅ · render ✅ (certified, 0.0.0.25) | [design.md](charts/gauge/design.md) |
 | `solid-gauge` | single series with one value + gaugeMin/gaugeMax + optional gaugeBands | utilization / progress fill (CPU%, SLO burn, reserve adequacy) where the filled arc IS the indicator | precise KPI with pointer (gauge), trend (line), category ranking (bar) | Design ✅ · render ✅ (certified, 0.0.0.26) | [design.md](charts/solid-gauge/design.md) |
+| `radar` | categories[N] + one-or-more series of N values | multi-dimensional comparison (scorecards, risk profiles, factor analysis) on N radial axes with polygon gridlines | trend (line), two-variable correlation (scatter), distribution (histogram) | Design ✅ · render ✅ (certified, 0.0.0.27) | [design.md](charts/radar/design.md) |
+| `polar` | categories[N] + one-or-more series of N values | cyclical/directional comparison on a circular grid (seasonal patterns, directional risk) | radar when polygon gridlines preferred, trend (line), part-to-whole (pie) | Design ✅ · render ✅ (certified, 0.0.0.28) | [design.md](charts/polar/design.md) |
+| `wind-rose` | categories[N] (directions) + one-or-more series of N values | directional/cyclical distribution as stacked polar columns (wind speed by direction, seasonal patterns) | nightingale (non-stacked), polar (line/area), histogram (1-D distribution) | Design ✅ · render ✅ (certified, 0.0.0.29) | [design.md](charts/wind-rose/design.md) |
+| `nightingale` | categories[N] + one-or-more series of N values | categorical magnitude as radius-proportional sectors (rose/coxcomb) with multi-series overlay | wind-rose (stacked), pie (part-to-whole), column (Cartesian comparison) | Design ✅ · render ✅ (certified, 0.0.0.30) | [design.md](charts/nightingale/design.md) |
+| `radial-bar` | categories[N] + one-or-more series of N values | categorical progress/completion as concentric rings (KPI dashboards, SLO meters) | bullet (single KPI bar), gauge (single dial), pie (part-to-whole) | Design ✅ · render ✅ (certified, 0.0.0.31) | [design.md](charts/radial-bar/design.md) |
+| `parliament` | categories[N] + single series of N integer seat counts | proportional allocation as a semicircular hemicycle of unit dots (board seats, voting, committee composition) | pie (part-to-whole arcs), bar (category comparison), radial-bar (progress rings) | Design ✅ · render ✅ (certified, 0.0.0.32) | [design.md](charts/parliament/design.md) |
 
-_Every Cartesian (Family A) type above is design-complete with validated example specs. Family B (Polar/radial) is now open with pie as the foundation chart, gauge, and solid gauge. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
+_Every Cartesian (Family A) type above is design-complete with validated example specs. Family B (Polar/radial) is complete with all 9 chart types certified: pie, gauge, solid-gauge, radar, polar, wind-rose, nightingale, radial-bar, and parliament. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
 
 ## Add a chart (for contributors / agents extending this)
 

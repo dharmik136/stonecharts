@@ -1,0 +1,11 @@
+{
+  "type": "parliament",
+  "title": "Council Composition",
+  "xAxis": {
+    "categories": ["Party A", "Party B", "Party C", "Independent"]
+  },
+  "series": [
+    {"name": "Seats", "data": [15, 12, 8, 5]},
+    {"name": "Ignored", "data": [1, 2, 3, 4]}
+  ]
+}

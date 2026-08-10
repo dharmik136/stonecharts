@@ -1,0 +1,11 @@
+{
+  "type": "nightingale",
+  "title": "Quarterly Comparison",
+  "xAxis": {
+    "categories": ["Q1", "Q2", "Q3", "Q4"]
+  },
+  "series": [
+    {"name": "2024", "data": [80, 60, 90, 70]},
+    {"name": "2025", "data": [50, 45, 55, 40]}
+  ]
+}

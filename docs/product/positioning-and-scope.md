@@ -9,7 +9,7 @@ review_mode: self
 applies_to: 0.0.0.1 and later
 requirements: [REQ-SCOPE-001]
 evidence: [TEST-CAPABILITY-MATRIX]
-last_reviewed: "2026-07-29"
+last_reviewed: "2026-08-10"
 review_due: "2026-08-29"
 supersedes: null
 superseded_by: null
@@ -53,9 +53,9 @@ An authorized user of a certified release can:
 
 Current certified chart types, customization surface, and language support are
 tracked authoritatively in [`SC-PROD-004`](capability-matrix.md); this document does
-not restate that table. As of `0.0.0.4` the certified chart types are `line`,
-`column`, `area`, `bar`, `scatter`, and `bubble`, and the certified language
-implementations are Python and Go.
+not restate that table. As of `0.0.0.32` the certified set includes 35 chart types
+across two complete families — Family A (Cartesian, 26 types) and Family B
+(Polar/radial, 9 types) — with certified language implementations in Python and Go.
 
 The `0.0.0.1` initial release scope (historical, satisfies `REQ-SCOPE-001`) was:
 
@@ -67,10 +67,12 @@ The `0.0.0.1` initial release scope (historical, satisfies `REQ-SCOPE-001`) was:
   interactions.
 - Python and Go as the first certified language implementations.
 
-Per [`DEC-017`](../project/decisions.md), further chart-family and language breadth
-beyond the `0.0.0.4` certified set is paused pending paid validation evidence or
-explicit approval; see [`SC-PROD-003`](visual-integrity-strategy.md) for the
-validation gate.
+Per [`DEC-017`](../project/decisions.md), chart-family expansion beyond `0.0.0.4`
+required explicit approval as necessary validation infrastructure. Decisions
+DEC-020 through DEC-048 admitted 28 additional chart types under that clause,
+completing Family A (Cartesian) and Family B (Polar/radial). Language expansion
+beyond Python and Go remains paused pending paid customer evidence; see
+[`SC-PROD-003`](visual-integrity-strategy.md) for the validation gate.
 
 ## Not in scope
 
