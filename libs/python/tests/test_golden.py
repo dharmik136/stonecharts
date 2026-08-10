@@ -1198,6 +1198,103 @@ def test_combo_line_area_fill_and_data_overflow():
     assert "<svg" in svg2
 
 
+def test_range_data_parity():
+    """rangeData specs produce identical SVG to their parallel-array equivalents."""
+    parallel_arearange = {
+        "type": "arearange",
+        "xAxis": {"categories": ["A", "B", "C"]},
+        "series": [{"name": "s", "data": [120, 180, 150], "low": [60, 95, 80]}],
+    }
+    atomic_arearange = {
+        "type": "arearange",
+        "xAxis": {"categories": ["A", "B", "C"]},
+        "series": [{"name": "s", "rangeData": [
+            {"low": 60, "high": 120},
+            {"low": 95, "high": 180},
+            {"low": 80, "high": 150},
+        ]}],
+    }
+    assert render_svg(ChartSpec.from_dict(parallel_arearange)) == render_svg(ChartSpec.from_dict(atomic_arearange))
+
+    parallel_colrange = {
+        "type": "columnrange",
+        "xAxis": {"categories": ["A", "B"]},
+        "series": [{"name": "s", "data": [10, 20], "high": [50, 70]}],
+    }
+    atomic_colrange = {
+        "type": "columnrange",
+        "xAxis": {"categories": ["A", "B"]},
+        "series": [{"name": "s", "rangeData": [
+            {"low": 10, "high": 50},
+            {"low": 20, "high": 70},
+        ]}],
+    }
+    assert render_svg(ChartSpec.from_dict(parallel_colrange)) == render_svg(ChartSpec.from_dict(atomic_colrange))
+
+    parallel_errorbar = {
+        "type": "error-bar",
+        "xAxis": {"categories": ["A", "B"]},
+        "series": [{"name": "s", "data": [100, 200], "low": [80, 170], "high": [120, 230]}],
+    }
+    atomic_errorbar = {
+        "type": "error-bar",
+        "xAxis": {"categories": ["A", "B"]},
+        "series": [{"name": "s", "rangeData": [
+            {"low": 80, "high": 120, "value": 100},
+            {"low": 170, "high": 230, "value": 200},
+        ]}],
+    }
+    assert render_svg(ChartSpec.from_dict(parallel_errorbar)) == render_svg(ChartSpec.from_dict(atomic_errorbar))
+
+    parallel_dumbbell = {
+        "type": "dumbbell",
+        "xAxis": {"categories": ["A", "B"]},
+        "series": [{"name": "s", "data": [10, 20], "high": [50, 70]}],
+    }
+    atomic_dumbbell = {
+        "type": "dumbbell",
+        "xAxis": {"categories": ["A", "B"]},
+        "series": [{"name": "s", "rangeData": [
+            {"low": 10, "high": 50},
+            {"low": 20, "high": 70},
+        ]}],
+    }
+    assert render_svg(ChartSpec.from_dict(parallel_dumbbell)) == render_svg(ChartSpec.from_dict(atomic_dumbbell))
+
+
+def test_range_data_validation():
+    """rangeData validation catches bad inputs."""
+    bad_low_gt_high = {
+        "type": "arearange",
+        "series": [{"name": "s", "rangeData": [{"low": 100, "high": 50}]}],
+    }
+    errs = validate(bad_low_gt_high)
+    assert any("low (100) must be <= high (50)" in e for e in errs)
+
+    missing_value_errorbar = {
+        "type": "error-bar",
+        "series": [{"name": "s", "rangeData": [{"low": 5, "high": 10}]}],
+    }
+    errs = validate(missing_value_errorbar)
+    assert any("value: required for error-bar" in e for e in errs)
+
+    valid_rangedata = {
+        "type": "columnrange",
+        "xAxis": {"categories": ["A"]},
+        "series": [{"name": "s", "rangeData": [{"low": 10, "high": 50}]}],
+    }
+    errs = validate(valid_rangedata)
+    assert errs == [], errs
+
+    valid_rangedata_no_data = {
+        "type": "dumbbell",
+        "xAxis": {"categories": ["A"]},
+        "series": [{"name": "s", "rangeData": [{"low": 10, "high": 50}]}],
+    }
+    errs = validate(valid_rangedata_no_data)
+    assert errs == [], errs
+
+
 if __name__ == "__main__":
     for _n in LINE_CASES:
         _check("line-basic", _n)
