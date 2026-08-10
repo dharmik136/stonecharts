@@ -993,3 +993,294 @@ func TestRendererPurity(t *testing.T) {
 		}
 	}
 }
+
+// TestSemanticInvariants verifies output correctness properties (DEC-050 / SC-CERT-06).
+func TestSemanticInvariants(t *testing.T) {
+	root := "../../"
+	barRe := regexp.MustCompile(`<rect\s[^>]*class="sc-bar sc-point"[^>]*/>`)
+	bubbleRe := regexp.MustCompile(`<circle\s[^>]*class="sc-bubble sc-point"[^>]*/>`)
+	attrRe := regexp.MustCompile(`([\w-]+)="([^"]*)"`)
+
+	extractAttrs := func(re2 *regexp.Regexp, svg string) []map[string]string {
+		matches := re2.FindAllString(svg, -1)
+		var out []map[string]string
+		for _, m := range matches {
+			attrs := map[string]string{}
+			for _, a := range attrRe.FindAllStringSubmatch(m, -1) {
+				attrs[a[1]] = a[2]
+			}
+			out = append(out, attrs)
+		}
+		return out
+	}
+
+	// SC-SEM-001: histogram bin counts == observation count
+	t.Run("SC-SEM-001/histogram-observation-count", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/histogram/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+		total := 0.0
+		for _, b := range bars {
+			v, _ := strconv.ParseFloat(b["data-y"], 64)
+			total += v
+		}
+		nObs := 0
+		for _, s := range spec.Series {
+			nObs += len(s.Data)
+		}
+		if total != float64(nObs) {
+			t.Errorf("bin counts %.0f != observations %d", total, nObs)
+		}
+	})
+
+	// SC-SEM-001: multi-series histogram
+	t.Run("SC-SEM-001/histogram-multi-series", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "histogram",
+			"binning": {"count": 5},
+			"series": [
+				{"name": "A", "data": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
+				{"name": "B", "data": [3, 5, 7, 9, 11, 13]}
+			]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+		for si, s := range spec.Series {
+			count := 0.0
+			idx := strconv.Itoa(si)
+			for _, b := range bars {
+				if b["data-series"] == idx {
+					v, _ := strconv.ParseFloat(b["data-y"], 64)
+					count += v
+				}
+			}
+			if count != float64(len(s.Data)) {
+				t.Errorf("series %d: bin counts %.0f != observations %d", si, count, len(s.Data))
+			}
+		}
+	})
+
+	// SC-SEM-002: waterfall closing total == sum(deltas)
+	t.Run("SC-SEM-002/waterfall-balance", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/waterfall/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+		lastTotal, _ := strconv.ParseFloat(bars[len(bars)-1]["data-total"], 64)
+		expected := 0.0
+		for _, v := range spec.Series[0].Data {
+			expected += v
+		}
+		if lastTotal != expected {
+			t.Errorf("closing total %.0f != sum(deltas) %.0f", lastTotal, expected)
+		}
+	})
+
+	// SC-SEM-002: waterfall with intermediate sums
+	t.Run("SC-SEM-002/waterfall-intermediate-sums", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/waterfall/examples/intermediate-sums.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+
+		skip := map[int]bool{}
+		for _, v := range spec.SumIndices {
+			skip[v] = true
+		}
+		for _, v := range spec.IntermediateSumIndices {
+			skip[v] = true
+		}
+		expected := 0.0
+		for i, v := range spec.Series[0].Data {
+			if !skip[i] {
+				expected += v
+			}
+		}
+
+		lastTotal, _ := strconv.ParseFloat(bars[len(bars)-1]["data-total"], 64)
+		if lastTotal != expected {
+			t.Errorf("closing total %.0f != sum(non-sum deltas) %.0f", lastTotal, expected)
+		}
+	})
+
+	// SC-SEM-006: bubble z > z' implies r >= r'
+	t.Run("SC-SEM-006/bubble-z-radius-monotonic", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bubble/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		circles := extractAttrs(bubbleRe, svg)
+		type zr struct{ z, r float64 }
+		var pairs []zr
+		for _, c := range circles {
+			z, _ := strconv.ParseFloat(c["data-z"], 64)
+			r, _ := strconv.ParseFloat(c["data-r"], 64)
+			pairs = append(pairs, zr{z, r})
+		}
+		for i, a := range pairs {
+			for j, b := range pairs {
+				if a.z > b.z && a.r < b.r {
+					t.Errorf("bubble %d (z=%.0f, r=%.1f) smaller than bubble %d (z=%.0f, r=%.1f)",
+						i, a.z, a.r, j, b.z, b.r)
+				}
+			}
+		}
+	})
+
+	// SC-SEM-006: multi-series bubbles share a global z scale
+	t.Run("SC-SEM-006/bubble-z-radius-multi-series", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bubble/examples/multi-series.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		circles := extractAttrs(bubbleRe, svg)
+		type zr struct{ z, r float64 }
+		var pairs []zr
+		for _, c := range circles {
+			z, _ := strconv.ParseFloat(c["data-z"], 64)
+			r, _ := strconv.ParseFloat(c["data-r"], 64)
+			pairs = append(pairs, zr{z, r})
+		}
+		for i, a := range pairs {
+			for j, b := range pairs {
+				if a.z > b.z && a.r < b.r {
+					t.Errorf("bubble %d (z=%.0f, r=%.1f) smaller than bubble %d (z=%.0f, r=%.1f)",
+						i, a.z, a.r, j, b.z, b.r)
+				}
+			}
+		}
+	})
+
+	// SC-SEM-007: percent stack bar heights tile to 100%
+	t.Run("SC-SEM-007/percent-stack-bar-heights", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "column",
+			"stacking": "percent",
+			"xAxis": {"categories": ["Q1", "Q2", "Q3"]},
+			"series": [
+				{"name": "A", "data": [30, 40, 10]},
+				{"name": "B", "data": [20, 10, 50]},
+				{"name": "C", "data": [50, 50, 40]}
+			]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+
+		byCat := map[string]float64{}
+		for _, b := range bars {
+			h, _ := strconv.ParseFloat(b["height"], 64)
+			byCat[b["data-x"]] += h
+		}
+
+		var ref float64
+		var refCat string
+		for cat, total := range byCat {
+			if refCat == "" {
+				ref = total
+				refCat = cat
+				continue
+			}
+			if diff := total - ref; diff > 0.5 || diff < -0.5 {
+				t.Errorf("category %s height %.1f != %s height %.1f", cat, total, refCat, ref)
+			}
+		}
+		if ref <= 0 {
+			t.Error("no bar height rendered")
+		}
+	})
+
+	// SC-SEM-007: zero category produces no visible bars
+	t.Run("SC-SEM-007/percent-stack-zero-category", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "column",
+			"stacking": "percent",
+			"xAxis": {"categories": ["Q1", "Q2", "Q3"]},
+			"series": [
+				{"name": "A", "data": [30, 0, 10]},
+				{"name": "B", "data": [20, 0, 50]}
+			]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+
+		byCat := map[string]float64{}
+		for _, b := range bars {
+			h, _ := strconv.ParseFloat(b["height"], 64)
+			byCat[b["data-x"]] += h
+		}
+
+		if byCat["Q2"] > 0.5 {
+			t.Errorf("zero category Q2 has height %.1f", byCat["Q2"])
+		}
+		q1 := byCat["Q1"]
+		q3 := byCat["Q3"]
+		if diff := q1 - q3; diff > 0.5 || diff < -0.5 {
+			t.Errorf("Q1 height %.1f != Q3 height %.1f", q1, q3)
+		}
+	})
+}
