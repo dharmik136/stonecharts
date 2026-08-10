@@ -1,0 +1,9 @@
+{
+  "type": "pie",
+  "subtype": "donut",
+  "innerSize": 0.5,
+  "title": "Browser Market Share",
+  "subtitle": "Donut view",
+  "xAxis": { "categories": ["Chrome", "Safari", "Firefox", "Edge", "Other"] },
+  "series": [{ "name": "Browsers", "data": [65, 18, 10, 5, 2] }]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "pie",
+  "subtype": "donut",
+  "innerSize": 0.45,
+  "title": "Claim Types",
+  "subtitle": "FY 2025",
+  "theme": "dark",
+  "xAxis": { "categories": ["Property", "Liability", "Auto", "Workers Comp"] },
+  "series": [{ "name": "Claims", "data": [42, 28, 20, 10] }]
+}

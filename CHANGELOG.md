@@ -20,7 +20,10 @@ No unreleased changes.
   labels and `series[0].data` for values. Single-slice 100% renders as
   `<circle>`. 27th chart type overall, 1st polar.
   Certified renderers in both Python and Go with byte-identical golden SVGs.
-- Cross-render corpus expanded to 133 examples across 27 chart types.
+- **Donut variant** (`subtype: "donut"`, `innerSize: 0.5`) — annular-ring
+  variant of pie. When `innerSize > 0`, slices render as annular sectors;
+  single-slice 100% renders as a fill-rule evenodd annular ring path.
+- Cross-render corpus expanded to 136 examples across 27 chart types.
 - Site gallery expanded to 27 chart types.
 
 ## [0.0.0.23] - 2026-08-10
