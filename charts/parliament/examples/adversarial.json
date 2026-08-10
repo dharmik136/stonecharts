@@ -1,0 +1,11 @@
+{
+  "type": "parliament",
+  "title": "<b>XSS &amp; \"edge\" test</b>",
+  "subtitle": "Adversarial &lt;script&gt; payload",
+  "xAxis": {
+    "categories": ["<img>", "A&B", "C\"D", "Normal", "Zero"]
+  },
+  "series": [
+    {"name": "<script>alert(1)</script>", "data": [10, 20, 15, 25, 0]}
+  ]
+}

@@ -62,6 +62,7 @@ SOLID_GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversar
 RADAR_CASES = ["basic", "line-only", "single-series", "themed-dark", "adversarial"]
 POLAR_CASES = ["basic", "line-only", "single-series", "themed-dark", "adversarial"]
 NIGHTINGALE_CASES = ["basic", "multi-series", "single-series", "themed-dark", "adversarial"]
+PARLIAMENT_CASES = ["basic", "multi-series", "single-series", "themed-dark", "adversarial"]
 RADIAL_BAR_CASES = ["basic", "multi-series", "single-series", "themed-dark", "adversarial"]
 WIND_ROSE_CASES = ["basic", "many-directions", "single-series", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
@@ -91,6 +92,7 @@ ACTIVE_VALIDATION_CASES = {
     "radar": RADAR_CASES,
     "polar": POLAR_CASES,
     "nightingale": NIGHTINGALE_CASES,
+    "parliament": PARLIAMENT_CASES,
     "radial-bar": RADIAL_BAR_CASES,
     "wind-rose": WIND_ROSE_CASES,
     "streamgraph": STREAMGRAPH_CASES,
@@ -355,6 +357,11 @@ def test_polar_goldens():
 def test_nightingale_goldens():
     for name in NIGHTINGALE_CASES:
         _check("nightingale", name)
+
+
+def test_parliament_goldens():
+    for name in PARLIAMENT_CASES:
+        _check("parliament", name)
 
 
 def test_radial_bar_goldens():
@@ -706,6 +713,7 @@ def test_capability_manifest_and_error():
         "line",
         "lollipop",
         "nightingale",
+        "parliament",
         "radial-bar",
         "pie",
         "polar",

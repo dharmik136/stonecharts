@@ -1,0 +1,10 @@
+{
+  "type": "parliament",
+  "title": "Vote Breakdown",
+  "xAxis": {
+    "categories": ["Yes", "No", "Abstain"]
+  },
+  "series": [
+    {"name": "Votes", "data": [65, 30, 5]}
+  ]
+}

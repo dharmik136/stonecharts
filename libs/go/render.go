@@ -393,6 +393,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderLollipopSVG(spec)
 	case "nightingale":
 		svg = renderNightingaleSVG(spec)
+	case "parliament":
+		svg = renderParliamentSVG(spec)
 	case "radial-bar":
 		svg = renderRadialBarSVG(spec)
 	case "pie":
