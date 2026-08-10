@@ -11,6 +11,7 @@ import math
 
 from ..spec import Axis, ChartSpec
 from ..util import esc, fmt_num
+from ..validate import SpecError
 from ._cartesian import render_cartesian
 
 
@@ -87,7 +88,15 @@ def _compute_bins(spec):
                 b = k - 1
             else:
                 b = math.floor((float(v) - lo) / w)
-                b = max(0, min(k - 1, b))
+                if b < 0 or b >= k:
+                    if spec.out_of_range == "clip":
+                        b = max(0, min(k - 1, b))
+                    else:
+                        raise SpecError([
+                            f"histogram: observation {fmt_num(float(v))} is outside bin range"
+                            f" [{fmt_num(lo)}, {fmt_num(lo + w * k)}];"
+                            f' set outOfRange to "clip" to clamp into edge bins'
+                        ])
             sc[b] += 1.0
         counts.append(sc)
         ns = len(s.data)

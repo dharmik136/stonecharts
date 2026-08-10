@@ -354,6 +354,7 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		typ = "line"
 	}
 	var svg string
+	var err error
 	switch typ {
 	case "area":
 		svg = renderAreaSVG(spec)
@@ -386,7 +387,10 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 	case "flame-chart":
 		svg = renderFlameChartSVG(spec)
 	case "histogram":
-		svg = renderHistogramSVG(spec)
+		svg, err = renderHistogramSVG(spec)
+		if err != nil {
+			return "", err
+		}
 	case "line":
 		svg = renderLineSVG(spec)
 	case "lollipop":
