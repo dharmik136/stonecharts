@@ -1,0 +1,17 @@
+{
+  "type": "development-triangle",
+  "title": "Incurred Loss Development Triangle",
+  "triangle": {
+    "origins": ["2021", "2022", "2023", "2024", "2025"],
+    "periods": [12, 24, 36, 48, 60],
+    "values": [
+      [120, 184, 213, 228, 235],
+      [137, 199, 229, 241],
+      [154, 216, 247],
+      [171, 238],
+      [193]
+    ],
+    "view": "cumulative",
+    "valueType": "incurred"
+  }
+}

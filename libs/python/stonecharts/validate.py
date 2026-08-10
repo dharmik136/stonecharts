@@ -478,7 +478,54 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
 # 0.0.0.15 admits funnel per DEC-031;
 # 0.0.0.16 admits variwide per DEC-032;
 # 0.0.0.17 admits timeline per DEC-033;
-# 0.0.0.18 admits windbarb per DEC-034).
+# 0.0.0.18 admits windbarb per DEC-034;
+# 0.0.0.33 admits development-triangle per DEC-057).
+
+
+def _validate_triangle(d: dict, errs: list[str]) -> None:
+    """Validate $.triangle for development-triangle chart type."""
+    tri = d.get("triangle")
+    if tri is None or not isinstance(tri, dict):
+        errs.append("$.triangle: required for development-triangle")
+        return
+    path = "$.triangle"
+    origins = tri.get("origins")
+    if not isinstance(origins, list) or len(origins) == 0:
+        errs.append(f"{path}.origins: required non-empty array of strings")
+    elif not all(isinstance(o, str) for o in origins):
+        errs.append(f"{path}.origins: all elements must be strings")
+    periods = tri.get("periods")
+    if not isinstance(periods, list) or len(periods) == 0:
+        errs.append(f"{path}.periods: required non-empty array of numbers")
+    elif not all(isinstance(p, (int, float)) for p in periods):
+        errs.append(f"{path}.periods: all elements must be numbers")
+    values = tri.get("values")
+    if not isinstance(values, list) or len(values) == 0:
+        errs.append(f"{path}.values: required non-empty array")
+    elif isinstance(origins, list) and len(values) != len(origins):
+        errs.append(f"{path}.values: length must equal origins length")
+    elif isinstance(periods, list):
+        for i, row in enumerate(values):
+            rp = f"{path}.values[{i}]"
+            if not isinstance(row, list):
+                errs.append(f"{rp}: expected array")
+                continue
+            max_cols = len(periods) - i
+            if len(row) > max_cols:
+                errs.append(f"{rp}: at most {max_cols} values allowed (triangular shape)")
+            for j, v in enumerate(row):
+                if not isinstance(v, (int, float)):
+                    errs.append(f"{rp}[{j}]: expected number")
+    if "view" in tri:
+        _str(tri["view"], f"{path}.view", errs)
+        if isinstance(tri["view"], str) and tri["view"] not in ("cumulative", "incremental"):
+            errs.append(f'{path}.view: expected "cumulative" or "incremental"')
+    if "valueType" in tri:
+        _str(tri["valueType"], f"{path}.valueType", errs)
+        if isinstance(tri["valueType"], str) and tri["valueType"] not in ("incurred", "paid"):
+            errs.append(f'{path}.valueType: expected "incurred" or "paid"')
+
+
 _KNOWN_TYPES = {
     "area",
     "arearange",
@@ -515,6 +562,7 @@ _KNOWN_TYPES = {
     "windbarb",
     "streamgraph",
     "xrange",
+    "development-triangle",
 }
 
 
@@ -558,13 +606,16 @@ def validate(d: Any) -> list[str]:
         _axis(d["xAxis"], "$.xAxis", errs)
     if "yAxis" in d:
         _axis(d["yAxis"], "$.yAxis", errs)
-    if "series" not in d:
+    _chart_type = d.get("type", "line") if isinstance(d.get("type"), str) else "line"
+    if "series" not in d and _chart_type != "development-triangle":
         errs.append("$.series: required")
-    elif not isinstance(d["series"], list):
+    elif "series" in d and not isinstance(d["series"], list):
         errs.append(f"$.series: expected array, received {_jtype(d['series'])}")
-    else:
+    elif "series" in d and isinstance(d["series"], list):
         for i, s in enumerate(d["series"]):
             _series(s, f"$.series[{i}]", errs, d.get("type"))
+    if _chart_type == "development-triangle":
+        _validate_triangle(d, errs)
     if "flags" in d:
         fl = d["flags"]
         if not isinstance(fl, list):
