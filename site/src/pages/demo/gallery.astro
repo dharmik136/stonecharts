@@ -34,6 +34,12 @@ const CHART_TYPES = [
   { id: 'xrange', label: 'X-Range', desc: 'Horizontal span bars on lane categories with optional milestones and dependency connectors for Gantt charts and trace waterfalls.' },
   { id: 'gauge', label: 'Gauge', desc: 'Single-value dial on a 270° arc with colored range bands, kite pointer, and pivot dot for KPI dashboards.' },
   { id: 'solid-gauge', label: 'Solid Gauge', desc: 'Filled arc from start to value angle on a 270° track with optional range bands for utilization and progress views.' },
+  { id: 'radar', label: 'Radar', desc: 'Multi-dimensional comparison on N radial axes with concentric polygon gridlines and per-series closed polygons with optional fill.' },
+  { id: 'polar', label: 'Polar', desc: 'Circular polar grid with categories at equal angular spacing and concentric circular gridlines for cyclical and directional comparison.' },
+  { id: 'wind-rose', label: 'Wind Rose', desc: 'Stacked polar columns with annular wedge sectors at equal angular spacing for directional and cyclical distribution views.' },
+  { id: 'nightingale', label: 'Nightingale', desc: 'Rose/coxcomb chart with equal-angle wedges from center and value-dependent radius for categorical magnitude comparison.' },
+  { id: 'radial-bar', label: 'Radial Bar', desc: 'Concentric progress rings where each category gets its own track, with arc fill proportional to value.' },
+  { id: 'parliament', label: 'Parliament', desc: 'Semicircular hemicycle of unit dots in concentric arcs, colored by category for proportional seat allocation views.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
@@ -75,7 +81,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Twenty-nine certified chart types, each rendered identically in Python and Go.
+      Thirty-five certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>

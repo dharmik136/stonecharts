@@ -1,0 +1,10 @@
+{
+  "type": "parliament",
+  "title": "Parliament Seats",
+  "xAxis": {
+    "categories": ["Left", "Center-Left", "Center", "Center-Right", "Right"]
+  },
+  "series": [
+    {"name": "Seats", "data": [42, 58, 30, 55, 35]}
+  ]
+}
