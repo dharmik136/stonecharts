@@ -27,6 +27,7 @@ _CAPABILITIES: dict[str, Any] = {
         "lollipop",
         "scatter",
         "streamgraph",
+        "technical-indicators",
         "timeline",
         "vector-plot",
         "variwide",

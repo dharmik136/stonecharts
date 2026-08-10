@@ -9,6 +9,23 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.22] - 2026-08-10
+
+### Added
+
+- **Technical-indicators chart** (`type: "technical-indicators"`) — base metric/
+  price line plus derived overlays computed from transforms: SMA, EMA, Bollinger
+  bands, VWAP, RSI, MACD (DEC-038). Series carries `indicators[]` array of
+  `{type, period?, color?, dashStyle?, params?, pane?}` objects; transforms run
+  in the renderer, not authored as raw series. Supports plot bands/lines on both
+  axes and panes, event flags (flag/circlepin/squarepin shapes), and oscillator
+  panes (RSI renders in a separate vertical split below the main chart).
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Pane objects now parse `plotBands` and `plotLines` from JSON (previously
+  silently ignored). Both renderers now render pane-scoped bands and lines.
+- Cross-render corpus expanded to 123 examples across 25 chart types.
+- Site gallery expanded to 25 chart types.
+
 ## [0.0.0.21] - 2026-08-10
 
 ### Added

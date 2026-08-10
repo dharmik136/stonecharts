@@ -37,6 +37,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "candlestick" {
 		return candlestickDataTable(spec)
 	}
+	if spec.Type == "technical-indicators" {
+		return tiDataTable(spec)
+	}
 	if spec.Type == "xrange" {
 		return xrangeDataTable(spec)
 	}
@@ -374,6 +377,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderScatterSVG(spec)
 	case "streamgraph":
 		svg = renderStreamgraphSVG(spec)
+	case "technical-indicators":
+		svg = renderTechnicalIndicatorsSVG(spec)
 	case "bubble":
 		svg = renderBubbleSVG(spec)
 	case "timeline":

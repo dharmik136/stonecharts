@@ -1,0 +1,92 @@
+[
+  {
+    "name": "missing data",
+    "spec": { "type": "technical-indicators", "series": [{ "name": "s" }] },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "name": "string data",
+    "spec": { "type": "technical-indicators", "series": [{ "data": ["a"] }] },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "name": "missing series",
+    "spec": { "type": "technical-indicators" },
+    "errors": ["$.series: required"]
+  },
+  {
+    "name": "volume string element",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1], "volume": ["x"] }] },
+    "errors": ["$.series[0].volume[0]: expected number, received string"]
+  },
+  {
+    "name": "volume not array",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1], "volume": 42 }] },
+    "errors": ["$.series[0].volume: expected array, received number"]
+  },
+  {
+    "name": "indicators not array",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1], "indicators": 42 }] },
+    "errors": ["$.series[0].indicators: expected array, received number"]
+  },
+  {
+    "name": "indicator not object",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1], "indicators": [42] }] },
+    "errors": ["$.series[0].indicators[0]: expected object, received number"]
+  },
+  {
+    "name": "indicator missing type",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1], "indicators": [{ "period": 7 }] }] },
+    "errors": ["$.series[0].indicators[0].type: required"]
+  },
+  {
+    "name": "indicator type not string",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1], "indicators": [{ "type": 5 }] }] },
+    "errors": ["$.series[0].indicators[0].type: expected string, received number"]
+  },
+  {
+    "name": "indicator period not number",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1], "indicators": [{ "type": "sma", "period": "x" }] }] },
+    "errors": ["$.series[0].indicators[0].period: expected number, received string"]
+  },
+  {
+    "name": "flags not array",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "flags": 42 },
+    "errors": ["$.flags: expected array, received number"]
+  },
+  {
+    "name": "flag not object",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "flags": [42] },
+    "errors": ["$.flags[0]: expected object, received number"]
+  },
+  {
+    "name": "flag missing x",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "flags": [{ "title": "ev" }] },
+    "errors": ["$.flags[0].x: required"]
+  },
+  {
+    "name": "flag missing title",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "flags": [{ "x": 0 }] },
+    "errors": ["$.flags[0].title: required"]
+  },
+  {
+    "name": "flag x not number",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "flags": [{ "x": "a", "title": "ev" }] },
+    "errors": ["$.flags[0].x: expected number, received string"]
+  },
+  {
+    "name": "flag title not string",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "flags": [{ "x": 0, "title": 42 }] },
+    "errors": ["$.flags[0].title: expected string, received number"]
+  },
+  {
+    "name": "panes not array",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "panes": 42 },
+    "errors": ["$.panes: expected array, received number"]
+  },
+  {
+    "name": "pane not object",
+    "spec": { "type": "technical-indicators", "series": [{ "data": [1] }], "panes": [42] },
+    "errors": ["$.panes[0]: expected object, received number"]
+  }
+]
