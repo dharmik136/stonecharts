@@ -6,6 +6,7 @@ Rides the shared cartesian frame with x_scale="linear" and include_zero=False.
 
 from __future__ import annotations
 
+import copy
 import math
 
 from ..spec import Datum
@@ -14,11 +15,13 @@ from ._cartesian import CartesianFrame, render_cartesian
 
 
 def render_svg(spec) -> str:
-    for s in spec.series:
+    mod = copy.copy(spec)
+    mod.series = [copy.copy(s) for s in spec.series]
+    for s in mod.series:
         if not s.data_points:
             x_arr = s.x or [float(i) for i in range(len(s.data))]
             s.data_points = [Datum(x=x_arr[i], y=s.data[i]) for i in range(min(len(x_arr), len(s.data)))]
-    return render_cartesian(spec, "Vector plot", "linear", _vector_marks, include_zero=False)
+    return render_cartesian(mod, "Vector plot", "linear", _vector_marks, include_zero=False)
 
 
 HEAD_LEN = 6.0
