@@ -110,11 +110,13 @@ def check_python_renderer(chart_type: str) -> str | None:
 def check_go_renderer(chart_type: str) -> str | None:
     """Phase 3: Go renderer file must exist."""
     type_id = _schema_type(chart_type)
-    go_id = type_id.replace("-", "")
-    path = GO_DIR / f"{go_id}.go"
-    if not path.is_file():
-        return f"Go renderer {path.relative_to(ROOT)} does not exist"
-    return None
+    candidates = [
+        GO_DIR / f"{type_id.replace('-', '_')}.go",
+        GO_DIR / f"{type_id.replace('-', '')}.go",
+    ]
+    if any(p.is_file() for p in candidates):
+        return None
+    return f"Go renderer {candidates[0].relative_to(ROOT)} does not exist"
 
 
 def check_capabilities_registration(chart_type: str) -> str | None:
