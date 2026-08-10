@@ -506,6 +506,7 @@ _KNOWN_TYPES = {
     "variwide",
     "waterfall",
     "vector-plot",
+    "wind-rose",
     "windbarb",
     "streamgraph",
     "xrange",

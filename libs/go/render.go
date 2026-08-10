@@ -413,6 +413,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderVectorPlotSVG(spec)
 	case "waterfall":
 		svg = renderWaterfallSVG(spec)
+	case "wind-rose":
+		svg = renderWindRoseSVG(spec)
 	case "windbarb":
 		svg = renderWindbarbSVG(spec)
 	case "xrange":
