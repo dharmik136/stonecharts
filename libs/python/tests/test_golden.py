@@ -44,10 +44,21 @@ TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
 STREAMGRAPH_CASES = ["basic", "silhouette", "themed-dark", "adversarial"]
 WINDBARB_CASES = ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"]
 VECTOR_PLOT_CASES = ["basic", "field", "themed-dark", "uniform-length", "adversarial"]
-PIE_CASES = ["basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"]
+PIE_CASES = [
+    "basic",
+    "many-slices",
+    "single-slice",
+    "themed-dark",
+    "adversarial",
+    "donut",
+    "donut-single",
+    "donut-dark",
+    "variable-radius",
+]
 FLAME_CHART_CASES = ["basic", "multi-series", "deep-stack", "themed-dark", "adversarial"]
 TECHNICAL_INDICATORS_CASES = ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"]
 GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"]
+SOLID_GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
@@ -71,6 +82,7 @@ ACTIVE_VALIDATION_CASES = {
     "pie": PIE_CASES,
     "funnel": FUNNEL_CASES,
     "gauge": GAUGE_CASES,
+    "solid-gauge": SOLID_GAUGE_CASES,
     "streamgraph": STREAMGRAPH_CASES,
     "technical-indicators": TECHNICAL_INDICATORS_CASES,
     "variwide": VARIWIDE_CASES,
@@ -313,6 +325,11 @@ def test_pie_goldens():
 def test_gauge_goldens():
     for name in GAUGE_CASES:
         _check("gauge", name)
+
+
+def test_solid_gauge_goldens():
+    for name in SOLID_GAUGE_CASES:
+        _check("solid-gauge", name)
 
 
 def test_flame_chart_goldens():
@@ -655,6 +672,7 @@ def test_capability_manifest_and_error():
         "lollipop",
         "pie",
         "scatter",
+        "solid-gauge",
         "streamgraph",
         "technical-indicators",
         "timeline",

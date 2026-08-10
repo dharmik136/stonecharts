@@ -7,12 +7,7 @@ import (
 	"unicode/utf8"
 )
 
-const (
-	gaugeStart = 3 * math.Pi / 4
-	gaugeSweep = 3 * math.Pi / 2
-)
-
-func renderGaugeSVG(spec *ChartSpec) string {
+func renderSolidGaugeSVG(spec *ChartSpec) string {
 	W, H := int(spec.Width), int(spec.Height)
 	theme := spec.theme
 	if theme == nil {
@@ -26,7 +21,7 @@ func renderGaugeSVG(spec *ChartSpec) string {
 	a11yAttr := ""
 	a11yDesc := ""
 	if spec.a11yOn() {
-		sum := esc(a11ySummary(spec, "Gauge"))
+		sum := esc(a11ySummary(spec, "Solid gauge"))
 		a11yAttr = fmt.Sprintf(` role="img" aria-label="%s"`, sum)
 		a11yDesc = fmt.Sprintf("<desc>%s</desc>", sum)
 	}
@@ -78,17 +73,17 @@ func renderGaugeSVG(spec *ChartSpec) string {
 		gaugeMax = gaugeMin + 100
 	}
 
-	ptrColor := esc(palette[0])
+	fillColor := esc(palette[0])
 	if s0 != nil {
 		grad, solidHex := s0.colorSpec()
 		if grad != nil {
 			if len(grad.Stops) > 0 {
-				ptrColor = esc(grad.Stops[0].Color)
+				fillColor = esc(grad.Stops[0].Color)
 			} else {
-				ptrColor = esc(palette[0])
+				fillColor = esc(palette[0])
 			}
 		} else if solidHex != "" {
-			ptrColor = esc(solidHex)
+			fillColor = esc(solidHex)
 		}
 	}
 
@@ -209,29 +204,31 @@ func renderGaugeSVG(spec *ChartSpec) string {
 		if frac > 1 {
 			frac = 1
 		}
-		ptrAngle := gaugeStart + frac*gaugeSweep
-		tipR := rInner - 4
-		baseW := 6.0
-		tailR := 12.0
-		tipX := cx + tipR*math.Cos(ptrAngle)
-		tipY := cy + tipR*math.Sin(ptrAngle)
-		leftX := cx + baseW*math.Cos(ptrAngle+math.Pi/2)
-		leftY := cy + baseW*math.Sin(ptrAngle+math.Pi/2)
-		rightX := cx + baseW*math.Cos(ptrAngle-math.Pi/2)
-		rightY := cy + baseW*math.Sin(ptrAngle-math.Pi/2)
-		tailX := cx + tailR*math.Cos(ptrAngle+math.Pi)
-		tailY := cy + tailR*math.Sin(ptrAngle+math.Pi)
-		dPtr := fmt.Sprintf(
-			"M %s %s L %s %s L %s %s L %s %s Z",
-			f1(tipX), f1(tipY), f1(leftX), f1(leftY), f1(tailX), f1(tailY), f1(rightX), f1(rightY))
-		sName := s0.Name
-		p.WriteString(fmt.Sprintf(
-			`<path class="sc-pointer sc-point" data-series="0" data-series-name="%s" data-y="%s" data-color="%s" d="%s" fill="%s"/>`,
-			esc(sName), esc(fmtNum(value)), ptrColor, dPtr, ptrColor))
+		if frac > 0 {
+			vAngle := gaugeStart + frac*gaugeSweep
+			vSweep := vAngle - gaugeStart
+			vLarge := 0
+			if vSweep > math.Pi {
+				vLarge = 1
+			}
 
-		p.WriteString(fmt.Sprintf(
-			`<circle class="sc-pivot" cx="%s" cy="%s" r="8" fill="%s"/>`,
-			f1(cx), f1(cy), ptrColor))
+			vox1 := cx + rOuter*math.Cos(gaugeStart)
+			voy1 := cy + rOuter*math.Sin(gaugeStart)
+			vox2 := cx + rOuter*math.Cos(vAngle)
+			voy2 := cy + rOuter*math.Sin(vAngle)
+			vix1 := cx + rInner*math.Cos(gaugeStart)
+			viy1 := cy + rInner*math.Sin(gaugeStart)
+			vix2 := cx + rInner*math.Cos(vAngle)
+			viy2 := cy + rInner*math.Sin(vAngle)
+			dFill := fmt.Sprintf(
+				"M %s %s A %s %s 0 %d 1 %s %s L %s %s A %s %s 0 %d 0 %s %s Z",
+				f1(vox1), f1(voy1), f1(rOuter), f1(rOuter), vLarge, f1(vox2), f1(voy2),
+				f1(vix2), f1(viy2), f1(rInner), f1(rInner), vLarge, f1(vix1), f1(viy1))
+			sName := s0.Name
+			p.WriteString(fmt.Sprintf(
+				`<path class="sc-gauge-fill sc-point" data-series="0" data-series-name="%s" data-y="%s" data-color="%s" d="%s" fill="%s"/>`,
+				esc(sName), esc(fmtNum(value)), fillColor, dFill, fillColor))
+		}
 
 		p.WriteString("</g>")
 	}
@@ -256,7 +253,7 @@ func renderGaugeSVG(spec *ChartSpec) string {
 		p.WriteString(`<g class="sc-legend-item" data-series="0">`)
 		p.WriteString(fmt.Sprintf(
 			`<rect x="%s" y="%s" width="14" height="4" rx="2" fill="%s"/>`,
-			f1(lx), f1(ly-9), ptrColor))
+			f1(lx), f1(ly-9), fillColor))
 		p.WriteString(fmt.Sprintf(
 			`<text x="%s" y="%s" font-size="12" fill="%s">%s</text>`,
 			f1(lx+20), f1(ly-2), theme.LegendTextColor, esc(s0.Name)))
@@ -268,7 +265,7 @@ func renderGaugeSVG(spec *ChartSpec) string {
 	return p.String()
 }
 
-func gaugeDataTable(spec *ChartSpec) string {
+func solidGaugeDataTable(spec *ChartSpec) string {
 	var b strings.Builder
 	b.WriteString(`<table class="sc-visually-hidden">`)
 	if spec.Title != "" {

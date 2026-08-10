@@ -43,6 +43,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "gauge" {
 		return gaugeDataTable(spec)
 	}
+	if spec.Type == "solid-gauge" {
+		return solidGaugeDataTable(spec)
+	}
 	if spec.Type == "pie" {
 		return pieDataTable(spec)
 	}
@@ -370,6 +373,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderFunnelSVG(spec)
 	case "gauge":
 		svg = renderGaugeSVG(spec)
+	case "solid-gauge":
+		svg = renderSolidGaugeSVG(spec)
 	case "candlestick":
 		svg = renderCandlestickSVG(spec)
 	case "column":

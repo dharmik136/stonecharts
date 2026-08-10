@@ -498,6 +498,7 @@ _KNOWN_TYPES = {
     "lollipop",
     "pie",
     "scatter",
+    "solid-gauge",
     "technical-indicators",
     "timeline",
     "variwide",

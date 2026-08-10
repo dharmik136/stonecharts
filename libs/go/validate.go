@@ -711,6 +711,7 @@ var knownTypes = map[string]bool{
 	"lollipop":    true,
 	"pie":         true,
 	"scatter":     true,
+	"solid-gauge": true,
 	"timeline":    true,
 	"variwide":    true,
 	"waterfall":   true,
