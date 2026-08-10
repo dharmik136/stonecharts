@@ -27,6 +27,7 @@ _CAPABILITIES: dict[str, Any] = {
         "histogram",
         "line",
         "lollipop",
+        "nightingale",
         "pie",
         "polar",
         "radar",
