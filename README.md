@@ -21,7 +21,7 @@ release, and environment boundaries.
 
 - **Byte-identical cross-language output.** The same JSON spec renders to the exact
   same SVG in Python and Go — verified by 177 golden-test fixtures across 35 chart
-  types.
+  types (7 certified, 8 candidate, 20 experimental).
 - **Deterministic and runtime-free.** Charts are fully rendered server-side without a
   browser, DOM, or JavaScript. The SVG is complete on its own; the interaction runtime
   only *enhances* it.
@@ -115,42 +115,54 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 
 ## Chart Catalog
 
-**35 certified chart types** across two families, all with byte-identical Python and
-Go renderers pinned by golden tests.
+**35 chart types** across three certification tiers, all with byte-identical Python
+and Go renderers pinned by golden tests.
 
-### Family A — Cartesian (26 types)
+| Tier | Count | Meaning |
+|------|-------|---------|
+| **Certified** | 7 | Passes all SC-CERT gates; commercially supported |
+| **Candidate** | 8 | Golden-tested and byte-identical; on path to certification |
+| **Experimental** | 20 | Implemented and functional; not commercially supported |
 
-| Chart | ID | Release | Chart | ID | Release |
-|-------|----|---------|-------|----|---------|
-| Line | `line-basic` | 0.0.0.1 | Lollipop | `lollipop` | 0.0.0.13 |
-| Column | `column` | 0.0.0.1 | Dumbbell | `dumbbell` | 0.0.0.14 |
-| Area | `area` | 0.0.0.1 | Funnel | `funnel` | 0.0.0.15 |
-| Bar | `bar` | 0.0.0.2 | Variwide | `variwide` | 0.0.0.16 |
-| Scatter | `scatter` | 0.0.0.3 | Timeline | `timeline` | 0.0.0.17 |
-| Bubble | `bubble` | 0.0.0.4 | Windbarb | `windbarb` | 0.0.0.18 |
-| Combo | `combo` | 0.0.0.5 | Streamgraph | `streamgraph` | 0.0.0.19 |
-| Histogram | `histogram` | 0.0.0.6 | Vector Plot | `vector-plot` | 0.0.0.20 |
-| Candlestick | `candlestick` | 0.0.0.7 | X-Range | `xrange` | 0.0.0.21 |
-| Error Bar | `error-bar` | 0.0.0.8 | Tech. Indicators | `technical-indicators` | 0.0.0.22 |
-| Area Range | `arearange` | 0.0.0.9 | Flame Chart | `flame-chart` | 0.0.0.23 |
-| Column Range | `columnrange` | 0.0.0.9 | | | |
-| Waterfall | `waterfall` | 0.0.0.10 | | | |
-| Bullet | `bullet` | 0.0.0.11 | | | |
-| Boxplot | `boxplot` | 0.0.0.12 | | | |
-
-### Family B — Polar / Radial (9 types)
+### Certified (7 types)
 
 | Chart | ID | Release |
 |-------|----|---------|
-| Pie | `pie` | 0.0.0.24 |
-| Gauge | `gauge` | 0.0.0.25 |
-| Solid Gauge | `solid-gauge` | 0.0.0.26 |
-| Radar | `radar` | 0.0.0.27 |
-| Polar | `polar` | 0.0.0.28 |
-| Wind Rose | `wind-rose` | 0.0.0.29 |
-| Nightingale | `nightingale` | 0.0.0.30 |
-| Radial Bar | `radial-bar` | 0.0.0.31 |
-| Parliament | `parliament` | 0.0.0.32 |
+| Line | `line` | 0.0.0.1 |
+| Column | `column` | 0.0.0.1 |
+| Area | `area` | 0.0.0.3 |
+| Bar | `bar` | 0.0.0.2 |
+| Scatter | `scatter` | 0.0.0.3 |
+| Bubble | `bubble` | 0.0.0.4 |
+| Combo | `combo` | 0.0.0.5 |
+
+### Candidate (8 types)
+
+| Chart | ID | Release |
+|-------|----|---------|
+| Histogram | `histogram` | 0.0.0.6 |
+| Error Bar | `error-bar` | 0.0.0.8 |
+| Area Range | `arearange` | 0.0.0.9 |
+| Column Range | `columnrange` | 0.0.0.9 |
+| Waterfall | `waterfall` | 0.0.0.10 |
+| Bullet | `bullet` | 0.0.0.11 |
+| Boxplot | `boxplot` | 0.0.0.12 |
+| Dumbbell | `dumbbell` | 0.0.0.14 |
+
+### Experimental (20 types)
+
+| Chart | ID | Release | Chart | ID | Release |
+|-------|----|---------|-------|----|---------|
+| Candlestick | `candlestick` | 0.0.0.7 | Pie | `pie` | 0.0.0.24 |
+| Lollipop | `lollipop` | 0.0.0.13 | Gauge | `gauge` | 0.0.0.25 |
+| Funnel | `funnel` | 0.0.0.15 | Solid Gauge | `solid-gauge` | 0.0.0.26 |
+| Variwide | `variwide` | 0.0.0.16 | Radar | `radar` | 0.0.0.27 |
+| Timeline | `timeline` | 0.0.0.17 | Polar | `polar` | 0.0.0.28 |
+| Windbarb | `windbarb` | 0.0.0.18 | Wind Rose | `wind-rose` | 0.0.0.29 |
+| Streamgraph | `streamgraph` | 0.0.0.19 | Nightingale | `nightingale` | 0.0.0.30 |
+| Vector Plot | `vector-plot` | 0.0.0.20 | Radial Bar | `radial-bar` | 0.0.0.31 |
+| X-Range | `xrange` | 0.0.0.21 | Parliament | `parliament` | 0.0.0.32 |
+| Tech. Indicators | `technical-indicators` | 0.0.0.22 | Flame Chart | `flame-chart` | 0.0.0.23 |
 
 Every chart type has a `design.md`, example specs, and golden SVGs in
 [`charts/<id>/`](charts/). See [`CHARTS.md`](CHARTS.md) to look up which chart type
