@@ -31,9 +31,23 @@
       "items": { "$ref": "#/$defs/finding" }
     },
     "evidence": { "type": "object" },
-    "environment": { "$ref": "#/$defs/environment" }
+    "environment": { "$ref": "#/$defs/environment" },
+    "presentationAdvisories": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/presentationAdvisory" }
+    }
   },
   "$defs": {
+    "presentationAdvisory": {
+      "type": "object",
+      "required": ["code", "severity", "message", "recommendation"],
+      "properties": {
+        "code": { "type": "string" },
+        "severity": { "enum": ["info", "warning"] },
+        "message": { "type": "string" },
+        "recommendation": { "type": "string" }
+      }
+    },
     "digest": {
       "type": "object",
       "required": ["algorithm", "value"],

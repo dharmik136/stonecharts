@@ -114,6 +114,20 @@ the override exists for deployment environments with known higher
 process-startup latency (e.g. Windows hosts where antivirus scanning delays
 the first execution of a freshly built adapter binary).
 
+## Presentation advisories
+
+StoneVerify may attach presentation advisories to evidence bundles when it
+detects configurations that, while technically valid, carry elevated risk of
+visual misinterpretation.
+
+| Advisory | Code | Trigger | Severity |
+|----------|------|---------|----------|
+| Dual y-axis | `ADV-DUAL-AXIS` | `secondaryYAxis` present in spec | `info` |
+
+Advisories are informational. They do not block rendering, change exit codes,
+or appear in the SVG output. They appear only in the evidence bundle's
+`manifest.json` under the `presentationAdvisories` key.
+
 ## Legal boundary
 
 These are engineering conformance statements. License rights, warranties, liability,
