@@ -710,6 +710,7 @@ var knownTypes = map[string]bool{
 	"line":         true,
 	"lollipop":     true,
 	"nightingale":  true,
+	"radial-bar":   true,
 	"pie":         true,
 	"polar":       true,
 	"radar":       true,

@@ -1,0 +1,12 @@
+{
+  "type": "radial-bar",
+  "title": "Team Metrics",
+  "xAxis": {
+    "categories": ["Speed", "Quality", "Reliability"]
+  },
+  "series": [
+    {"name": "Q1", "data": [40, 30, 50]},
+    {"name": "Q2", "data": [25, 35, 20]}
+  ],
+  "yAxis": {"max": 100}
+}

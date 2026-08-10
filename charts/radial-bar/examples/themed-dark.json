@@ -1,0 +1,12 @@
+{
+  "type": "radial-bar",
+  "title": "System Health",
+  "theme": "dark",
+  "xAxis": {
+    "categories": ["CPU", "Memory", "Disk", "Network"]
+  },
+  "series": [
+    {"name": "Usage", "data": [72, 58, 85, 40]}
+  ],
+  "yAxis": {"max": 100}
+}
