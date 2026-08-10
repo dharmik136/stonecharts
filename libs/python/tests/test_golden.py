@@ -44,6 +44,7 @@ TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
 STREAMGRAPH_CASES = ["basic", "silhouette", "themed-dark", "adversarial"]
 WINDBARB_CASES = ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"]
 VECTOR_PLOT_CASES = ["basic", "field", "themed-dark", "uniform-length", "adversarial"]
+XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -68,6 +69,7 @@ ACTIVE_VALIDATION_CASES = {
     "timeline": TIMELINE_CASES,
     "windbarb": WINDBARB_CASES,
     "vector-plot": VECTOR_PLOT_CASES,
+    "xrange": XRANGE_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -288,6 +290,11 @@ def test_windbarb_goldens():
 def test_vector_plot_goldens():
     for name in VECTOR_PLOT_CASES:
         _check("vector-plot", name)
+
+
+def test_xrange_goldens():
+    for name in XRANGE_CASES:
+        _check("xrange", name)
 
 
 def test_column_edge_cases():
@@ -623,6 +630,7 @@ def test_capability_manifest_and_error():
         "variwide",
         "waterfall",
         "windbarb",
+        "xrange",
     ]
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")

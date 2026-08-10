@@ -1,0 +1,26 @@
+{
+  "type": "xrange",
+  "title": "Platform Migration — Q3 Plan",
+  "subtitle": "Gantt: task spans per track, finish-to-start dependencies, launch milestone (day index)",
+  "id": "gantt",
+  "xAxis": { "title": "Day", "type": "datetime", "min": 0, "max": 64 },
+  "yAxis": {
+    "title": "Track",
+    "categories": ["Discovery", "Schema", "Backend", "Frontend", "Migration", "Launch"]
+  },
+  "series": [
+    {
+      "name": "Delivery plan",
+      "color": "#3f9b6a",
+      "data": [0, 8, 14, 22, 40, 60],
+      "spans": [
+        { "x": 0,  "x2": 8,  "y": 0, "id": "disc",  "name": "Discovery & scoping" },
+        { "x": 8,  "x2": 18, "y": 1, "id": "sch",   "name": "Schema design",        "dependency": ["disc"] },
+        { "x": 14, "x2": 38, "y": 2, "id": "be",    "name": "Backend services",     "dependency": ["sch"] },
+        { "x": 22, "x2": 44, "y": 3, "id": "fe",    "name": "Frontend rebuild",     "dependency": ["sch"] },
+        { "x": 40, "x2": 58, "y": 4, "id": "mig",   "name": "Data migration",       "dependency": ["be", "fe"] },
+        { "x": 60, "x2": 60, "y": 5, "id": "ga",    "name": "GA launch", "milestone": true, "dependency": ["mig"] }
+      ]
+    }
+  ]
+}
