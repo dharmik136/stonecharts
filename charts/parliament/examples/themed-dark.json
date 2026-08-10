@@ -1,0 +1,11 @@
+{
+  "type": "parliament",
+  "title": "Senate Allocation",
+  "theme": "dark",
+  "xAxis": {
+    "categories": ["Democrats", "Republicans", "Independents"]
+  },
+  "series": [
+    {"name": "Seats", "data": [48, 49, 3]}
+  ]
+}
