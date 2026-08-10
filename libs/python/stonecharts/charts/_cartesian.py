@@ -82,6 +82,9 @@ class CartesianFrame:
     x_ticks: list[float] = field(default_factory=list)
     slot_lefts: list[float] = field(default_factory=list)  # variwide only
     slot_widths: list[float] = field(default_factory=list)  # variwide only
+    sg_baseline: list[float] = field(default_factory=list)  # streamgraph only
+    sg_cum_bottom: list[list[float]] = field(default_factory=list)
+    sg_cum_top: list[list[float]] = field(default_factory=list)
 
     def xpix(self, i: float) -> float:
         """Category index (or, under LINEAR scale, a numeric x-VALUE) -> pixel x.
@@ -320,6 +323,55 @@ def build_frame(
         else:
             lo = spec.y_axis.min if spec.y_axis.min is not None else (min(values) if values else 0.0)
             hi = spec.y_axis.max if spec.y_axis.max is not None else (max(values) if values else 0.0)
+    # Streamgraph baseline-offset transform: pre-compute the offset envelope
+    # so the y-domain and gridlines are correct.
+    sg_baseline: list[float] = []
+    sg_cum_bottom: list[list[float]] = []
+    sg_cum_top: list[list[float]] = []
+    if spec.type == "streamgraph" and n > 0:
+        K = len(spec.series)
+        all_vals: list[list[float]] = []
+        for s in spec.series:
+            all_vals.append([float(v) for v in s.data[:n]])
+        sg_totals = [0.0] * n
+        for k in range(K):
+            for i in range(len(all_vals[k])):
+                sg_totals[i] += all_vals[k][i]
+        running_sg = [0.0] * n
+        for k in range(K):
+            bot = running_sg[:]
+            top = [running_sg[i] + all_vals[k][i] for i in range(len(all_vals[k]))]
+            sg_cum_bottom.append(bot)
+            sg_cum_top.append(top)
+            running_sg = top[:]
+        offset_mode = spec.offset if spec.offset else "wiggle"
+        sg_baseline = [0.0] * n
+        if offset_mode == "silhouette":
+            for i in range(n):
+                sg_baseline[i] = -sg_totals[i] / 2.0
+        else:
+            sg_baseline[0] = 0.0
+            y_acc = 0.0
+            for i in range(1, n):
+                num_w = 0.0
+                den_w = 0.0
+                for k in range(K):
+                    ct_i = sg_cum_top[k][i] if i < len(sg_cum_top[k]) else 0.0
+                    ct_prev = sg_cum_top[k][i - 1] if (i - 1) < len(sg_cum_top[k]) else 0.0
+                    move_k = ct_i - ct_prev
+                    weight_k = move_k / 2.0
+                    for j in range(k):
+                        ct_j_i = sg_cum_top[j][i] if i < len(sg_cum_top[j]) else 0.0
+                        ct_j_prev = sg_cum_top[j][i - 1] if (i - 1) < len(sg_cum_top[j]) else 0.0
+                        weight_k += ct_j_i - ct_j_prev
+                    num_w += weight_k * move_k
+                    den_w += move_k
+                if den_w != 0.0:
+                    y_acc -= num_w / den_w
+                sg_baseline[i] = y_acc
+        lo = spec.y_axis.min if spec.y_axis.min is not None else min(sg_baseline[i] for i in range(n))
+        hi = spec.y_axis.max if spec.y_axis.max is not None else max(sg_baseline[i] + sg_totals[i] for i in range(n))
+
     y_min, y_max, y_ticks = nice_ticks(lo, hi)
 
     if x_scale == "numeric":
@@ -423,6 +475,9 @@ def build_frame(
         y2_ticks=y2_ticks,
         slot_lefts=slot_lefts,
         slot_widths=slot_ws,
+        sg_baseline=sg_baseline,
+        sg_cum_bottom=sg_cum_bottom,
+        sg_cum_top=sg_cum_top,
     )
 
 

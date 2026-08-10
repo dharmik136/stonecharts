@@ -296,6 +296,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderLollipopSVG(spec)
 	case "scatter":
 		svg = renderScatterSVG(spec)
+	case "streamgraph":
+		svg = renderStreamgraphSVG(spec)
 	case "bubble":
 		svg = renderBubbleSVG(spec)
 	case "timeline":

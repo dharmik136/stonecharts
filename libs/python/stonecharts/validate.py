@@ -421,6 +421,7 @@ _KNOWN_TYPES = {
     "variwide",
     "waterfall",
     "windbarb",
+    "streamgraph",
 }
 
 
@@ -444,6 +445,10 @@ def validate(d: Any) -> list[str]:
         _str(d["stacking"], "$.stacking", errs)
         if isinstance(d["stacking"], str) and d["stacking"] not in ("normal", "percent"):
             errs.append(f'$.stacking: expected one of "normal", "percent", received "{d["stacking"]}"')
+    if "offset" in d:
+        _str(d["offset"], "$.offset", errs)
+        if isinstance(d["offset"], str) and d["offset"] not in ("wiggle", "silhouette"):
+            errs.append(f'$.offset: expected one of "wiggle", "silhouette", received "{d["offset"]}"')
     if "grouping" in d:
         _bool(d["grouping"], "$.grouping", errs)
     if "theme" in d:
