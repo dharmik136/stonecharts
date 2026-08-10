@@ -705,6 +705,7 @@ var knownTypes = map[string]bool{
 	"error-bar":   true,
 	"flame-chart": true,
 	"funnel":      true,
+	"gauge":       true,
 	"histogram":   true,
 	"line":        true,
 	"lollipop":    true,
@@ -815,6 +816,41 @@ func validate(v interface{}) []string {
 			for j, elem := range arr {
 				if _, ok := elem.(map[string]interface{}); !ok {
 					errs = append(errs, "$.panes["+itoa(j)+"]: expected object, received "+jtype(elem))
+				}
+			}
+		}
+	}
+	for _, gk := range []string{"gaugeMin", "gaugeMax"} {
+		if x, ok := has(d, gk); ok {
+			vnum(x, "$."+gk, &errs)
+		}
+	}
+	if raw, ok := has(d, "gaugeBands"); ok {
+		arr, ok := raw.([]interface{})
+		if !ok {
+			errs = append(errs, "$.gaugeBands: expected array, received "+jtype(raw))
+		} else {
+			for j, elem := range arr {
+				prefix := "$.gaugeBands[" + itoa(j) + "]"
+				bm, ok := elem.(map[string]interface{})
+				if !ok {
+					errs = append(errs, prefix+": expected object, received "+jtype(elem))
+				} else {
+					if fv, ok := has(bm, "from"); !ok {
+						errs = append(errs, prefix+".from: required")
+					} else {
+						vnum(fv, prefix+".from", &errs)
+					}
+					if tv, ok := has(bm, "to"); !ok {
+						errs = append(errs, prefix+".to: required")
+					} else {
+						vnum(tv, prefix+".to", &errs)
+					}
+					if cv, ok := has(bm, "color"); !ok {
+						errs = append(errs, prefix+".color: required")
+					} else {
+						vstr(cv, prefix+".color", &errs)
+					}
 				}
 			}
 		}

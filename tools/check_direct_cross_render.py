@@ -49,6 +49,7 @@ ACTIVE = {
     "vector-plot": ["basic", "field", "themed-dark", "uniform-length", "adversarial"],
     "flame-chart": ["basic", "multi-series", "deep-stack", "themed-dark", "adversarial"],
     "pie": ["basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"],
+    "gauge": ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"],
     "technical-indicators": ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"],
     "xrange": ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"],
 }

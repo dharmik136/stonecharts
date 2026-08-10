@@ -1,0 +1,16 @@
+{
+  "id": "gauge-dark",
+  "type": "gauge",
+  "title": "Battery",
+  "width": 400,
+  "height": 300,
+  "theme": "dark",
+  "series": [{ "name": "Level", "data": [65] }],
+  "gaugeMin": 0,
+  "gaugeMax": 100,
+  "gaugeBands": [
+    { "from": 0, "to": 20, "color": "#df5353" },
+    { "from": 20, "to": 50, "color": "#dddf0d" },
+    { "from": 50, "to": 100, "color": "#55bf3b" }
+  ]
+}
