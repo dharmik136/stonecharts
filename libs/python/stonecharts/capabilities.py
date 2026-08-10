@@ -28,6 +28,7 @@ _CAPABILITIES: dict[str, Any] = {
         "scatter",
         "streamgraph",
         "timeline",
+        "vector-plot",
         "variwide",
         "waterfall",
         "windbarb",

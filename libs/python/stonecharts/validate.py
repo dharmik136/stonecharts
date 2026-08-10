@@ -375,12 +375,24 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         _str(v["type"], f"{path}.type", errs)
     if "labels" in v:
         _str_array(v["labels"], f"{path}.labels", errs)
+    if "x" in v:
+        if not isinstance(v["x"], list):
+            errs.append(f"{path}.x: expected array, received {_jtype(v['x'])}")
+        else:
+            for i, e in enumerate(v["x"]):
+                _num(e, f"{path}.x[{i}]", errs)
     if "direction" in v:
         if not isinstance(v["direction"], list):
             errs.append(f"{path}.direction: expected array, received {_jtype(v['direction'])}")
         else:
             for i, e in enumerate(v["direction"]):
                 _num(e, f"{path}.direction[{i}]", errs)
+    if "length" in v:
+        if not isinstance(v["length"], list):
+            errs.append(f"{path}.length: expected array, received {_jtype(v['length'])}")
+        else:
+            for i, e in enumerate(v["length"]):
+                _num(e, f"{path}.length[{i}]", errs)
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
@@ -420,6 +432,7 @@ _KNOWN_TYPES = {
     "timeline",
     "variwide",
     "waterfall",
+    "vector-plot",
     "windbarb",
     "streamgraph",
 }
@@ -449,6 +462,12 @@ def validate(d: Any) -> list[str]:
         _str(d["offset"], "$.offset", errs)
         if isinstance(d["offset"], str) and d["offset"] not in ("wiggle", "silhouette"):
             errs.append(f'$.offset: expected one of "wiggle", "silhouette", received "{d["offset"]}"')
+    if "vectorLength" in d:
+        _num(d["vectorLength"], "$.vectorLength", errs)
+    if "rotationOrigin" in d:
+        _str(d["rotationOrigin"], "$.rotationOrigin", errs)
+        if isinstance(d["rotationOrigin"], str) and d["rotationOrigin"] not in ("center", "start", "end"):
+            errs.append(f'$.rotationOrigin: expected one of "center", "start", "end", received "{d["rotationOrigin"]}"')
     if "grouping" in d:
         _bool(d["grouping"], "$.grouping", errs)
     if "theme" in d:
