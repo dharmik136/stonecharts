@@ -61,6 +61,7 @@ GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"]
 SOLID_GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"]
 RADAR_CASES = ["basic", "line-only", "single-series", "themed-dark", "adversarial"]
 POLAR_CASES = ["basic", "line-only", "single-series", "themed-dark", "adversarial"]
+WIND_ROSE_CASES = ["basic", "many-directions", "single-series", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
@@ -87,6 +88,7 @@ ACTIVE_VALIDATION_CASES = {
     "solid-gauge": SOLID_GAUGE_CASES,
     "radar": RADAR_CASES,
     "polar": POLAR_CASES,
+    "wind-rose": WIND_ROSE_CASES,
     "streamgraph": STREAMGRAPH_CASES,
     "technical-indicators": TECHNICAL_INDICATORS_CASES,
     "variwide": VARIWIDE_CASES,
@@ -344,6 +346,11 @@ def test_radar_goldens():
 def test_polar_goldens():
     for name in POLAR_CASES:
         _check("polar", name)
+
+
+def test_wind_rose_goldens():
+    for name in WIND_ROSE_CASES:
+        _check("wind-rose", name)
 
 
 def test_flame_chart_goldens():
@@ -695,6 +702,7 @@ def test_capability_manifest_and_error():
         "vector-plot",
         "variwide",
         "waterfall",
+        "wind-rose",
         "windbarb",
         "xrange",
     ]

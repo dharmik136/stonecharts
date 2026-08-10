@@ -1,0 +1,12 @@
+{
+  "type": "wind-rose",
+  "title": "Network Traffic by Hour",
+  "theme": "dark",
+  "xAxis": {
+    "categories": ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"]
+  },
+  "series": [
+    {"name": "Internal", "data": [5, 2, 10, 30, 40, 35, 20, 10]},
+    {"name": "External", "data": [8, 3, 15, 25, 35, 30, 25, 12]}
+  ]
+}
