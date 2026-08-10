@@ -33,9 +33,10 @@
         "variwide",
         "streamgraph",
         "timeline",
+        "vector-plot",
         "windbarb"
       ],
-      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027; 0.0.0.12 admits boxplot per DEC-028; 0.0.0.13 admits lollipop per DEC-029; 0.0.0.14 admits dumbbell per DEC-030; 0.0.0.15 admits funnel per DEC-031; 0.0.0.16 admits variwide per DEC-032; 0.0.0.17 admits timeline per DEC-033; 0.0.0.18 admits windbarb per DEC-034; 0.0.0.19 admits streamgraph per DEC-035); maps to the released chart design and renderer pair."
+      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027; 0.0.0.12 admits boxplot per DEC-028; 0.0.0.13 admits lollipop per DEC-029; 0.0.0.14 admits dumbbell per DEC-030; 0.0.0.15 admits funnel per DEC-031; 0.0.0.16 admits variwide per DEC-032; 0.0.0.17 admits timeline per DEC-033; 0.0.0.18 admits windbarb per DEC-034; 0.0.0.19 admits streamgraph per DEC-035; 0.0.0.20 admits vector-plot per DEC-036); maps to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",
@@ -192,6 +193,17 @@
       "enum": ["wiggle", "silhouette"],
       "default": "wiggle",
       "description": "Streamgraph: baseline-offset mode. 'wiggle' = minimal-wiggle spine (classic streamgraph); 'silhouette' = inside-out centered stack spanning [-T/2, +T/2] at each x."
+    },
+    "vectorLength": {
+      "type": "number",
+      "default": 20,
+      "description": "Vector-plot: max arrow pixel length. The longest magnitude maps to this many pixels; every other arrow scales linearly."
+    },
+    "rotationOrigin": {
+      "type": "string",
+      "enum": ["center", "start", "end"],
+      "default": "center",
+      "description": "Vector-plot: where the arrow pivots on its (x,y) anchor. 'center' = midpoint at anchor, 'start' = tail at anchor, 'end' = head at anchor."
     }
   },
   "allOf": [
@@ -679,9 +691,19 @@
           "description": "Timeline: per-event label text, aligned to data by index.",
           "items": { "type": "string" }
         },
+        "x": {
+          "type": "array",
+          "description": "Vector-plot: per-point numeric x-coordinate, aligned to data (y) by index. If omitted, x defaults to 0-based index.",
+          "items": { "type": "number" }
+        },
         "direction": {
           "type": "array",
-          "description": "Windbarb: per-point wind direction in degrees (0-360, meteorological 'from' bearing), aligned to data by index.",
+          "description": "Windbarb/vector-plot: per-point direction in degrees, aligned to data by index. Windbarb: meteorological 'from' bearing (0-360). Vector-plot: arrow heading (0 = north/up, clockwise).",
+          "items": { "type": "number" }
+        },
+        "length": {
+          "type": "array",
+          "description": "Vector-plot: per-point magnitude, aligned to data by index. Non-negative; drives arrow pixel length via the length-scale.",
           "items": { "type": "number" }
         }
       }

@@ -43,6 +43,7 @@ VARIWIDE_CASES = ["basic", "adversarial", "dark", "negative"]
 TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
 STREAMGRAPH_CASES = ["basic", "silhouette", "themed-dark", "adversarial"]
 WINDBARB_CASES = ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"]
+VECTOR_PLOT_CASES = ["basic", "field", "themed-dark", "uniform-length", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -66,6 +67,7 @@ ACTIVE_VALIDATION_CASES = {
     "variwide": VARIWIDE_CASES,
     "timeline": TIMELINE_CASES,
     "windbarb": WINDBARB_CASES,
+    "vector-plot": VECTOR_PLOT_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -281,6 +283,11 @@ def test_streamgraph_goldens():
 def test_windbarb_goldens():
     for name in WINDBARB_CASES:
         _check("windbarb", name)
+
+
+def test_vector_plot_goldens():
+    for name in VECTOR_PLOT_CASES:
+        _check("vector-plot", name)
 
 
 def test_column_edge_cases():
@@ -612,6 +619,7 @@ def test_capability_manifest_and_error():
         "scatter",
         "streamgraph",
         "timeline",
+        "vector-plot",
         "variwide",
         "waterfall",
         "windbarb",

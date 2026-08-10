@@ -37,6 +37,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "candlestick" {
 		return candlestickDataTable(spec)
 	}
+	if spec.Type == "vector-plot" {
+		return vectorPlotDataTable(spec)
+	}
 	if spec.Type == "scatter" || spec.Type == "bubble" {
 		return pointModelDataTable(spec, spec.Type == "bubble")
 	}
@@ -244,6 +247,51 @@ func errorBarDataTable(spec *ChartSpec) string {
 	return b.String()
 }
 
+func vectorPlotDataTable(spec *ChartSpec) string {
+	var b strings.Builder
+	b.WriteString(`<table class="sc-visually-hidden">`)
+	if spec.Title != "" {
+		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
+	}
+	b.WriteString(`<thead><tr><th scope="col">Series</th><th scope="col">X</th>` +
+		`<th scope="col">Y</th><th scope="col">Direction</th>` +
+		`<th scope="col">Length</th></tr></thead><tbody>`)
+	for _, s := range spec.Series {
+		xArr := s.X
+		if len(xArr) == 0 {
+			xArr = make([]float64, len(s.Data))
+			for i := range s.Data {
+				xArr[i] = float64(i)
+			}
+		}
+		dirArr := s.Direction
+		if len(dirArr) == 0 {
+			dirArr = make([]float64, len(s.Data))
+		}
+		lenArr := s.Length
+		if len(lenArr) == 0 {
+			lenArr = make([]float64, len(s.Data))
+		}
+		nPts := len(xArr)
+		if len(s.Data) < nPts {
+			nPts = len(s.Data)
+		}
+		if len(dirArr) < nPts {
+			nPts = len(dirArr)
+		}
+		if len(lenArr) < nPts {
+			nPts = len(lenArr)
+		}
+		for i := 0; i < nPts; i++ {
+			b.WriteString(`<tr><th scope="row">` + esc(s.Name) + `</th><td>` +
+				esc(fmtNum(xArr[i])) + `</td><td>` + esc(fmtNum(s.Data[i])) + `</td><td>` +
+				esc(fmtNum(dirArr[i])) + `</td><td>` + esc(fmtNum(lenArr[i])) + `</td></tr>`)
+		}
+	}
+	b.WriteString("</tbody></table>")
+	return b.String()
+}
+
 func capabilityError(received string) error {
 	return &CapabilityError{
 		Code:    "E_CAPABILITY",
@@ -304,6 +352,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderTimelineSVG(spec)
 	case "variwide":
 		svg = renderVariwideSVG(spec)
+	case "vector-plot":
+		svg = renderVectorPlotSVG(spec)
 	case "waterfall":
 		svg = renderWaterfallSVG(spec)
 	case "windbarb":
