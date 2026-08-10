@@ -38,6 +38,7 @@ _CAPABILITIES: dict[str, Any] = {
         "vector-plot",
         "variwide",
         "waterfall",
+        "wind-rose",
         "windbarb",
         "xrange",
     ],
