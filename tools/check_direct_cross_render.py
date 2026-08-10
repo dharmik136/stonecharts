@@ -64,6 +64,7 @@ ACTIVE = {
     "radar": ["basic", "line-only", "single-series", "themed-dark", "adversarial"],
     "polar": ["basic", "line-only", "single-series", "themed-dark", "adversarial"],
     "nightingale": ["basic", "multi-series", "single-series", "themed-dark", "adversarial"],
+    "radial-bar": ["basic", "multi-series", "single-series", "themed-dark", "adversarial"],
     "wind-rose": ["basic", "many-directions", "single-series", "themed-dark", "adversarial"],
     "technical-indicators": ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"],
     "xrange": ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"],

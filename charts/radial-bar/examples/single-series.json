@@ -1,0 +1,11 @@
+{
+  "type": "radial-bar",
+  "title": "SLO Compliance",
+  "xAxis": {
+    "categories": ["Availability", "Latency", "Error Rate"]
+  },
+  "series": [
+    {"name": "Score", "data": [99.5, 85, 92]}
+  ],
+  "yAxis": {"max": 100}
+}
