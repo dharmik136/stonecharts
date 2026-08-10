@@ -1,0 +1,16 @@
+{
+  "id": "<script>alert('xss')</script>",
+  "type": "gauge",
+  "title": "<b>Bad</b> & \"evil\" gauge",
+  "subtitle": "Adversarial — unicode: ☃❤️",
+  "width": 500,
+  "height": 350,
+  "series": [{ "name": "<script>xss</script>", "data": [0] }],
+  "gaugeMin": 0,
+  "gaugeMax": 200,
+  "gaugeBands": [
+    { "from": 0, "to": 100, "color": "#55bf3b" },
+    { "from": 100, "to": 200, "color": "#df5353" }
+  ],
+  "legend": true
+}
