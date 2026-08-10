@@ -62,6 +62,7 @@ ACTIVE = {
     "gauge": ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"],
     "solid-gauge": ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"],
     "radar": ["basic", "line-only", "single-series", "themed-dark", "adversarial"],
+    "polar": ["basic", "line-only", "single-series", "themed-dark", "adversarial"],
     "technical-indicators": ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"],
     "xrange": ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"],
 }
