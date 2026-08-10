@@ -54,6 +54,11 @@ Document status and classification are authoritative in each file's metadata.
 - [DEC-050 semantic invariant tests](project/decision-briefs/dec-050-semantic-invariants.md)
 - [DEC-051 property and fuzz test expansion](project/decision-briefs/dec-051-property-fuzz-expansion.md)
 - [DEC-052 strict input validation](project/decision-briefs/dec-052-strict-input-validation.md)
+- [DEC-053 tiered certification model](project/decision-briefs/dec-053-tiered-certification.md)
+- [DEC-054 range-point schema unification](project/decision-briefs/dec-054-range-point-schema.md)
+- [DEC-055 technical indicators boundary](project/decision-briefs/dec-055-technical-indicators-boundary.md)
+- [DEC-056 combo dual-axis presentation safety](project/decision-briefs/dec-056-dual-axis-policy.md)
+- [DEC-057 development triangle chart type](project/decision-briefs/dec-057-development-triangle.md)
 
 ## Architecture and contracts
 
