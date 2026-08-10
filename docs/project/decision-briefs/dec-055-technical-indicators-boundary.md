@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-025
 title: DEC-055 Technical Indicators Architectural Boundary
-status: proposed
+status: accepted
 classification: informative
 owner: product-owner
 approver: maintainer
