@@ -86,6 +86,15 @@ receive an ADR; bounded operating decisions name their controlling project docum
 
 | Priority | ID | Decision | Current recommendation | Decide before |
 |---:|---|---|---|---|
+| 1 | DEC-049 | Renderer purity invariant | Mandate that `render_svg`/`RenderSVG` must not mutate the input `ChartSpec`; fix 4 Python and 2 Go renderers that currently violate this; add a cross-chart purity test gate | Before next release |
+| 2 | DEC-052 | Strict input validation | Replace silent fallbacks (histogram bin clamping, arearange missing low values) with explicit `SpecError` or opt-in policy flags; add validation for boxplot ordering, pie negatives, gauge bounds | Before next release |
+| 3 | DEC-050 | Semantic invariant tests | Add chart-type-specific mathematical correctness assertions (histogram bin sums, waterfall balance, boxplot ordering, percent-stack totals) as a new assurance layer beyond byte parity | Before next release |
+| 4 | DEC-051 | Property and fuzz test expansion | Extend randomized property tests and Go fuzz seeds from the current 7 chart types to all 35, organized by data model family in 4 phases | After DEC-049 |
+| 5 | DEC-053 | Tiered certification model | Replace flat "all 35 certified" surface with certified (7) / candidate (8) / experimental (20) tiers; update `capabilities()` to return tier metadata | After DEC-050 |
+| 6 | DEC-054 | Range-point schema unification | Replace parallel-array range data model with atomic `{low, high}` range-point objects across arearange, columnrange, error-bar, dumbbell | After DEC-052 |
+| 7 | DEC-055 | Technical indicators boundary | Mark technical-indicators as experimental tier; defer code separation until customer need arises | After DEC-053 |
+| 8 | DEC-056 | Combo dual-axis presentation safety | Introduce advisory metadata in StoneVerify evidence for dual-axis combo charts flagging visual-correlation risk | Independent |
+| 9 | DEC-057 | Development triangle chart type | Build a first-class `development-triangle` chart type for the insurance/actuarial segment with domain-specific features | After DEC-049, DEC-050 |
 
 ## Discussion order
 
@@ -94,3 +103,12 @@ The commercial boundary is governed by the approved policy document and must not
 
 DEC-005 stakeholder brief: [Compatibility decision brief](decision-briefs/dec-005-compatibility.md).
 DEC-017 stakeholder brief: [Visual integrity repositioning brief](decision-briefs/dec-017-visual-integrity.md).
+DEC-049 stakeholder brief: [Renderer purity invariant](decision-briefs/dec-049-renderer-purity.md).
+DEC-050 stakeholder brief: [Semantic invariant tests](decision-briefs/dec-050-semantic-invariants.md).
+DEC-051 stakeholder brief: [Property and fuzz test expansion](decision-briefs/dec-051-property-fuzz-expansion.md).
+DEC-052 stakeholder brief: [Strict input validation](decision-briefs/dec-052-strict-input-validation.md).
+DEC-053 stakeholder brief: [Tiered certification model](decision-briefs/dec-053-tiered-certification.md).
+DEC-054 stakeholder brief: [Range-point schema unification](decision-briefs/dec-054-range-point-schema.md).
+DEC-055 stakeholder brief: [Technical indicators boundary](decision-briefs/dec-055-technical-indicators-boundary.md).
+DEC-056 stakeholder brief: [Combo dual-axis presentation safety](decision-briefs/dec-056-dual-axis-policy.md).
+DEC-057 stakeholder brief: [Development triangle chart type](decision-briefs/dec-057-development-triangle.md).

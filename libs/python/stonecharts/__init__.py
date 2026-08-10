@@ -1,4 +1,4 @@
-"""StoneCharts — an original, proprietary charting library (Python edition).
+"""StoneCharts — Visual Integrity Infrastructure for deterministic reporting charts.
 
 Proprietary. Copyright (c) 2026 Dharmik Shingala. All rights reserved.
 
@@ -33,7 +33,7 @@ from .spec import (
 )
 from .validate import SpecError, validate
 
-__version__ = "0.0.0.14"
+__version__ = "0.0.0.32"
 __all__ = [
     "THEMES",
     "Axis",
