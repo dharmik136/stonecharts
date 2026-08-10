@@ -102,6 +102,53 @@ type OHLCDatum struct {
 	Close float64 `json:"close"`
 }
 
+// Indicator describes a technical indicator overlay (SMA, EMA, etc.).
+type Indicator struct {
+	Type      string                 `json:"type"`
+	Period    *int                   `json:"period,omitempty"`
+	Color     string                 `json:"color,omitempty"`
+	DashStyle string                 `json:"dashStyle,omitempty"`
+	Params    map[string]interface{} `json:"params,omitempty"`
+	Pane      *int                   `json:"pane,omitempty"`
+}
+
+// Flag marks a point event on the chart.
+type Flag struct {
+	X     float64 `json:"x"`
+	Title string  `json:"title"`
+	Text  string  `json:"text,omitempty"`
+	Color string  `json:"color,omitempty"`
+	Shape string  `json:"shape,omitempty"`
+}
+
+// PlotBand is a horizontal band across the plot area.
+type PlotBand struct {
+	From    float64  `json:"from"`
+	To      float64  `json:"to"`
+	Color   string   `json:"color"`
+	Label   string   `json:"label,omitempty"`
+	Opacity *float64 `json:"opacity,omitempty"`
+}
+
+// PlotLine is a horizontal reference line on an axis.
+type PlotLine struct {
+	Value     float64  `json:"value"`
+	Color     string   `json:"color"`
+	Width     *float64 `json:"width,omitempty"`
+	DashStyle string   `json:"dashStyle,omitempty"`
+	Label     string   `json:"label,omitempty"`
+}
+
+// Pane defines a sub-pane (e.g. for indicators rendered below the main chart).
+type Pane struct {
+	Height    *float64   `json:"height,omitempty"`
+	Min       *float64   `json:"min,omitempty"`
+	Max       *float64   `json:"max,omitempty"`
+	Title     string     `json:"title,omitempty"`
+	PlotBands []PlotBand `json:"plotBands,omitempty"`
+	PlotLines []PlotLine `json:"plotLines,omitempty"`
+}
+
 type Series struct {
 	Name        string          `json:"name"`
 	Data        []float64       `json:"data"`
@@ -127,6 +174,8 @@ type Series struct {
 	Direction   []float64       `json:"direction,omitempty"`
 	Length      []float64       `json:"length,omitempty"`
 	Spans       []SpanDatum     `json:"spans,omitempty"`
+	Volume     []float64   `json:"volume,omitempty"`
+	Indicators []Indicator `json:"indicators,omitempty"`
 }
 
 type SpanDatum struct {
@@ -259,6 +308,8 @@ type Axis struct {
 	Max        *float64  `json:"max,omitempty"`
 	GridLine   *GridLine `json:"gridLine,omitempty"` // yAxis only
 	Opposite   *bool     `json:"opposite,omitempty"` // secondaryYAxis only
+	PlotBands []PlotBand `json:"plotBands,omitempty"`
+	PlotLines []PlotLine `json:"plotLines,omitempty"`
 }
 
 type Margin struct {
@@ -454,6 +505,8 @@ type ChartSpec struct {
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
 	Series                 []Series        `json:"series"`
+	Flags []Flag `json:"flags,omitempty"`
+	Panes []Pane `json:"panes,omitempty"`
 }
 
 // applyDefaults mirrors the Python ChartSpec defaults so the two libraries

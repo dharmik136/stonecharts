@@ -1,0 +1,28 @@
+{
+  "type": "technical-indicators",
+  "title": "API p95 Latency with Moving Averages",
+  "subtitle": "Base latency line + SMA(7) & EMA(7) overlays, SLO plot line",
+  "xAxis": {
+    "title": "Day",
+    "categories": ["Jun 1", "Jun 2", "Jun 3", "Jun 4", "Jun 5", "Jun 6", "Jun 7", "Jun 8", "Jun 9", "Jun 10", "Jun 11", "Jun 12", "Jun 13", "Jun 14"]
+  },
+  "yAxis": {
+    "title": "p95 latency (ms)",
+    "plotLines": [
+      { "value": 250, "color": "#d65f5f", "width": 1.5, "dashStyle": "dashed", "label": "SLO 250ms" }
+    ]
+  },
+  "series": [
+    {
+      "name": "p95 latency",
+      "type": "line",
+      "data": [186, 192, 205, 198, 221, 244, 233, 218, 226, 241, 258, 247, 231, 224],
+      "color": "#2f7ed8",
+      "lineWidth": 2,
+      "indicators": [
+        { "type": "sma", "period": 7, "color": "#e0703c" },
+        { "type": "ema", "period": 7, "color": "#3f9b6a", "dashStyle": "dashed" }
+      ]
+    }
+  ]
+}

@@ -34,10 +34,11 @@
         "streamgraph",
         "timeline",
         "vector-plot",
+        "technical-indicators",
         "windbarb",
         "xrange"
       ],
-      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027; 0.0.0.12 admits boxplot per DEC-028; 0.0.0.13 admits lollipop per DEC-029; 0.0.0.14 admits dumbbell per DEC-030; 0.0.0.15 admits funnel per DEC-031; 0.0.0.16 admits variwide per DEC-032; 0.0.0.17 admits timeline per DEC-033; 0.0.0.18 admits windbarb per DEC-034; 0.0.0.19 admits streamgraph per DEC-035; 0.0.0.20 admits vector-plot per DEC-036; 0.0.0.21 admits xrange per DEC-037); maps to the released chart design and renderer pair."
+      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027; 0.0.0.12 admits boxplot per DEC-028; 0.0.0.13 admits lollipop per DEC-029; 0.0.0.14 admits dumbbell per DEC-030; 0.0.0.15 admits funnel per DEC-031; 0.0.0.16 admits variwide per DEC-032; 0.0.0.17 admits timeline per DEC-033; 0.0.0.18 admits windbarb per DEC-034; 0.0.0.19 admits streamgraph per DEC-035; 0.0.0.20 admits vector-plot per DEC-036; 0.0.0.21 admits xrange per DEC-037; 0.0.0.22 admits technical-indicators per DEC-038); maps to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",
@@ -205,6 +206,34 @@
       "enum": ["center", "start", "end"],
       "default": "center",
       "description": "Vector-plot: where the arrow pivots on its (x,y) anchor. 'center' = midpoint at anchor, 'start' = tail at anchor, 'end' = head at anchor."
+    },
+    "flags": {
+      "type": "array",
+      "description": "Technical-indicators: event markers anchored along the base plot.",
+      "items": {
+        "type": "object",
+        "required": ["x", "title"],
+        "properties": {
+          "x": { "type": "number", "description": "Category index or datetime position." },
+          "title": { "type": "string", "description": "Short label shown on the flag glyph." },
+          "text": { "type": "string", "description": "Longer tooltip text." },
+          "color": { "type": "string", "description": "Flag fill color." },
+          "shape": { "type": "string", "enum": ["flag", "circlepin", "squarepin"], "default": "flag" }
+        }
+      }
+    },
+    "panes": {
+      "type": "array",
+      "description": "Technical-indicators: vertical split of the plot area into stacked panes. panes[0] = base pane; panes[1..] = oscillator panes.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "height": { "type": "number", "description": "Pane height as a fraction (0..1) of the available plot area." },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "title": { "type": "string" }
+        }
+      }
     }
   },
   "allOf": [
@@ -494,6 +523,36 @@
             "type": "number"
           },
           "description": "Histogram x-axis bin edges."
+        },
+        "plotBands": {
+          "type": "array",
+          "description": "Shaded regions spanning a range on this axis.",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "color"],
+            "properties": {
+              "from": { "type": "number" },
+              "to": { "type": "number" },
+              "color": { "type": "string" },
+              "label": { "type": "string" },
+              "opacity": { "type": "number" }
+            }
+          }
+        },
+        "plotLines": {
+          "type": "array",
+          "description": "Reference lines at a specific value on this axis.",
+          "items": {
+            "type": "object",
+            "required": ["value", "color"],
+            "properties": {
+              "value": { "type": "number" },
+              "color": { "type": "string" },
+              "width": { "type": "number" },
+              "dashStyle": { "type": "string", "enum": ["solid", "dashed", "dotted"] },
+              "label": { "type": "string" }
+            }
+          }
         }
       }
     },
@@ -529,6 +588,36 @@
                 "dotted"
               ],
               "default": "solid"
+            }
+          }
+        },
+        "plotBands": {
+          "type": "array",
+          "description": "Shaded horizontal value regions.",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "color"],
+            "properties": {
+              "from": { "type": "number" },
+              "to": { "type": "number" },
+              "color": { "type": "string" },
+              "label": { "type": "string" },
+              "opacity": { "type": "number" }
+            }
+          }
+        },
+        "plotLines": {
+          "type": "array",
+          "description": "Horizontal reference lines at a value.",
+          "items": {
+            "type": "object",
+            "required": ["value", "color"],
+            "properties": {
+              "value": { "type": "number" },
+              "color": { "type": "string" },
+              "width": { "type": "number" },
+              "dashStyle": { "type": "string", "enum": ["solid", "dashed", "dotted"] },
+              "label": { "type": "string" }
             }
           }
         }
@@ -650,9 +739,30 @@
         },
         "type": {
           "type": "string",
-          "enum": ["line", "column"],
+          "enum": ["line", "column", "area"],
           "default": "column",
-          "description": "Per-series mark kind for combo charts. 'column' = baseline-anchored rect; 'line' = path + markers."
+          "description": "Per-series mark kind. 'column' = baseline-anchored rect; 'line' = path + markers; 'area' = path + fill down to the pane floor."
+        },
+        "volume": {
+          "type": "array",
+          "description": "Technical-indicators: per-record volume, aligned to data by index. Required only for a VWAP indicator.",
+          "items": { "type": "number" }
+        },
+        "indicators": {
+          "type": "array",
+          "description": "Technical-indicators: derived overlays computed from this series' data. Each element names a transform type and its parameters.",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": { "type": "string", "enum": ["sma", "ema", "bollinger", "vwap", "macd", "rsi"], "description": "Indicator transform type." },
+              "period": { "type": "integer", "minimum": 1, "description": "Lookback window size." },
+              "color": { "type": "string", "description": "Overlay line color." },
+              "dashStyle": { "type": "string", "enum": ["solid", "dashed", "dotted"] },
+              "params": { "type": "object", "description": "Extra transform parameters (e.g. {stdDev: 2} for Bollinger)." },
+              "pane": { "type": "integer", "minimum": 0, "description": "Target pane index (0 = base, 1+ = oscillator)." }
+            }
+          }
         },
         "yAxis": {
           "type": "integer",

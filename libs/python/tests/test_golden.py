@@ -44,6 +44,7 @@ TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
 STREAMGRAPH_CASES = ["basic", "silhouette", "themed-dark", "adversarial"]
 WINDBARB_CASES = ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"]
 VECTOR_PLOT_CASES = ["basic", "field", "themed-dark", "uniform-length", "adversarial"]
+TECHNICAL_INDICATORS_CASES = ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
@@ -65,6 +66,7 @@ ACTIVE_VALIDATION_CASES = {
     "dumbbell": DUMBBELL_CASES,
     "funnel": FUNNEL_CASES,
     "streamgraph": STREAMGRAPH_CASES,
+    "technical-indicators": TECHNICAL_INDICATORS_CASES,
     "variwide": VARIWIDE_CASES,
     "timeline": TIMELINE_CASES,
     "windbarb": WINDBARB_CASES,
@@ -295,6 +297,11 @@ def test_vector_plot_goldens():
 def test_xrange_goldens():
     for name in XRANGE_CASES:
         _check("xrange", name)
+
+
+def test_technical_indicators_goldens():
+    for name in TECHNICAL_INDICATORS_CASES:
+        _check("technical-indicators", name)
 
 
 def test_column_edge_cases():
@@ -625,6 +632,7 @@ def test_capability_manifest_and_error():
         "lollipop",
         "scatter",
         "streamgraph",
+        "technical-indicators",
         "timeline",
         "vector-plot",
         "variwide",

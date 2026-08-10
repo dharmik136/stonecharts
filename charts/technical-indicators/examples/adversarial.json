@@ -1,0 +1,32 @@
+{
+  "type": "technical-indicators",
+  "title": "<img onerror=alert(1)> &amp; \"quotes\"",
+  "subtitle": "XSS in all user-facing fields",
+  "id": "adv",
+  "xAxis": {
+    "title": "X <script>",
+    "categories": ["<b>d1</b>", "d\"2", "d&3", "d 4", "d5", "d6", "d7", "d8", "d9", "d10"]
+  },
+  "yAxis": {
+    "title": "Y &amp;",
+    "plotLines": [
+      { "value": 50, "color": "#d65f5f", "width": 1, "dashStyle": "dashed", "label": "<script>SLO" }
+    ]
+  },
+  "flags": [
+    { "x": 2, "title": "<b>Deploy</b>", "text": "v1 & \"release\"", "color": "#5b8def", "shape": "flag" },
+    { "x": 7, "title": "Halt<script>", "color": "#d65f5f", "shape": "circlepin" }
+  ],
+  "series": [
+    {
+      "name": "<script>alert(1)</script>",
+      "type": "line",
+      "data": [30, 42, 55, 48, 63, 71, 58, 44, 52, 67],
+      "color": "#2f7ed8",
+      "indicators": [
+        { "type": "sma", "period": 3, "color": "#e0703c" },
+        { "type": "ema", "period": 3, "color": "#3f9b6a", "dashStyle": "dashed" }
+      ]
+    }
+  ]
+}

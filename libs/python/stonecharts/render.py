@@ -30,6 +30,7 @@ from .charts import line as _line
 from .charts import lollipop as _lollipop
 from .charts import scatter as _scatter
 from .charts import streamgraph as _streamgraph
+from .charts import technical_indicators as _technical_indicators
 from .charts import timeline as _timeline
 from .charts import variwide as _variwide
 from .charts import vector_plot as _vector_plot
@@ -62,6 +63,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "lollipop": _lollipop.render_svg,
     "scatter": _scatter.render_svg,
     "streamgraph": _streamgraph.render_svg,
+    "technical-indicators": _technical_indicators.render_svg,
     "bubble": _bubble.render_svg,
     "candlestick": _candlestick.render_svg,
     "timeline": _timeline.render_svg,
@@ -210,6 +212,19 @@ def _data_table(spec: ChartSpec) -> str:
             '<thead><tr><th scope="col">Series</th><th scope="col">Lane</th>'
             '<th scope="col">Start</th><th scope="col">End</th>'
             '<th scope="col">Duration</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "technical-indicators":
+        cats = spec.x_axis.categories or []
+        rows = []
+        for s in spec.series:
+            for i, v in enumerate(s.data):
+                cat = cats[i] if i < len(cats) else str(i)
+                rows.append(f'<tr><th scope="row">{esc(cat)}</th><td>{esc(s.name)}</td><td>{esc(fmt_num(v))}</td></tr>')
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
+            '<th scope="col">Value</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
     if spec.type == "vector-plot":
