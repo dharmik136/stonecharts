@@ -21,7 +21,7 @@ def render_svg(spec: ChartSpec) -> str:
     W, H = spec.width, spec.height
     theme = spec.theme
     palette = theme.palette
-    cid = esc(spec.id)
+    _cid = esc(spec.id)
 
     a11y_attr = ""
     a11y_desc = ""

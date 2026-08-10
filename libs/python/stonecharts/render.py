@@ -27,12 +27,12 @@ from .charts import error_bar as _error_bar
 from .charts import flame_chart as _flame_chart
 from .charts import funnel as _funnel
 from .charts import gauge as _gauge
-from .charts import solid_gauge as _solid_gauge
 from .charts import histogram as _histogram
 from .charts import line as _line
 from .charts import lollipop as _lollipop
 from .charts import pie as _pie
 from .charts import scatter as _scatter
+from .charts import solid_gauge as _solid_gauge
 from .charts import streamgraph as _streamgraph
 from .charts import technical_indicators as _technical_indicators
 from .charts import timeline as _timeline
@@ -229,11 +229,7 @@ def _data_table(spec: ChartSpec) -> str:
             for i, v in enumerate(s0.data):
                 cat = cats[i] if i < len(cats) else str(i)
                 pct = (v / total) * 100 if total > 0 else 0.0
-                rows.append(
-                    f'<tr><th scope="row">{esc(cat)}</th>'
-                    f"<td>{esc(fmt_num(v))}</td>"
-                    f"<td>{pct:.1f}%</td></tr>"
-                )
+                rows.append(f'<tr><th scope="row">{esc(cat)}</th><td>{esc(fmt_num(v))}</td><td>{pct:.1f}%</td></tr>')
         return (
             f'<table class="sc-visually-hidden">{caption}'
             '<thead><tr><th scope="col">Category</th><th scope="col">Value</th>'
