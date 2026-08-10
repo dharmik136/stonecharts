@@ -523,6 +523,7 @@ type ChartSpec struct {
 	GaugeMin               *float64        `json:"gaugeMin,omitempty"`
 	GaugeMax               *float64        `json:"gaugeMax,omitempty"`
 	GaugeBands             []GaugeBand     `json:"gaugeBands,omitempty"`
+	OutOfRange             string          `json:"outOfRange,omitempty"`
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
@@ -550,6 +551,9 @@ func (c *ChartSpec) applyDefaults() {
 	if c.Legend == nil {
 		t := true
 		c.Legend = &t
+	}
+	if c.OutOfRange == "" {
+		c.OutOfRange = "error"
 	}
 	for i := range c.Series {
 		if c.Series[i].Name == "" {

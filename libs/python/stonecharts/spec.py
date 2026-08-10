@@ -428,6 +428,7 @@ class ChartSpec:
     gauge_min: float = 0.0  # gauge: scale minimum
     gauge_max: float = 100.0  # gauge: scale maximum
     gauge_bands: list[GaugeBand] | None = None  # gauge: colored range bands
+    out_of_range: str = "error"  # histogram: "error" | "clip"
     flags: list[Flag] | None = None
     panes: list[Pane] | None = None
 
@@ -786,6 +787,7 @@ class ChartSpec:
             ]
             if d.get("gaugeBands")
             else None,
+            out_of_range=d.get("outOfRange") or "error",
             flags=flags,
             panes=panes,
         )
