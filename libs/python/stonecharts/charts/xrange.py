@@ -52,7 +52,7 @@ def _xrange_marks(fr: CartesianFrame, p: list[str]) -> None:
     cats = fr.cats
 
     span_index: dict[str, tuple[float, float]] = {}
-    for si, s in enumerate(fr.spec.series):
+    for _si, s in enumerate(fr.spec.series):
         for sp in s.spans or []:
             if sp.id:
                 end_x = xval(sp.x2)
