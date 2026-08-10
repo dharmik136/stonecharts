@@ -128,6 +128,15 @@ class FrameDatum:
 
 
 @dataclass
+class RangePoint:
+    low: float
+    high: float
+    value: float | None = None
+    category: str | None = None
+    name: str | None = None
+
+
+@dataclass
 class BoxDatum:
     low: float
     q1: float
@@ -208,6 +217,7 @@ class Series:
     regression: bool = False
     low: list[float] | None = None
     high: list[float] | None = None
+    range_data: list[RangePoint] | None = None
     data_points: list[Datum] | None = None  # scatter only — see Datum
     ohlc: list[dict] | None = None  # candlestick only — [{open,high,low,close}, ...]
     box_data: list[BoxDatum] | None = None  # boxplot only — 5-number summary per category
@@ -524,6 +534,34 @@ class ChartSpec:
                     )
                     for ind in indicators_raw
                 ]
+            range_data_raw = s.get("rangeData")
+            range_data_list = None
+            if isinstance(range_data_raw, list) and len(range_data_raw) > 0:
+                range_data_list = [
+                    RangePoint(
+                        low=float(rp["low"]),
+                        high=float(rp["high"]),
+                        value=float(rp["value"]) if "value" in rp else None,
+                        category=rp.get("category"),
+                        name=rp.get("name"),
+                    )
+                    for rp in range_data_raw
+                ]
+                if chart_type == "arearange":
+                    data_field = [rp.high for rp in range_data_list]
+                    low_field: list[float] | None = [rp.low for rp in range_data_list]
+                    high_field: list[float] | None = None
+                elif chart_type == "error-bar":
+                    data_field = [rp.value for rp in range_data_list]  # type: ignore[misc]
+                    low_field = [rp.low for rp in range_data_list]
+                    high_field = [rp.high for rp in range_data_list]
+                else:  # columnrange, dumbbell
+                    data_field = [rp.low for rp in range_data_list]
+                    low_field = None
+                    high_field = [rp.high for rp in range_data_list]
+            else:
+                low_field = [float(v) for v in s["low"]] if "low" in s and s["low"] is not None else None
+                high_field = [float(v) for v in s["high"]] if "high" in s and s["high"] is not None else None
             series.append(
                 Series(
                     name=s.get("name") or f"Series {i + 1}",
@@ -540,8 +578,9 @@ class ChartSpec:
                     curve=s.get("curve"),
                     marker=marker,
                     regression=bool(s.get("regression", False)),
-                    low=[float(v) for v in s["low"]] if "low" in s and s["low"] is not None else None,
-                    high=[float(v) for v in s["high"]] if "high" in s and s["high"] is not None else None,
+                    low=low_field,
+                    high=high_field,
+                    range_data=range_data_list,
                     ohlc=s.get("ohlc"),
                     box_data=box_data,
                     widths=[float(v) for v in s["widths"]] if "widths" in s and s["widths"] is not None else None,

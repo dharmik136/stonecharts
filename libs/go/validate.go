@@ -468,7 +468,14 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 			}
 		}
 	}
-	if x, ok := has(m, "data"); !ok && chartType != "boxplot" && chartType != "flame-chart" {
+	rangeTypes := map[string]bool{"arearange": true, "columnrange": true, "error-bar": true, "dumbbell": true}
+	hasRangeData := false
+	if rd, ok := has(m, "rangeData"); ok {
+		if rdArr, ok := rd.([]interface{}); ok && len(rdArr) > 0 {
+			hasRangeData = true
+		}
+	}
+	if x, ok := has(m, "data"); !ok && chartType != "boxplot" && chartType != "flame-chart" && !(rangeTypes[chartType] && hasRangeData) {
 		*errs = append(*errs, path+".data: required")
 	} else if !ok {
 		// boxplot uses boxData, flame-chart uses frames instead of data
@@ -1053,6 +1060,50 @@ func validate(v interface{}) []string {
 					if !ok {
 						continue
 					}
+					prefix := "$.series[" + itoa(i) + "]"
+					rd, rdOk := has(m, "rangeData")
+					if rdOk {
+						if rdArr, ok := rd.([]interface{}); ok && len(rdArr) > 0 {
+							for j, elem := range rdArr {
+								rpPath := prefix + ".rangeData[" + itoa(j) + "]"
+								rp, ok := elem.(map[string]interface{})
+								if !ok {
+									errs = append(errs, rpPath+": expected object, received "+jtype(elem))
+									continue
+								}
+								if lv, ok := has(rp, "low"); !ok {
+									errs = append(errs, rpPath+".low: required")
+								} else {
+									vnum(lv, rpPath+".low", &errs)
+								}
+								if hv, ok := has(rp, "high"); !ok {
+									errs = append(errs, rpPath+".high: required")
+								} else {
+									vnum(hv, rpPath+".high", &errs)
+								}
+								if chartTypeStr == "error-bar" {
+									if _, ok := has(rp, "value"); !ok {
+										errs = append(errs, rpPath+".value: required for error-bar")
+									}
+								}
+								if vv, ok := has(rp, "value"); ok {
+									vnum(vv, rpPath+".value", &errs)
+								}
+								if cv, ok := has(rp, "category"); ok {
+									vstr(cv, rpPath+".category", &errs)
+								}
+								if nv, ok := has(rp, "name"); ok {
+									vstr(nv, rpPath+".name", &errs)
+								}
+								lowF, lowOk := rp["low"].(float64)
+								highF, highOk := rp["high"].(float64)
+								if lowOk && highOk && lowF > highF {
+									errs = append(errs, rpPath+": low ("+fmtNum(lowF)+") must be <= high ("+fmtNum(highF)+")")
+								}
+							}
+							continue
+						}
+					}
 					data, dataOk := has(m, "data")
 					if !dataOk {
 						continue
@@ -1064,7 +1115,6 @@ func validate(v interface{}) []string {
 					dataLen := len(dataArr)
 					low, lowOk := has(m, "low")
 					high, highOk := has(m, "high")
-					prefix := "$.series[" + itoa(i) + "]"
 					if chartTypeStr == "arearange" {
 						if !lowOk {
 							errs = append(errs, prefix+".low: required for arearange, received 0 values for "+itoa(dataLen)+" data points")

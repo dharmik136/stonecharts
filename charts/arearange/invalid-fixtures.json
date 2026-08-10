@@ -49,5 +49,32 @@
     "errors": [
       "$.series: expected array, received string"
     ]
+  },
+  {
+    "spec": {
+      "type": "arearange",
+      "series": [{ "name": "s", "rangeData": [{"low": 10, "high": 5}] }]
+    },
+    "errors": [
+      "$.series[0].rangeData[0]: low (10) must be <= high (5)"
+    ]
+  },
+  {
+    "spec": {
+      "type": "arearange",
+      "series": [{ "name": "s", "rangeData": [{"high": 10}] }]
+    },
+    "errors": [
+      "$.series[0].rangeData[0].low: required"
+    ]
+  },
+  {
+    "spec": {
+      "type": "arearange",
+      "series": [{ "name": "s", "rangeData": ["bad"] }]
+    },
+    "errors": [
+      "$.series[0].rangeData[0]: expected object, received string"
+    ]
   }
 ]

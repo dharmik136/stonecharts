@@ -1666,3 +1666,75 @@ func TestSemanticInvariants(t *testing.T) {
 		}
 	})
 }
+
+func TestRangeDataParity(t *testing.T) {
+	cases := []struct {
+		name     string
+		parallel string
+		atomic   string
+	}{
+		{
+			name:     "arearange",
+			parallel: `{"type":"arearange","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","data":[120,180,150],"low":[60,95,80]}]}`,
+			atomic:   `{"type":"arearange","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","rangeData":[{"low":60,"high":120},{"low":95,"high":180},{"low":80,"high":150}]}]}`,
+		},
+		{
+			name:     "columnrange",
+			parallel: `{"type":"columnrange","xAxis":{"categories":["A","B"]},"series":[{"name":"s","data":[10,20],"high":[50,70]}]}`,
+			atomic:   `{"type":"columnrange","xAxis":{"categories":["A","B"]},"series":[{"name":"s","rangeData":[{"low":10,"high":50},{"low":20,"high":70}]}]}`,
+		},
+		{
+			name:     "error-bar",
+			parallel: `{"type":"error-bar","xAxis":{"categories":["A","B"]},"series":[{"name":"s","data":[100,200],"low":[80,170],"high":[120,230]}]}`,
+			atomic:   `{"type":"error-bar","xAxis":{"categories":["A","B"]},"series":[{"name":"s","rangeData":[{"low":80,"high":120,"value":100},{"low":170,"high":230,"value":200}]}]}`,
+		},
+		{
+			name:     "dumbbell",
+			parallel: `{"type":"dumbbell","xAxis":{"categories":["A","B"]},"series":[{"name":"s","data":[10,20],"high":[50,70]}]}`,
+			atomic:   `{"type":"dumbbell","xAxis":{"categories":["A","B"]},"series":[{"name":"s","rangeData":[{"low":10,"high":50},{"low":20,"high":70}]}]}`,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			specP, err := FromJSON([]byte(tc.parallel))
+			if err != nil {
+				t.Fatalf("parallel: %v", err)
+			}
+			specA, err := FromJSON([]byte(tc.atomic))
+			if err != nil {
+				t.Fatalf("atomic: %v", err)
+			}
+			svgP, _ := RenderSVG(specP)
+			svgA, _ := RenderSVG(specA)
+			if svgP != svgA {
+				t.Errorf("SVG mismatch for %s: parallel (%d bytes) != atomic (%d bytes)", tc.name, len(svgP), len(svgA))
+			}
+		})
+	}
+}
+
+func TestRangeDataValidation(t *testing.T) {
+	bad := `{"type":"arearange","series":[{"name":"s","rangeData":[{"low":100,"high":50}]}]}`
+	_, err := FromJSON([]byte(bad))
+	if err == nil {
+		t.Fatal("expected error for low > high")
+	}
+	if !strings.Contains(err.Error(), "low (100) must be <= high (50)") {
+		t.Errorf("expected low>high error, got: %v", err)
+	}
+
+	missingVal := `{"type":"error-bar","series":[{"name":"s","rangeData":[{"low":5,"high":10}]}]}`
+	_, err = FromJSON([]byte(missingVal))
+	if err == nil {
+		t.Fatal("expected error for missing value")
+	}
+	if !strings.Contains(err.Error(), "value: required for error-bar") {
+		t.Errorf("expected value required error, got: %v", err)
+	}
+
+	valid := `{"type":"columnrange","xAxis":{"categories":["A"]},"series":[{"name":"s","rangeData":[{"low":10,"high":50}]}]}`
+	_, err = FromJSON([]byte(valid))
+	if err != nil {
+		t.Fatalf("valid rangeData rejected: %v", err)
+	}
+}
