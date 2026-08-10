@@ -157,6 +157,41 @@ class Indicator:
 
 
 @dataclass
+class TriangleData:
+    origins: list[str]
+    periods: list[int]
+    values: list[list[float]]
+    view: str = "cumulative"
+    value_type: str = "incurred"
+    unit: str = ""
+
+
+@dataclass
+class DiagonalConfig:
+    highlight: bool = False
+    label: str = ""
+
+
+@dataclass
+class FactorsConfig:
+    show: bool = False
+    position: str = "below"
+
+
+@dataclass
+class ColorScaleConfig:
+    scale_type: str = "sequential"
+    domain: str = "auto"
+
+
+@dataclass
+class TriangleAnnotation:
+    origin: str
+    period: int
+    text: str
+
+
+@dataclass
 class Flag:
     x: float
     title: str
@@ -441,6 +476,11 @@ class ChartSpec:
     out_of_range: str = "error"  # histogram: "error" | "clip"
     flags: list[Flag] | None = None
     panes: list[Pane] | None = None
+    triangle: TriangleData | None = None
+    diagonal: DiagonalConfig | None = None
+    factors_config: FactorsConfig | None = None
+    color_scale: ColorScaleConfig | None = None
+    triangle_annotations: list[TriangleAnnotation] | None = None
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -829,4 +869,32 @@ class ChartSpec:
             out_of_range=d.get("outOfRange") or "error",
             flags=flags,
             panes=panes,
+            triangle=TriangleData(
+                origins=[str(o) for o in d["triangle"]["origins"]],
+                periods=[int(p) for p in d["triangle"]["periods"]],
+                values=[[float(v) for v in row] for row in d["triangle"]["values"]],
+                view=d["triangle"].get("view") or "cumulative",
+                value_type=d["triangle"].get("valueType") or "incurred",
+                unit=d["triangle"].get("unit") or "",
+            ) if isinstance(d.get("triangle"), dict) else None,
+            diagonal=DiagonalConfig(
+                highlight=bool(d["diagonal"].get("highlight", False)),
+                label=d["diagonal"].get("label") or "",
+            ) if isinstance(d.get("diagonal"), dict) else None,
+            factors_config=FactorsConfig(
+                show=bool(d["factors"].get("show", False)),
+                position=d["factors"].get("position") or "below",
+            ) if isinstance(d.get("factors"), dict) else None,
+            color_scale=ColorScaleConfig(
+                scale_type=d["colorScale"].get("type") or "sequential",
+                domain=d["colorScale"].get("domain") or "auto",
+            ) if isinstance(d.get("colorScale"), dict) else None,
+            triangle_annotations=[
+                TriangleAnnotation(
+                    origin=str(a["origin"]),
+                    period=int(a["period"]),
+                    text=str(a["text"]),
+                )
+                for a in d["annotations"]
+            ] if isinstance(d.get("annotations"), list) else None,
         )

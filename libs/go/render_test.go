@@ -52,7 +52,8 @@ func TestGolden(t *testing.T) {
 		"radial-bar":          {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
 		"wind-rose":           {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
 		"technical-indicators": {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
-		"xrange":       {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
+		"xrange":                {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
+		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -1045,7 +1046,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypeNames(), []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "histogram", "line", "lollipop", "nightingale", "parliament", "pie", "polar", "radar", "radial-bar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "variwide", "vector-plot", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypeNames(), []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "development-triangle", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "histogram", "line", "lollipop", "nightingale", "parliament", "pie", "polar", "radar", "radial-bar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "variwide", "vector-plot", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	if tier := caps.ChartTypes["line"].Tier; tier != "certified" {
@@ -1346,6 +1347,7 @@ func TestRendererPurity(t *testing.T) {
 		"wind-rose":             {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
 		"technical-indicators":  {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
 		"xrange":                {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
+		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
