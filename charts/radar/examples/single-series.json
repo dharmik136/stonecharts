@@ -1,0 +1,10 @@
+{
+  "type": "radar",
+  "title": "Product Coverage",
+  "xAxis": {
+    "categories": ["Performance", "Security", "Usability"]
+  },
+  "series": [
+    {"name": "Product X", "data": [85, 70, 92], "fillOpacity": 0.25}
+  ]
+}

@@ -497,6 +497,7 @@ _KNOWN_TYPES = {
     "line",
     "lollipop",
     "pie",
+    "radar",
     "scatter",
     "solid-gauge",
     "technical-indicators",

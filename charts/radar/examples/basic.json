@@ -1,0 +1,11 @@
+{
+  "type": "radar",
+  "title": "Service Scorecard",
+  "xAxis": {
+    "categories": ["Latency", "Throughput", "Availability", "Error Rate", "Saturation"]
+  },
+  "series": [
+    {"name": "Service A", "data": [80, 95, 99, 15, 60], "fillOpacity": 0.15},
+    {"name": "Service B", "data": [70, 80, 95, 25, 45], "fillOpacity": 0.15}
+  ]
+}

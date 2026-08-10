@@ -1,0 +1,12 @@
+{
+  "type": "radar",
+  "title": "<b>XSS &amp; \"edge\" test</b>",
+  "subtitle": "Adversarial &lt;script&gt; payload",
+  "xAxis": {
+    "categories": ["<img>", "A&B", "C\"D", "Normal", "Edge&Case", "Last<>"]
+  },
+  "series": [
+    {"name": "<script>alert(1)</script>", "data": [0, 100, 50, 75, 25, 100], "fillOpacity": 0.1},
+    {"name": "Safe & Sound", "data": [100, 0, 50, 25, 75, 0], "fillOpacity": 0.1}
+  ]
+}

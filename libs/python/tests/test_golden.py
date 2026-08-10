@@ -59,6 +59,7 @@ FLAME_CHART_CASES = ["basic", "multi-series", "deep-stack", "themed-dark", "adve
 TECHNICAL_INDICATORS_CASES = ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"]
 GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"]
 SOLID_GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"]
+RADAR_CASES = ["basic", "line-only", "single-series", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
@@ -83,6 +84,7 @@ ACTIVE_VALIDATION_CASES = {
     "funnel": FUNNEL_CASES,
     "gauge": GAUGE_CASES,
     "solid-gauge": SOLID_GAUGE_CASES,
+    "radar": RADAR_CASES,
     "streamgraph": STREAMGRAPH_CASES,
     "technical-indicators": TECHNICAL_INDICATORS_CASES,
     "variwide": VARIWIDE_CASES,
@@ -330,6 +332,11 @@ def test_gauge_goldens():
 def test_solid_gauge_goldens():
     for name in SOLID_GAUGE_CASES:
         _check("solid-gauge", name)
+
+
+def test_radar_goldens():
+    for name in RADAR_CASES:
+        _check("radar", name)
 
 
 def test_flame_chart_goldens():
@@ -671,6 +678,7 @@ def test_capability_manifest_and_error():
         "line",
         "lollipop",
         "pie",
+        "radar",
         "scatter",
         "solid-gauge",
         "streamgraph",
