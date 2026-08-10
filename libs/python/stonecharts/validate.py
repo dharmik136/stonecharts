@@ -328,7 +328,9 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         _intnum(v["yAxis"], f"{path}.yAxis", errs)
         if isinstance(v["yAxis"], (int, float)) and not isinstance(v["yAxis"], bool) and int(v["yAxis"]) not in (0, 1):
             errs.append(f'{path}.yAxis: expected one of 0, 1, received "{int(v["yAxis"])}"')
-    if "data" not in v and chart_type not in ("boxplot", "flame-chart"):
+    _range_types = {"arearange", "columnrange", "error-bar", "dumbbell"}
+    has_range_data = isinstance(v.get("rangeData"), list) and len(v.get("rangeData", [])) > 0
+    if "data" not in v and chart_type not in ("boxplot", "flame-chart") and not (chart_type in _range_types and has_range_data):
         errs.append(f"{path}.data: required")
     elif "data" not in v:
         pass
@@ -691,6 +693,40 @@ def validate(d: Any) -> list[str]:
     if ct in ("arearange", "columnrange", "error-bar", "dumbbell") and isinstance(d.get("series"), list):
         for i, s in enumerate(d["series"]):
             if not isinstance(s, dict):
+                continue
+            rd = s.get("rangeData")
+            if isinstance(rd, list) and len(rd) > 0:
+                for j, rp in enumerate(rd):
+                    rp_path = f"$.series[{i}].rangeData[{j}]"
+                    if not isinstance(rp, dict):
+                        errs.append(f"{rp_path}: expected object, received {_jtype(rp)}")
+                        continue
+                    if "low" not in rp:
+                        errs.append(f"{rp_path}.low: required")
+                    else:
+                        _num(rp["low"], f"{rp_path}.low", errs)
+                    if "high" not in rp:
+                        errs.append(f"{rp_path}.high: required")
+                    else:
+                        _num(rp["high"], f"{rp_path}.high", errs)
+                    if ct == "error-bar" and "value" not in rp:
+                        errs.append(f"{rp_path}.value: required for error-bar")
+                    elif "value" in rp:
+                        _num(rp["value"], f"{rp_path}.value", errs)
+                    if "category" in rp:
+                        _str(rp["category"], f"{rp_path}.category", errs)
+                    if "name" in rp:
+                        _str(rp["name"], f"{rp_path}.name", errs)
+                    if (
+                        isinstance(rp.get("low"), (int, float))
+                        and not isinstance(rp.get("low"), bool)
+                        and isinstance(rp.get("high"), (int, float))
+                        and not isinstance(rp.get("high"), bool)
+                        and float(rp["low"]) > float(rp["high"])
+                    ):
+                        errs.append(
+                            f"{rp_path}: low ({fmt_num(float(rp['low']))}) must be <= high ({fmt_num(float(rp['high']))})"
+                        )
                 continue
             data = s.get("data")
             if not isinstance(data, list):
