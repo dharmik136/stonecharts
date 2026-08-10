@@ -6,9 +6,18 @@ import (
 )
 
 func renderFlameChartSVG(spec *ChartSpec) string {
+	mod := *spec
+	mod.Series = make([]Series, len(spec.Series))
+	copy(mod.Series, spec.Series)
+	for i := range mod.Series {
+		d := make([]float64, len(spec.Series[i].Data))
+		copy(d, spec.Series[i].Data)
+		mod.Series[i].Data = d
+	}
+
 	maxDepth := 0
 	var allTimes []float64
-	for _, s := range spec.Series {
+	for _, s := range mod.Series {
 		for _, fr := range s.Frames {
 			if fr.Depth > maxDepth {
 				maxDepth = fr.Depth
@@ -21,18 +30,18 @@ func renderFlameChartSVG(spec *ChartSpec) string {
 	for d := 0; d <= maxDepth; d++ {
 		depthCats[d] = fmt.Sprintf("%d", d)
 	}
-	spec.XAxis.Categories = depthCats
+	mod.XAxis.Categories = depthCats
 
-	for i := range spec.Series {
-		for len(spec.Series[i].Data) < len(depthCats) {
-			spec.Series[i].Data = append(spec.Series[i].Data, 0.0)
+	for i := range mod.Series {
+		for len(mod.Series[i].Data) < len(depthCats) {
+			mod.Series[i].Data = append(mod.Series[i].Data, 0.0)
 		}
 	}
 
-	if spec.YAxis.Min == nil {
+	if mod.YAxis.Min == nil {
 		v := 0.0
-		if spec.XAxis.Min != nil {
-			v = *spec.XAxis.Min
+		if mod.XAxis.Min != nil {
+			v = *mod.XAxis.Min
 		} else if len(allTimes) > 0 {
 			v = allTimes[0]
 			for _, t := range allTimes[1:] {
@@ -41,12 +50,12 @@ func renderFlameChartSVG(spec *ChartSpec) string {
 				}
 			}
 		}
-		spec.YAxis.Min = &v
+		mod.YAxis.Min = &v
 	}
-	if spec.YAxis.Max == nil {
+	if mod.YAxis.Max == nil {
 		v := 0.0
-		if spec.XAxis.Max != nil {
-			v = *spec.XAxis.Max
+		if mod.XAxis.Max != nil {
+			v = *mod.XAxis.Max
 		} else if len(allTimes) > 0 {
 			v = allTimes[0]
 			for _, t := range allTimes[1:] {
@@ -55,10 +64,10 @@ func renderFlameChartSVG(spec *ChartSpec) string {
 				}
 			}
 		}
-		spec.YAxis.Max = &v
+		mod.YAxis.Max = &v
 	}
 
-	return renderCartesian(spec, "Flame chart", "band", flameMarks, false, "horizontal")
+	return renderCartesian(&mod, "Flame chart", "band", flameMarks, false, "horizontal")
 }
 
 const (
