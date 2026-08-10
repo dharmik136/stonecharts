@@ -127,8 +127,10 @@ def _macd(
     n = len(data)
     macd_line: list[float | None] = [None] * n
     for i in range(n):
-        if ema_fast[i] is not None and ema_slow[i] is not None:
-            macd_line[i] = ema_fast[i] - ema_slow[i]
+        ef = ema_fast[i]
+        es = ema_slow[i]
+        if ef is not None and es is not None:
+            macd_line[i] = ef - es
     defined = [v for v in macd_line if v is not None]
     sig_vals = _ema(defined, signal_period) if defined else [None] * n
     signal_line: list[float | None] = [None] * n
@@ -139,8 +141,10 @@ def _macd(
             di += 1
     hist: list[float | None] = [None] * n
     for i in range(n):
-        if macd_line[i] is not None and signal_line[i] is not None:
-            hist[i] = macd_line[i] - signal_line[i]
+        ml = macd_line[i]
+        sl = signal_line[i]
+        if ml is not None and sl is not None:
+            hist[i] = ml - sl
     return macd_line, signal_line, hist
 
 
@@ -323,7 +327,7 @@ def _emit_plot_bands_lines(fr: CartesianFrame, p: list[str], ypix_fn, base_top: 
     for pl in spec.x_axis.plot_lines or []:
         gx = fr.xpix(int(pl.value))
         sw = pl.width if pl.width is not None else 1
-        ds = dash_array(pl.dash_style)
+        ds = dash_array(pl.dash_style or "")
         ds_attr = f' stroke-dasharray="{ds}"' if ds else ""
         p.append(
             f'<line class="sc-plotline" x1="{gx:.1f}" y1="{base_top:.1f}" '
@@ -355,7 +359,7 @@ def _emit_plot_bands_lines(fr: CartesianFrame, p: list[str], ypix_fn, base_top: 
     for pl in spec.y_axis.plot_lines or []:
         gy = ypix_fn(pl.value)
         sw = pl.width if pl.width is not None else 1
-        ds = dash_array(pl.dash_style)
+        ds = dash_array(pl.dash_style or "")
         ds_attr = f' stroke-dasharray="{ds}"' if ds else ""
         p.append(
             f'<line class="sc-plotline" x1="{fr.plot_x:.1f}" y1="{gy:.1f}" '
@@ -440,11 +444,11 @@ def _emit_overlay(fr: CartesianFrame, p: list[str], s, ind, si: int, ypix_fn, th
         if ind.params and "stdDev" in ind.params:
             k = float(ind.params["stdDev"])
         mid_vals, upper_vals, lower_vals = _bollinger(data, period, k)
-        defined = [
-            (i, upper_vals[i], lower_vals[i])
-            for i in range(len(data))
-            if upper_vals[i] is not None and lower_vals[i] is not None
-        ]
+        defined: list[tuple[int, float, float]] = []
+        for i in range(len(data)):
+            u, lower = upper_vals[i], lower_vals[i]
+            if u is not None and lower is not None:
+                defined.append((i, u, lower))
         if defined:
             upper_pts = [(fr.xpix(i), ypix_fn(u)) for i, u, _ in defined]
             lower_pts = [(fr.xpix(i), ypix_fn(lower)) for i, _, lower in defined]
@@ -466,9 +470,11 @@ def _emit_overlay(fr: CartesianFrame, p: list[str], s, ind, si: int, ypix_fn, th
                 x = fr.xpix(i)
                 cy = ypix_fn((u + lower) / 2)
                 xlabel = fr.cats[i] if i < len(fr.cats) else str(i)
+                m_val = mid_vals[i]
+                if m_val is None: m_val = 0.0
                 common = (
                     f'class="sc-point" data-series="{si}" data-series-name="{esc(band_name)}" '
-                    f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(mid_vals[i]))}" '
+                    f'data-x="{esc(xlabel)}" data-y="{esc(fmt_num(m_val))}" '
                     f'data-low="{esc(fmt_num(lower))}" data-high="{esc(fmt_num(u))}" '
                     f'data-color="{esc(color)}" data-r="{fmt_num(radius)}" '
                     f'data-r-hover="{fmt_num(radius_hover)}"'
