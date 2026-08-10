@@ -139,7 +139,9 @@ class Series:
     box_data: list[BoxDatum] | None = None  # boxplot only — 5-number summary per category
     widths: list[float] | None = None  # variwide only — per-datum width metric
     labels: list[str] | None = None  # timeline only — per-event label text
-    direction: list[float] | None = None  # windbarb only — per-point wind direction (degrees)
+    x: list[float] | None = None  # vector-plot — per-point numeric x-coordinate
+    direction: list[float] | None = None  # windbarb/vector-plot — per-point direction (degrees)
+    length: list[float] | None = None  # vector-plot only — per-point magnitude
 
 
 @dataclass
@@ -338,6 +340,8 @@ class ChartSpec:
     barb_length: float = 20.0
     y_offset: float = 0.0
     offset: str = "wiggle"  # streamgraph baseline: "wiggle" | "silhouette"
+    vector_length: float = 20.0
+    rotation_origin: str = "center"
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -439,9 +443,11 @@ class ChartSpec:
                     box_data=box_data,
                     widths=[float(v) for v in s["widths"]] if "widths" in s and s["widths"] is not None else None,
                     labels=[str(v) for v in s["labels"]] if "labels" in s and s["labels"] is not None else None,
+                    x=[float(v) for v in s["x"]] if "x" in s and s["x"] is not None else None,
                     direction=[float(v) for v in s["direction"]]
                     if "direction" in s and s["direction"] is not None
                     else None,
+                    length=[float(v) for v in s["length"]] if "length" in s and s["length"] is not None else None,
                 )
             )
         xa = d.get("xAxis") or {}
@@ -571,4 +577,6 @@ class ChartSpec:
             barb_length=float(d.get("barbLength", 20)),
             y_offset=float(d.get("yOffset", 0)),
             offset=d.get("offset") or "wiggle",
+            vector_length=float(d.get("vectorLength", 20)),
+            rotation_origin=d.get("rotationOrigin") or "center",
         )
