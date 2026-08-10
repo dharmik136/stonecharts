@@ -415,6 +415,7 @@ class ChartSpec:
     offset: str = "wiggle"  # streamgraph baseline: "wiggle" | "silhouette"
     vector_length: float = 20.0
     rotation_origin: str = "center"
+    inner_size: float = 0.0  # pie/donut: inner radius as fraction of outer (0 = pie, >0 = donut)
     flags: list[Flag] | None = None
     panes: list[Pane] | None = None
 
@@ -758,6 +759,7 @@ class ChartSpec:
             offset=d.get("offset") or "wiggle",
             vector_length=float(d.get("vectorLength", 20)),
             rotation_origin=d.get("rotationOrigin") or "center",
+            inner_size=float(d.get("innerSize", 0)),
             flags=flags,
             panes=panes,
         )

@@ -510,6 +510,7 @@ type ChartSpec struct {
 	Offset                 string          `json:"offset,omitempty"` // streamgraph: "wiggle" | "silhouette"
 	VectorLength           *float64        `json:"vectorLength,omitempty"`
 	RotationOrigin         string          `json:"rotationOrigin,omitempty"`
+	InnerSize              *float64        `json:"innerSize,omitempty"`
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
