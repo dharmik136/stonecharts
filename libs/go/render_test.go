@@ -42,6 +42,7 @@ func TestGolden(t *testing.T) {
 		"windbarb":     {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
 		"vector-plot":  {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
 		"flame-chart":         {"basic", "multi-series", "deep-stack", "themed-dark", "adversarial"},
+		"pie":                 {"basic", "many-slices", "single-slice", "themed-dark", "adversarial"},
 		"technical-indicators": {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
 		"xrange":       {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
 	}
@@ -690,7 +691,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "flame-chart", "funnel", "histogram", "line", "lollipop", "scatter", "streamgraph", "technical-indicators", "timeline", "vector-plot", "variwide", "waterfall", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "flame-chart", "funnel", "histogram", "line", "lollipop", "pie", "scatter", "streamgraph", "technical-indicators", "timeline", "vector-plot", "variwide", "waterfall", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}
@@ -699,7 +700,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	} else if !strings.HasPrefix(svg, "<svg") {
 		t.Fatalf("expected SVG output for column, got %q", svg[:min(len(svg), 64)])
 	}
-	bad := &ChartSpec{Type: "pie", Series: []Series{{Name: "s", Data: []float64{1}}}}
+	bad := &ChartSpec{Type: "heatmap", Series: []Series{{Name: "s", Data: []float64{1}}}}
 	if _, err := RenderSVG(bad); err == nil {
 		t.Fatal("expected capability error")
 	} else {
@@ -710,7 +711,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 		if ce.Code != "E_CAPABILITY" || ce.Path != "$.type" {
 			t.Fatalf("unexpected capability error: %+v", ce)
 		}
-		if ce.Message != `unsupported chart type "pie"` {
+		if ce.Message != `unsupported chart type "heatmap"` {
 			t.Fatalf("unexpected capability message: %+v", ce)
 		}
 	}

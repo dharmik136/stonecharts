@@ -330,7 +330,7 @@
   },
   {
     "spec": {
-      "type": "pie",
+      "type": "heatmap",
       "series": [
         {
           "name": "s",
@@ -341,7 +341,7 @@
       ]
     },
     "errors": [
-      "$.type: unknown chart type \"pie\""
+      "$.type: unknown chart type \"heatmap\""
     ]
   },
   {

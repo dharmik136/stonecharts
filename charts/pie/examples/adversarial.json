@@ -1,0 +1,7 @@
+{
+  "type": "pie",
+  "title": "<script>alert('xss')</script>",
+  "subtitle": "\" onload=\"alert(1)\"",
+  "xAxis": { "categories": ["<img src=x>", "normal", "&amp;entity"] },
+  "series": [{ "name": "<b>bold</b>", "data": [50, 30, 20] }]
+}

@@ -1,0 +1,7 @@
+{
+  "type": "pie",
+  "title": "Browser Market Share",
+  "subtitle": "Q2 2026",
+  "xAxis": { "categories": ["Chrome", "Safari", "Firefox", "Edge", "Other"] },
+  "series": [{ "name": "Browsers", "data": [65, 18, 10, 5, 2] }]
+}

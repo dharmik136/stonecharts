@@ -1,0 +1,52 @@
+[
+  {
+    "name": "missing series",
+    "spec": { "type": "pie" },
+    "errors": ["$.series: required"]
+  },
+  {
+    "name": "series not array",
+    "spec": { "type": "pie", "series": 42 },
+    "errors": ["$.series: expected array, received number"]
+  },
+  {
+    "name": "series item not object",
+    "spec": { "type": "pie", "series": ["bad"] },
+    "errors": ["$.series[0]: expected object, received string"]
+  },
+  {
+    "name": "data not array",
+    "spec": { "type": "pie", "series": [{ "data": "bad" }] },
+    "errors": ["$.series[0].data: expected array, received string"]
+  },
+  {
+    "name": "data element not number",
+    "spec": { "type": "pie", "series": [{ "data": ["x"] }] },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "name": "missing data",
+    "spec": { "type": "pie", "series": [{ "name": "s" }] },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "name": "title not string",
+    "spec": { "type": "pie", "title": 42, "series": [{ "data": [1] }] },
+    "errors": ["$.title: expected string, received number"]
+  },
+  {
+    "name": "categories not array",
+    "spec": { "type": "pie", "xAxis": { "categories": 42 }, "series": [{ "data": [1] }] },
+    "errors": ["$.xAxis.categories: expected array, received number"]
+  },
+  {
+    "name": "category element not string",
+    "spec": { "type": "pie", "xAxis": { "categories": [42] }, "series": [{ "data": [1] }] },
+    "errors": ["$.xAxis.categories[0]: expected string, received number"]
+  },
+  {
+    "name": "theme not valid",
+    "spec": { "type": "pie", "theme": 42, "series": [{ "data": [1] }] },
+    "errors": ["$.theme: expected string or theme object, received number"]
+  }
+]

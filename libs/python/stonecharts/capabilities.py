@@ -26,6 +26,7 @@ _CAPABILITIES: dict[str, Any] = {
         "histogram",
         "line",
         "lollipop",
+        "pie",
         "scatter",
         "streamgraph",
         "technical-indicators",

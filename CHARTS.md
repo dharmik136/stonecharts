@@ -28,7 +28,7 @@ schema), and the one render call — nothing more is needed.
 | Compare a value **across categories** (ranking, few groups) | `bar` / `column` |
 | Trend **plus magnitude/volume** under the line | `area` |
 | Composition + **volume flow** of many series over ordered time (theme river) | `streamgraph` |
-| **Part-to-whole** of a single total | `pie` / `donut` _(planned)_ |
+| **Part-to-whole** of a single total | `pie` |
 | Two measures on the same x — **magnitude (columns) + trend (line)**, optionally on dual y-axes | `combo` |
 | **Correlation** between two continuous variables (x,y points) | `scatter` |
 | Correlation + a third value as size | `bubble` |
@@ -78,7 +78,13 @@ schema), and the one render call — nothing more is needed.
 | `vector-plot` | series of [x,y,direction,length] field samples | show direction + magnitude at each point of a field (wind / flow / force / gradient) | x/y correlation only (use scatter), size-only third value (use bubble), category ranking (use column) | Design ✅ · render ✅ (certified, 0.0.0.20) | [design.md](charts/vector-plot/design.md) |
 | `windbarb` | datetime[N] + per-point {speed, direction} (speed in `data`, direction in the forward-compatible companion) | show wind **speed and direction** at a glance along a time axis (meteogram wind strip) | speed trend (use line), direction frequency (use wind rose), generic vector field (use vector plot) | Design ✅ · render ✅ (certified, 0.0.0.18) | [design.md](charts/windbarb/design.md) |
 
-_Every Cartesian (Family A) Highcharts-baseline type above is design-complete with validated example specs; renderers land per the build order in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md) (§3.3), starting with `column`. Other families (pie/polar, heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the same roadmap._
+### Family B — Polar / Radial
+
+| Type | Data shape | When to use | Don't use when (use _this_ instead) | Status | Design |
+|------|-----------|-------------|--------------------------------------|--------|--------|
+| `pie` | categories[N] + one series of N non-negative values | part-to-whole composition of a single total (market share, budget allocation) | trend (line), category ranking (column/bar), many slices > 8 (consider bar), stacked composition over time (area) | Design ✅ · render ✅ (certified, 0.0.0.24) | [design.md](charts/pie/design.md) |
+
+_Every Cartesian (Family A) type above is design-complete with validated example specs. Family B (Polar/radial) is now open with pie as the foundation chart. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
 
 ## Add a chart (for contributors / agents extending this)
 
