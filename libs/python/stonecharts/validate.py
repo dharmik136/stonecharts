@@ -504,6 +504,7 @@ _KNOWN_TYPES = {
     "technical-indicators",
     "timeline",
     "variwide",
+    "nightingale",
     "waterfall",
     "vector-plot",
     "wind-rose",

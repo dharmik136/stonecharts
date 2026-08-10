@@ -30,6 +30,7 @@ from .charts import gauge as _gauge
 from .charts import histogram as _histogram
 from .charts import line as _line
 from .charts import lollipop as _lollipop
+from .charts import nightingale as _nightingale
 from .charts import pie as _pie
 from .charts import polar as _polar
 from .charts import radar as _radar
@@ -71,6 +72,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
     "lollipop": _lollipop.render_svg,
+    "nightingale": _nightingale.render_svg,
     "pie": _pie.render_svg,
     "polar": _polar.render_svg,
     "radar": _radar.render_svg,
