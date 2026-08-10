@@ -1,0 +1,8 @@
+{
+  "type": "pie",
+  "subtype": "variablepie",
+  "title": "Countries by GDP and Population",
+  "subtitle": "Angle = GDP share, radius = population",
+  "xAxis": { "categories": ["USA", "China", "Japan", "Germany", "India"] },
+  "series": [{ "name": "GDP", "data": [26, 18, 4, 4, 3], "z": [330, 1400, 125, 84, 1400] }]
+}

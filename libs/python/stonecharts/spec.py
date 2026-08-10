@@ -207,6 +207,7 @@ class Series:
     widths: list[float] | None = None  # variwide only — per-datum width metric
     labels: list[str] | None = None  # timeline only — per-event label text
     x: list[float] | None = None  # vector-plot — per-point numeric x-coordinate
+    z: list[float] | None = None  # variable-radius pie — per-slice radius metric
     direction: list[float] | None = None  # windbarb/vector-plot — per-point direction (degrees)
     length: list[float] | None = None  # vector-plot only — per-point magnitude
     spans: list[Span] | None = None  # xrange/Gantt — per-series span objects
@@ -416,6 +417,7 @@ class ChartSpec:
     vector_length: float = 20.0
     rotation_origin: str = "center"
     inner_size: float = 0.0  # pie/donut: inner radius as fraction of outer (0 = pie, >0 = donut)
+    min_size: float = 0.2  # variable-radius pie: minimum slice radius as fraction of max
     flags: list[Flag] | None = None
     panes: list[Pane] | None = None
 
@@ -534,6 +536,7 @@ class ChartSpec:
                     widths=[float(v) for v in s["widths"]] if "widths" in s and s["widths"] is not None else None,
                     labels=[str(v) for v in s["labels"]] if "labels" in s and s["labels"] is not None else None,
                     x=[float(v) for v in s["x"]] if "x" in s and s["x"] is not None else None,
+                    z=[float(v) for v in s["z"]] if "z" in s and s["z"] is not None else None,
                     direction=[float(v) for v in s["direction"]]
                     if "direction" in s and s["direction"] is not None
                     else None,
@@ -760,6 +763,7 @@ class ChartSpec:
             vector_length=float(d.get("vectorLength", 20)),
             rotation_origin=d.get("rotationOrigin") or "center",
             inner_size=float(d.get("innerSize", 0)),
+            min_size=float(d.get("minSize", 0.2)),
             flags=flags,
             panes=panes,
         )
