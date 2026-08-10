@@ -439,7 +439,9 @@ class ChartSpec:
                     box_data=box_data,
                     widths=[float(v) for v in s["widths"]] if "widths" in s and s["widths"] is not None else None,
                     labels=[str(v) for v in s["labels"]] if "labels" in s and s["labels"] is not None else None,
-                    direction=[float(v) for v in s["direction"]] if "direction" in s and s["direction"] is not None else None,
+                    direction=[float(v) for v in s["direction"]]
+                    if "direction" in s and s["direction"] is not None
+                    else None,
                 )
             )
         xa = d.get("xAxis") or {}

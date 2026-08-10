@@ -41,6 +41,11 @@ ACTIVE = {
     "boxplot": ["basic", "grouped", "outliers", "themed-dark", "adversarial"],
     "lollipop": ["basic", "grouped", "horizontal", "themed-dark", "adversarial"],
     "dumbbell": ["basic", "grouped", "horizontal", "themed-dark", "adversarial"],
+    "funnel": ["basic", "adversarial", "neck", "pyramid", "themed-dark"],
+    "variwide": ["basic", "adversarial", "dark", "negative"],
+    "timeline": ["basic", "multi", "vertical", "adversarial"],
+    "windbarb": ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"],
+    "streamgraph": ["basic", "silhouette", "themed-dark", "adversarial"],
 }
 
 
