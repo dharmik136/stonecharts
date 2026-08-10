@@ -48,6 +48,7 @@ func TestGolden(t *testing.T) {
 		"radar":               {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
 		"polar":               {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
 		"nightingale":         {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"radial-bar":          {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
 		"wind-rose":           {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
 		"technical-indicators": {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
 		"xrange":       {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
@@ -697,7 +698,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "histogram", "line", "lollipop", "nightingale", "pie", "polar", "radar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "vector-plot", "variwide", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "histogram", "line", "lollipop", "nightingale", "radial-bar", "pie", "polar", "radar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "vector-plot", "variwide", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}

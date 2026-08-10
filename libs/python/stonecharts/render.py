@@ -34,6 +34,7 @@ from .charts import nightingale as _nightingale
 from .charts import pie as _pie
 from .charts import polar as _polar
 from .charts import radar as _radar
+from .charts import radial_bar as _radial_bar
 from .charts import scatter as _scatter
 from .charts import solid_gauge as _solid_gauge
 from .charts import streamgraph as _streamgraph
@@ -73,6 +74,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "line": _line.render_svg,
     "lollipop": _lollipop.render_svg,
     "nightingale": _nightingale.render_svg,
+    "radial-bar": _radial_bar.render_svg,
     "pie": _pie.render_svg,
     "polar": _polar.render_svg,
     "radar": _radar.render_svg,
