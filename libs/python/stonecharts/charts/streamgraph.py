@@ -14,8 +14,7 @@ from .line import _marker, _path_d, _spline_d
 
 
 def render_svg(spec) -> str:
-    return render_cartesian(spec, "Streamgraph", "point", _streamgraph_marks,
-                            include_zero=False)
+    return render_cartesian(spec, "Streamgraph", "point", _streamgraph_marks, include_zero=False)
 
 
 def _streamgraph_marks(fr: CartesianFrame, p: list[str]) -> None:
@@ -61,8 +60,7 @@ def _streamgraph_marks(fr: CartesianFrame, p: list[str]) -> None:
             fill = st.fill
             fill_op = st.area_op if st.area_op else ""
             p.append(
-                f'<path class="sc-series-area" data-series="{si}" d="{ribbon_d}" '
-                f'fill="{fill}"{fill_op} stroke="none"/>'
+                f'<path class="sc-series-area" data-series="{si}" d="{ribbon_d}" fill="{fill}"{fill_op} stroke="none"/>'
             )
 
         mk = s.marker or Marker()
