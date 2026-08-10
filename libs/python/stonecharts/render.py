@@ -32,6 +32,7 @@ from .charts import scatter as _scatter
 from .charts import streamgraph as _streamgraph
 from .charts import timeline as _timeline
 from .charts import variwide as _variwide
+from .charts import vector_plot as _vector_plot
 from .charts import waterfall as _waterfall
 from .charts import windbarb as _windbarb
 from .limits import enforce_svg_limit
@@ -64,6 +65,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "candlestick": _candlestick.render_svg,
     "timeline": _timeline.render_svg,
     "variwide": _variwide.render_svg,
+    "vector-plot": _vector_plot.render_svg,
     "waterfall": _waterfall.render_svg,
     "windbarb": _windbarb.render_svg,
 }
@@ -186,6 +188,28 @@ def _data_table(spec: ChartSpec) -> str:
             '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
             '<th scope="col">Open</th><th scope="col">High</th>'
             '<th scope="col">Low</th><th scope="col">Close</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "vector-plot":
+        rows = []
+        for s in spec.series:
+            x_arr = s.x or [float(i) for i in range(len(s.data))]
+            dir_arr = s.direction or [0.0] * len(s.data)
+            len_arr = s.length or [0.0] * len(s.data)
+            n_pts = min(len(x_arr), len(s.data), len(dir_arr), len(len_arr))
+            for i in range(n_pts):
+                rows.append(
+                    f'<tr><th scope="row">{esc(s.name)}</th>'
+                    f"<td>{esc(fmt_num(x_arr[i]))}</td>"
+                    f"<td>{esc(fmt_num(s.data[i]))}</td>"
+                    f"<td>{esc(fmt_num(dir_arr[i]))}</td>"
+                    f"<td>{esc(fmt_num(len_arr[i]))}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Series</th><th scope="col">X</th>'
+            '<th scope="col">Y</th><th scope="col">Direction</th>'
+            '<th scope="col">Length</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
     if spec.type in ("scatter", "bubble"):

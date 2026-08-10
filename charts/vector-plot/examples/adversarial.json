@@ -1,0 +1,27 @@
+{
+  "type": "vector-plot",
+  "title": "<img onerror=alert(1)> &amp; \"quotes\"",
+  "subtitle": "Zero-length, huge length, negative coords, all rotation origins",
+  "vectorLength": 30,
+  "rotationOrigin": "end",
+  "xAxis": { "title": "X <script>" },
+  "yAxis": { "title": "Y &amp;" },
+  "series": [
+    {
+      "name": "<b>Series\"1</b>",
+      "x":         [-100, 0, 100, 50, -50],
+      "data":      [-50, 0, 50, -25, 25],
+      "direction": [0, 360, 720, -90, 180.5],
+      "length":    [0, 0, 999999, 0.0001, 50]
+    },
+    {
+      "name": "Series 2",
+      "x":         [0],
+      "data":      [0],
+      "direction": [45],
+      "length":    [10],
+      "color":     "#c42525",
+      "lineWidth": 0.5
+    }
+  ]
+}

@@ -9,6 +9,23 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.20] - 2026-08-10
+
+### Added
+
+- **Vector-plot chart** (`type: "vector-plot"`) — arrow glyphs on a numeric x/y
+  plane where each datum carries direction (heading in degrees, 0 = north,
+  clockwise) and length (magnitude scaled to pixel length via a global
+  length-scale) (DEC-036). New spec fields: `vectorLength` (max arrow pixel
+  length, default 20), `rotationOrigin` (`"center"`, `"start"`, or `"end"`
+  anchor placement). New series fields: `x` (numeric x-coordinates), `length`
+  (per-point magnitude). Uses linear x-scale with `include_zero=False`. Arrow
+  glyphs rendered as stroked `<path>` elements (shaft + arrowhead barbs) with
+  trigonometric rotation. Certified renderers in both Python and Go with
+  byte-identical golden SVGs.
+- Cross-render corpus expanded to 105 examples across 23 chart types.
+- Site gallery expanded to 23 chart types.
+
 ## [0.0.0.19] - 2026-08-10
 
 ### Added

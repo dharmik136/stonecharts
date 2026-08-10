@@ -1,0 +1,42 @@
+[
+  {
+    "name": "missing data",
+    "spec": { "type": "vector-plot", "series": [{ "name": "s" }] },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "name": "string data",
+    "spec": { "type": "vector-plot", "series": [{ "data": ["a"] }] },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "name": "string direction",
+    "spec": { "type": "vector-plot", "series": [{ "data": [1], "direction": ["N"] }] },
+    "errors": ["$.series[0].direction[0]: expected number, received string"]
+  },
+  {
+    "name": "string length",
+    "spec": { "type": "vector-plot", "series": [{ "data": [1], "length": ["big"] }] },
+    "errors": ["$.series[0].length[0]: expected number, received string"]
+  },
+  {
+    "name": "string x",
+    "spec": { "type": "vector-plot", "series": [{ "data": [1], "x": ["a"] }] },
+    "errors": ["$.series[0].x[0]: expected number, received string"]
+  },
+  {
+    "name": "invalid vectorLength",
+    "spec": { "type": "vector-plot", "vectorLength": "big", "series": [{ "data": [1] }] },
+    "errors": ["$.vectorLength: expected number, received string"]
+  },
+  {
+    "name": "invalid rotationOrigin",
+    "spec": { "type": "vector-plot", "rotationOrigin": "middle", "series": [{ "data": [1] }] },
+    "errors": ["$.rotationOrigin: expected one of \"center\", \"start\", \"end\", received \"middle\""]
+  },
+  {
+    "name": "missing series",
+    "spec": { "type": "vector-plot" },
+    "errors": ["$.series: required"]
+  }
+]

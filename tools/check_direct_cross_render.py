@@ -46,6 +46,7 @@ ACTIVE = {
     "timeline": ["basic", "multi", "vertical", "adversarial"],
     "windbarb": ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"],
     "streamgraph": ["basic", "silhouette", "themed-dark", "adversarial"],
+    "vector-plot": ["basic", "field", "themed-dark", "uniform-length", "adversarial"],
 }
 
 

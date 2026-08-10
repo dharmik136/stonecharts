@@ -528,12 +528,30 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	if x, ok := has(m, "labels"); ok {
 		vstrArray(x, path+".labels", errs)
 	}
+	if x, ok := has(m, "x"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".x: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".x["+itoa(i)+"]", errs)
+			}
+		}
+	}
 	if x, ok := has(m, "direction"); ok {
 		if arr, ok := x.([]interface{}); !ok {
 			*errs = append(*errs, path+".direction: expected array, received "+jtype(x))
 		} else {
 			for i, e := range arr {
 				vnum(e, path+".direction["+itoa(i)+"]", errs)
+			}
+		}
+	}
+	if x, ok := has(m, "length"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".length: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				vnum(e, path+".length["+itoa(i)+"]", errs)
 			}
 		}
 	}
@@ -595,6 +613,7 @@ var knownTypes = map[string]bool{
 	"timeline":    true,
 	"variwide":    true,
 	"waterfall":   true,
+	"vector-plot":  true,
 	"windbarb":     true,
 	"streamgraph":  true,
 }
@@ -636,6 +655,15 @@ func validate(v interface{}) []string {
 		vstr(x, "$.offset", &errs)
 		if s, ok := x.(string); ok && s != "wiggle" && s != "silhouette" {
 			errs = append(errs, `$.offset: expected one of "wiggle", "silhouette", received "`+s+`"`)
+		}
+	}
+	if x, ok := has(d, "vectorLength"); ok {
+		vnum(x, "$.vectorLength", &errs)
+	}
+	if x, ok := has(d, "rotationOrigin"); ok {
+		vstr(x, "$.rotationOrigin", &errs)
+		if s, ok := x.(string); ok && s != "center" && s != "start" && s != "end" {
+			errs = append(errs, `$.rotationOrigin: expected one of "center", "start", "end", received "`+s+`"`)
 		}
 	}
 	if x, ok := has(d, "grouping"); ok {
