@@ -1045,8 +1045,17 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "histogram", "line", "lollipop", "nightingale", "parliament", "radial-bar", "pie", "polar", "radar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "vector-plot", "variwide", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypeNames(), []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "histogram", "line", "lollipop", "nightingale", "parliament", "pie", "polar", "radar", "radial-bar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "variwide", "vector-plot", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
+	}
+	if tier := caps.ChartTypes["line"].Tier; tier != "certified" {
+		t.Fatalf("expected line tier=certified, got %q", tier)
+	}
+	if tier := caps.ChartTypes["waterfall"].Tier; tier != "candidate" {
+		t.Fatalf("expected waterfall tier=candidate, got %q", tier)
+	}
+	if tier := caps.ChartTypes["parliament"].Tier; tier != "experimental" {
+		t.Fatalf("expected parliament tier=experimental, got %q", tier)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}
 	if svg, err := RenderSVG(spec); err != nil {
