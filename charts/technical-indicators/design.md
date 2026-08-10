@@ -593,6 +593,17 @@ A self-contained interactive HTML file: inline SVG + CSS + the shared runtime.
 - Renders fully (static) even with JavaScript disabled — base, overlays, band,
   panes, plot bands/lines, and flags all server-rendered and readable.
 
+## Certification boundary (DEC-055)
+
+This chart type is classified **experimental** (DEC-053) because its computational
+transforms (SMA, EMA, Bollinger, VWAP, RSI, MACD) blur the boundary between
+rendering authoritative values and recalculating derived values. For regulated
+reporting, the recommended architecture is: the customer computes their own
+derived values, StoneCharts renders them faithfully. If a customer requires TI in
+the certified tier, the transforms should be separated into a pre-render
+`compute_indicators(spec)` function that returns a new spec with pre-computed
+series, keeping the rendering kernel pure.
+
 ## Rendering notes
 
 - Y-axis uses "nice numbers" ticks (~6) per pane. The base pane is **not**
