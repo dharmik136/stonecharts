@@ -41,6 +41,7 @@ func TestGolden(t *testing.T) {
 		"streamgraph":  {"basic", "silhouette", "themed-dark", "adversarial"},
 		"windbarb":     {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
 		"vector-plot":  {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
+		"xrange":       {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -687,7 +688,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "funnel", "histogram", "line", "lollipop", "scatter", "streamgraph", "timeline", "vector-plot", "variwide", "waterfall", "windbarb"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypes, []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "funnel", "histogram", "line", "lollipop", "scatter", "streamgraph", "timeline", "vector-plot", "variwide", "waterfall", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}
