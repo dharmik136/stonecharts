@@ -310,39 +310,3 @@ func renderRadarSVG(spec *ChartSpec) string {
 	return p.String()
 }
 
-func radarDataTable(spec *ChartSpec) string {
-	var b strings.Builder
-	b.WriteString(`<table class="sc-visually-hidden">`)
-	if spec.Title != "" {
-		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
-	}
-	cats := spec.XAxis.Categories
-	n := 0
-	for _, s := range spec.Series {
-		if len(s.Data) > n {
-			n = len(s.Data)
-		}
-	}
-	b.WriteString("<thead><tr><td></td>")
-	for i := 0; i < n; i++ {
-		label := fmt.Sprintf("%d", i)
-		if i < len(cats) {
-			label = cats[i]
-		}
-		b.WriteString(`<th scope="col">` + esc(label) + `</th>`)
-	}
-	b.WriteString("</tr></thead><tbody>")
-	for _, s := range spec.Series {
-		b.WriteString(`<tr><th scope="row">` + esc(s.Name) + `</th>`)
-		for i := 0; i < n; i++ {
-			if i < len(s.Data) {
-				b.WriteString("<td>" + esc(fmtNum(s.Data[i])) + "</td>")
-			} else {
-				b.WriteString("<td></td>")
-			}
-		}
-		b.WriteString("</tr>")
-	}
-	b.WriteString("</tbody></table>")
-	return b.String()
-}
