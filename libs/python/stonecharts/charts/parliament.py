@@ -184,10 +184,7 @@ def render_svg(spec: ChartSpec) -> str:
         lx = (W - total_w) / 2
         p.append(f'<g class="sc-legend" transform="translate({lx:.1f},{legend_y:.1f})">')
         for j, item in enumerate(legend_items):
-            p.append(
-                f'<g class="sc-legend-item" data-series="{j}" '
-                f'transform="translate({j * 80},0)">{item}</g>'
-            )
+            p.append(f'<g class="sc-legend-item" data-series="{j}" transform="translate({j * 80},0)">{item}</g>')
         p.append("</g>")
 
     p.append("</svg>")
