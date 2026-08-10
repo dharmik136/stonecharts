@@ -225,22 +225,56 @@ checkout with `go run`.
 
 ## Status
 
-| Chart | Spec | Python | Go | Interactivity |
-|-------|------|--------|----|----|
-| Basic line (`line-basic`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Column (`column`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Area (`area`) | ✅ certified (0.0.0.1) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Bar (`bar`) | ✅ certified (0.0.0.2) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Scatter (`scatter`) | ✅ certified (0.0.0.3) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Bubble (`bubble`) | ✅ certified (0.0.0.4) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
-| Combo (`combo`) | ✅ certified (0.0.0.5) | ✅ | ✅ | tooltip · highlight · legend toggle · crosshair |
+### Family A — Cartesian (26 chart types)
+
+| Chart | Spec | Python | Go |
+|-------|------|--------|----|
+| Basic line (`line-basic`) | ✅ certified (0.0.0.1) | ✅ | ✅ |
+| Column (`column`) | ✅ certified (0.0.0.1) | ✅ | ✅ |
+| Area (`area`) | ✅ certified (0.0.0.1) | ✅ | ✅ |
+| Bar (`bar`) | ✅ certified (0.0.0.2) | ✅ | ✅ |
+| Scatter (`scatter`) | ✅ certified (0.0.0.3) | ✅ | ✅ |
+| Bubble (`bubble`) | ✅ certified (0.0.0.4) | ✅ | ✅ |
+| Combo (`combo`) | ✅ certified (0.0.0.5) | ✅ | ✅ |
+| Histogram (`histogram`) | ✅ certified (0.0.0.6) | ✅ | ✅ |
+| Candlestick (`candlestick`) | ✅ certified (0.0.0.7) | ✅ | ✅ |
+| Error Bar (`error-bar`) | ✅ certified (0.0.0.8) | ✅ | ✅ |
+| Area Range (`arearange`) | ✅ certified (0.0.0.9) | ✅ | ✅ |
+| Column Range (`columnrange`) | ✅ certified (0.0.0.9) | ✅ | ✅ |
+| Waterfall (`waterfall`) | ✅ certified (0.0.0.10) | ✅ | ✅ |
+| Bullet (`bullet`) | ✅ certified (0.0.0.11) | ✅ | ✅ |
+| Boxplot (`boxplot`) | ✅ certified (0.0.0.12) | ✅ | ✅ |
+| Lollipop (`lollipop`) | ✅ certified (0.0.0.13) | ✅ | ✅ |
+| Dumbbell (`dumbbell`) | ✅ certified (0.0.0.14) | ✅ | ✅ |
+| Funnel (`funnel`) | ✅ certified (0.0.0.15) | ✅ | ✅ |
+| Variwide (`variwide`) | ✅ certified (0.0.0.16) | ✅ | ✅ |
+| Timeline (`timeline`) | ✅ certified (0.0.0.17) | ✅ | ✅ |
+| Windbarb (`windbarb`) | ✅ certified (0.0.0.18) | ✅ | ✅ |
+| Streamgraph (`streamgraph`) | ✅ certified (0.0.0.19) | ✅ | ✅ |
+| Vector Plot (`vector-plot`) | ✅ certified (0.0.0.20) | ✅ | ✅ |
+| X-Range (`xrange`) | ✅ certified (0.0.0.21) | ✅ | ✅ |
+| Technical Indicators (`technical-indicators`) | ✅ certified (0.0.0.22) | ✅ | ✅ |
+| Flame Chart (`flame-chart`) | ✅ certified (0.0.0.23) | ✅ | ✅ |
+
+### Family B — Polar / Radial (9 chart types)
+
+| Chart | Spec | Python | Go |
+|-------|------|--------|----|
+| Pie (`pie`) | ✅ certified (0.0.0.24) | ✅ | ✅ |
+| Gauge (`gauge`) | ✅ certified (0.0.0.25) | ✅ | ✅ |
+| Solid Gauge (`solid-gauge`) | ✅ certified (0.0.0.26) | ✅ | ✅ |
+| Radar (`radar`) | ✅ certified (0.0.0.27) | ✅ | ✅ |
+| Polar (`polar`) | ✅ certified (0.0.0.28) | ✅ | ✅ |
+| Wind Rose (`wind-rose`) | ✅ certified (0.0.0.29) | ✅ | ✅ |
+| Nightingale (`nightingale`) | ✅ certified (0.0.0.30) | ✅ | ✅ |
+| Radial Bar (`radial-bar`) | ✅ certified (0.0.0.31) | ✅ | ✅ |
+| Parliament (`parliament`) | ✅ certified (0.0.0.32) | ✅ | ✅ |
 
 Python and Go render **byte-identical SVG** from the same spec, pinned by golden
-tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`).
+tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`). 35 chart
+types across 177 cross-render examples.
 
-The released scope is line, column, and area (0.0.0.1), bar (0.0.0.2), scatter
-(0.0.0.3), bubble (0.0.0.4), and combo (0.0.0.5). See
-[`docs/product/capability-matrix.md`](docs/product/capability-matrix.md) for the
+See [`docs/product/capability-matrix.md`](docs/product/capability-matrix.md) for the
 authoritative distinction between certified technical capability, commercial pilot
 scope, and design-only roadmap material.
 

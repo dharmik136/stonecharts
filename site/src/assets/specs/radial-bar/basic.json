@@ -1,0 +1,11 @@
+{
+  "type": "radial-bar",
+  "title": "Skill Levels",
+  "xAxis": {
+    "categories": ["Python", "Go", "SQL", "JavaScript", "TypeScript"]
+  },
+  "series": [
+    {"name": "Proficiency", "data": [90, 75, 80, 65, 70]}
+  ],
+  "yAxis": {"max": 100}
+}

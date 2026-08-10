@@ -1,0 +1,11 @@
+{
+  "type": "polar",
+  "title": "Monthly Rainfall",
+  "xAxis": {
+    "categories": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  },
+  "series": [
+    {"name": "Tokyo", "data": [50, 60, 110, 130, 200, 180, 250, 220, 180, 120, 80, 40], "fillOpacity": 0.15},
+    {"name": "London", "data": [55, 40, 50, 45, 50, 45, 45, 55, 50, 65, 60, 55], "fillOpacity": 0.15}
+  ]
+}

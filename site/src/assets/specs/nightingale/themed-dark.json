@@ -1,0 +1,12 @@
+{
+  "type": "nightingale",
+  "title": "Sensor Coverage",
+  "theme": "dark",
+  "xAxis": {
+    "categories": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+  },
+  "series": [
+    {"name": "Range", "data": [90, 60, 75, 50, 85, 70, 80, 55]},
+    {"name": "Accuracy", "data": [70, 50, 60, 40, 65, 55, 60, 45]}
+  ]
+}

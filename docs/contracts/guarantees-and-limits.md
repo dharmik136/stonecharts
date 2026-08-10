@@ -6,7 +6,7 @@ classification: normative
 owner: product-owner
 approver: maintainer
 review_mode: self
-applies_to: 0.0.0.1
+applies_to: 0.0.0.1 and later
 requirements: [REQ-DET-001, REQ-VIS-001, REQ-CUST-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, REVIEW-VISUAL-PROFILE]
 last_reviewed: "2026-07-18"
@@ -68,9 +68,9 @@ changes. `0.0.0.1` may still carry controlled pre-release breaks while the relea
 under qualification, but every post-release public change must follow the approved
 compatibility policy and its evidence requirements.
 
-## 0.0.0.1 known limits
+## Known limits
 
-- Line, column, and area are released chart types.
+- 35 chart types are certified across Family A (Cartesian) and Family B (Polar/radial).
 - Layout uses deterministic defaults and manual margins; there is no automatic text
   measurement, wrapping, collision avoidance, or legend pagination.
 - The default font stack depends on the host viewer and has no pixel identity promise.

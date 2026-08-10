@@ -9,6 +9,81 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.32] - 2026-08-10
+
+### Added
+
+- **Parliament chart** (`type: "parliament"`) — semicircular hemicycle of
+  unit dots arranged in concentric arcs, colored by category (DEC-048).
+  Last Family B (Polar/radial) chart type. Single-series only; total dots
+  equal the sum of values. Uses `xAxis.categories` for party/category labels
+  and `series[0].data` for per-category seat counts. Zero-valued categories
+  are skipped. 35th chart type overall, 9th and final polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 177 examples across 35 chart types.
+- Site gallery expanded to 35 chart types.
+- **Family B (Polar/radial) complete** — all 9 polar chart types are now
+  certified: pie, gauge, solid-gauge, radar, polar, wind-rose, nightingale,
+  radial-bar, parliament.
+
+## [0.0.0.31] - 2026-08-10
+
+### Added
+
+- **Radial-bar chart** (`type: "radial-bar"`) — concentric progress rings
+  where each category gets its own track at a fixed radius band, and value
+  determines the arc fill from the start angle (DEC-047). Multiple series
+  stack angularly within each track. Uses `yAxis.max` for the full-circle
+  reference (auto-derived from data maximum if absent). 34th chart type
+  overall, 8th polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 172 examples across 34 chart types.
+
+## [0.0.0.30] - 2026-08-10
+
+### Added
+
+- **Nightingale chart** (`type: "nightingale"`) — rose/coxcomb chart with
+  equal-angle wedges from center and value-dependent radius (DEC-046).
+  Multiple series overlay back-to-front with fill opacity rather than
+  stacking outward. 33rd chart type overall, 7th polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 167 examples across 33 chart types.
+
+## [0.0.0.29] - 2026-08-10
+
+### Added
+
+- **Wind-rose chart** (`type: "wind-rose"`) — stacked polar column chart
+  with annular wedge sectors at equal angular spacing (DEC-045). Stacking
+  outward from center, y_max derived from maximum cumulative stack across
+  all directions. 32nd chart type overall, 6th polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 162 examples across 32 chart types.
+
+## [0.0.0.28] - 2026-08-10
+
+### Added
+
+- **Polar chart** (`type: "polar"`) — circular polar grid with categories
+  at equal angular spacing and concentric circular gridlines (DEC-044).
+  Same data model as radar but with circular gridlines instead of polygon.
+  31st chart type overall, 5th polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 157 examples across 31 chart types.
+
+## [0.0.0.27] - 2026-08-10
+
+### Added
+
+- **Radar chart** (`type: "radar"`) — spider/web chart with N radial axes
+  at equal angular spacing, concentric polygon gridlines, and per-series
+  closed polygons with optional fill (DEC-043). Minimum 3 categories
+  enforced at render time. 30th chart type overall, 4th polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 152 examples across 30 chart types.
+- Site gallery expanded to 30 chart types.
+
 ## [0.0.0.26] - 2026-08-10
 
 ### Added
