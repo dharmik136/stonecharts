@@ -69,6 +69,17 @@ as a donut (annular ring). Slices become annular sectors:
 - `subtype: "donut"` is conventional but not required; `innerSize > 0` is
   the actual trigger.
 
+### Variable-radius variant
+
+When `series[0].z` is provided (a companion array of per-slice radius values),
+each slice's outer radius is proportional to its `z` value. Angle still encodes
+share; radius encodes a second metric.
+
+- `z[i]` maps linearly to `[minSize * r, r]` where `minSize` defaults to 0.2.
+- If all z values are equal, all slices use the full radius.
+- `subtype: "variablepie"` is conventional but not required; `z` presence is
+  the trigger.
+
 ### Accessibility
 
 `role="img"`, `aria-label`, `<desc>` summary.

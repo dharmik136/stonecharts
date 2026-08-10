@@ -42,7 +42,7 @@ func TestGolden(t *testing.T) {
 		"windbarb":     {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
 		"vector-plot":  {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
 		"flame-chart":         {"basic", "multi-series", "deep-stack", "themed-dark", "adversarial"},
-		"pie":                 {"basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark"},
+		"pie":                 {"basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"},
 		"technical-indicators": {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
 		"xrange":       {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
 	}

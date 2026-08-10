@@ -129,8 +129,22 @@ def render_svg(spec: ChartSpec) -> str:
 
     cx = plot_x + plot_w / 2
     cy = plot_y + plot_h / 2
-    r = min(plot_w, plot_h) / 2
+    r_max = min(plot_w, plot_h) / 2
+    r = r_max
     ri = r * spec.inner_size
+
+    z_vals = s0.z if s0 and s0.z else None
+    z_min = 0.0
+    z_max = 0.0
+    if z_vals and len(z_vals) >= n:
+        z_min = min(z_vals[:n])
+        z_max = max(z_vals[:n])
+
+    def slice_r(i: int) -> float:
+        if not z_vals or i >= len(z_vals) or z_max <= z_min:
+            return r_max
+        t = (z_vals[i] - z_min) / (z_max - z_min) if z_max > z_min else 0.5
+        return r_max * (spec.min_size + (1 - spec.min_size) * t)
 
     if n > 0 and s0 is not None and total > 0:
         p.append('<g class="sc-series" data-series="0">')
@@ -178,11 +192,12 @@ def render_svg(spec: ChartSpec) -> str:
                 if v <= 0:
                     continue
                 sweep = (v / total) * 2 * math.pi
-                ox1 = cx + r * math.cos(angle)
-                oy1 = cy + r * math.sin(angle)
+                sr = slice_r(i)
+                ox1 = cx + sr * math.cos(angle)
+                oy1 = cy + sr * math.sin(angle)
                 end_angle = angle + sweep
-                ox2 = cx + r * math.cos(end_angle)
-                oy2 = cy + r * math.sin(end_angle)
+                ox2 = cx + sr * math.cos(end_angle)
+                oy2 = cy + sr * math.sin(end_angle)
                 large_arc = 1 if sweep > math.pi else 0
 
                 fill = esc(palette[i % len(palette)]) if color_by_point else pie_fill
@@ -196,14 +211,14 @@ def render_svg(spec: ChartSpec) -> str:
                     iy2 = cy + ri * math.sin(end_angle)
                     d_str = (
                         f"M {ox1:.1f} {oy1:.1f} "
-                        f"A {r:.1f} {r:.1f} 0 {large_arc} 1 {ox2:.1f} {oy2:.1f} "
+                        f"A {sr:.1f} {sr:.1f} 0 {large_arc} 1 {ox2:.1f} {oy2:.1f} "
                         f"L {ix2:.1f} {iy2:.1f} "
                         f"A {ri:.1f} {ri:.1f} 0 {large_arc} 0 {ix1:.1f} {iy1:.1f} Z"
                     )
                 else:
                     d_str = (
                         f"M {cx:.1f} {cy:.1f} L {ox1:.1f} {oy1:.1f} "
-                        f"A {r:.1f} {r:.1f} 0 {large_arc} 1 {ox2:.1f} {oy2:.1f} Z"
+                        f"A {sr:.1f} {sr:.1f} 0 {large_arc} 1 {ox2:.1f} {oy2:.1f} Z"
                     )
 
                 p.append(
@@ -211,7 +226,7 @@ def render_svg(spec: ChartSpec) -> str:
                     f'data-series-name="{esc(s0.name)}" data-x="{esc(cat)}" '
                     f'data-y="{esc(fmt_num(v))}" data-color="{fill}" '
                     f'data-index="{i}" data-percentage="{pct}" '
-                    f'data-r="{r:.1f}" data-r-hover="{r + 4:.1f}" '
+                    f'data-r="{sr:.1f}" data-r-hover="{sr + 4:.1f}" '
                     f'cx="{cx:.1f}" cy="{cy:.1f}" '
                     f'd="{d_str}" '
                     f'fill="{fill}" stroke="{stroke_color}" stroke-width="2"/>'

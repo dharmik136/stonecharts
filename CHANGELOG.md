@@ -23,7 +23,10 @@ No unreleased changes.
 - **Donut variant** (`subtype: "donut"`, `innerSize: 0.5`) — annular-ring
   variant of pie. When `innerSize > 0`, slices render as annular sectors;
   single-slice 100% renders as a fill-rule evenodd annular ring path.
-- Cross-render corpus expanded to 136 examples across 27 chart types.
+- **Variable-radius pie variant** (`series[0].z: [...]`) — each slice's
+  outer radius encodes a second metric. `z[i]` maps linearly to a
+  `[minSize * r, r]` range (default `minSize: 0.2`).
+- Cross-render corpus expanded to 137 examples across 27 chart types.
 - Site gallery expanded to 27 chart types.
 
 ## [0.0.0.23] - 2026-08-10
