@@ -694,6 +694,352 @@ func TestRandomizedSpecsRenderValidSVG(t *testing.T) {
 	}
 }
 
+// TestRandomizedAll35Types extends property coverage to all chart types (DEC-051).
+func TestRandomizedAll35Types(t *testing.T) {
+	rng := rand.New(rand.NewSource(20260810))
+	validate := func(t *testing.T, label string, specJSON []byte) {
+		t.Helper()
+		parsed, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatalf("%s parse: %v", label, err)
+		}
+		svg, err := RenderSVG(parsed)
+		if err != nil {
+			t.Fatalf("%s render: %v", label, err)
+		}
+		if !strings.HasPrefix(svg, "<svg") || !strings.Contains(svg, `role="img"`) {
+			t.Fatalf("%s: not a valid chart SVG", label)
+		}
+		if strings.Contains(svg, "NaN") || strings.Contains(svg, "Infinity") {
+			t.Fatalf("%s: non-finite output", label)
+		}
+		svg2, _ := RenderSVG(parsed)
+		if svg != svg2 {
+			t.Fatalf("%s: non-deterministic render", label)
+		}
+	}
+
+	randData := func(n int) string {
+		vals := make([]string, n)
+		for i := range vals {
+			vals[i] = fmt.Sprintf("%.3f", float64(rng.Intn(200000)-100000)/1000)
+		}
+		return "[" + strings.Join(vals, ",") + "]"
+	}
+	posData := func(n int) string {
+		vals := make([]string, n)
+		for i := range vals {
+			vals[i] = fmt.Sprintf("%.2f", float64(rng.Intn(9900)+100)/100)
+		}
+		return "[" + strings.Join(vals, ",") + "]"
+	}
+	cats := func(n int, prefix string) string {
+		cs := make([]string, n)
+		for i := range cs {
+			cs[i] = fmt.Sprintf(`"%s%d"`, prefix, i)
+		}
+		return "[" + strings.Join(cs, ",") + "]"
+	}
+
+	// Category-value family
+	for _, ct := range []string{"lollipop", "nightingale", "radial-bar"} {
+		for c := 0; c < 8; c++ {
+			pts := rng.Intn(10) + 2
+			sc := rng.Intn(3) + 1
+			series := make([]string, sc)
+			for s := range series {
+				series[s] = fmt.Sprintf(`{"name":"S%d","data":%s}`, s, randData(pts))
+			}
+			j := fmt.Sprintf(`{"type":"%s","xAxis":{"categories":%s},"series":[%s]}`,
+				ct, cats(pts, "C"), strings.Join(series, ","))
+			validate(t, fmt.Sprintf("%s/%d", ct, c), []byte(j))
+		}
+	}
+
+	// Streamgraph (positive values — represents flow volumes)
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(8) + 3
+		sc := rng.Intn(2) + 2
+		series := make([]string, sc)
+		for s := range series {
+			series[s] = fmt.Sprintf(`{"name":"S%d","data":%s}`, s, posData(pts))
+		}
+		j := fmt.Sprintf(`{"type":"streamgraph","xAxis":{"categories":%s},"series":[%s]}`,
+			cats(pts, "C"), strings.Join(series, ","))
+		validate(t, fmt.Sprintf("streamgraph/%d", c), []byte(j))
+	}
+
+	// Variwide
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(6) + 2
+		j := fmt.Sprintf(`{"type":"variwide","xAxis":{"categories":%s},"series":[{"name":"S0","data":%s,"widths":%s}]}`,
+			cats(pts, "C"), randData(pts), posData(pts))
+		validate(t, fmt.Sprintf("variwide/%d", c), []byte(j))
+	}
+
+	// Windbarb
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(10) + 2
+		dir := make([]string, pts)
+		spd := make([]string, pts)
+		for i := range dir {
+			dir[i] = fmt.Sprintf("%.1f", float64(rng.Intn(3600))/10)
+			spd[i] = fmt.Sprintf("%.1f", float64(rng.Intn(400))/10)
+		}
+		j := fmt.Sprintf(`{"type":"windbarb","xAxis":{"categories":%s},"series":[{"name":"S0","data":[%s],"direction":[%s]}]}`,
+			cats(pts, "T"), strings.Join(spd, ","), strings.Join(dir, ","))
+		validate(t, fmt.Sprintf("windbarb/%d", c), []byte(j))
+	}
+
+	// Range family
+	for _, ct := range []string{"arearange", "columnrange", "error-bar", "dumbbell"} {
+		for c := 0; c < 8; c++ {
+			pts := rng.Intn(6) + 2
+			dv := make([]string, pts)
+			lo := make([]string, pts)
+			hi := make([]string, pts)
+			for i := range dv {
+				center := float64(rng.Intn(8000)+1000) / 100
+				spread := float64(rng.Intn(1900)+100) / 100
+				dv[i] = fmt.Sprintf("%.2f", center)
+				lo[i] = fmt.Sprintf("%.2f", center-spread)
+				hi[i] = fmt.Sprintf("%.2f", center+spread)
+			}
+			j := fmt.Sprintf(`{"type":"%s","xAxis":{"categories":%s},"series":[{"name":"S0","data":[%s],"low":[%s],"high":[%s]}]}`,
+				ct, cats(pts, "C"), strings.Join(dv, ","), strings.Join(lo, ","), strings.Join(hi, ","))
+			validate(t, fmt.Sprintf("%s/%d", ct, c), []byte(j))
+		}
+	}
+
+	// Boxplot
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(4) + 2
+		boxes := make([]string, pts)
+		medians := make([]string, pts)
+		for i := range boxes {
+			vs := make([]float64, 5)
+			for j := range vs {
+				vs[j] = float64(rng.Intn(10000)) / 100
+			}
+			// sort
+			for a := 0; a < 5; a++ {
+				for b := a + 1; b < 5; b++ {
+					if vs[a] > vs[b] {
+						vs[a], vs[b] = vs[b], vs[a]
+					}
+				}
+			}
+			boxes[i] = fmt.Sprintf(`{"low":%.2f,"q1":%.2f,"median":%.2f,"q3":%.2f,"high":%.2f}`,
+				vs[0], vs[1], vs[2], vs[3], vs[4])
+			medians[i] = fmt.Sprintf("%.2f", vs[2])
+		}
+		j := fmt.Sprintf(`{"type":"boxplot","xAxis":{"categories":%s},"series":[{"name":"S0","data":[%s],"boxData":[%s]}]}`,
+			cats(pts, "C"), strings.Join(medians, ","), strings.Join(boxes, ","))
+		validate(t, fmt.Sprintf("boxplot/%d", c), []byte(j))
+	}
+
+	// Candlestick
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(10) + 2
+		ohlc := make([]string, pts)
+		closes := make([]string, pts)
+		for i := range ohlc {
+			o := float64(rng.Intn(10000)+5000) / 100
+			cl := float64(rng.Intn(10000)+5000) / 100
+			hi := o
+			if cl > hi {
+				hi = cl
+			}
+			hi += float64(rng.Intn(1000)+1) / 100
+			lo := o
+			if cl < lo {
+				lo = cl
+			}
+			lo -= float64(rng.Intn(1000)+1) / 100
+			ohlc[i] = fmt.Sprintf(`{"open":%.2f,"high":%.2f,"low":%.2f,"close":%.2f}`, o, hi, lo, cl)
+			closes[i] = fmt.Sprintf("%.2f", cl)
+		}
+		j := fmt.Sprintf(`{"type":"candlestick","xAxis":{"categories":%s},"series":[{"name":"S0","data":[%s],"ohlc":[%s]}]}`,
+			cats(pts, "D"), strings.Join(closes, ","), strings.Join(ohlc, ","))
+		validate(t, fmt.Sprintf("candlestick/%d", c), []byte(j))
+	}
+
+	// Histogram
+	for c := 0; c < 8; c++ {
+		n := rng.Intn(40) + 10
+		vals := make([]string, n)
+		for i := range vals {
+			vals[i] = fmt.Sprintf("%.2f", float64(rng.Intn(10000))/100)
+		}
+		j := fmt.Sprintf(`{"type":"histogram","outOfRange":"clip","series":[{"name":"S0","data":[%s]}]}`,
+			strings.Join(vals, ","))
+		validate(t, fmt.Sprintf("histogram/%d", c), []byte(j))
+	}
+
+	// Xrange
+	for c := 0; c < 8; c++ {
+		lanes := rng.Intn(3) + 1
+		nSpans := rng.Intn(6) + 2
+		spans := make([]string, nSpans)
+		for i := range spans {
+			x := float64(rng.Intn(800)) / 10
+			x2 := x + float64(rng.Intn(200)+10)/10
+			y := rng.Intn(lanes)
+			spans[i] = fmt.Sprintf(`{"x":%.1f,"x2":%.1f,"y":%d}`, x, x2, y)
+		}
+		j := fmt.Sprintf(`{"type":"xrange","yAxis":{"categories":%s},"series":[{"name":"S0","data":[],"spans":[%s]}]}`,
+			cats(lanes, "Lane"), strings.Join(spans, ","))
+		validate(t, fmt.Sprintf("xrange/%d", c), []byte(j))
+	}
+
+	// Flame-chart
+	for c := 0; c < 8; c++ {
+		nFrames := rng.Intn(10) + 2
+		frames := make([]string, nFrames)
+		for i := range frames {
+			x := float64(rng.Intn(800)) / 10
+			x2 := x + float64(rng.Intn(200)+5)/10
+			depth := rng.Intn(5)
+			frames[i] = fmt.Sprintf(`{"x":%.1f,"x2":%.1f,"depth":%d,"name":"fn%d"}`, x, x2, depth, rng.Intn(100))
+		}
+		j := fmt.Sprintf(`{"type":"flame-chart","series":[{"name":"S0","data":[],"frames":[%s]}]}`,
+			strings.Join(frames, ","))
+		validate(t, fmt.Sprintf("flame-chart/%d", c), []byte(j))
+	}
+
+	// Bullet
+	for c := 0; c < 8; c++ {
+		val := float64(rng.Intn(800)+100) / 10
+		target := float64(rng.Intn(500)+500) / 10
+		r1 := float64(rng.Intn(400)+200) / 10
+		r2 := r1 + float64(rng.Intn(200)+100)/10
+		r3 := r2 + float64(rng.Intn(200)+100)/10
+		j := fmt.Sprintf(`{"type":"bullet","bulletTarget":%.1f,"bulletRanges":[%.1f,%.1f,%.1f],"series":[{"name":"S0","data":[%.1f]}]}`,
+			target, r1, r2, r3, val)
+		validate(t, fmt.Sprintf("bullet/%d", c), []byte(j))
+	}
+
+	// Technical-indicators
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(20) + 10
+		vals := make([]string, pts)
+		for i := range vals {
+			vals[i] = fmt.Sprintf("%.2f", float64(rng.Intn(10000)+5000)/100)
+		}
+		period := 5
+		if pts < 5 {
+			period = pts
+		}
+		j := fmt.Sprintf(`{"type":"technical-indicators","series":[{"name":"S0","type":"line","data":[%s],"indicators":[{"type":"sma","period":%d}]}]}`,
+			strings.Join(vals, ","), period)
+		validate(t, fmt.Sprintf("technical-indicators/%d", c), []byte(j))
+	}
+
+	// Pie
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(6) + 2
+		j := fmt.Sprintf(`{"type":"pie","xAxis":{"categories":%s},"series":[{"name":"S0","data":%s}]}`,
+			cats(pts, "Slice"), posData(pts))
+		validate(t, fmt.Sprintf("pie/%d", c), []byte(j))
+	}
+
+	// Gauge / solid-gauge
+	for _, ct := range []string{"gauge", "solid-gauge"} {
+		for c := 0; c < 8; c++ {
+			lo := float64(rng.Intn(300)) / 10
+			hi := lo + float64(rng.Intn(1000)+200)/10
+			val := lo + float64(rng.Intn(int(hi-lo)*10+1))/10
+			j := fmt.Sprintf(`{"type":"%s","gaugeMin":%.1f,"gaugeMax":%.1f,"series":[{"name":"S0","data":[%.1f]}]}`,
+				ct, lo, hi, val)
+			validate(t, fmt.Sprintf("%s/%d", ct, c), []byte(j))
+		}
+	}
+
+	// Parliament
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(6) + 2
+		j := fmt.Sprintf(`{"type":"parliament","xAxis":{"categories":%s},"series":[{"name":"S0","data":%s}]}`,
+			cats(pts, "Party"), posData(pts))
+		validate(t, fmt.Sprintf("parliament/%d", c), []byte(j))
+	}
+
+	// Radar / polar
+	for _, ct := range []string{"radar", "polar"} {
+		for c := 0; c < 8; c++ {
+			pts := rng.Intn(5) + 3
+			sc := rng.Intn(2) + 1
+			series := make([]string, sc)
+			for s := range series {
+				series[s] = fmt.Sprintf(`{"name":"S%d","data":%s}`, s, posData(pts))
+			}
+			j := fmt.Sprintf(`{"type":"%s","xAxis":{"categories":%s},"series":[%s]}`,
+				ct, cats(pts, "Ax"), strings.Join(series, ","))
+			validate(t, fmt.Sprintf("%s/%d", ct, c), []byte(j))
+		}
+	}
+
+	// Wind-rose
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(12) + 4
+		sc := rng.Intn(2) + 1
+		series := make([]string, sc)
+		for s := range series {
+			series[s] = fmt.Sprintf(`{"name":"S%d","data":%s}`, s, posData(pts))
+		}
+		j := fmt.Sprintf(`{"type":"wind-rose","xAxis":{"categories":%s},"series":[%s]}`,
+			cats(pts, "Dir"), strings.Join(series, ","))
+		validate(t, fmt.Sprintf("wind-rose/%d", c), []byte(j))
+	}
+
+	// Waterfall
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(6) + 2
+		j := fmt.Sprintf(`{"type":"waterfall","xAxis":{"categories":%s},"series":[{"name":"S0","data":%s}]}`,
+			cats(pts, "Step"), randData(pts))
+		validate(t, fmt.Sprintf("waterfall/%d", c), []byte(j))
+	}
+
+	// Funnel
+	for c := 0; c < 8; c++ {
+		pts := rng.Intn(4) + 2
+		j := fmt.Sprintf(`{"type":"funnel","xAxis":{"categories":%s},"series":[{"name":"S0","data":%s}]}`,
+			cats(pts, "Stage"), posData(pts))
+		validate(t, fmt.Sprintf("funnel/%d", c), []byte(j))
+	}
+
+	// Timeline
+	for c := 0; c < 8; c++ {
+		n := rng.Intn(5) + 1
+		vals := make([]string, n)
+		labels := make([]string, n)
+		for i := range vals {
+			vals[i] = fmt.Sprintf("%.0f", float64(rng.Intn(8000)+1000))
+			labels[i] = fmt.Sprintf(`"Evt%d"`, i)
+		}
+		j := fmt.Sprintf(`{"type":"timeline","series":[{"name":"S0","data":[%s],"labels":[%s]}]}`,
+			strings.Join(vals, ","), strings.Join(labels, ","))
+		validate(t, fmt.Sprintf("timeline/%d", c), []byte(j))
+	}
+
+	// Vector-plot
+	for c := 0; c < 8; c++ {
+		n := rng.Intn(10) + 2
+		xs := make([]string, n)
+		ys := make([]string, n)
+		dirs := make([]string, n)
+		lens := make([]string, n)
+		for i := range xs {
+			xs[i] = fmt.Sprintf("%.1f", float64(rng.Intn(1000))/10)
+			ys[i] = fmt.Sprintf("%.1f", float64(rng.Intn(1000))/10)
+			dirs[i] = fmt.Sprintf("%.1f", float64(rng.Intn(3600))/10)
+			lens[i] = fmt.Sprintf("%.1f", float64(rng.Intn(500))/10)
+		}
+		j := fmt.Sprintf(`{"type":"vector-plot","series":[{"name":"S0","x":[%s],"data":[%s],"direction":[%s],"length":[%s]}]}`,
+			strings.Join(xs, ","), strings.Join(ys, ","), strings.Join(dirs, ","), strings.Join(lens, ","))
+		validate(t, fmt.Sprintf("vector-plot/%d", c), []byte(j))
+	}
+}
+
 func TestCapabilityManifestAndError(t *testing.T) {
 	caps := Capabilities()
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
@@ -819,6 +1165,34 @@ func FuzzFromJSON(f *testing.F) {
 		{"bubble", "basic"},
 		{"combo", "basic"},
 		{"combo", "dual-axis"},
+		{"lollipop", "basic"},
+		{"variwide", "basic"},
+		{"streamgraph", "basic"},
+		{"windbarb", "basic"},
+		{"nightingale", "basic"},
+		{"radial-bar", "basic"},
+		{"arearange", "basic"},
+		{"columnrange", "basic"},
+		{"error-bar", "basic"},
+		{"dumbbell", "basic"},
+		{"boxplot", "basic"},
+		{"candlestick", "basic"},
+		{"histogram", "basic"},
+		{"xrange", "trace-waterfall"},
+		{"flame-chart", "basic"},
+		{"bullet", "basic"},
+		{"technical-indicators", "basic"},
+		{"pie", "basic"},
+		{"gauge", "basic"},
+		{"solid-gauge", "basic"},
+		{"parliament", "basic"},
+		{"radar", "basic"},
+		{"polar", "basic"},
+		{"wind-rose", "basic"},
+		{"waterfall", "basic"},
+		{"funnel", "basic"},
+		{"timeline", "basic"},
+		{"vector-plot", "basic"},
 	}
 	for _, s := range seeds {
 		data, err := os.ReadFile("../../charts/" + s.dir + "/examples/" + s.name + ".json")
@@ -836,8 +1210,7 @@ func FuzzFromJSON(f *testing.F) {
 		if err != nil {
 			return
 		}
-		low := strings.ToLower(svg)
-		if strings.Contains(low, "nan") || strings.Contains(low, "inf") {
+		if strings.Contains(svg, "NaN") || strings.Contains(svg, "+Inf") || strings.Contains(svg, "-Inf") {
 			t.Errorf("NaN/Inf in fuzz render output")
 		}
 	})
