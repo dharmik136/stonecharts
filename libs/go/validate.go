@@ -718,6 +718,7 @@ var knownTypes = map[string]bool{
 	"variwide":    true,
 	"waterfall":   true,
 	"vector-plot":  true,
+	"wind-rose":    true,
 	"windbarb":     true,
 	"streamgraph":           true,
 	"technical-indicators":  true,

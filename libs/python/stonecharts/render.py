@@ -41,6 +41,7 @@ from .charts import timeline as _timeline
 from .charts import variwide as _variwide
 from .charts import vector_plot as _vector_plot
 from .charts import waterfall as _waterfall
+from .charts import wind_rose as _wind_rose
 from .charts import windbarb as _windbarb
 from .charts import xrange as _xrange
 from .limits import enforce_svg_limit
@@ -82,6 +83,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "variwide": _variwide.render_svg,
     "vector-plot": _vector_plot.render_svg,
     "waterfall": _waterfall.render_svg,
+    "wind-rose": _wind_rose.render_svg,
     "windbarb": _windbarb.render_svg,
     "xrange": _xrange.render_svg,
 }
