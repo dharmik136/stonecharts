@@ -9,6 +9,27 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.21] - 2026-08-10
+
+### Added
+
+- **X-range chart** (`type: "xrange"`) — horizontal span bars on lane categories
+  with optional milestones and dependency connectors (DEC-037). Data model uses
+  `series[].spans` array of `{x, x2, y, id?, name?, dependency?, milestone?}`
+  objects where x/x2 are start/end positions and y is the lane index. Supports
+  Gantt charts, distributed-trace span waterfalls, and per-thread swimlanes.
+  Rides the shared cartesian frame with `orientation="horizontal"` and band
+  x-scale. Milestone spans render as diamond `<polygon>` glyphs. Dependency
+  connectors render as orthogonal elbow `<path>` elements with arrowheads.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 118 examples across 24 chart types.
+- Site gallery expanded to 24 chart types.
+
+### Fixed
+
+- Python spec parser now parses `yAxis.categories` (was missing, causing
+  horizontal-mode charts to show numeric lane labels instead of category names).
+
 ## [0.0.0.20] - 2026-08-10
 
 ### Added

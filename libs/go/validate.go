@@ -564,6 +564,41 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 			}
 		}
 	}
+	if x, ok := has(m, "spans"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".spans: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				spPath := path + ".spans[" + itoa(i) + "]"
+				sp, ok := e.(map[string]interface{})
+				if !ok {
+					*errs = append(*errs, spPath+": expected object, received "+jtype(e))
+					continue
+				}
+				for _, req := range []string{"x", "x2", "y"} {
+					if v, ok := has(sp, req); !ok {
+						*errs = append(*errs, spPath+"."+req+": required")
+					} else {
+						vnum(v, spPath+"."+req, errs)
+					}
+				}
+				if v, ok := has(sp, "id"); ok {
+					vstr(v, spPath+".id", errs)
+				}
+				if v, ok := has(sp, "name"); ok {
+					vstr(v, spPath+".name", errs)
+				}
+				if v, ok := has(sp, "dependency"); ok {
+					vstrArray(v, spPath+".dependency", errs)
+				}
+				if v, ok := has(sp, "milestone"); ok {
+					if _, ok := v.(bool); !ok {
+						*errs = append(*errs, spPath+".milestone: expected boolean, received "+jtype(v))
+					}
+				}
+			}
+		}
+	}
 }
 
 func vnonneg(v interface{}, path string, errs *[]string) {
@@ -616,6 +651,7 @@ var knownTypes = map[string]bool{
 	"vector-plot":  true,
 	"windbarb":     true,
 	"streamgraph":  true,
+	"xrange":       true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.

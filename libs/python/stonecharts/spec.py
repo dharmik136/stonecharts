@@ -108,6 +108,17 @@ class Datum:
 
 
 @dataclass
+class Span:
+    x: float
+    x2: float
+    y: int
+    id: str | None = None
+    name: str | None = None
+    dependency: list[str] | None = None
+    milestone: bool = False
+
+
+@dataclass
 class BoxDatum:
     low: float
     q1: float
@@ -142,6 +153,7 @@ class Series:
     x: list[float] | None = None  # vector-plot — per-point numeric x-coordinate
     direction: list[float] | None = None  # windbarb/vector-plot — per-point direction (degrees)
     length: list[float] | None = None  # vector-plot only — per-point magnitude
+    spans: list[Span] | None = None  # xrange/Gantt — per-series span objects
 
 
 @dataclass
@@ -448,6 +460,20 @@ class ChartSpec:
                     if "direction" in s and s["direction"] is not None
                     else None,
                     length=[float(v) for v in s["length"]] if "length" in s and s["length"] is not None else None,
+                    spans=[
+                        Span(
+                            x=float(sp["x"]),
+                            x2=float(sp["x2"]),
+                            y=int(sp["y"]),
+                            id=sp.get("id"),
+                            name=sp.get("name"),
+                            dependency=sp.get("dependency"),
+                            milestone=bool(sp.get("milestone", False)),
+                        )
+                        for sp in s["spans"]
+                    ]
+                    if "spans" in s and s["spans"] is not None
+                    else None,
                 )
             )
         xa = d.get("xAxis") or {}
@@ -539,6 +565,7 @@ class ChartSpec:
             ),
             y_axis=Axis(
                 title=ya.get("title"),
+                categories=ya.get("categories"),
                 min=_opt_float(ya, "min"),
                 max=_opt_float(ya, "max"),
                 grid_line=grid,

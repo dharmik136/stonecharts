@@ -28,6 +28,7 @@ const CHART_TYPES = [
   { id: 'windbarb', label: 'Windbarb', desc: 'Meteorological wind-barb glyphs encoding speed (feathers) and direction (rotation) on a fixed lane.' },
   { id: 'streamgraph', label: 'Streamgraph', desc: 'Stacked filled-area ribbons over a floating baseline (wiggle or silhouette) showing volume composition over time.' },
   { id: 'vector-plot', label: 'Vector Plot', desc: 'Arrow glyphs on a numeric x/y plane encoding direction (heading) and magnitude (arrow length) at each anchor point.' },
+  { id: 'xrange', label: 'X-Range', desc: 'Horizontal span bars on lane categories with optional milestones and dependency connectors for Gantt charts and trace waterfalls.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
@@ -69,7 +70,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Twenty-one certified chart types, each rendered identically in Python and Go.
+      Twenty-four certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>

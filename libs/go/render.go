@@ -37,6 +37,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "candlestick" {
 		return candlestickDataTable(spec)
 	}
+	if spec.Type == "xrange" {
+		return xrangeDataTable(spec)
+	}
 	if spec.Type == "vector-plot" {
 		return vectorPlotDataTable(spec)
 	}
@@ -247,6 +250,31 @@ func errorBarDataTable(spec *ChartSpec) string {
 	return b.String()
 }
 
+func xrangeDataTable(spec *ChartSpec) string {
+	var b strings.Builder
+	b.WriteString(`<table class="sc-visually-hidden">`)
+	if spec.Title != "" {
+		b.WriteString("<caption>" + esc(spec.Title) + "</caption>")
+	}
+	b.WriteString(`<thead><tr><th scope="col">Series</th><th scope="col">Lane</th>` +
+		`<th scope="col">Start</th><th scope="col">End</th>` +
+		`<th scope="col">Duration</th></tr></thead><tbody>`)
+	laneCats := spec.YAxis.Categories
+	for _, s := range spec.Series {
+		for _, sp := range s.Spans {
+			laneLabel := strconv.Itoa(sp.Y)
+			if sp.Y < len(laneCats) {
+				laneLabel = laneCats[sp.Y]
+			}
+			b.WriteString(`<tr><th scope="row">` + esc(s.Name) + `</th><td>` +
+				esc(laneLabel) + `</td><td>` + esc(fmtNum(sp.X)) + `</td><td>` +
+				esc(fmtNum(sp.X2)) + `</td><td>` + esc(fmtNum(sp.X2-sp.X)) + `</td></tr>`)
+		}
+	}
+	b.WriteString("</tbody></table>")
+	return b.String()
+}
+
 func vectorPlotDataTable(spec *ChartSpec) string {
 	var b strings.Builder
 	b.WriteString(`<table class="sc-visually-hidden">`)
@@ -358,6 +386,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderWaterfallSVG(spec)
 	case "windbarb":
 		svg = renderWindbarbSVG(spec)
+	case "xrange":
+		svg = renderXRangeSVG(spec)
 	default:
 		return "", capabilityError(typ)
 	}

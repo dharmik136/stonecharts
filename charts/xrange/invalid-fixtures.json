@@ -1,0 +1,42 @@
+[
+  {
+    "name": "missing data",
+    "spec": { "type": "xrange", "series": [{ "name": "s" }] },
+    "errors": ["$.series[0].data: required"]
+  },
+  {
+    "name": "string data",
+    "spec": { "type": "xrange", "series": [{ "data": ["a"] }] },
+    "errors": ["$.series[0].data[0]: expected number, received string"]
+  },
+  {
+    "name": "missing series",
+    "spec": { "type": "xrange" },
+    "errors": ["$.series: required"]
+  },
+  {
+    "name": "span missing x",
+    "spec": { "type": "xrange", "series": [{ "data": [0], "spans": [{ "x2": 10, "y": 0 }] }] },
+    "errors": ["$.series[0].spans[0].x: required"]
+  },
+  {
+    "name": "span missing x2",
+    "spec": { "type": "xrange", "series": [{ "data": [0], "spans": [{ "x": 0, "y": 0 }] }] },
+    "errors": ["$.series[0].spans[0].x2: required"]
+  },
+  {
+    "name": "span missing y",
+    "spec": { "type": "xrange", "series": [{ "data": [0], "spans": [{ "x": 0, "x2": 10 }] }] },
+    "errors": ["$.series[0].spans[0].y: required"]
+  },
+  {
+    "name": "span string x",
+    "spec": { "type": "xrange", "series": [{ "data": [0], "spans": [{ "x": "a", "x2": 10, "y": 0 }] }] },
+    "errors": ["$.series[0].spans[0].x: expected number, received string"]
+  },
+  {
+    "name": "span not object",
+    "spec": { "type": "xrange", "series": [{ "data": [0], "spans": [42] }] },
+    "errors": ["$.series[0].spans[0]: expected object, received number"]
+  }
+]

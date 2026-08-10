@@ -31,7 +31,7 @@ type CapabilityManifest struct {
 var activeCapabilities = CapabilityManifest{
 	SpecVersion:        "0.0.0.1",
 	SVGContractVersion: "0.0.0.1",
-	ChartTypes:         []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "funnel", "histogram", "line", "lollipop", "scatter", "streamgraph", "timeline", "vector-plot", "variwide", "waterfall", "windbarb"},
+	ChartTypes:         []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "dumbbell", "error-bar", "funnel", "histogram", "line", "lollipop", "scatter", "streamgraph", "timeline", "vector-plot", "variwide", "waterfall", "windbarb", "xrange"},
 	Column: map[string][]string{
 		"grouping": []string{"grouped", "overlay"},
 		"stacking": []string{"none", "normal", "percent-nonnegative"},
