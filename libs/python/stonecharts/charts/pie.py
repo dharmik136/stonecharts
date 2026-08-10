@@ -130,6 +130,7 @@ def render_svg(spec: ChartSpec) -> str:
     cx = plot_x + plot_w / 2
     cy = plot_y + plot_h / 2
     r = min(plot_w, plot_h) / 2
+    ri = r * spec.inner_size
 
     if n > 0 and s0 is not None and total > 0:
         p.append('<g class="sc-series" data-series="0">')
@@ -141,15 +142,35 @@ def render_svg(spec: ChartSpec) -> str:
             fill = esc(palette[idx % len(palette)]) if color_by_point else pie_fill
             cat = cats[idx] if idx < len(cats) else str(idx)
             pct = f"{100.0:.1f}%"
-            p.append(
-                f'<circle class="sc-slice sc-point" data-series="0" '
-                f'data-series-name="{esc(s0.name)}" data-x="{esc(cat)}" '
-                f'data-y="{esc(fmt_num(data[idx]))}" data-color="{fill}" '
-                f'data-index="{idx}" data-percentage="{pct}" '
-                f'data-r="{r:.1f}" data-r-hover="{r + 4:.1f}" '
-                f'cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" '
-                f'fill="{fill}" stroke="{stroke_color}" stroke-width="2"/>'
-            )
+            if ri > 0:
+                d_str = (
+                    f"M {cx - r:.1f} {cy:.1f} "
+                    f"A {r:.1f} {r:.1f} 0 1 1 {cx + r:.1f} {cy:.1f} "
+                    f"A {r:.1f} {r:.1f} 0 1 1 {cx - r:.1f} {cy:.1f} "
+                    f"M {cx - ri:.1f} {cy:.1f} "
+                    f"A {ri:.1f} {ri:.1f} 0 1 0 {cx + ri:.1f} {cy:.1f} "
+                    f"A {ri:.1f} {ri:.1f} 0 1 0 {cx - ri:.1f} {cy:.1f} Z"
+                )
+                p.append(
+                    f'<path class="sc-slice sc-point" data-series="0" '
+                    f'data-series-name="{esc(s0.name)}" data-x="{esc(cat)}" '
+                    f'data-y="{esc(fmt_num(data[idx]))}" data-color="{fill}" '
+                    f'data-index="{idx}" data-percentage="{pct}" '
+                    f'data-r="{r:.1f}" data-r-hover="{r + 4:.1f}" '
+                    f'cx="{cx:.1f}" cy="{cy:.1f}" '
+                    f'd="{d_str}" fill-rule="evenodd" '
+                    f'fill="{fill}" stroke="{stroke_color}" stroke-width="2"/>'
+                )
+            else:
+                p.append(
+                    f'<circle class="sc-slice sc-point" data-series="0" '
+                    f'data-series-name="{esc(s0.name)}" data-x="{esc(cat)}" '
+                    f'data-y="{esc(fmt_num(data[idx]))}" data-color="{fill}" '
+                    f'data-index="{idx}" data-percentage="{pct}" '
+                    f'data-r="{r:.1f}" data-r-hover="{r + 4:.1f}" '
+                    f'cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" '
+                    f'fill="{fill}" stroke="{stroke_color}" stroke-width="2"/>'
+                )
         else:
             angle = -math.pi / 2
             for i in range(n):
@@ -157,16 +178,33 @@ def render_svg(spec: ChartSpec) -> str:
                 if v <= 0:
                     continue
                 sweep = (v / total) * 2 * math.pi
-                x1 = cx + r * math.cos(angle)
-                y1 = cy + r * math.sin(angle)
+                ox1 = cx + r * math.cos(angle)
+                oy1 = cy + r * math.sin(angle)
                 end_angle = angle + sweep
-                x2 = cx + r * math.cos(end_angle)
-                y2 = cy + r * math.sin(end_angle)
+                ox2 = cx + r * math.cos(end_angle)
+                oy2 = cy + r * math.sin(end_angle)
                 large_arc = 1 if sweep > math.pi else 0
 
                 fill = esc(palette[i % len(palette)]) if color_by_point else pie_fill
                 cat = cats[i] if i < len(cats) else str(i)
                 pct = f"{(v / total) * 100:.1f}%"
+
+                if ri > 0:
+                    ix1 = cx + ri * math.cos(angle)
+                    iy1 = cy + ri * math.sin(angle)
+                    ix2 = cx + ri * math.cos(end_angle)
+                    iy2 = cy + ri * math.sin(end_angle)
+                    d_str = (
+                        f"M {ox1:.1f} {oy1:.1f} "
+                        f"A {r:.1f} {r:.1f} 0 {large_arc} 1 {ox2:.1f} {oy2:.1f} "
+                        f"L {ix2:.1f} {iy2:.1f} "
+                        f"A {ri:.1f} {ri:.1f} 0 {large_arc} 0 {ix1:.1f} {iy1:.1f} Z"
+                    )
+                else:
+                    d_str = (
+                        f"M {cx:.1f} {cy:.1f} L {ox1:.1f} {oy1:.1f} "
+                        f"A {r:.1f} {r:.1f} 0 {large_arc} 1 {ox2:.1f} {oy2:.1f} Z"
+                    )
 
                 p.append(
                     f'<path class="sc-slice sc-point" data-series="0" '
@@ -175,8 +213,7 @@ def render_svg(spec: ChartSpec) -> str:
                     f'data-index="{i}" data-percentage="{pct}" '
                     f'data-r="{r:.1f}" data-r-hover="{r + 4:.1f}" '
                     f'cx="{cx:.1f}" cy="{cy:.1f}" '
-                    f'd="M {cx:.1f} {cy:.1f} L {x1:.1f} {y1:.1f} '
-                    f'A {r:.1f} {r:.1f} 0 {large_arc} 1 {x2:.1f} {y2:.1f} Z" '
+                    f'd="{d_str}" '
                     f'fill="{fill}" stroke="{stroke_color}" stroke-width="2"/>'
                 )
 

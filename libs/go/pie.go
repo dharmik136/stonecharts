@@ -174,6 +174,7 @@ func renderPieSVG(spec *ChartSpec) string {
 	if plotH/2 < r {
 		r = plotH / 2
 	}
+	ri := r * fdef(spec.InnerSize, 0)
 
 	if n > 0 && s0 != nil && total > 0 {
 		p.WriteString(`<g class="sc-series" data-series="0">`)
@@ -204,12 +205,27 @@ func renderPieSVG(spec *ChartSpec) string {
 				cat = cats[idx]
 			}
 			pct := "100.0%"
-			p.WriteString(fmt.Sprintf(
-				`<circle class="sc-slice sc-point" data-series="0" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-index="%d" data-percentage="%s" data-r="%s" data-r-hover="%s" cx="%s" cy="%s" r="%s" fill="%s" stroke="%s" stroke-width="2"/>`,
-				esc(s0.Name), esc(cat), esc(fmtNum(data[idx])), fill,
-				idx, pct, f1(r), f1(r+4),
-				f1(cx), f1(cy), f1(r),
-				fill, strokeColor))
+			if ri > 0 {
+				dStr := fmt.Sprintf(
+					"M %s %s A %s %s 0 1 1 %s %s A %s %s 0 1 1 %s %s M %s %s A %s %s 0 1 0 %s %s A %s %s 0 1 0 %s %s Z",
+					f1(cx-r), f1(cy), f1(r), f1(r), f1(cx+r), f1(cy),
+					f1(r), f1(r), f1(cx-r), f1(cy),
+					f1(cx-ri), f1(cy), f1(ri), f1(ri), f1(cx+ri), f1(cy),
+					f1(ri), f1(ri), f1(cx-ri), f1(cy))
+				p.WriteString(fmt.Sprintf(
+					`<path class="sc-slice sc-point" data-series="0" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-index="%d" data-percentage="%s" data-r="%s" data-r-hover="%s" cx="%s" cy="%s" d="%s" fill-rule="evenodd" fill="%s" stroke="%s" stroke-width="2"/>`,
+					esc(s0.Name), esc(cat), esc(fmtNum(data[idx])), fill,
+					idx, pct, f1(r), f1(r+4),
+					f1(cx), f1(cy), dStr,
+					fill, strokeColor))
+			} else {
+				p.WriteString(fmt.Sprintf(
+					`<circle class="sc-slice sc-point" data-series="0" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-index="%d" data-percentage="%s" data-r="%s" data-r-hover="%s" cx="%s" cy="%s" r="%s" fill="%s" stroke="%s" stroke-width="2"/>`,
+					esc(s0.Name), esc(cat), esc(fmtNum(data[idx])), fill,
+					idx, pct, f1(r), f1(r+4),
+					f1(cx), f1(cy), f1(r),
+					fill, strokeColor))
+			}
 		} else {
 			angle := -math.Pi / 2
 			for i := 0; i < n; i++ {
@@ -218,11 +234,11 @@ func renderPieSVG(spec *ChartSpec) string {
 					continue
 				}
 				sweep := (v / total) * 2 * math.Pi
-				x1 := cx + r*math.Cos(angle)
-				y1 := cy + r*math.Sin(angle)
+				ox1 := cx + r*math.Cos(angle)
+				oy1 := cy + r*math.Sin(angle)
 				endAngle := angle + sweep
-				x2 := cx + r*math.Cos(endAngle)
-				y2 := cy + r*math.Sin(endAngle)
+				ox2 := cx + r*math.Cos(endAngle)
+				oy2 := cy + r*math.Sin(endAngle)
 				largeArc := 0
 				if sweep > math.Pi {
 					largeArc = 1
@@ -240,13 +256,28 @@ func renderPieSVG(spec *ChartSpec) string {
 				}
 				pct := fmt.Sprintf("%.1f%%", (v/total)*100)
 
+				var dStr string
+				if ri > 0 {
+					ix1 := cx + ri*math.Cos(angle)
+					iy1 := cy + ri*math.Sin(angle)
+					ix2 := cx + ri*math.Cos(endAngle)
+					iy2 := cy + ri*math.Sin(endAngle)
+					dStr = fmt.Sprintf(
+						"M %s %s A %s %s 0 %d 1 %s %s L %s %s A %s %s 0 %d 0 %s %s Z",
+						f1(ox1), f1(oy1), f1(r), f1(r), largeArc, f1(ox2), f1(oy2),
+						f1(ix2), f1(iy2), f1(ri), f1(ri), largeArc, f1(ix1), f1(iy1))
+				} else {
+					dStr = fmt.Sprintf(
+						"M %s %s L %s %s A %s %s 0 %d 1 %s %s Z",
+						f1(cx), f1(cy), f1(ox1), f1(oy1),
+						f1(r), f1(r), largeArc, f1(ox2), f1(oy2))
+				}
+
 				p.WriteString(fmt.Sprintf(
-					`<path class="sc-slice sc-point" data-series="0" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-index="%d" data-percentage="%s" data-r="%s" data-r-hover="%s" cx="%s" cy="%s" d="M %s %s L %s %s A %s %s 0 %d 1 %s %s Z" fill="%s" stroke="%s" stroke-width="2"/>`,
+					`<path class="sc-slice sc-point" data-series="0" data-series-name="%s" data-x="%s" data-y="%s" data-color="%s" data-index="%d" data-percentage="%s" data-r="%s" data-r-hover="%s" cx="%s" cy="%s" d="%s" fill="%s" stroke="%s" stroke-width="2"/>`,
 					esc(s0.Name), esc(cat), esc(fmtNum(v)), fill,
 					i, pct, f1(r), f1(r+4),
-					f1(cx), f1(cy),
-					f1(cx), f1(cy), f1(x1), f1(y1),
-					f1(r), f1(r), largeArc, f1(x2), f1(y2),
+					f1(cx), f1(cy), dStr,
 					fill, strokeColor))
 
 				angle = endAngle

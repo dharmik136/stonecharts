@@ -59,6 +59,16 @@ Each `<path>` (or `<circle>`) carries:
 `data-index` (slice index), `data-percentage` (formatted %),
 `data-color`, `data-r`, `data-r-hover`, `cx`, `cy`.
 
+### Donut variant
+
+When `innerSize` > 0 (float 0–1, proportion of outer radius), the chart renders
+as a donut (annular ring). Slices become annular sectors:
+
+- Path: outer arc (clockwise) → line to inner arc → inner arc (counter-clockwise) → close.
+- Single-slice 100%: two concentric circle arcs with `fill-rule="evenodd"`.
+- `subtype: "donut"` is conventional but not required; `innerSize > 0` is
+  the actual trigger.
+
 ### Accessibility
 
 `role="img"`, `aria-label`, `<desc>` summary.
