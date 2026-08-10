@@ -1,0 +1,12 @@
+{
+  "type": "polar",
+  "title": "Quarterly Revenue",
+  "theme": "dark",
+  "xAxis": {
+    "categories": ["Q1", "Q2", "Q3", "Q4"]
+  },
+  "series": [
+    {"name": "2025", "data": [120, 180, 150, 200], "fillOpacity": 0.2},
+    {"name": "2026", "data": [140, 200, 170, 220], "fillOpacity": 0.2}
+  ]
+}

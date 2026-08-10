@@ -28,6 +28,7 @@ _CAPABILITIES: dict[str, Any] = {
         "line",
         "lollipop",
         "pie",
+        "polar",
         "radar",
         "scatter",
         "solid-gauge",
