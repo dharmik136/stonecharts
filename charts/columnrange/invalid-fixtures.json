@@ -49,5 +49,23 @@
     "errors": [
       "$.series: expected array, received string"
     ]
+  },
+  {
+    "spec": {
+      "type": "columnrange",
+      "series": [{ "name": "s", "rangeData": [{"low": 20, "high": 3}] }]
+    },
+    "errors": [
+      "$.series[0].rangeData[0]: low (20) must be <= high (3)"
+    ]
+  },
+  {
+    "spec": {
+      "type": "columnrange",
+      "series": [{ "name": "s", "rangeData": [{"low": "bad", "high": 10}] }]
+    },
+    "errors": [
+      "$.series[0].rangeData[0].low: expected number, received string"
+    ]
   }
 ]

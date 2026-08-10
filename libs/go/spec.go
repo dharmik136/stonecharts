@@ -84,6 +84,16 @@ type Datum struct {
 	Z *float64 // bubble only (§3.3 Rank 4); nil for scatter, always set for bubble
 }
 
+// RangePoint bundles low/high (and optional center value) into one object,
+// replacing parallel data[]+low[]+high[] arrays for range chart types.
+type RangePoint struct {
+	Low      float64 `json:"low"`
+	High     float64 `json:"high"`
+	Value    *float64 `json:"value,omitempty"`
+	Category string   `json:"category,omitempty"`
+	Name     string   `json:"name,omitempty"`
+}
+
 // BoxDatum is a 5-number summary for one category in a boxplot chart.
 type BoxDatum struct {
 	Low      float64   `json:"low"`
@@ -173,6 +183,7 @@ type Series struct {
 	Regression  bool            `json:"regression,omitempty"`
 	Low         []float64       `json:"low,omitempty"`
 	High        []float64       `json:"high,omitempty"`
+	RangeData   []RangePoint    `json:"rangeData,omitempty"`
 	OHLC        []OHLCDatum     `json:"ohlc,omitempty"`
 	BoxData     []BoxDatum      `json:"boxData,omitempty"`
 	Widths      []float64       `json:"widths,omitempty"`
@@ -561,6 +572,37 @@ func (c *ChartSpec) applyDefaults() {
 		}
 		if c.Series[i].Type == "" {
 			c.Series[i].Type = "column"
+		}
+		if len(c.Series[i].RangeData) > 0 {
+			rd := c.Series[i].RangeData
+			n := len(rd)
+			switch c.Type {
+			case "arearange":
+				c.Series[i].Data = make([]float64, n)
+				c.Series[i].Low = make([]float64, n)
+				for j, rp := range rd {
+					c.Series[i].Data[j] = rp.High
+					c.Series[i].Low[j] = rp.Low
+				}
+			case "error-bar":
+				c.Series[i].Data = make([]float64, n)
+				c.Series[i].Low = make([]float64, n)
+				c.Series[i].High = make([]float64, n)
+				for j, rp := range rd {
+					if rp.Value != nil {
+						c.Series[i].Data[j] = *rp.Value
+					}
+					c.Series[i].Low[j] = rp.Low
+					c.Series[i].High[j] = rp.High
+				}
+			case "columnrange", "dumbbell":
+				c.Series[i].Data = make([]float64, n)
+				c.Series[i].High = make([]float64, n)
+				for j, rp := range rd {
+					c.Series[i].Data[j] = rp.Low
+					c.Series[i].High[j] = rp.High
+				}
+			}
 		}
 	}
 }

@@ -50,5 +50,23 @@
     "errors": [
       "$.series: expected array, received string"
     ]
+  },
+  {
+    "spec": {
+      "type": "error-bar",
+      "series": [{ "name": "s", "rangeData": [{"low": 5, "high": 10}] }]
+    },
+    "errors": [
+      "$.series[0].rangeData[0].value: required for error-bar"
+    ]
+  },
+  {
+    "spec": {
+      "type": "error-bar",
+      "series": [{ "name": "s", "rangeData": [{"low": 15, "high": 10, "value": 12}] }]
+    },
+    "errors": [
+      "$.series[0].rangeData[0]: low (15) must be <= high (10)"
+    ]
   }
 ]

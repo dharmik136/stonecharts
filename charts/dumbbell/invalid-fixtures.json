@@ -26,5 +26,19 @@
       "series": "oops"
     },
     "errors": ["$.series: expected array, received string"]
+  },
+  {
+    "spec": {
+      "type": "dumbbell",
+      "series": [{ "name": "s", "rangeData": [{"low": 50, "high": 20}] }]
+    },
+    "errors": ["$.series[0].rangeData[0]: low (50) must be <= high (20)"]
+  },
+  {
+    "spec": {
+      "type": "dumbbell",
+      "series": [{ "name": "s", "rangeData": [{"low": 10}] }]
+    },
+    "errors": ["$.series[0].rangeData[0].high: required"]
   }
 ]

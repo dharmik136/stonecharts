@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-024
 title: DEC-054 Range-Point Schema Unification
-status: proposed
+status: accepted
 classification: informative
 owner: product-owner
 approver: maintainer

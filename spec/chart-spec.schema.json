@@ -662,6 +662,17 @@
         }
       }
     },
+    "RangePoint": {
+      "type": "object",
+      "required": ["low", "high"],
+      "properties": {
+        "low":      { "type": "number", "description": "Lower boundary value." },
+        "high":     { "type": "number", "description": "Upper boundary value." },
+        "value":    { "type": "number", "description": "Center value (required for error-bar)." },
+        "category": { "type": "string", "description": "Optional category label for this point." },
+        "name":     { "type": "string", "description": "Optional point name." }
+      }
+    },
     "series": {
       "type": "object",
       "required": [
@@ -826,6 +837,13 @@
                 "items": { "type": "number" }
               }
             }
+          }
+        },
+        "rangeData": {
+          "type": "array",
+          "description": "Atomic range-point model for arearange, columnrange, error-bar, dumbbell. Each element bundles low/high (and optional value for error-bar) into one object, replacing parallel data[]+low[]+high[] arrays. When present, data/low/high arrays on the same series are ignored.",
+          "items": {
+            "$ref": "#/definitions/RangePoint"
           }
         },
         "samples": {
