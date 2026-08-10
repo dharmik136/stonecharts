@@ -199,8 +199,8 @@ func renderTechnicalIndicatorsSVG(spec *ChartSpec) string {
 
 	var allOverlayVals []float64
 	for _, s := range spec.Series {
-		for _, v := range s.Data {
-			allOverlayVals = append(allOverlayVals, v)
+		if len(s.Data) > 0 {
+			allOverlayVals = append(allOverlayVals, s.Data...)
 		}
 		for _, ind := range s.Indicators {
 			vals := tiComputeIndicatorValues(&s, &ind)
