@@ -35,6 +35,7 @@ from .charts import variwide as _variwide
 from .charts import vector_plot as _vector_plot
 from .charts import waterfall as _waterfall
 from .charts import windbarb as _windbarb
+from .charts import xrange as _xrange
 from .limits import enforce_svg_limit
 from .spec import ChartSpec
 from .util import esc, fmt_num
@@ -68,6 +69,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "vector-plot": _vector_plot.render_svg,
     "waterfall": _waterfall.render_svg,
     "windbarb": _windbarb.render_svg,
+    "xrange": _xrange.render_svg,
 }
 _CAPABILITIES = capabilities()
 
@@ -188,6 +190,26 @@ def _data_table(spec: ChartSpec) -> str:
             '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
             '<th scope="col">Open</th><th scope="col">High</th>'
             '<th scope="col">Low</th><th scope="col">Close</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "xrange":
+        rows = []
+        lane_cats = spec.y_axis.categories or []
+        for s in spec.series:
+            for sp in s.spans or []:
+                lane_label = lane_cats[sp.y] if sp.y < len(lane_cats) else str(sp.y)
+                rows.append(
+                    f'<tr><th scope="row">{esc(s.name)}</th>'
+                    f"<td>{esc(lane_label)}</td>"
+                    f"<td>{esc(fmt_num(sp.x))}</td>"
+                    f"<td>{esc(fmt_num(sp.x2))}</td>"
+                    f"<td>{esc(fmt_num(sp.x2 - sp.x))}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Series</th><th scope="col">Lane</th>'
+            '<th scope="col">Start</th><th scope="col">End</th>'
+            '<th scope="col">Duration</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
     if spec.type == "vector-plot":

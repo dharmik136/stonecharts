@@ -126,6 +126,17 @@ type Series struct {
 	X           []float64       `json:"x,omitempty"`
 	Direction   []float64       `json:"direction,omitempty"`
 	Length      []float64       `json:"length,omitempty"`
+	Spans       []SpanDatum     `json:"spans,omitempty"`
+}
+
+type SpanDatum struct {
+	X          float64  `json:"x"`
+	X2         float64  `json:"x2"`
+	Y          int      `json:"y"`
+	ID         string   `json:"id,omitempty"`
+	Name       string   `json:"name,omitempty"`
+	Dependency []string `json:"dependency,omitempty"`
+	Milestone  bool     `json:"milestone,omitempty"`
 }
 
 // UnmarshalJSON normalizes the point model (§3.3 Rank 3 / §5.4b lockstep):

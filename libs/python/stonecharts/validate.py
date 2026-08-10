@@ -393,6 +393,31 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         else:
             for i, e in enumerate(v["length"]):
                 _num(e, f"{path}.length[{i}]", errs)
+    if "spans" in v:
+        if not isinstance(v["spans"], list):
+            errs.append(f"{path}.spans: expected array, received {_jtype(v['spans'])}")
+        else:
+            for i, sp in enumerate(v["spans"]):
+                sp_path = f"{path}.spans[{i}]"
+                if not isinstance(sp, dict):
+                    errs.append(f"{sp_path}: expected object, received {_jtype(sp)}")
+                    continue
+                for req in ("x", "x2", "y"):
+                    if req not in sp:
+                        errs.append(f"{sp_path}.{req}: required")
+                    elif req == "y":
+                        if not isinstance(sp[req], (int, float)):
+                            errs.append(f"{sp_path}.{req}: expected number, received {_jtype(sp[req])}")
+                    else:
+                        _num(sp[req], f"{sp_path}.{req}", errs)
+                if "id" in sp:
+                    _str(sp["id"], f"{sp_path}.id", errs)
+                if "name" in sp:
+                    _str(sp["name"], f"{sp_path}.name", errs)
+                if "dependency" in sp:
+                    _str_array(sp["dependency"], f"{sp_path}.dependency", errs)
+                if "milestone" in sp and not isinstance(sp["milestone"], bool):
+                    errs.append(f"{sp_path}.milestone: expected boolean, received {_jtype(sp['milestone'])}")
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
@@ -435,6 +460,7 @@ _KNOWN_TYPES = {
     "vector-plot",
     "windbarb",
     "streamgraph",
+    "xrange",
 }
 
 
