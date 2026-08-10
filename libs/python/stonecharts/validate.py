@@ -505,6 +505,7 @@ _KNOWN_TYPES = {
     "timeline",
     "variwide",
     "nightingale",
+    "parliament",
     "radial-bar",
     "waterfall",
     "vector-plot",
