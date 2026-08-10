@@ -1,0 +1,20 @@
+{
+  "type": "flame-chart",
+  "title": "<img onerror=alert(1)> &amp; \"quotes\"",
+  "subtitle": "XSS in all user-facing fields",
+  "id": "adv",
+  "xAxis": { "title": "X <script>" },
+  "yAxis": { "title": "Y &amp;" },
+  "series": [
+    {
+      "name": "<script>alert(1)</script>",
+      "data": [],
+      "frames": [
+        { "x": 0, "x2": 50, "depth": 0, "name": "<b>main</b>" },
+        { "x": 0, "x2": 25, "depth": 1, "name": "fn&\"q'" },
+        { "x": 25, "x2": 50, "depth": 1, "name": "fn<script>" },
+        { "x": 5, "x2": 20, "depth": 2, "name": "leaf" }
+      ]
+    }
+  ]
+}

@@ -174,8 +174,17 @@ type Series struct {
 	Direction   []float64       `json:"direction,omitempty"`
 	Length      []float64       `json:"length,omitempty"`
 	Spans       []SpanDatum     `json:"spans,omitempty"`
+	Frames      []FrameDatum    `json:"frames,omitempty"`
 	Volume     []float64   `json:"volume,omitempty"`
 	Indicators []Indicator `json:"indicators,omitempty"`
+}
+
+type FrameDatum struct {
+	X     float64 `json:"x"`
+	X2    float64 `json:"x2"`
+	Depth int     `json:"depth"`
+	Name  string  `json:"name,omitempty"`
+	Color string  `json:"color,omitempty"`
 }
 
 type SpanDatum struct {
