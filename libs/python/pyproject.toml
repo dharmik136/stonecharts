@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stonecharts"
-version = "0.0.0.14"
-description = "StoneCharts — original, proprietary interactive charting library (Python edition)"
+version = "0.0.0.32"
+description = "StoneCharts — Visual Integrity Infrastructure for deterministic reporting charts (Python renderer)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Proprietary — All Rights Reserved" }
