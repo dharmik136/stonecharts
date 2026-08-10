@@ -1,0 +1,50 @@
+[
+  {
+    "description": "missing triangle field",
+    "spec": {
+      "type": "development-triangle"
+    },
+    "errors": [
+      "$.triangle: required for development-triangle"
+    ]
+  },
+  {
+    "description": "triangle is not an object",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": "not-an-object"
+    },
+    "errors": [
+      "$.triangle: required for development-triangle"
+    ]
+  },
+  {
+    "description": "origins contains non-string",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": [2021, 2022],
+        "periods": [12, 24],
+        "values": [[100, 200], [110]]
+      }
+    },
+    "errors": [
+      "$.triangle.origins: all elements must be strings"
+    ]
+  },
+  {
+    "description": "invalid view enum value",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12],
+        "values": [[100]],
+        "view": "both"
+      }
+    },
+    "errors": [
+      "$.triangle.view: expected \"cumulative\" or \"incremental\""
+    ]
+  }
+]

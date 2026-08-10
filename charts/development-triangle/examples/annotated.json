@@ -1,0 +1,16 @@
+{
+  "type": "development-triangle",
+  "title": "Annotated Triangle",
+  "triangle": {
+    "origins": ["2022", "2023", "2024"],
+    "periods": [12, 24, 36],
+    "values": [
+      [200, 310, 350],
+      [220, 340],
+      [250]
+    ]
+  },
+  "annotations": [
+    {"origin": "2022", "period": 36, "text": "Large loss adjusted"}
+  ]
+}

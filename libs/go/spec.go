@@ -122,6 +122,41 @@ type Indicator struct {
 	Pane      *int                   `json:"pane,omitempty"`
 }
 
+// TriangleData holds the actuarial loss-development matrix.
+type TriangleData struct {
+	Origins   []string    `json:"origins"`
+	Periods   []float64   `json:"periods"`
+	Values    [][]float64 `json:"values"`
+	View      string      `json:"view,omitempty"`
+	ValueType string      `json:"valueType,omitempty"`
+	Unit      string      `json:"unit,omitempty"`
+}
+
+// DiagonalConfig controls latest-diagonal highlighting.
+type DiagonalConfig struct {
+	Highlight bool   `json:"highlight,omitempty"`
+	Label     string `json:"label,omitempty"`
+}
+
+// FactorsConfig controls development factor display.
+type FactorsConfig struct {
+	Show     bool   `json:"show,omitempty"`
+	Position string `json:"position,omitempty"`
+}
+
+// ColorScaleConfig controls cell color-scale.
+type ColorScaleConfig struct {
+	Type   string `json:"type,omitempty"`
+	Domain string `json:"domain,omitempty"`
+}
+
+// TriangleAnnotation is a cell-level note on a development triangle.
+type TriangleAnnotation struct {
+	Origin string `json:"origin"`
+	Period int    `json:"period"`
+	Text   string `json:"text"`
+}
+
 // Flag marks a point event on the chart.
 type Flag struct {
 	X     float64 `json:"x"`
@@ -539,8 +574,13 @@ type ChartSpec struct {
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
 	Series                 []Series        `json:"series"`
-	Flags []Flag `json:"flags,omitempty"`
-	Panes []Pane `json:"panes,omitempty"`
+	Flags                  []Flag               `json:"flags,omitempty"`
+	Panes                  []Pane               `json:"panes,omitempty"`
+	Triangle               *TriangleData        `json:"triangle,omitempty"`
+	Diagonal               *DiagonalConfig      `json:"diagonal,omitempty"`
+	Factors                *FactorsConfig       `json:"factors,omitempty"`
+	ColorScaleCfg          *ColorScaleConfig    `json:"colorScale,omitempty"`
+	Annotations            []TriangleAnnotation `json:"annotations,omitempty"`
 }
 
 // applyDefaults mirrors the Python ChartSpec defaults so the two libraries
