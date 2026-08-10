@@ -86,6 +86,10 @@ receive an ADR; bounded operating decisions name their controlling project docum
 
 | Priority | ID | Decision | Current recommendation | Decide before |
 |---:|---|---|---|---|
+| 1 | DEC-049 | Renderer purity invariant | Mandate that `render_svg`/`RenderSVG` must not mutate the input `ChartSpec`; fix 4 Python and 2 Go renderers that currently violate this; add a cross-chart purity test gate | Before next release |
+| 2 | DEC-052 | Strict input validation | Replace silent fallbacks (histogram bin clamping, arearange missing low values) with explicit `SpecError` or opt-in policy flags; add validation for boxplot ordering, pie negatives, gauge bounds | Before next release |
+| 3 | DEC-050 | Semantic invariant tests | Add chart-type-specific mathematical correctness assertions (histogram bin sums, waterfall balance, boxplot ordering, percent-stack totals) as a new assurance layer beyond byte parity | Before next release |
+| 4 | DEC-051 | Property and fuzz test expansion | Extend randomized property tests and Go fuzz seeds from the current 7 chart types to all 35, organized by data model family in 4 phases | After DEC-049 |
 
 ## Discussion order
 
@@ -94,3 +98,7 @@ The commercial boundary is governed by the approved policy document and must not
 
 DEC-005 stakeholder brief: [Compatibility decision brief](decision-briefs/dec-005-compatibility.md).
 DEC-017 stakeholder brief: [Visual integrity repositioning brief](decision-briefs/dec-017-visual-integrity.md).
+DEC-049 stakeholder brief: [Renderer purity invariant](decision-briefs/dec-049-renderer-purity.md).
+DEC-050 stakeholder brief: [Semantic invariant tests](decision-briefs/dec-050-semantic-invariants.md).
+DEC-051 stakeholder brief: [Property and fuzz test expansion](decision-briefs/dec-051-property-fuzz-expansion.md).
+DEC-052 stakeholder brief: [Strict input validation](decision-briefs/dec-052-strict-input-validation.md).

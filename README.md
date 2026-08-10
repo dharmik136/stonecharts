@@ -1,67 +1,89 @@
 # StoneCharts
 
-StoneCharts is Visual Integrity Infrastructure for deterministic reporting charts:
-one governed chart specification, certified Python and Go renderers, and evidence
-that supported visuals stay consistent across language and release boundaries.
+[![CI](https://github.com/dharmik136/stonecharts/actions/workflows/quality.yml/badge.svg)](https://github.com/dharmik136/stonecharts/actions/workflows/quality.yml)
+![License: Proprietary](https://img.shields.io/badge/license-Proprietary-red)
+![Python ≥3.9](https://img.shields.io/badge/python-%E2%89%A53.9-3776AB)
+![Go ≥1.26](https://img.shields.io/badge/go-%E2%89%A51.26-00ADD8)
+![Charts: 35](https://img.shields.io/badge/chart_types-35-28a745)
+![Dependencies: 0](https://img.shields.io/badge/runtime_deps-0-brightgreen)
 
-StoneCharts is currently entering a governed Alpha qualification phase. Product scope,
-guarantees, requirements, architecture decisions, risks, evidence, and release gates
-are indexed in [`docs/README.md`](docs/README.md). Execution is tracked in the private
-[StoneCharts GitHub Project](https://github.com/users/dharmik136/projects/2).
+**Visual Integrity Infrastructure** for deterministic reporting charts — one governed
+JSON specification, certified Python and Go renderers producing byte-identical SVG,
+and formal conformance proofs that every visual stays consistent across language,
+release, and environment boundaries.
 
-**Not** a fork or copy of any commercial charting library. The chart-type catalog
-is inspired by common visualization types (line, bar, pie, scatter, heatmap, …);
-every renderer here is written from scratch. All rights reserved.
+> **Not** a fork or copy of any commercial charting library. Every renderer is written
+> from scratch. All rights reserved.
 
-## What a chart is here
+---
 
-1. A **spec** — a language-agnostic recipe (type, data, axes, titles, colors).
+## Why StoneCharts
+
+- **Byte-identical cross-language output.** The same JSON spec renders to the exact
+  same SVG in Python and Go — verified by 177 golden-test fixtures across 35 chart
+  types.
+- **Deterministic and runtime-free.** Charts are fully rendered server-side without a
+  browser, DOM, or JavaScript. The SVG is complete on its own; the interaction runtime
+  only *enhances* it.
+- **Zero runtime dependencies.** Both the Python package and Go module ship with zero
+  runtime dependencies.
+- **Formal conformance proofs.** [StoneVerify](#stoneverify) produces local evidence
+  bundles proving visual integrity between releases — auditable artifacts, not just
+  test assertions.
+- **Governed engineering.** 48 formal decisions, requirements traceability, evidence
+  packs, and a [12-job CI pipeline](#ci). Every chart type is admitted through a
+  governed process with its own decision record.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Chart Spec (JSON)                                  │
+│  spec/chart-spec.schema.json                        │
+├──────────────────────┬──────────────────────────────┤
+│  Python Renderer     │  Go Renderer                 │
+│  libs/python/        │  libs/go/                    │
+├──────────────────────┴──────────────────────────────┤
+│              Deterministic SVG                      │
+│              (byte-identical across languages)      │
+├─────────────────────────────────────────────────────┤
+│  Interaction Runtime (optional enhancement)         │
+│  runtime/chart-interactions.js                      │
+│  Tooltip · Crosshair · Legend toggle · Keyboard nav │
+│  Screen-reader summary · Navigable data table       │
+├─────────────────────────────────────────────────────┤
+│         Self-contained interactive HTML              │
+└─────────────────────────────────────────────────────┘
+```
+
+1. A **spec** — a language-agnostic JSON recipe (type, data, axes, titles, colors).
    Schema: [`spec/chart-spec.schema.json`](spec/chart-spec.schema.json).
-2. A **renderer** per language turns the spec into an **SVG** that follows
-   [`spec/svg-contract.md`](spec/svg-contract.md).
+2. A **renderer** per language turns the spec into an **SVG** that follows the
+   [SVG DOM contract](spec/svg-contract.md).
 3. The shared **interaction runtime**
    ([`runtime/chart-interactions.js`](runtime/chart-interactions.js)) enhances that
-   SVG (tooltip, point highlight, legend toggle, crosshair, keyboard navigation)
-   and layers on accessibility (a concise screen-reader summary plus a
-   navigable data table). Output is a single, self-contained interactive HTML file.
+   SVG with tooltip, crosshair, legend toggle, keyboard navigation, and accessibility
+   (screen-reader summary + navigable data table). Output is a single, self-contained
+   interactive HTML file.
 
-## Repo layout
+## Requirements
 
-```
-spec/          shared spec schema + the SVG DOM contract
-runtime/       the shared vanilla-JS interaction runtime (written once)
-charts/<id>/   per-chart docs: design.md, examples/, golden/
-libs/python/   Python renderer (stonecharts package)
-libs/go/       Go renderer
-CHARTS.md      the "smart" router: data + intent -> which chart + its design.md
-```
+| Dependency | Version |
+|------------|---------|
+| Python     | ≥ 3.9   |
+| Go         | ≥ 1.26  |
+| Browser (for interactive HTML) | Any modern browser |
 
-Every new chart type = one `charts/<id>/` folder (with its `design.md`) plus a
-renderer in each `libs/<lang>`. See any chart's `design.md` to generate it.
+Both renderers have **zero runtime dependencies**. Dev/test dependencies are listed
+in [`pyproject.toml`](libs/python/pyproject.toml) and [`go.mod`](libs/go/go.mod).
 
-## Guarantees & limitations
+## Quickstart
 
-StoneCharts generates deterministic static SVG without a browser runtime for
-supported chart specifications. Go and Python outputs are byte-identical for
-covered fixtures. Canonical output, browser behavior, visual export, and
-customization have separate applicability boundaries in the governed
-[`guarantees and limits`](docs/contracts/guarantees-and-limits.md).
-
-- **Deterministic & runtime-free rendering.** The SVG is fully drawn server-side —
-  no browser or JS needed to produce it; the runtime only *enhances* an
-  already-complete chart.
-- **Cross-language byte parity** is verified per fixture by the golden tests in
-  both languages; it is a guarantee for *covered* specs, not an untested claim for
-  every possible input (see [`docs/robustness.md`](docs/robustness.md)).
-- **Interactivity & accessibility are optional layers.** Disable the a11y layer
-  with `a11y: false`; the interactive HTML is one self-contained file.
-- **Export is out of scope of the core.** PDF/PNG/email delivery is a downstream
-  concern — convert or rasterize the SVG with the tool of your choice.
-
-## Quickstart (Python)
+### Python
 
 ```bash
 cd libs/python
+pip install -e .
 python examples/line_basic.py       # writes examples/line_basic.out.html
 ```
 
@@ -76,11 +98,11 @@ spec = ChartSpec(
 save_html(spec, "chart.html")   # self-contained interactive HTML
 ```
 
-## Quickstart (Go)
+### Go
 
 ```bash
 cd libs/go
-go test ./...                                              # golden test vs the shared reference
+go test ./...                                              # golden test vs shared reference
 go run ./cmd/line_basic ../../charts/line-basic/examples/basic.json out.svg out.html
 ```
 
@@ -91,192 +113,152 @@ spec, _ := stonecharts.FromJSON(specJSON)   // matches spec/chart-spec.schema.js
 stonecharts.SaveHTML(spec, "chart.html", "")
 ```
 
-## StoneVerify Proof
+## Chart Catalog
 
-The primary Visual Integrity proof compares a candidate render against an
-approved local evidence bundle:
+**35 certified chart types** across two families, all with byte-identical Python and
+Go renderers pinned by golden tests.
+
+### Family A — Cartesian (26 types)
+
+| Chart | ID | Release | Chart | ID | Release |
+|-------|----|---------|-------|----|---------|
+| Line | `line-basic` | 0.0.0.1 | Lollipop | `lollipop` | 0.0.0.13 |
+| Column | `column` | 0.0.0.1 | Dumbbell | `dumbbell` | 0.0.0.14 |
+| Area | `area` | 0.0.0.1 | Funnel | `funnel` | 0.0.0.15 |
+| Bar | `bar` | 0.0.0.2 | Variwide | `variwide` | 0.0.0.16 |
+| Scatter | `scatter` | 0.0.0.3 | Timeline | `timeline` | 0.0.0.17 |
+| Bubble | `bubble` | 0.0.0.4 | Windbarb | `windbarb` | 0.0.0.18 |
+| Combo | `combo` | 0.0.0.5 | Streamgraph | `streamgraph` | 0.0.0.19 |
+| Histogram | `histogram` | 0.0.0.6 | Vector Plot | `vector-plot` | 0.0.0.20 |
+| Candlestick | `candlestick` | 0.0.0.7 | X-Range | `xrange` | 0.0.0.21 |
+| Error Bar | `error-bar` | 0.0.0.8 | Tech. Indicators | `technical-indicators` | 0.0.0.22 |
+| Area Range | `arearange` | 0.0.0.9 | Flame Chart | `flame-chart` | 0.0.0.23 |
+| Column Range | `columnrange` | 0.0.0.9 | | | |
+| Waterfall | `waterfall` | 0.0.0.10 | | | |
+| Bullet | `bullet` | 0.0.0.11 | | | |
+| Boxplot | `boxplot` | 0.0.0.12 | | | |
+
+### Family B — Polar / Radial (9 types)
+
+| Chart | ID | Release |
+|-------|----|---------|
+| Pie | `pie` | 0.0.0.24 |
+| Gauge | `gauge` | 0.0.0.25 |
+| Solid Gauge | `solid-gauge` | 0.0.0.26 |
+| Radar | `radar` | 0.0.0.27 |
+| Polar | `polar` | 0.0.0.28 |
+| Wind Rose | `wind-rose` | 0.0.0.29 |
+| Nightingale | `nightingale` | 0.0.0.30 |
+| Radial Bar | `radial-bar` | 0.0.0.31 |
+| Parliament | `parliament` | 0.0.0.32 |
+
+Every chart type has a `design.md`, example specs, and golden SVGs in
+[`charts/<id>/`](charts/). See [`CHARTS.md`](CHARTS.md) to look up which chart type
+fits a given data shape and intent.
+
+## Guarantees and Limitations
+
+StoneCharts generates deterministic static SVG for supported chart specifications.
+Canonical output, browser behavior, visual export, and customization have separate
+applicability boundaries documented in the
+[guarantees and limits contract](docs/contracts/guarantees-and-limits.md).
+
+- **Deterministic and runtime-free rendering.** The SVG is fully drawn server-side —
+  no browser or JS needed to produce it; the runtime only *enhances* an
+  already-complete chart.
+- **Cross-language byte parity** is verified per fixture by golden tests in both
+  languages; it is a guarantee for *covered* specs, not an untested claim for every
+  possible input (see [`docs/robustness.md`](docs/robustness.md)).
+- **Interactivity and accessibility are optional layers.** Disable the a11y layer
+  with `a11y: false`; the interactive HTML is one self-contained file.
+- **Export is out of scope of the core.** PDF/PNG/email delivery is a downstream
+  concern — convert or rasterize the SVG with the tool of your choice.
+
+## StoneVerify
+
+StoneVerify is the conformance proof system: it renders a chart spec, compares the
+output against an approved baseline, and produces a local evidence bundle proving
+visual integrity.
 
 ```bash
+# Create an approved baseline
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
-  --runtime python \
-  --evidence .tmp-stoneverify-baseline
-```
+  --runtime python --evidence .tmp-baseline
 
-```bash
+# Verify a candidate against the baseline
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
-  --baseline-evidence .tmp-stoneverify-baseline \
-  --baseline-note "approved baseline for release review" \
-  --evidence .tmp-stoneverify-candidate
-```
+  --baseline-evidence .tmp-baseline --evidence .tmp-candidate
 
-When `--baseline-evidence` is supplied and no runtime is specified, StoneVerify
-defaults to one Python render. Use explicit repeated `--runtime` flags for a
-cross-runtime proof:
-
-```bash
+# Cross-language proof (Python + Go produce identical SVG)
 python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
-  --runtime python \
-  --runtime go \
-  --from-source \
-  --evidence .tmp-stoneverify-bubble
+  --runtime python --runtime go --from-source --evidence .tmp-proof
 ```
 
-It writes `manifest.json`, `input-spec.json`, runtime SVG outputs,
-`comparison.json`, `report.html`, and `checksums.txt`. This is a local
-conformance proof, not hosted storage or a PDF/document-generation system.
+Each evidence bundle contains `manifest.json`, the input spec, rendered SVGs,
+`comparison.json` with semantic difference classification, `report.html` for
+reviewers, and `checksums.txt` for tamper detection.
 
-To demonstrate a CI failure without corrupting a renderer, apply an explicit
-demo-only drift to the last runtime output:
+Supports JUnit XML output, GitHub Actions annotations, baseline supersession
+tracking, and stable exit codes for automation. See the full
+[StoneVerify Quick Start](docs/quality/stoneverify-quickstart.md) for the complete
+reference.
 
-```bash
-python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
-  --runtime python \
-  --runtime go \
-  --from-source \
-  --demo-drift text \
-  --evidence .tmp-stoneverify-drift
+## Repo Layout
+
+```
+spec/            Shared JSON Schema + SVG DOM contract
+runtime/         Shared vanilla-JS interaction runtime
+charts/<id>/     Per-chart design.md, example specs, golden SVGs
+libs/python/     Python renderer (stonecharts package)
+libs/go/         Go renderer (stonecharts module)
+docs/            Governance, architecture, contracts, quality, releases
+tools/           Build, check, and verification scripts
+site/            Gated demo site (Astro)
+CHARTS.md        Data shape + intent → chart type router
+CHANGELOG.md     Full release history
 ```
 
-To record that a new approved baseline replaces an older one:
+## Documentation
 
-```bash
-python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
-  --baseline-evidence .tmp-stoneverify-baseline \
-  --supersedes-baseline .tmp-stoneverify-older-baseline \
-  --baseline-note "replaces baseline after dependency upgrade review" \
-  --evidence .tmp-stoneverify-candidate
-```
+| Topic | Location |
+|-------|----------|
+| Documentation index | [`docs/README.md`](docs/README.md) |
+| Product thesis | [`docs/product/thesis.md`](docs/product/thesis.md) |
+| System architecture | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
+| Renderer constitution | [`docs/architecture/renderer-constitution.md`](docs/architecture/renderer-constitution.md) |
+| Guarantees and limits | [`docs/contracts/guarantees-and-limits.md`](docs/contracts/guarantees-and-limits.md) |
+| Capability matrix | [`docs/product/capability-matrix.md`](docs/product/capability-matrix.md) |
+| Test strategy | [`docs/quality/test-strategy.md`](docs/quality/test-strategy.md) |
+| StoneVerify quick start | [`docs/quality/stoneverify-quickstart.md`](docs/quality/stoneverify-quickstart.md) |
+| Threat model | [`docs/security/threat-model.md`](docs/security/threat-model.md) |
+| Decision log (48 decisions) | [`docs/project/decisions.md`](docs/project/decisions.md) |
 
-To validate that an existing evidence bundle still matches its recorded checksums:
+Execution is tracked in the private
+[StoneCharts GitHub Project](https://github.com/users/dharmik136/projects/2).
 
-```bash
-python tools/stonecharts_verify.py --check-evidence .tmp-stoneverify-bubble
-```
+## CI
 
-To compare two stored evidence bundles directly:
+The [quality workflow](.github/workflows/quality.yml) runs on every push and pull
+request with 12 jobs:
 
-```bash
-python tools/stonecharts_verify.py --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-check
-```
+- **Lint and static analysis** — ruff, mypy, go vet, golangci-lint, CodeQL
+- **Cross-platform tests** — Python 3.9 + 3.14, Go, on Ubuntu and Windows
+- **Wheel install smoke test** — build, install, and verify all 35 chart types
+- **Documentation validation** — structure, metadata, and cross-references
+- **Cross-language parity** — Python/Go byte-identical output verification
+- **Schema compatibility** — backward-compatibility check on PRs
+- **StoneVerify pilot gate** — full conformance proof with artifact upload
+- **Browser qualification** — Playwright interaction and accessibility tests
 
-The comparison reports each runtime separately, and it separates a changed input
-spec from a changed rendering of the same spec. Only the second is renderer drift:
+## Contributing
 
-```text
-StoneVerify compare FAIL: Evidence bundles differ: the same input spec produced different output.
-input spec: match
-  go: FAIL - same input spec rendered differently: attribute, numeric formatting, ordering, or text-content drift
-  python: PASS - hash match
-```
+StoneCharts is proprietary software. Contributions are accepted only from authorized
+collaborators under written terms. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Bundles that cover different runtimes are reported as a mismatch rather than
-compared on the runtimes they happen to share.
+## Security
 
-To write that comparison to a reviewable HTML report:
-
-```bash
-python tools/stonecharts_verify.py \
-  --compare-evidence .tmp-stoneverify-bubble .tmp-stoneverify-baseline-drift \
-  --compare-report .tmp-stoneverify-compare/report.html
-```
-
-For CI systems that ingest test reports, add a JUnit XML report:
-
-```bash
-python tools/stonecharts_verify.py charts/bubble/examples/basic.json \
-  --runtime python \
-  --runtime go \
-  --from-source \
-  --demo-drift text \
-  --evidence .tmp-stoneverify-drift \
-  --junit-report .tmp-stoneverify-drift/junit.xml
-```
-
-The XML report has one testcase per compared runtime pair, or one testcase per
-runtime in baseline mode. A passing comparison writes zero failures; a failing
-comparison writes failure text from StoneVerify's semantic findings. The XML
-does not decide job status by itself: StoneVerify's exit code remains the source
-of pass/fail behavior.
-
-When `GITHUB_ACTIONS=true`, StoneVerify also emits GitHub workflow annotations
-and appends a concise job summary if `GITHUB_STEP_SUMMARY` is available. This
-happens without requiring `--junit-report`.
-
-StoneVerify uses stable exit codes for automation:
-
-| Code | Meaning |
-|------|---------|
-| 0 | Verification completed and passed. |
-| 1 | Verification completed, but differences or invalid evidence were found. |
-| 2 | CLI usage error, such as missing required arguments. |
-| 3 | Invalid or unsupported chart specification. |
-| 4 | Renderer or adapter execution failure. |
-| 5 | Reserved for resource-limit or timeout failure. |
-| 70 | Reserved for internal StoneVerify failure. |
-
-When installed from the Python wheel, StoneVerify is available as `stoneverify`.
-For `--runtime go`, it invokes a prebuilt `stoneverify-go-render` adapter
-resolved from `--go-binary`, `STONEVERIFY_GO_BINARY`, or `PATH`. The adapter
-contract is intentionally small: `stoneverify-go-render <spec.json>` writes SVG
-to stdout, `stoneverify-go-render --version` reports `adapter=`,
-`stonecharts=`, and `module=` fields, and failures write stderr with a non-zero
-exit. `--from-source` is only the development fallback for running against this
-checkout with `go run`.
-
-## Status
-
-### Family A — Cartesian (26 chart types)
-
-| Chart | Spec | Python | Go |
-|-------|------|--------|----|
-| Basic line (`line-basic`) | ✅ certified (0.0.0.1) | ✅ | ✅ |
-| Column (`column`) | ✅ certified (0.0.0.1) | ✅ | ✅ |
-| Area (`area`) | ✅ certified (0.0.0.1) | ✅ | ✅ |
-| Bar (`bar`) | ✅ certified (0.0.0.2) | ✅ | ✅ |
-| Scatter (`scatter`) | ✅ certified (0.0.0.3) | ✅ | ✅ |
-| Bubble (`bubble`) | ✅ certified (0.0.0.4) | ✅ | ✅ |
-| Combo (`combo`) | ✅ certified (0.0.0.5) | ✅ | ✅ |
-| Histogram (`histogram`) | ✅ certified (0.0.0.6) | ✅ | ✅ |
-| Candlestick (`candlestick`) | ✅ certified (0.0.0.7) | ✅ | ✅ |
-| Error Bar (`error-bar`) | ✅ certified (0.0.0.8) | ✅ | ✅ |
-| Area Range (`arearange`) | ✅ certified (0.0.0.9) | ✅ | ✅ |
-| Column Range (`columnrange`) | ✅ certified (0.0.0.9) | ✅ | ✅ |
-| Waterfall (`waterfall`) | ✅ certified (0.0.0.10) | ✅ | ✅ |
-| Bullet (`bullet`) | ✅ certified (0.0.0.11) | ✅ | ✅ |
-| Boxplot (`boxplot`) | ✅ certified (0.0.0.12) | ✅ | ✅ |
-| Lollipop (`lollipop`) | ✅ certified (0.0.0.13) | ✅ | ✅ |
-| Dumbbell (`dumbbell`) | ✅ certified (0.0.0.14) | ✅ | ✅ |
-| Funnel (`funnel`) | ✅ certified (0.0.0.15) | ✅ | ✅ |
-| Variwide (`variwide`) | ✅ certified (0.0.0.16) | ✅ | ✅ |
-| Timeline (`timeline`) | ✅ certified (0.0.0.17) | ✅ | ✅ |
-| Windbarb (`windbarb`) | ✅ certified (0.0.0.18) | ✅ | ✅ |
-| Streamgraph (`streamgraph`) | ✅ certified (0.0.0.19) | ✅ | ✅ |
-| Vector Plot (`vector-plot`) | ✅ certified (0.0.0.20) | ✅ | ✅ |
-| X-Range (`xrange`) | ✅ certified (0.0.0.21) | ✅ | ✅ |
-| Technical Indicators (`technical-indicators`) | ✅ certified (0.0.0.22) | ✅ | ✅ |
-| Flame Chart (`flame-chart`) | ✅ certified (0.0.0.23) | ✅ | ✅ |
-
-### Family B — Polar / Radial (9 chart types)
-
-| Chart | Spec | Python | Go |
-|-------|------|--------|----|
-| Pie (`pie`) | ✅ certified (0.0.0.24) | ✅ | ✅ |
-| Gauge (`gauge`) | ✅ certified (0.0.0.25) | ✅ | ✅ |
-| Solid Gauge (`solid-gauge`) | ✅ certified (0.0.0.26) | ✅ | ✅ |
-| Radar (`radar`) | ✅ certified (0.0.0.27) | ✅ | ✅ |
-| Polar (`polar`) | ✅ certified (0.0.0.28) | ✅ | ✅ |
-| Wind Rose (`wind-rose`) | ✅ certified (0.0.0.29) | ✅ | ✅ |
-| Nightingale (`nightingale`) | ✅ certified (0.0.0.30) | ✅ | ✅ |
-| Radial Bar (`radial-bar`) | ✅ certified (0.0.0.31) | ✅ | ✅ |
-| Parliament (`parliament`) | ✅ certified (0.0.0.32) | ✅ | ✅ |
-
-Python and Go render **byte-identical SVG** from the same spec, pinned by golden
-tests (`libs/go/render_test.go`, `libs/python/tests/test_golden.py`). 35 chart
-types across 177 cross-render examples.
-
-See [`docs/product/capability-matrix.md`](docs/product/capability-matrix.md) for the
-authoritative distinction between certified technical capability, commercial pilot
-scope, and design-only roadmap material.
+Report vulnerabilities privately via GitHub's security advisory facility. See
+[SECURITY.md](SECURITY.md) for scope and process.
 
 ## License
 
