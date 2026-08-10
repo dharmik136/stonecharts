@@ -9,6 +9,21 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.23] - 2026-08-10
+
+### Added
+
+- **Flame chart** (`type: "flame-chart"`) — time-ordered stack-frame profiler
+  view: per-thread frames drawn as horizontal floating bars at [start, end]
+  per depth level with inverted depth mapping (depth 0 = root at bottom)
+  (DEC-039). Series carries `frames[]` array of `{x, x2, depth, name?,
+  color?}` objects. Supports in-bar labels with automatic truncation, per-frame
+  color overrides, and multi-series (multi-thread) layout. 26th and last
+  Cartesian (Family A) chart type.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 128 examples across 26 chart types.
+- Site gallery expanded to 26 chart types.
+
 ## [0.0.0.22] - 2026-08-10
 
 ### Added

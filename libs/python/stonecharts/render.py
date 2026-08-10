@@ -24,6 +24,7 @@ from .charts import columnrange as _columnrange
 from .charts import combo as _combo
 from .charts import dumbbell as _dumbbell
 from .charts import error_bar as _error_bar
+from .charts import flame_chart as _flame_chart
 from .charts import funnel as _funnel
 from .charts import histogram as _histogram
 from .charts import line as _line
@@ -57,6 +58,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "dumbbell": _dumbbell.render_svg,
     "columnrange": _columnrange.render_svg,
     "error-bar": _error_bar.render_svg,
+    "flame-chart": _flame_chart.render_svg,
     "funnel": _funnel.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
@@ -212,6 +214,24 @@ def _data_table(spec: ChartSpec) -> str:
             '<thead><tr><th scope="col">Series</th><th scope="col">Lane</th>'
             '<th scope="col">Start</th><th scope="col">End</th>'
             '<th scope="col">Duration</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "flame-chart":
+        rows = []
+        for s in spec.series:
+            for fr in s.frames or []:
+                duration = fr.x2 - fr.x
+                name = fr.name or ""
+                rows.append(
+                    f'<tr><th scope="row">{esc(s.name)}</th><td>{fr.depth}</td>'
+                    f"<td>{esc(fmt_num(fr.x))}</td><td>{esc(fmt_num(fr.x2))}</td>"
+                    f"<td>{esc(fmt_num(duration))}</td><td>{esc(name)}</td></tr>"
+                )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Series</th><th scope="col">Depth</th>'
+            '<th scope="col">Start</th><th scope="col">End</th>'
+            '<th scope="col">Duration</th><th scope="col">Name</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
     if spec.type == "technical-indicators":

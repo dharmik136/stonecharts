@@ -119,6 +119,15 @@ class Span:
 
 
 @dataclass
+class FrameDatum:
+    x: float
+    x2: float
+    depth: int
+    name: str | None = None
+    color: str | None = None
+
+
+@dataclass
 class BoxDatum:
     low: float
     q1: float
@@ -201,6 +210,7 @@ class Series:
     direction: list[float] | None = None  # windbarb/vector-plot — per-point direction (degrees)
     length: list[float] | None = None  # vector-plot only — per-point magnitude
     spans: list[Span] | None = None  # xrange/Gantt — per-series span objects
+    frames: list[FrameDatum] | None = None  # flame-chart — per-series call frames
     volume: list[float] | None = None
     indicators: list[Indicator] | None = None
 
@@ -540,6 +550,18 @@ class ChartSpec:
                         for sp in s["spans"]
                     ]
                     if "spans" in s and s["spans"] is not None
+                    else None,
+                    frames=[
+                        FrameDatum(
+                            x=float(fr["x"]),
+                            x2=float(fr["x2"]),
+                            depth=int(fr["depth"]),
+                            name=fr.get("name"),
+                            color=fr.get("color"),
+                        )
+                        for fr in s["frames"]
+                    ]
+                    if "frames" in s and s["frames"] is not None
                     else None,
                     volume=s.get("volume"),
                     indicators=indicators,
