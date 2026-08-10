@@ -1278,3 +1278,115 @@ def test_go_runtime_uses_explicit_adapter_binary(tmp_path, stoneverify_go_binary
     assert go_runtime["stonechartsVersion"] == "0.0.0.32"
     assert go_runtime["goAdapterVersion"] == "1.0.0"
     assert go_runtime["goBinary"] == str(stoneverify_go_binary)
+
+
+def test_dual_axis_advisory_present_in_manifest(tmp_path):
+    spec_path = (ROOT / "charts/combo/examples/dual-axis.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert "presentationAdvisories" in manifest
+    advisories = manifest["presentationAdvisories"]
+    assert len(advisories) == 1
+    adv = advisories[0]
+    assert adv["code"] == "ADV-DUAL-AXIS"
+    assert adv["severity"] == "info"
+    assert "dual y-axes" in adv["message"]
+    assert isinstance(adv["recommendation"], str) and len(adv["recommendation"]) > 0
+
+
+def test_no_advisory_for_single_axis_spec(tmp_path):
+    spec_path = (ROOT / "charts/bubble/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert "presentationAdvisories" not in manifest
+
+
+def test_validate_manifest_shape_accepts_valid_advisory():
+    manifest = {
+        "schemaVersion": 1,
+        "tool": "stonecharts_verify",
+        "toolVersion": 1,
+        "generatedAt": "2026-08-10T00:00:00+00:00",
+        "status": "pass",
+        "comparison": "comparison.json",
+        "report": "report.html",
+        "input": {"file": "input-spec.json", "sha256": "a" * 64, "bytes": 100},
+        "runtimes": [
+            {
+                "runtime": "python",
+                "output": "python-output.svg",
+                "sha256": "b" * 64,
+                "bytes": 11,
+                "demoDriftApplied": "none",
+            }
+        ],
+        "presentationAdvisories": [
+            {
+                "code": "ADV-DUAL-AXIS",
+                "severity": "info",
+                "message": "Dual y-axes advisory.",
+                "recommendation": "Consider scale rationale.",
+            }
+        ],
+    }
+    errors = stonecharts_verify.validate_manifest_shape(manifest)
+    advisory_errors = [e for e in errors if "presentationAdvisories" in e]
+    assert advisory_errors == []
+
+
+def test_validate_manifest_shape_rejects_malformed_advisory():
+    manifest = {
+        "schemaVersion": 1,
+        "tool": "stonecharts_verify",
+        "toolVersion": 1,
+        "generatedAt": "2026-08-10T00:00:00+00:00",
+        "status": "pass",
+        "comparison": "comparison.json",
+        "report": "report.html",
+        "input": {"file": "input-spec.json", "sha256": "a" * 64, "bytes": 100},
+        "runtimes": [
+            {
+                "runtime": "python",
+                "output": "python-output.svg",
+                "sha256": "b" * 64,
+                "bytes": 11,
+                "demoDriftApplied": "none",
+            }
+        ],
+        "presentationAdvisories": [
+            {"code": "", "severity": "critical", "message": "", "recommendation": ""}
+        ],
+    }
+    errors = stonecharts_verify.validate_manifest_shape(manifest)
+    advisory_errors = [e for e in errors if "presentationAdvisories" in e]
+    assert len(advisory_errors) >= 3

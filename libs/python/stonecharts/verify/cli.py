@@ -240,6 +240,25 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> list[str]:
             errors.append("manifest.baseline must be an object")
         elif baseline.get("status") not in {"pass", "fail", "not-checked"}:
             errors.append("manifest.baseline.status must be pass, fail, or not-checked")
+
+    advisories = manifest.get("presentationAdvisories")
+    if advisories is not None:
+        if not isinstance(advisories, list):
+            errors.append("manifest.presentationAdvisories must be an array")
+        else:
+            for i, adv in enumerate(advisories):
+                where = f"manifest.presentationAdvisories[{i}]"
+                if not isinstance(adv, dict):
+                    errors.append(f"{where} must be an object")
+                    continue
+                if not isinstance(adv.get("code"), str) or not adv.get("code"):
+                    errors.append(f"{where}.code must be a non-empty string")
+                if adv.get("severity") not in {"info", "warning"}:
+                    errors.append(f"{where}.severity must be info or warning")
+                if not isinstance(adv.get("message"), str) or not adv.get("message"):
+                    errors.append(f"{where}.message must be a non-empty string")
+                if not isinstance(adv.get("recommendation"), str) or not adv.get("recommendation"):
+                    errors.append(f"{where}.recommendation must be a non-empty string")
     return errors
 
 
@@ -1630,6 +1649,7 @@ def main() -> int:
     except (OSError, UnicodeDecodeError, json.JSONDecodeError, SpecError, CapabilityError) as exc:
         print(f"StoneVerify INVALID_SPEC: {exc}", file=sys.stderr)
         return EXIT_INVALID_SPEC
+    has_dual_axis = isinstance(spec_data.get("secondaryYAxis"), dict)
     spec_bytes = canonical_json_bytes(spec_data)
 
     evidence.parent.mkdir(parents=True, exist_ok=True)
@@ -1701,6 +1721,15 @@ def main() -> int:
                     go_version=go_version,
                 ),
             }
+            if has_dual_axis:
+                manifest["presentationAdvisories"] = [
+                    {
+                        "code": "ADV-DUAL-AXIS",
+                        "severity": "info",
+                        "message": "This chart uses dual y-axes. Visual relationships between series on different axes may be artifacts of scale selection.",
+                        "recommendation": "Consider whether the implied visual relationship is genuine. For regulatory submissions, document the rationale for scale selection.",
+                    }
+                ]
             baseline_dir = args.baseline_evidence.resolve() if args.baseline_evidence else None
             baseline_manifest = load_baseline(baseline_dir) if baseline_dir else None
             supersedes_baseline_dir = args.supersedes_baseline.resolve() if args.supersedes_baseline else None
