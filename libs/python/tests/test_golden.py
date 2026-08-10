@@ -44,6 +44,7 @@ TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
 STREAMGRAPH_CASES = ["basic", "silhouette", "themed-dark", "adversarial"]
 WINDBARB_CASES = ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"]
 VECTOR_PLOT_CASES = ["basic", "field", "themed-dark", "uniform-length", "adversarial"]
+PIE_CASES = ["basic", "many-slices", "single-slice", "themed-dark", "adversarial"]
 FLAME_CHART_CASES = ["basic", "multi-series", "deep-stack", "themed-dark", "adversarial"]
 TECHNICAL_INDICATORS_CASES = ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
@@ -66,6 +67,7 @@ ACTIVE_VALIDATION_CASES = {
     "lollipop": LOLLIPOP_CASES,
     "dumbbell": DUMBBELL_CASES,
     "flame-chart": FLAME_CHART_CASES,
+    "pie": PIE_CASES,
     "funnel": FUNNEL_CASES,
     "streamgraph": STREAMGRAPH_CASES,
     "technical-indicators": TECHNICAL_INDICATORS_CASES,
@@ -299,6 +301,11 @@ def test_vector_plot_goldens():
 def test_xrange_goldens():
     for name in XRANGE_CASES:
         _check("xrange", name)
+
+
+def test_pie_goldens():
+    for name in PIE_CASES:
+        _check("pie", name)
 
 
 def test_flame_chart_goldens():
@@ -638,6 +645,7 @@ def test_capability_manifest_and_error():
         "histogram",
         "line",
         "lollipop",
+        "pie",
         "scatter",
         "streamgraph",
         "technical-indicators",
@@ -651,12 +659,12 @@ def test_capability_manifest_and_error():
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
-        render_svg(ChartSpec(type="pie", series=[{"name": "s", "data": [1]}]))
+        render_svg(ChartSpec(type="heatmap", series=[{"name": "s", "data": [1]}]))
         raise AssertionError("expected capability error")
     except CapabilityError as exc:
         assert exc.code == "E_CAPABILITY"
         assert exc.path == "$.type"
-        assert exc.message == 'unsupported chart type "pie"'
+        assert exc.message == 'unsupported chart type "heatmap"'
 
 
 def test_a11y_toggle():
@@ -900,7 +908,7 @@ def test_validation_deep_coverage():
             '$.series[0].yAxis: expected one of 0, 1, received "2"',
         ),
         # unknown chart type
-        ({"type": "pie", "series": [{"data": [1]}]}, '$.type: unknown chart type "pie"'),
+        ({"type": "heatmap", "series": [{"data": [1]}]}, '$.type: unknown chart type "heatmap"'),
         # percent stacking: non-dict series item skipped
         ({"type": "line", "stacking": "percent", "series": [42]}, "$.series[0]: expected object, received number"),
         # percent stacking: non-list data skipped

@@ -1,0 +1,6 @@
+{
+  "type": "pie",
+  "title": "Revenue by Region",
+  "xAxis": { "categories": ["North America", "Europe", "Asia Pacific", "Latin America", "Middle East", "Africa", "Oceania", "Central Asia"] },
+  "series": [{ "name": "Revenue", "data": [35, 28, 20, 7, 4, 3, 2, 1] }]
+}
