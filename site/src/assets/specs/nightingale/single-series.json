@@ -1,0 +1,10 @@
+{
+  "type": "nightingale",
+  "title": "Cause Distribution",
+  "xAxis": {
+    "categories": ["Disease", "Wounds", "Other", "Preventable", "Zymotic", "Unknown"]
+  },
+  "series": [
+    {"name": "Deaths", "data": [25, 10, 5, 40, 35, 8]}
+  ]
+}

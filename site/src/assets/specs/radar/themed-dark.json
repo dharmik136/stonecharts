@@ -1,0 +1,12 @@
+{
+  "type": "radar",
+  "title": "Infrastructure Health",
+  "theme": "dark",
+  "xAxis": {
+    "categories": ["CPU", "Memory", "Disk", "Network", "Latency"]
+  },
+  "series": [
+    {"name": "Cluster A", "data": [72, 85, 60, 90, 40], "fillOpacity": 0.2},
+    {"name": "Cluster B", "data": [55, 70, 80, 65, 75], "fillOpacity": 0.2}
+  ]
+}
