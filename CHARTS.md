@@ -84,8 +84,9 @@ schema), and the one render call — nothing more is needed.
 |------|-----------|-------------|--------------------------------------|--------|--------|
 | `pie` | categories[N] + one series of N non-negative values | part-to-whole composition of a single total (market share, budget allocation). Add `innerSize: 0.5` for donut variant | trend (line), category ranking (column/bar), many slices > 8 (consider bar), stacked composition over time (area) | Design ✅ · render ✅ (certified, 0.0.0.24) | [design.md](charts/pie/design.md) |
 | `gauge` | single series with one value + gaugeMin/gaugeMax + optional gaugeBands | single KPI against a scale with colored range bands (SLA compliance, loss ratios, reserve adequacy) | trend (line), multi-category ranking (bar), full distribution (boxplot) | Design ✅ · render ✅ (certified, 0.0.0.25) | [design.md](charts/gauge/design.md) |
+| `solid-gauge` | single series with one value + gaugeMin/gaugeMax + optional gaugeBands | utilization / progress fill (CPU%, SLO burn, reserve adequacy) where the filled arc IS the indicator | precise KPI with pointer (gauge), trend (line), category ranking (bar) | Design ✅ · render ✅ (certified, 0.0.0.26) | [design.md](charts/solid-gauge/design.md) |
 
-_Every Cartesian (Family A) type above is design-complete with validated example specs. Family B (Polar/radial) is now open with pie as the foundation chart and gauge as its first sibling. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
+_Every Cartesian (Family A) type above is design-complete with validated example specs. Family B (Polar/radial) is now open with pie as the foundation chart, gauge, and solid gauge. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
 
 ## Add a chart (for contributors / agents extending this)
 

@@ -33,6 +33,7 @@ const CHART_TYPES = [
   { id: 'technical-indicators', label: 'Technical Indicators', desc: 'Base metric line with derived overlays (SMA, EMA, Bollinger, VWAP, RSI) plus plot bands/lines, oscillator panes, and event flags.' },
   { id: 'xrange', label: 'X-Range', desc: 'Horizontal span bars on lane categories with optional milestones and dependency connectors for Gantt charts and trace waterfalls.' },
   { id: 'gauge', label: 'Gauge', desc: 'Single-value dial on a 270° arc with colored range bands, kite pointer, and pivot dot for KPI dashboards.' },
+  { id: 'solid-gauge', label: 'Solid Gauge', desc: 'Filled arc from start to value angle on a 270° track with optional range bands for utilization and progress views.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
@@ -74,7 +75,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Twenty-eight certified chart types, each rendered identically in Python and Go.
+      Twenty-nine certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>
