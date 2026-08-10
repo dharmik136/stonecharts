@@ -468,10 +468,10 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 			}
 		}
 	}
-	if x, ok := has(m, "data"); !ok && chartType != "boxplot" {
+	if x, ok := has(m, "data"); !ok && chartType != "boxplot" && chartType != "flame-chart" {
 		*errs = append(*errs, path+".data: required")
 	} else if !ok {
-		// boxplot uses boxData instead of data
+		// boxplot uses boxData, flame-chart uses frames instead of data
 	} else if arr, ok := x.([]interface{}); !ok {
 		*errs = append(*errs, path+".data: expected array, received "+jtype(x))
 	} else if chartType == "scatter" {
@@ -599,6 +599,33 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 			}
 		}
 	}
+	if x, ok := has(m, "frames"); ok {
+		if arr, ok := x.([]interface{}); !ok {
+			*errs = append(*errs, path+".frames: expected array, received "+jtype(x))
+		} else {
+			for i, e := range arr {
+				frPath := path + ".frames[" + itoa(i) + "]"
+				fr, ok := e.(map[string]interface{})
+				if !ok {
+					*errs = append(*errs, frPath+": expected object, received "+jtype(e))
+					continue
+				}
+				for _, req := range []string{"x", "x2", "depth"} {
+					if v, ok := has(fr, req); !ok {
+						*errs = append(*errs, frPath+"."+req+": required")
+					} else {
+						vnum(v, frPath+"."+req, errs)
+					}
+				}
+				if v, ok := has(fr, "name"); ok {
+					vstr(v, frPath+".name", errs)
+				}
+				if v, ok := has(fr, "color"); ok {
+					vstr(v, frPath+".color", errs)
+				}
+			}
+		}
+	}
 	if x, ok := has(m, "volume"); ok {
 		arr, ok := x.([]interface{})
 		if !ok {
@@ -676,6 +703,7 @@ var knownTypes = map[string]bool{
 	"combo":       true,
 	"dumbbell":    true,
 	"error-bar":   true,
+	"flame-chart": true,
 	"funnel":      true,
 	"histogram":   true,
 	"line":        true,

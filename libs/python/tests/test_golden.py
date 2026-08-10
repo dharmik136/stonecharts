@@ -44,6 +44,7 @@ TIMELINE_CASES = ["basic", "multi", "vertical", "adversarial"]
 STREAMGRAPH_CASES = ["basic", "silhouette", "themed-dark", "adversarial"]
 WINDBARB_CASES = ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"]
 VECTOR_PLOT_CASES = ["basic", "field", "themed-dark", "uniform-length", "adversarial"]
+FLAME_CHART_CASES = ["basic", "multi-series", "deep-stack", "themed-dark", "adversarial"]
 TECHNICAL_INDICATORS_CASES = ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
@@ -64,6 +65,7 @@ ACTIVE_VALIDATION_CASES = {
     "bullet": BULLET_CASES,
     "lollipop": LOLLIPOP_CASES,
     "dumbbell": DUMBBELL_CASES,
+    "flame-chart": FLAME_CHART_CASES,
     "funnel": FUNNEL_CASES,
     "streamgraph": STREAMGRAPH_CASES,
     "technical-indicators": TECHNICAL_INDICATORS_CASES,
@@ -297,6 +299,11 @@ def test_vector_plot_goldens():
 def test_xrange_goldens():
     for name in XRANGE_CASES:
         _check("xrange", name)
+
+
+def test_flame_chart_goldens():
+    for name in FLAME_CHART_CASES:
+        _check("flame-chart", name)
 
 
 def test_technical_indicators_goldens():
@@ -626,6 +633,7 @@ def test_capability_manifest_and_error():
         "combo",
         "dumbbell",
         "error-bar",
+        "flame-chart",
         "funnel",
         "histogram",
         "line",

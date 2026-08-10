@@ -37,6 +37,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "candlestick" {
 		return candlestickDataTable(spec)
 	}
+	if spec.Type == "flame-chart" {
+		return flameChartDataTable(spec)
+	}
 	if spec.Type == "technical-indicators" {
 		return tiDataTable(spec)
 	}
@@ -367,6 +370,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderColumnRangeSVG(spec)
 	case "error-bar":
 		svg = renderErrorBarSVG(spec)
+	case "flame-chart":
+		svg = renderFlameChartSVG(spec)
 	case "histogram":
 		svg = renderHistogramSVG(spec)
 	case "line":
