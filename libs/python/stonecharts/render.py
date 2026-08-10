@@ -26,6 +26,7 @@ from .charts import dumbbell as _dumbbell
 from .charts import error_bar as _error_bar
 from .charts import flame_chart as _flame_chart
 from .charts import funnel as _funnel
+from .charts import gauge as _gauge
 from .charts import histogram as _histogram
 from .charts import line as _line
 from .charts import lollipop as _lollipop
@@ -61,6 +62,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "error-bar": _error_bar.render_svg,
     "flame-chart": _flame_chart.render_svg,
     "funnel": _funnel.render_svg,
+    "gauge": _gauge.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
     "lollipop": _lollipop.render_svg,
@@ -196,6 +198,24 @@ def _data_table(spec: ChartSpec) -> str:
             '<thead><tr><th scope="col">Category</th><th scope="col">Series</th>'
             '<th scope="col">Open</th><th scope="col">High</th>'
             '<th scope="col">Low</th><th scope="col">Close</th></tr></thead>'
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "gauge":
+        rows = []
+        s0 = spec.series[0] if spec.series else None
+        if s0 and s0.data:
+            g_min = spec.gauge_min
+            g_max = spec.gauge_max
+            rows.append(
+                f'<tr><th scope="row">{esc(s0.name)}</th>'
+                f"<td>{esc(fmt_num(s0.data[0]))}</td>"
+                f"<td>{esc(fmt_num(g_min))}</td>"
+                f"<td>{esc(fmt_num(g_max))}</td></tr>"
+            )
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            '<thead><tr><th scope="col">Metric</th><th scope="col">Value</th>'
+            '<th scope="col">Min</th><th scope="col">Max</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
     if spec.type == "pie":

@@ -45,7 +45,7 @@ schema), and the one render call — nothing more is needed.
 | **Conversion / drop-off** across ordered pipeline stages | `funnel` |
 | Compare a value where each category has a **meaningful width** (two metrics) | `variwide` |
 | Value across a **2-D grid** (matrix) | `heatmap` _(planned)_ |
-| A single KPI against a range | `gauge` _(planned)_ |
+| A single KPI against a range | `gauge` |
 
 ## Catalog
 
@@ -83,8 +83,9 @@ schema), and the one render call — nothing more is needed.
 | Type | Data shape | When to use | Don't use when (use _this_ instead) | Status | Design |
 |------|-----------|-------------|--------------------------------------|--------|--------|
 | `pie` | categories[N] + one series of N non-negative values | part-to-whole composition of a single total (market share, budget allocation). Add `innerSize: 0.5` for donut variant | trend (line), category ranking (column/bar), many slices > 8 (consider bar), stacked composition over time (area) | Design ✅ · render ✅ (certified, 0.0.0.24) | [design.md](charts/pie/design.md) |
+| `gauge` | single series with one value + gaugeMin/gaugeMax + optional gaugeBands | single KPI against a scale with colored range bands (SLA compliance, loss ratios, reserve adequacy) | trend (line), multi-category ranking (bar), full distribution (boxplot) | Design ✅ · render ✅ (certified, 0.0.0.25) | [design.md](charts/gauge/design.md) |
 
-_Every Cartesian (Family A) type above is design-complete with validated example specs. Family B (Polar/radial) is now open with pie as the foundation chart. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
+_Every Cartesian (Family A) type above is design-complete with validated example specs. Family B (Polar/radial) is now open with pie as the foundation chart and gauge as its first sibling. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
 
 ## Add a chart (for contributors / agents extending this)
 

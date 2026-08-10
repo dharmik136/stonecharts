@@ -9,6 +9,19 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.25] - 2026-08-10
+
+### Added
+
+- **Gauge chart** (`type: "gauge"`) — single-KPI value displayed as a
+  pointer on a 270-degree annular arc with optional colored range bands
+  (DEC-041). Family B (Polar/radial) sibling reusing pie's arc substrate.
+  New spec fields: `gaugeMin`, `gaugeMax`, `gaugeBands`. Pointer is a
+  kite-shaped needle with center pivot. 28th chart type overall, 2nd polar.
+  Certified renderers in both Python and Go with byte-identical golden SVGs.
+- Cross-render corpus expanded to 142 examples across 28 chart types.
+- Site gallery expanded to 28 chart types.
+
 ## [0.0.0.24] - 2026-08-10
 
 ### Added

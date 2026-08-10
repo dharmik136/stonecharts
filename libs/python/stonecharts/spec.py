@@ -175,6 +175,13 @@ class PlotLine:
 
 
 @dataclass
+class GaugeBand:
+    from_val: float
+    to_val: float
+    color: str
+
+
+@dataclass
 class Pane:
     height: float | None = None
     min: float | None = None
@@ -418,6 +425,9 @@ class ChartSpec:
     rotation_origin: str = "center"
     inner_size: float = 0.0  # pie/donut: inner radius as fraction of outer (0 = pie, >0 = donut)
     min_size: float = 0.2  # variable-radius pie: minimum slice radius as fraction of max
+    gauge_min: float = 0.0  # gauge: scale minimum
+    gauge_max: float = 100.0  # gauge: scale maximum
+    gauge_bands: list[GaugeBand] | None = None  # gauge: colored range bands
     flags: list[Flag] | None = None
     panes: list[Pane] | None = None
 
@@ -764,6 +774,18 @@ class ChartSpec:
             rotation_origin=d.get("rotationOrigin") or "center",
             inner_size=float(d.get("innerSize", 0)),
             min_size=float(d.get("minSize", 0.2)),
+            gauge_min=float(d.get("gaugeMin", 0)),
+            gauge_max=float(d.get("gaugeMax", 100)),
+            gauge_bands=[
+                GaugeBand(
+                    from_val=float(b["from"]),
+                    to_val=float(b["to"]),
+                    color=str(b["color"]),
+                )
+                for b in d["gaugeBands"]
+            ]
+            if d.get("gaugeBands")
+            else None,
             flags=flags,
             panes=panes,
         )

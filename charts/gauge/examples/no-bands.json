@@ -1,0 +1,10 @@
+{
+  "id": "gauge-no-bands",
+  "type": "gauge",
+  "title": "Temperature",
+  "width": 400,
+  "height": 300,
+  "series": [{ "name": "Temp", "data": [22.5] }],
+  "gaugeMin": -20,
+  "gaugeMax": 50
+}

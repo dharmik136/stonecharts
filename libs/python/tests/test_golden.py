@@ -47,6 +47,7 @@ VECTOR_PLOT_CASES = ["basic", "field", "themed-dark", "uniform-length", "adversa
 PIE_CASES = ["basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"]
 FLAME_CHART_CASES = ["basic", "multi-series", "deep-stack", "themed-dark", "adversarial"]
 TECHNICAL_INDICATORS_CASES = ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"]
+GAUGE_CASES = ["basic", "no-bands", "full-scale", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
@@ -69,6 +70,7 @@ ACTIVE_VALIDATION_CASES = {
     "flame-chart": FLAME_CHART_CASES,
     "pie": PIE_CASES,
     "funnel": FUNNEL_CASES,
+    "gauge": GAUGE_CASES,
     "streamgraph": STREAMGRAPH_CASES,
     "technical-indicators": TECHNICAL_INDICATORS_CASES,
     "variwide": VARIWIDE_CASES,
@@ -306,6 +308,11 @@ def test_xrange_goldens():
 def test_pie_goldens():
     for name in PIE_CASES:
         _check("pie", name)
+
+
+def test_gauge_goldens():
+    for name in GAUGE_CASES:
+        _check("gauge", name)
 
 
 def test_flame_chart_goldens():
@@ -642,6 +649,7 @@ def test_capability_manifest_and_error():
         "error-bar",
         "flame-chart",
         "funnel",
+        "gauge",
         "histogram",
         "line",
         "lollipop",

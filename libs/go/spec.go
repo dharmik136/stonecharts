@@ -139,6 +139,13 @@ type PlotLine struct {
 	Label     string   `json:"label,omitempty"`
 }
 
+// GaugeBand is a colored range band on a gauge chart.
+type GaugeBand struct {
+	From  float64 `json:"from"`
+	To    float64 `json:"to"`
+	Color string  `json:"color"`
+}
+
 // Pane defines a sub-pane (e.g. for indicators rendered below the main chart).
 type Pane struct {
 	Height    *float64   `json:"height,omitempty"`
@@ -513,6 +520,9 @@ type ChartSpec struct {
 	RotationOrigin         string          `json:"rotationOrigin,omitempty"`
 	InnerSize              *float64        `json:"innerSize,omitempty"`
 	MinSize                *float64        `json:"minSize,omitempty"`
+	GaugeMin               *float64        `json:"gaugeMin,omitempty"`
+	GaugeMax               *float64        `json:"gaugeMax,omitempty"`
+	GaugeBands             []GaugeBand     `json:"gaugeBands,omitempty"`
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
