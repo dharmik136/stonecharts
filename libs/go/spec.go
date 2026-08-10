@@ -171,6 +171,7 @@ type Series struct {
 	Widths      []float64       `json:"widths,omitempty"`
 	Labels      []string        `json:"labels,omitempty"`
 	X           []float64       `json:"x,omitempty"`
+	Z           []float64       `json:"z,omitempty"`
 	Direction   []float64       `json:"direction,omitempty"`
 	Length      []float64       `json:"length,omitempty"`
 	Spans       []SpanDatum     `json:"spans,omitempty"`
@@ -511,6 +512,7 @@ type ChartSpec struct {
 	VectorLength           *float64        `json:"vectorLength,omitempty"`
 	RotationOrigin         string          `json:"rotationOrigin,omitempty"`
 	InnerSize              *float64        `json:"innerSize,omitempty"`
+	MinSize                *float64        `json:"minSize,omitempty"`
 	XAxis                  Axis            `json:"xAxis"`
 	YAxis                  Axis            `json:"yAxis"`
 	SecondaryYAxis         *Axis           `json:"secondaryYAxis,omitempty"`
