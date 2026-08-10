@@ -1,0 +1,17 @@
+{
+  "type": "streamgraph",
+  "title": "Log Volume by Source",
+  "subtitle": "Wiggle baseline — events per minute",
+  "offset": "wiggle",
+  "xAxis": {
+    "title": "Time",
+    "categories": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"]
+  },
+  "series": [
+    { "name": "auth",      "data": [120, 90, 210, 480, 520, 300] },
+    { "name": "api",       "data": [340, 280, 610, 1180, 1240, 720] },
+    { "name": "worker",    "data": [80, 60, 150, 300, 340, 190] },
+    { "name": "scheduler", "data": [30, 200, 45, 60, 55, 210] },
+    { "name": "gateway",   "data": [260, 210, 500, 940, 980, 560] }
+  ]
+}

@@ -9,6 +9,21 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.19] - 2026-08-10
+
+### Added
+
+- **Streamgraph chart** (`type: "streamgraph"`) — stacked, filled area ribbons
+  over a shared x-axis displaced off a floating baseline (DEC-035). New spec
+  field: `offset` (`"wiggle"` or `"silhouette"` baseline algorithm, default
+  `"wiggle"`). Uses point x-scale with `include_zero=False`. Baseline offset
+  pre-computed in `build_frame()` so gridlines and axis labels reflect the true
+  offset envelope. Supports monotone curve smoothing, gradient fills, dark
+  theme. Certified renderers in both Python and Go with byte-identical golden
+  SVGs.
+- Cross-render corpus expanded to 100 examples across 22 chart types.
+- Site gallery expanded to 22 chart types.
+
 ## [0.0.0.18] - 2026-08-10
 
 ### Added

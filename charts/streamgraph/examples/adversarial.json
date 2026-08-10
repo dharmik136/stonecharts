@@ -11,7 +11,7 @@
     {
       "name": "</g><script>alert(1)</script>",
       "data": [12, 18, 9, 24],
-      "color": "\"><script>bad()</script>"
+      "color": "#c42525"
     },
     {
       "name": "Ampersand & <Angle>",
