@@ -267,6 +267,12 @@
           "title": { "type": "string" }
         }
       }
+    },
+    "outOfRange": {
+      "type": "string",
+      "enum": ["error", "clip"],
+      "default": "error",
+      "description": "Histogram: policy for observations outside the computed bin range. 'error' (default) raises a validation error; 'clip' clamps into the nearest edge bin (legacy behavior)."
     }
   },
   "allOf": [

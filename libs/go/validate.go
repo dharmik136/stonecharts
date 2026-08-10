@@ -968,5 +968,168 @@ func validate(v interface{}) []string {
 			}
 		}
 	}
+	if chartTypeStr == "pie" {
+		if arr, ok := has(d, "series"); ok {
+			if series, ok := arr.([]interface{}); ok {
+				for i, s := range series {
+					m, ok := s.(map[string]interface{})
+					if !ok {
+						continue
+					}
+					if data, ok := has(m, "data"); ok {
+						if darr, ok := data.([]interface{}); ok {
+							for j, v := range darr {
+								if f, ok := v.(float64); ok && f < 0 {
+									errs = append(errs, "$.series["+itoa(i)+"].data["+itoa(j)+"]: pie data must be non-negative, received "+fmtNum(f))
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if chartTypeStr == "gauge" || chartTypeStr == "solid-gauge" {
+		gMin, gMinOk := has(d, "gaugeMin")
+		gMax, gMaxOk := has(d, "gaugeMax")
+		if gMinOk && gMaxOk {
+			if gMinF, ok1 := gMin.(float64); ok1 {
+				if gMaxF, ok2 := gMax.(float64); ok2 {
+					if gMinF >= gMaxF {
+						errs = append(errs, "$.gaugeMin/gaugeMax: gaugeMin must be less than gaugeMax, received "+fmtNum(gMinF)+" >= "+fmtNum(gMaxF))
+					}
+				}
+			}
+		}
+	}
+	if chartTypeStr == "boxplot" {
+		if arr, ok := has(d, "series"); ok {
+			if series, ok := arr.([]interface{}); ok {
+				for i, s := range series {
+					m, ok := s.(map[string]interface{})
+					if !ok {
+						continue
+					}
+					if bd, ok := has(m, "boxData"); ok {
+						if bdArr, ok := bd.([]interface{}); ok {
+							for j, b := range bdArr {
+								bm, ok := b.(map[string]interface{})
+								if !ok {
+									continue
+								}
+								keys := []string{"low", "q1", "median", "q3", "high"}
+								vals := make([]float64, len(keys))
+								allOk := true
+								for k, key := range keys {
+									if v, ok := has(bm, key); ok {
+										if f, ok := v.(float64); ok {
+											vals[k] = f
+										} else {
+											allOk = false
+										}
+									} else {
+										allOk = false
+									}
+								}
+								if allOk {
+									for k := 0; k < len(vals)-1; k++ {
+										if vals[k] > vals[k+1] {
+											errs = append(errs, "$.series["+itoa(i)+"].boxData["+itoa(j)+"]: "+keys[k]+" ("+fmtNum(vals[k])+") must be <= "+keys[k+1]+" ("+fmtNum(vals[k+1])+")")
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if chartTypeStr == "arearange" || chartTypeStr == "columnrange" || chartTypeStr == "error-bar" || chartTypeStr == "dumbbell" {
+		if arr, ok := has(d, "series"); ok {
+			if series, ok := arr.([]interface{}); ok {
+				for i, s := range series {
+					m, ok := s.(map[string]interface{})
+					if !ok {
+						continue
+					}
+					data, dataOk := has(m, "data")
+					if !dataOk {
+						continue
+					}
+					dataArr, ok := data.([]interface{})
+					if !ok {
+						continue
+					}
+					dataLen := len(dataArr)
+					low, lowOk := has(m, "low")
+					high, highOk := has(m, "high")
+					prefix := "$.series[" + itoa(i) + "]"
+					if chartTypeStr == "arearange" {
+						if !lowOk {
+							errs = append(errs, prefix+".low: required for arearange, received 0 values for "+itoa(dataLen)+" data points")
+						} else if lowArr, ok := low.([]interface{}); ok {
+							if len(lowArr) == 0 {
+								errs = append(errs, prefix+".low: required for arearange, received 0 values for "+itoa(dataLen)+" data points")
+							} else if len(lowArr) != dataLen {
+								errs = append(errs, prefix+".low: length ("+itoa(len(lowArr))+") must match data length ("+itoa(dataLen)+")")
+							}
+						}
+					}
+					if chartTypeStr == "columnrange" || chartTypeStr == "dumbbell" {
+						if !highOk {
+							errs = append(errs, prefix+".high: required for "+chartTypeStr+", received 0 values for "+itoa(dataLen)+" data points")
+						} else if highArr, ok := high.([]interface{}); ok {
+							if len(highArr) == 0 {
+								errs = append(errs, prefix+".high: required for "+chartTypeStr+", received 0 values for "+itoa(dataLen)+" data points")
+							} else if len(highArr) != dataLen {
+								errs = append(errs, prefix+".high: length ("+itoa(len(highArr))+") must match data length ("+itoa(dataLen)+")")
+							}
+						}
+					}
+					if chartTypeStr == "error-bar" {
+						if !lowOk {
+							errs = append(errs, prefix+".low: required for error-bar, received 0 values for "+itoa(dataLen)+" data points")
+						} else if lowArr, ok := low.([]interface{}); ok {
+							if len(lowArr) == 0 {
+								errs = append(errs, prefix+".low: required for error-bar, received 0 values for "+itoa(dataLen)+" data points")
+							} else if len(lowArr) != dataLen {
+								errs = append(errs, prefix+".low: length ("+itoa(len(lowArr))+") must match data length ("+itoa(dataLen)+")")
+							}
+						}
+						if !highOk {
+							errs = append(errs, prefix+".high: required for error-bar, received 0 values for "+itoa(dataLen)+" data points")
+						} else if highArr, ok := high.([]interface{}); ok {
+							if len(highArr) == 0 {
+								errs = append(errs, prefix+".high: required for error-bar, received 0 values for "+itoa(dataLen)+" data points")
+							} else if len(highArr) != dataLen {
+								errs = append(errs, prefix+".high: length ("+itoa(len(highArr))+") must match data length ("+itoa(dataLen)+")")
+							}
+						}
+					}
+					if lowOk {
+						if lowArr, ok := low.([]interface{}); ok {
+							for j, v := range lowArr {
+								vnum(v, prefix+".low["+itoa(j)+"]", &errs)
+							}
+						}
+					}
+					if highOk {
+						if highArr, ok := high.([]interface{}); ok {
+							for j, v := range highArr {
+								vnum(v, prefix+".high["+itoa(j)+"]", &errs)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if x, ok := has(d, "outOfRange"); ok {
+		vstr(x, "$.outOfRange", &errs)
+		if s, ok := x.(string); ok && s != "error" && s != "clip" {
+			errs = append(errs, "$.outOfRange: expected one of \"error\", \"clip\", received \""+s+"\"")
+		}
+	}
 	return errs
 }

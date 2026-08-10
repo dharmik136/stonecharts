@@ -18,7 +18,7 @@
       "type": "dumbbell",
       "series": [{ "name": "s", "data": ["abc"] }]
     },
-    "errors": ["$.series[0].data[0]: expected number, received string"]
+    "errors": ["$.series[0].data[0]: expected number, received string", "$.series[0].high: required for dumbbell, received 0 values for 1 data points"]
   },
   {
     "spec": {
