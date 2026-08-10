@@ -693,7 +693,8 @@ def test_capability_manifest_and_error():
     caps = capabilities()
     assert caps["specVersion"] == "0.0.0.1"
     assert caps["svgContractVersion"] == "0.0.0.1"
-    assert caps["chartTypes"] == [
+    ct = caps["chartTypes"]
+    assert sorted(ct.keys()) == [
         "area",
         "arearange",
         "bar",
@@ -714,22 +715,25 @@ def test_capability_manifest_and_error():
         "lollipop",
         "nightingale",
         "parliament",
-        "radial-bar",
         "pie",
         "polar",
         "radar",
+        "radial-bar",
         "scatter",
         "solid-gauge",
         "streamgraph",
         "technical-indicators",
         "timeline",
-        "vector-plot",
         "variwide",
+        "vector-plot",
         "waterfall",
         "wind-rose",
         "windbarb",
         "xrange",
     ]
+    assert ct["line"]["tier"] == "certified"
+    assert ct["waterfall"]["tier"] == "candidate"
+    assert ct["parliament"]["tier"] == "experimental"
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
@@ -790,7 +794,7 @@ def test_golden_coverage_completeness():
 def test_schema_type_enum_matches_capabilities():
     """The JSON schema type enum must list exactly the capabilities chartTypes."""
     schema_types = set(SCHEMA["properties"]["type"]["enum"])
-    cap_types = set(capabilities()["chartTypes"])
+    cap_types = set(capabilities()["chartTypes"].keys())
     assert schema_types == cap_types, f"schema={schema_types}, capabilities={cap_types}"
 
 
@@ -798,7 +802,7 @@ def test_active_validation_cases_cover_all_chart_types():
     """ACTIVE_VALIDATION_CASES must cover every capability-listed chart type."""
     dir_to_type = {"line-basic": "line"}
     tested_types = {dir_to_type.get(d, d) for d in ACTIVE_VALIDATION_CASES}
-    cap_types = set(capabilities()["chartTypes"])
+    cap_types = set(capabilities()["chartTypes"].keys())
     assert tested_types == cap_types, f"tested={tested_types}, capabilities={cap_types}"
 
 
