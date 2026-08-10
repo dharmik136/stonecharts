@@ -48,6 +48,32 @@ Semantic invariants prove:
 For a product selling visual integrity to regulated industries, the second class of
 assurance is what makes the certification story credible.
 
+### Market context
+
+**IFRS 17 requires that visualizations accurately represent underlying calculations.**
+Actuarial reporting under IFRS 17 demands transparency across the entire chain from
+model to financial statement. A waterfall chart showing reserve movements must balance
+mathematically — not just render visually. A histogram of loss distributions must
+account for every observation. Regulators expect drill-down and reconciliation, which
+means the visualization layer must be provably correct, not just visually consistent.
+
+**No competitor offers semantic correctness guarantees.** Highcharts (40+ chart types,
+market leader) tests rendering but not mathematical correctness of chart semantics.
+Vega tests grammar compilation but not domain invariants. This is a genuine
+whitespace in the market — a charting library that can prove "this waterfall balances"
+or "this histogram accounts for all observations" would be unique.
+
+**The insurance analytics market is growing at 15.6% CAGR** (USD 15.4B in 2026,
+projected USD 31.8B by 2031). AI-driven actuarial tools and advanced visualization
+dashboards are top investment priorities. Buyers in this market care about
+correctness and auditability, not just visual appeal.
+
+**The certification gate model becomes a competitive moat.** Enterprise chart libraries
+charge $500–$2,000 per developer per year. None offer a formal certification gate
+with numbered assurance requirements. The SC-CERT-01 through SC-CERT-08 model
+proposed here creates a differentiated product story that regulated buyers will
+recognize from their own compliance frameworks (SOC 2, ISO 27001, Solvency II).
+
 ### Proposed invariants
 
 Each invariant is a testable mathematical property of the chart type's semantics:

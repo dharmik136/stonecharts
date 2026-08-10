@@ -54,6 +54,31 @@ examples) but no randomized or fuzz coverage. This means:
   problems, or nondeterminism."
 - **Fuzz tests** prove: "Malformed or extreme inputs do not crash the renderer."
 
+### Market context and industry trends
+
+**Property-based testing and fuzzing are converging.** The testing community now
+treats "property-based testing," "fuzz testing," and "generative testing" as
+essentially interchangeable — differing only in historical emphasis (fuzzing for
+crashes/security, PBT for logical correctness). Coverage-guided property-based
+fuzzing combines the best of both: AFL-style coverage guidance with Hypothesis-style
+invariant checking.
+
+**Hypothesis is the definitive PBT library for Python** with an estimated 500,000
+users and dozens of extensions. StoneCharts should adopt Hypothesis rather than
+the current `random.Random(seed)` approach. Hypothesis provides automatic shrinking
+(finding minimal failing cases), coverage-guided generation, and stateful testing —
+all of which would significantly strengthen the assurance story.
+
+**Visual regression testing is now mainstream** but focused on pixel comparison, not
+semantic correctness. Tools like Chromatic, Percy, and Playwright visual comparisons
+catch unintended visual changes but cannot prove that a chart is semantically
+correct. StoneCharts' property tests fill a gap that screenshot-comparison tools
+cannot.
+
+**Competitors rely on example-based testing only.** Highcharts, Vega, and Chart.js
+test with fixed fixtures. None advertise randomized or property-based testing of
+their renderers. This is an assurance gap StoneCharts can exploit.
+
 For the 28 chart types without property/fuzz coverage, the only assurance is that
 hand-crafted examples work. Edge cases in data shapes, empty series, extreme values,
 and unusual combinations are untested by randomized generation.
@@ -119,13 +144,31 @@ Generator for: pie, gauge, solid-gauge, parliament, radar, polar, wind-rose.
 Each Python generator gets a corresponding Go randomized test and fuzz seed corpus
 entry.
 
+### Tooling upgrade: adopt Hypothesis
+
+The current Python property tests use `random.Random(seed)` with manual spec
+construction. This should be upgraded to Hypothesis, which provides:
+
+- **Automatic shrinking** — when a test fails, Hypothesis finds the minimal
+  reproducing case automatically, saving debugging time.
+- **Coverage-guided generation** — Hypothesis uses feedback to explore the input
+  space more effectively than uniform random generation.
+- **Strategy composition** — `@st.composite` strategies can be built for each data
+  model family and reused across chart types.
+- **Database of failing examples** — Hypothesis remembers previously failing inputs
+  and replays them in future runs.
+
+Hypothesis is a zero-runtime-dependency dev tool (already compatible with the
+project's `dev` extras in pyproject.toml).
+
 ### Coverage target
 
 Every chart type should have:
-- 8 randomized property test cases (matching the existing pattern)
+- Hypothesis-based property tests (Python) with `@given` strategies per data family
 - At least 2 fuzz seed corpus entries in Go
 - Determinism assertion (render twice, compare bytes)
 - No-crash assertion (no panic/exception on valid randomized input)
+- Purity assertion (spec unchanged after render, per DEC-049)
 
 ## Options
 

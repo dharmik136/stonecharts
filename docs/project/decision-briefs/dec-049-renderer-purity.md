@@ -60,6 +60,34 @@ SVG   = render(spec')
    auditing, or forwarding) will see the renderer's internal state, not their original
    input.
 
+## Market context
+
+**Immutable architecture is now an industry-standard pattern.** The functional
+programming community has converged on the principle that business logic should be
+pure and side effects isolated at system boundaries. React, Redux, and event-sourcing
+architectures all rely on immutability for correctness and auditability. Facebook
+reported 20% rendering efficiency gains from adopting immutable data structures.
+
+**Regulatory requirements now demand reproducible outputs.** U.S. interagency guidance
+SR 26-2 (April 2026, Federal Reserve / OCC / FDIC) requires that models produce
+reproducible outputs for validation. The EU AI Act classifies risk-scoring AI as
+high-risk, requiring explainability and auditability. A renderer that mutates its
+input undermines reproducibility — the same spec rendered twice may produce different
+results, which fails the reproducibility test.
+
+**Competitors do not offer this guarantee.** Highcharts' export server uses
+Puppeteer (browser-based rendering), which introduces non-deterministic factors
+(font rendering, layout engine state). Vega's server-side path uses headless
+browsers. Neither can make a "pure function" claim about their render pipeline.
+StoneCharts' native SVG rendering is architecturally positioned to make this claim
+— but only if the renderer is actually pure.
+
+**IFRS 17 and Solvency II reporting require data lineage.** Actuarial reporting
+under IFRS 17 requires transparency across the modeling and reporting chain. If a
+renderer modifies the input spec, the data lineage between "what the actuary
+specified" and "what was rendered" is broken. Regulators will ask about this during
+examination.
+
 ## Recommendation
 
 Accept the Renderer Purity Invariant as a project-wide engineering rule:
