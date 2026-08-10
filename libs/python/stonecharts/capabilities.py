@@ -29,6 +29,7 @@ _CAPABILITIES: dict[str, Any] = {
         "lollipop",
         "pie",
         "scatter",
+        "solid-gauge",
         "streamgraph",
         "technical-indicators",
         "timeline",

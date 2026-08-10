@@ -1,8 +1,8 @@
-"""Gauge chart renderer: ChartSpec -> SVG string.
+"""Solid gauge renderer: ChartSpec -> SVG string.
 
-Value-to-angle pointer over a 270-degree annular arc with colored range bands.
+Filled arc from start angle to value angle over a 270-degree annular track.
 Non-Cartesian (Family B polar sibling) — own SVG shell, no axes.
-See charts/gauge/design.md for the full geometry contract.
+See charts/solid-gauge/design.md for the full geometry contract.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ def render_svg(spec: ChartSpec) -> str:
     a11y_attr = ""
     a11y_desc = ""
     if spec.a11y:
-        _sum = esc(a11y_summary(spec, "Gauge"))
+        _sum = esc(a11y_summary(spec, "Solid gauge"))
         a11y_attr = f' role="img" aria-label="{_sum}"'
         a11y_desc = f"<desc>{_sum}</desc>"
 
@@ -62,12 +62,12 @@ def render_svg(spec: ChartSpec) -> str:
 
     bands = spec.gauge_bands or []
 
-    ptr_color = esc(palette[0])
+    fill_color = esc(palette[0])
     if s0 is not None:
         if isinstance(s0.color, Gradient):
-            ptr_color = esc(s0.color.stops[0].color) if s0.color.stops else esc(palette[0])
+            fill_color = esc(s0.color.stops[0].color) if s0.color.stops else esc(palette[0])
         elif s0.color:
-            ptr_color = esc(s0.color)
+            fill_color = esc(s0.color)
 
     p: list[str] = []
 
@@ -171,33 +171,32 @@ def render_svg(spec: ChartSpec) -> str:
             )
 
         frac = max(0.0, min(1.0, (value - gauge_min) / (gauge_max - gauge_min)))
-        ptr_angle = _GAUGE_START + frac * _GAUGE_SWEEP
-        tip_r = r_inner - 4
-        base_w = 6.0
-        tail_r = 12.0
-        tip_x = cx + tip_r * math.cos(ptr_angle)
-        tip_y = cy + tip_r * math.sin(ptr_angle)
-        left_x = cx + base_w * math.cos(ptr_angle + math.pi / 2)
-        left_y = cy + base_w * math.sin(ptr_angle + math.pi / 2)
-        right_x = cx + base_w * math.cos(ptr_angle - math.pi / 2)
-        right_y = cy + base_w * math.sin(ptr_angle - math.pi / 2)
-        tail_x = cx + tail_r * math.cos(ptr_angle + math.pi)
-        tail_y = cy + tail_r * math.sin(ptr_angle + math.pi)
-        d_ptr = (
-            f"M {tip_x:.1f} {tip_y:.1f} "
-            f"L {left_x:.1f} {left_y:.1f} "
-            f"L {tail_x:.1f} {tail_y:.1f} "
-            f"L {right_x:.1f} {right_y:.1f} Z"
-        )
-        s_name = s0.name
-        p.append(
-            f'<path class="sc-pointer sc-point" data-series="0" '
-            f'data-series-name="{esc(s_name)}" '
-            f'data-y="{esc(fmt_num(value))}" data-color="{ptr_color}" '
-            f'd="{d_ptr}" fill="{ptr_color}"/>'
-        )
+        if frac > 0:
+            v_angle = _GAUGE_START + frac * _GAUGE_SWEEP
+            v_sweep = v_angle - _GAUGE_START
+            v_large = 1 if v_sweep > math.pi else 0
 
-        p.append(f'<circle class="sc-pivot" cx="{cx:.1f}" cy="{cy:.1f}" r="8" fill="{ptr_color}"/>')
+            vox1 = cx + r_outer * math.cos(_GAUGE_START)
+            voy1 = cy + r_outer * math.sin(_GAUGE_START)
+            vox2 = cx + r_outer * math.cos(v_angle)
+            voy2 = cy + r_outer * math.sin(v_angle)
+            vix1 = cx + r_inner * math.cos(_GAUGE_START)
+            viy1 = cy + r_inner * math.sin(_GAUGE_START)
+            vix2 = cx + r_inner * math.cos(v_angle)
+            viy2 = cy + r_inner * math.sin(v_angle)
+            d_fill = (
+                f"M {vox1:.1f} {voy1:.1f} "
+                f"A {r_outer:.1f} {r_outer:.1f} 0 {v_large} 1 {vox2:.1f} {voy2:.1f} "
+                f"L {vix2:.1f} {viy2:.1f} "
+                f"A {r_inner:.1f} {r_inner:.1f} 0 {v_large} 0 {vix1:.1f} {viy1:.1f} Z"
+            )
+            s_name = s0.name
+            p.append(
+                f'<path class="sc-gauge-fill sc-point" data-series="0" '
+                f'data-series-name="{esc(s_name)}" '
+                f'data-y="{esc(fmt_num(value))}" data-color="{fill_color}" '
+                f'd="{d_fill}" fill="{fill_color}"/>'
+            )
 
         p.append("</g>")
 
@@ -215,7 +214,7 @@ def render_svg(spec: ChartSpec) -> str:
         ly = H - 10
         p.append('<g class="sc-legend">')
         p.append('<g class="sc-legend-item" data-series="0">')
-        p.append(f'<rect x="{lx:.1f}" y="{ly - 9:.1f}" width="14" height="4" rx="2" fill="{ptr_color}"/>')
+        p.append(f'<rect x="{lx:.1f}" y="{ly - 9:.1f}" width="14" height="4" rx="2" fill="{fill_color}"/>')
         p.append(
             f'<text x="{lx + 20:.1f}" y="{ly - 2:.1f}" font-size="12" '
             f'fill="{theme.legend_text_color}">{esc(s0.name)}</text>'

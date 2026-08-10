@@ -32,6 +32,7 @@ from .charts import line as _line
 from .charts import lollipop as _lollipop
 from .charts import pie as _pie
 from .charts import scatter as _scatter
+from .charts import solid_gauge as _solid_gauge
 from .charts import streamgraph as _streamgraph
 from .charts import technical_indicators as _technical_indicators
 from .charts import timeline as _timeline
@@ -63,6 +64,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "flame-chart": _flame_chart.render_svg,
     "funnel": _funnel.render_svg,
     "gauge": _gauge.render_svg,
+    "solid-gauge": _solid_gauge.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
     "lollipop": _lollipop.render_svg,
@@ -200,7 +202,7 @@ def _data_table(spec: ChartSpec) -> str:
             '<th scope="col">Low</th><th scope="col">Close</th></tr></thead>'
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
-    if spec.type == "gauge":
+    if spec.type in ("gauge", "solid-gauge"):
         rows = []
         s0 = spec.series[0] if spec.series else None
         if s0 and s0.data:
@@ -227,11 +229,7 @@ def _data_table(spec: ChartSpec) -> str:
             for i, v in enumerate(s0.data):
                 cat = cats[i] if i < len(cats) else str(i)
                 pct = (v / total) * 100 if total > 0 else 0.0
-                rows.append(
-                    f'<tr><th scope="row">{esc(cat)}</th>'
-                    f"<td>{esc(fmt_num(v))}</td>"
-                    f"<td>{pct:.1f}%</td></tr>"
-                )
+                rows.append(f'<tr><th scope="row">{esc(cat)}</th><td>{esc(fmt_num(v))}</td><td>{pct:.1f}%</td></tr>')
         return (
             f'<table class="sc-visually-hidden">{caption}'
             '<thead><tr><th scope="col">Category</th><th scope="col">Value</th>'
