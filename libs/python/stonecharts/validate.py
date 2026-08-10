@@ -418,6 +418,29 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
                     _str_array(sp["dependency"], f"{sp_path}.dependency", errs)
                 if "milestone" in sp and not isinstance(sp["milestone"], bool):
                     errs.append(f"{sp_path}.milestone: expected boolean, received {_jtype(sp['milestone'])}")
+    if "volume" in v:
+        vol = v["volume"]
+        if not isinstance(vol, list):
+            errs.append(f"{path}.volume: expected array, received {_jtype(vol)}")
+        else:
+            for j, val in enumerate(vol):
+                if not isinstance(val, (int, float)):
+                    errs.append(f"{path}.volume[{j}]: expected number, received {_jtype(val)}")
+    if "indicators" in v:
+        inds = v["indicators"]
+        if not isinstance(inds, list):
+            errs.append(f"{path}.indicators: expected array, received {_jtype(inds)}")
+        else:
+            for j, ind in enumerate(inds):
+                if not isinstance(ind, dict):
+                    errs.append(f"{path}.indicators[{j}]: expected object, received {_jtype(ind)}")
+                else:
+                    if "type" not in ind:
+                        errs.append(f"{path}.indicators[{j}].type: required")
+                    elif not isinstance(ind["type"], str):
+                        errs.append(f"{path}.indicators[{j}].type: expected string, received {_jtype(ind['type'])}")
+                    if "period" in ind and not isinstance(ind["period"], (int, float)):
+                        errs.append(f"{path}.indicators[{j}].period: expected number, received {_jtype(ind['period'])}")
 
 
 # Known chart types for the active release scope (0.0.0.1: area/column/line;
@@ -454,6 +477,7 @@ _KNOWN_TYPES = {
     "line",
     "lollipop",
     "scatter",
+    "technical-indicators",
     "timeline",
     "variwide",
     "waterfall",
@@ -511,6 +535,31 @@ def validate(d: Any) -> list[str]:
     else:
         for i, s in enumerate(d["series"]):
             _series(s, f"$.series[{i}]", errs, d.get("type"))
+    if "flags" in d:
+        fl = d["flags"]
+        if not isinstance(fl, list):
+            errs.append(f"$.flags: expected array, received {_jtype(fl)}")
+        else:
+            for j, f in enumerate(fl):
+                if not isinstance(f, dict):
+                    errs.append(f"$.flags[{j}]: expected object, received {_jtype(f)}")
+                else:
+                    if "x" not in f:
+                        errs.append(f"$.flags[{j}].x: required")
+                    elif not isinstance(f["x"], (int, float)):
+                        errs.append(f"$.flags[{j}].x: expected number, received {_jtype(f['x'])}")
+                    if "title" not in f:
+                        errs.append(f"$.flags[{j}].title: required")
+                    elif not isinstance(f["title"], str):
+                        errs.append(f"$.flags[{j}].title: expected string, received {_jtype(f['title'])}")
+    if "panes" in d:
+        pn = d["panes"]
+        if not isinstance(pn, list):
+            errs.append(f"$.panes: expected array, received {_jtype(pn)}")
+        else:
+            for j, p in enumerate(pn):
+                if not isinstance(p, dict):
+                    errs.append(f"$.panes[{j}]: expected object, received {_jtype(p)}")
     if d.get("stacking") == "percent" and isinstance(d.get("series"), list):
         for i, s in enumerate(d["series"]):
             if not isinstance(s, dict):

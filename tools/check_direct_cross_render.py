@@ -47,6 +47,7 @@ ACTIVE = {
     "windbarb": ["basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"],
     "streamgraph": ["basic", "silhouette", "themed-dark", "adversarial"],
     "vector-plot": ["basic", "field", "themed-dark", "uniform-length", "adversarial"],
+    "technical-indicators": ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"],
     "xrange": ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"],
 }
 

@@ -599,6 +599,42 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 			}
 		}
 	}
+	if x, ok := has(m, "volume"); ok {
+		arr, ok := x.([]interface{})
+		if !ok {
+			*errs = append(*errs, path+".volume: expected array, received "+jtype(x))
+		} else {
+			for j, val := range arr {
+				if _, ok := val.(float64); !ok {
+					*errs = append(*errs, path+".volume["+itoa(j)+"]: expected number, received "+jtype(val))
+				}
+			}
+		}
+	}
+	if x, ok := has(m, "indicators"); ok {
+		arr, ok := x.([]interface{})
+		if !ok {
+			*errs = append(*errs, path+".indicators: expected array, received "+jtype(x))
+		} else {
+			for j, elem := range arr {
+				ind, ok := elem.(map[string]interface{})
+				if !ok {
+					*errs = append(*errs, path+".indicators["+itoa(j)+"]: expected object, received "+jtype(elem))
+				} else {
+					if _, has := ind["type"]; !has {
+						*errs = append(*errs, path+".indicators["+itoa(j)+"].type: required")
+					} else if _, ok := ind["type"].(string); !ok {
+						*errs = append(*errs, path+".indicators["+itoa(j)+"].type: expected string, received "+jtype(ind["type"]))
+					}
+					if p, has := ind["period"]; has {
+						if _, ok := p.(float64); !ok {
+							*errs = append(*errs, path+".indicators["+itoa(j)+"].period: expected number, received "+jtype(p))
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 func vnonneg(v interface{}, path string, errs *[]string) {
@@ -650,8 +686,9 @@ var knownTypes = map[string]bool{
 	"waterfall":   true,
 	"vector-plot":  true,
 	"windbarb":     true,
-	"streamgraph":  true,
-	"xrange":       true,
+	"streamgraph":           true,
+	"technical-indicators":  true,
+	"xrange":                true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
@@ -716,6 +753,42 @@ func validate(v interface{}) []string {
 	}
 	if x, ok := has(d, "yAxis"); ok {
 		vaxis(x, "$.yAxis", &errs)
+	}
+	if raw, ok := has(d, "flags"); ok {
+		arr, ok := raw.([]interface{})
+		if !ok {
+			errs = append(errs, "$.flags: expected array, received "+jtype(raw))
+		} else {
+			for j, elem := range arr {
+				fl, ok := elem.(map[string]interface{})
+				if !ok {
+					errs = append(errs, "$.flags["+itoa(j)+"]: expected object, received "+jtype(elem))
+				} else {
+					if xv, hasX := fl["x"]; !hasX {
+						errs = append(errs, "$.flags["+itoa(j)+"].x: required")
+					} else if _, ok := xv.(float64); !ok {
+						errs = append(errs, "$.flags["+itoa(j)+"].x: expected number, received "+jtype(xv))
+					}
+					if tv, hasT := fl["title"]; !hasT {
+						errs = append(errs, "$.flags["+itoa(j)+"].title: required")
+					} else if _, ok := tv.(string); !ok {
+						errs = append(errs, "$.flags["+itoa(j)+"].title: expected string, received "+jtype(tv))
+					}
+				}
+			}
+		}
+	}
+	if raw, ok := has(d, "panes"); ok {
+		arr, ok := raw.([]interface{})
+		if !ok {
+			errs = append(errs, "$.panes: expected array, received "+jtype(raw))
+		} else {
+			for j, elem := range arr {
+				if _, ok := elem.(map[string]interface{}); !ok {
+					errs = append(errs, "$.panes["+itoa(j)+"]: expected object, received "+jtype(elem))
+				}
+			}
+		}
 	}
 	chartType, _ := has(d, "type")
 	chartTypeStr, _ := chartType.(string)

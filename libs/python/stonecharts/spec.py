@@ -129,6 +129,53 @@ class BoxDatum:
 
 
 @dataclass
+class Indicator:
+    type: str
+    period: int | None = None
+    color: str | None = None
+    dash_style: str | None = None
+    params: dict | None = None
+    pane: int | None = None
+
+
+@dataclass
+class Flag:
+    x: float
+    title: str
+    text: str | None = None
+    color: str | None = None
+    shape: str | None = None
+
+
+@dataclass
+class PlotBand:
+    from_val: float
+    to: float
+    color: str
+    label: str | None = None
+    opacity: float | None = None
+
+
+@dataclass
+class PlotLine:
+    value: float
+    color: str
+    width: float | None = None
+    dash_style: str | None = None
+    label: str | None = None
+
+
+@dataclass
+class Pane:
+    height: float | None = None
+    min: float | None = None
+    max: float | None = None
+    title: str | None = None
+    plot_bands: list[PlotBand] | None = None
+    plot_lines: list[PlotLine] | None = None
+
+
+@dataclass
 class Series:
     name: str
     data: list[float]
@@ -154,6 +201,8 @@ class Series:
     direction: list[float] | None = None  # windbarb/vector-plot — per-point direction (degrees)
     length: list[float] | None = None  # vector-plot only — per-point magnitude
     spans: list[Span] | None = None  # xrange/Gantt — per-series span objects
+    volume: list[float] | None = None
+    indicators: list[Indicator] | None = None
 
 
 @dataclass
@@ -174,6 +223,8 @@ class Axis:
     opposite: bool | None = None  # secondaryYAxis only
 
     bin_edges: list[float] | None = None  # xAxis only (histogram bins)
+    plot_bands: list[PlotBand] | None = None
+    plot_lines: list[PlotLine] | None = None
 
 
 @dataclass
@@ -354,6 +405,8 @@ class ChartSpec:
     offset: str = "wiggle"  # streamgraph baseline: "wiggle" | "silhouette"
     vector_length: float = 20.0
     rotation_origin: str = "center"
+    flags: list[Flag] | None = None
+    panes: list[Pane] | None = None
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -433,6 +486,20 @@ class ChartSpec:
                     )
                     for bd in box_data_raw
                 ]
+            indicators_raw = s.get("indicators")
+            indicators = None
+            if indicators_raw:
+                indicators = [
+                    Indicator(
+                        type=ind["type"],
+                        period=ind.get("period"),
+                        color=ind.get("color"),
+                        dash_style=ind.get("dashStyle"),
+                        params=ind.get("params"),
+                        pane=ind.get("pane"),
+                    )
+                    for ind in indicators_raw
+                ]
             series.append(
                 Series(
                     name=s.get("name") or f"Series {i + 1}",
@@ -474,6 +541,8 @@ class ChartSpec:
                     ]
                     if "spans" in s and s["spans"] is not None
                     else None,
+                    volume=s.get("volume"),
+                    indicators=indicators,
                 )
             )
         xa = d.get("xAxis") or {}
@@ -548,6 +617,63 @@ class ChartSpec:
                 dash_style=conn_raw.get("dashStyle", "dashed"),
             )
 
+        def _parse_plot_bands(raw):
+            if not raw:
+                return None
+            return [
+                PlotBand(
+                    from_val=float(pb["from"]),
+                    to=float(pb["to"]),
+                    color=pb["color"],
+                    label=pb.get("label"),
+                    opacity=pb.get("opacity"),
+                )
+                for pb in raw
+            ]
+
+        def _parse_plot_lines(raw):
+            if not raw:
+                return None
+            return [
+                PlotLine(
+                    value=float(pl["value"]),
+                    color=pl["color"],
+                    width=pl.get("width"),
+                    dash_style=pl.get("dashStyle"),
+                    label=pl.get("label"),
+                )
+                for pl in raw
+            ]
+
+        flags_raw = d.get("flags")
+        flags = None
+        if flags_raw:
+            flags = [
+                Flag(
+                    x=float(fl["x"]),
+                    title=fl["title"],
+                    text=fl.get("text"),
+                    color=fl.get("color"),
+                    shape=fl.get("shape"),
+                )
+                for fl in flags_raw
+            ]
+
+        panes_raw = d.get("panes")
+        panes = None
+        if panes_raw:
+            panes = [
+                Pane(
+                    height=p.get("height"),
+                    min=p.get("min"),
+                    max=p.get("max"),
+                    title=p.get("title"),
+                    plot_bands=_parse_plot_bands(p.get("plotBands")),
+                    plot_lines=_parse_plot_lines(p.get("plotLines")),
+                )
+                for p in panes_raw
+            ]
+
         return ChartSpec(
             series=series,
             type=d.get("type") or "line",
@@ -562,6 +688,8 @@ class ChartSpec:
                 max=_opt_float(xa, "max"),
                 bin_edges=xa.get("binEdges"),
                 grid_line=xgrid,
+                plot_bands=_parse_plot_bands(xa.get("plotBands")),
+                plot_lines=_parse_plot_lines(xa.get("plotLines")),
             ),
             y_axis=Axis(
                 title=ya.get("title"),
@@ -569,6 +697,8 @@ class ChartSpec:
                 min=_opt_float(ya, "min"),
                 max=_opt_float(ya, "max"),
                 grid_line=grid,
+                plot_bands=_parse_plot_bands(ya.get("plotBands")),
+                plot_lines=_parse_plot_lines(ya.get("plotLines")),
             ),
             secondary_y_axis=secondary,
             binning=binning,
@@ -606,4 +736,6 @@ class ChartSpec:
             offset=d.get("offset") or "wiggle",
             vector_length=float(d.get("vectorLength", 20)),
             rotation_origin=d.get("rotationOrigin") or "center",
+            flags=flags,
+            panes=panes,
         )

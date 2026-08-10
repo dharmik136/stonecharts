@@ -95,7 +95,7 @@ def _vector_marks(fr: CartesianFrame, p: list[str]) -> None:
             lbx = headx + HEAD_LEN * ((-ux) * ca - (-uy) * sa)
             lby = heady + HEAD_LEN * ((-ux) * sa + (-uy) * ca)
             rbx = headx + HEAD_LEN * ((-ux) * ca + (-uy) * sa)
-            rby = heady + HEAD_LEN * (-(-ux) * sa + (-uy) * ca)
+            rby = heady + HEAD_LEN * (ux * sa + (-uy) * ca)
 
             d = (
                 f"M{tailx:.1f} {taily:.1f} L{headx:.1f} {heady:.1f} "
