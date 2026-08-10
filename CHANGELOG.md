@@ -9,6 +9,16 @@ not represented as Semantic Versioning.
 
 No unreleased changes.
 
+## [0.0.0.26] - 2026-08-10
+
+### Added
+
+- **Solid gauge chart** (`type: "solid-gauge"`) — single-KPI value displayed
+  as a filled arc from start angle to value angle on a 270-degree annular track
+  with optional colored range bands (DEC-042). Family B (Polar/radial) sibling
+  reusing gauge's arc substrate. Reuses `gaugeMin`, `gaugeMax`, `gaugeBands`.
+  29th chart type overall, 3rd polar.
+
 ## [0.0.0.25] - 2026-08-10
 
 ### Added

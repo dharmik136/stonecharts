@@ -1,0 +1,52 @@
+[
+  {
+    "description": "gaugeMin is not a number",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeMin": "zero"},
+    "errors": ["$.gaugeMin: expected number, received string"]
+  },
+  {
+    "description": "gaugeMax is not a number",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeMax": true},
+    "errors": ["$.gaugeMax: expected number, received boolean"]
+  },
+  {
+    "description": "gaugeBands is not an array",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": "bad"},
+    "errors": ["$.gaugeBands: expected array, received string"]
+  },
+  {
+    "description": "gaugeBands element is not an object",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": [42]},
+    "errors": ["$.gaugeBands[0]: expected object, received number"]
+  },
+  {
+    "description": "gaugeBand missing from",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": [{"to": 50, "color": "#ff0000"}]},
+    "errors": ["$.gaugeBands[0].from: required"]
+  },
+  {
+    "description": "gaugeBand missing to",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": [{"from": 0, "color": "#ff0000"}]},
+    "errors": ["$.gaugeBands[0].to: required"]
+  },
+  {
+    "description": "gaugeBand missing color",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": [{"from": 0, "to": 50}]},
+    "errors": ["$.gaugeBands[0].color: required"]
+  },
+  {
+    "description": "gaugeBand from is not a number",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": [{"from": "start", "to": 50, "color": "#ff0000"}]},
+    "errors": ["$.gaugeBands[0].from: expected number, received string"]
+  },
+  {
+    "description": "gaugeBand to is not a number",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": [{"from": 0, "to": "end", "color": "#ff0000"}]},
+    "errors": ["$.gaugeBands[0].to: expected number, received string"]
+  },
+  {
+    "description": "gaugeBand color is not a string",
+    "spec": {"type": "solid-gauge", "series": [{"data": [50]}], "gaugeBands": [{"from": 0, "to": 50, "color": 123}]},
+    "errors": ["$.gaugeBands[0].color: expected string, received number"]
+  }
+]

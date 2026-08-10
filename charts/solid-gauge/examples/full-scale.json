@@ -1,0 +1,13 @@
+{
+  "type": "solid-gauge",
+  "id": "sg-full",
+  "title": "Memory",
+  "series": [{ "name": "Used", "data": [100] }],
+  "gaugeMin": 0,
+  "gaugeMax": 100,
+  "gaugeBands": [
+    { "from": 0, "to": 50, "color": "#55bf3b" },
+    { "from": 50, "to": 80, "color": "#dddf0d" },
+    { "from": 80, "to": 100, "color": "#df5353" }
+  ]
+}
