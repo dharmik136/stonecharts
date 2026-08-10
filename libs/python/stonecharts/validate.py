@@ -492,6 +492,7 @@ _KNOWN_TYPES = {
     "error-bar",
     "flame-chart",
     "funnel",
+    "gauge",
     "histogram",
     "line",
     "lollipop",
@@ -580,6 +581,31 @@ def validate(d: Any) -> list[str]:
             for j, p in enumerate(pn):
                 if not isinstance(p, dict):
                     errs.append(f"$.panes[{j}]: expected object, received {_jtype(p)}")
+    for gk in ("gaugeMin", "gaugeMax"):
+        if gk in d:
+            _num(d[gk], f"$.{gk}", errs)
+    if "gaugeBands" in d:
+        gb = d["gaugeBands"]
+        if not isinstance(gb, list):
+            errs.append(f"$.gaugeBands: expected array, received {_jtype(gb)}")
+        else:
+            for j, b in enumerate(gb):
+                prefix = f"$.gaugeBands[{j}]"
+                if not isinstance(b, dict):
+                    errs.append(f"{prefix}: expected object, received {_jtype(b)}")
+                else:
+                    if "from" not in b:
+                        errs.append(f"{prefix}.from: required")
+                    else:
+                        _num(b["from"], f"{prefix}.from", errs)
+                    if "to" not in b:
+                        errs.append(f"{prefix}.to: required")
+                    else:
+                        _num(b["to"], f"{prefix}.to", errs)
+                    if "color" not in b:
+                        errs.append(f"{prefix}.color: required")
+                    else:
+                        _str(b["color"], f"{prefix}.color", errs)
     if d.get("stacking") == "percent" and isinstance(d.get("series"), list):
         for i, s in enumerate(d["series"]):
             if not isinstance(s, dict):

@@ -1,0 +1,15 @@
+{
+  "id": "gauge-basic",
+  "type": "gauge",
+  "title": "Speed",
+  "width": 400,
+  "height": 300,
+  "series": [{ "name": "Speed", "data": [72] }],
+  "gaugeMin": 0,
+  "gaugeMax": 100,
+  "gaugeBands": [
+    { "from": 0, "to": 40, "color": "#55bf3b" },
+    { "from": 40, "to": 70, "color": "#dddf0d" },
+    { "from": 70, "to": 100, "color": "#df5353" }
+  ]
+}
