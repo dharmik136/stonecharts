@@ -328,7 +328,7 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
         _intnum(v["yAxis"], f"{path}.yAxis", errs)
         if isinstance(v["yAxis"], (int, float)) and not isinstance(v["yAxis"], bool) and int(v["yAxis"]) not in (0, 1):
             errs.append(f'{path}.yAxis: expected one of 0, 1, received "{int(v["yAxis"])}"')
-    if "data" not in v and chart_type != "boxplot":
+    if "data" not in v and chart_type not in ("boxplot", "flame-chart"):
         errs.append(f"{path}.data: required")
     elif "data" not in v:
         pass
@@ -418,6 +418,24 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
                     _str_array(sp["dependency"], f"{sp_path}.dependency", errs)
                 if "milestone" in sp and not isinstance(sp["milestone"], bool):
                     errs.append(f"{sp_path}.milestone: expected boolean, received {_jtype(sp['milestone'])}")
+    if "frames" in v:
+        if not isinstance(v["frames"], list):
+            errs.append(f"{path}.frames: expected array, received {_jtype(v['frames'])}")
+        else:
+            for i, fr in enumerate(v["frames"]):
+                fr_path = f"{path}.frames[{i}]"
+                if not isinstance(fr, dict):
+                    errs.append(f"{fr_path}: expected object, received {_jtype(fr)}")
+                    continue
+                for req in ("x", "x2", "depth"):
+                    if req not in fr:
+                        errs.append(f"{fr_path}.{req}: required")
+                    else:
+                        _num(fr[req], f"{fr_path}.{req}", errs)
+                if "name" in fr:
+                    _str(fr["name"], f"{fr_path}.name", errs)
+                if "color" in fr:
+                    _str(fr["color"], f"{fr_path}.color", errs)
     if "volume" in v:
         vol = v["volume"]
         if not isinstance(vol, list):
@@ -472,6 +490,7 @@ _KNOWN_TYPES = {
     "combo",
     "dumbbell",
     "error-bar",
+    "flame-chart",
     "funnel",
     "histogram",
     "line",

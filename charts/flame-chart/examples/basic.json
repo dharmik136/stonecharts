@@ -1,0 +1,21 @@
+{
+  "type": "flame-chart",
+  "title": "Request Handler Profile",
+  "subtitle": "Wall-clock call stack over 100ms request",
+  "xAxis": { "title": "Time (ms)" },
+  "yAxis": { "title": "Stack Depth" },
+  "series": [
+    {
+      "name": "main",
+      "data": [],
+      "frames": [
+        { "x": 0, "x2": 100, "depth": 0, "name": "handleRequest" },
+        { "x": 0, "x2": 60,  "depth": 1, "name": "parseBody" },
+        { "x": 60, "x2": 100, "depth": 1, "name": "respond" },
+        { "x": 5, "x2": 45,  "depth": 2, "name": "jsonDecode" },
+        { "x": 60, "x2": 85, "depth": 2, "name": "serialize" },
+        { "x": 85, "x2": 98, "depth": 2, "name": "write" }
+      ]
+    }
+  ]
+}

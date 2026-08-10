@@ -1,0 +1,52 @@
+[
+  {
+    "name": "missing series",
+    "spec": { "type": "flame-chart" },
+    "errors": ["$.series: required"]
+  },
+  {
+    "name": "frames not array",
+    "spec": { "type": "flame-chart", "series": [{ "frames": 42 }] },
+    "errors": ["$.series[0].frames: expected array, received number"]
+  },
+  {
+    "name": "frame not object",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [42] }] },
+    "errors": ["$.series[0].frames[0]: expected object, received number"]
+  },
+  {
+    "name": "frame missing x",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [{ "x2": 10, "depth": 0 }] }] },
+    "errors": ["$.series[0].frames[0].x: required"]
+  },
+  {
+    "name": "frame missing x2",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [{ "x": 0, "depth": 0 }] }] },
+    "errors": ["$.series[0].frames[0].x2: required"]
+  },
+  {
+    "name": "frame missing depth",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [{ "x": 0, "x2": 10 }] }] },
+    "errors": ["$.series[0].frames[0].depth: required"]
+  },
+  {
+    "name": "frame x not number",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [{ "x": "a", "x2": 10, "depth": 0 }] }] },
+    "errors": ["$.series[0].frames[0].x: expected number, received string"]
+  },
+  {
+    "name": "frame x2 not number",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [{ "x": 0, "x2": "b", "depth": 0 }] }] },
+    "errors": ["$.series[0].frames[0].x2: expected number, received string"]
+  },
+  {
+    "name": "frame depth not number",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [{ "x": 0, "x2": 10, "depth": "c" }] }] },
+    "errors": ["$.series[0].frames[0].depth: expected number, received string"]
+  },
+  {
+    "name": "frame name not string",
+    "spec": { "type": "flame-chart", "series": [{ "frames": [{ "x": 0, "x2": 10, "depth": 0, "name": 42 }] }] },
+    "errors": ["$.series[0].frames[0].name: expected string, received number"]
+  }
+]
