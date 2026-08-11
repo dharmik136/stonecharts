@@ -1,0 +1,1 @@
+{"series":[{"data":[80,95,99,15,60],"fillOpacity":0.15,"name":"Service A"},{"data":[70,80,95,25,45],"fillOpacity":0.15,"name":"Service B"}],"title":"Service Scorecard","type":"radar","xAxis":{"categories":["Latency","Throughput","Availability","Error Rate","Saturation"]}}

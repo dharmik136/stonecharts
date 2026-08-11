@@ -1,0 +1,1 @@
+{"series":[{"data":[5,3,4,2,6,8,7,4],"name":"0-5 kt"},{"data":[8,5,6,4,9,12,10,6],"name":"5-10 kt"},{"data":[3,2,3,1,4,5,4,2],"name":"10-15 kt"}],"title":"Wind Distribution","type":"wind-rose","xAxis":{"categories":["N","NE","E","SE","S","SW","W","NW"]}}

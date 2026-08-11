@@ -1,0 +1,1 @@
+{"series":[{"data":[82,145,96,210,168,74],"marker":{"radius":5,"symbol":"circle"},"name":"p99"}],"subtitle":"Single series, one centered stem per category","title":"p99 Latency by Endpoint","type":"lollipop","xAxis":{"categories":["/login","/search","/cart","/checkout","/invoice","/profile"],"title":"Endpoint"},"yAxis":{"title":"p99 latency (ms)"}}

@@ -1,0 +1,50 @@
+{
+  "equal": true,
+  "message": "All requested runtime outputs are byte-identical.",
+  "pairs": [
+    {
+      "basis": [
+        "byte-identical"
+      ],
+      "category": "unknown-structural",
+      "confidence": "high",
+      "equal": true,
+      "equality": "byte",
+      "findings": [],
+      "firstDifference": null,
+      "left": "go",
+      "leftBytes": 2143,
+      "leftSha256": "51dc4986d77ed6011d3ae755a7de95a7844ddeb3b366b58186dfaaf8448ae36d",
+      "likelyCause": "none",
+      "lineDiff": [],
+      "right": "python",
+      "rightBytes": 2143,
+      "rightSha256": "51dc4986d77ed6011d3ae755a7de95a7844ddeb3b366b58186dfaaf8448ae36d",
+      "structural": {
+        "equalTagInventory": true,
+        "leftTagCounts": {
+          "desc": 2,
+          "g": 2,
+          "line": 1,
+          "polygon": 5,
+          "svg": 2,
+          "text": 4
+        },
+        "rightTagCounts": {
+          "desc": 2,
+          "g": 2,
+          "line": 1,
+          "polygon": 5,
+          "svg": 2,
+          "text": 4
+        }
+      },
+      "visual": {
+        "reason": "First StoneVerify proof compares canonical SVG bytes and structure; raster visual diff is deferred.",
+        "status": "equivalent-by-byte-identity"
+      }
+    }
+  ],
+  "schemaVersion": 1,
+  "status": "pass"
+}
