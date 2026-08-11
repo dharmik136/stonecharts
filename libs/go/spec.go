@@ -125,11 +125,36 @@ type Indicator struct {
 // TriangleData holds the actuarial loss-development matrix.
 type TriangleData struct {
 	Origins   []string    `json:"origins"`
-	Periods   []float64   `json:"periods"`
+	Periods   []int       `json:"-"`
 	Values    [][]float64 `json:"values"`
 	View      string      `json:"view,omitempty"`
 	ValueType string      `json:"valueType,omitempty"`
 	Unit      string      `json:"unit,omitempty"`
+}
+
+func (t *TriangleData) UnmarshalJSON(b []byte) error {
+	type alias struct {
+		Origins   []string    `json:"origins"`
+		Periods   []float64   `json:"periods"`
+		Values    [][]float64 `json:"values"`
+		View      string      `json:"view,omitempty"`
+		ValueType string      `json:"valueType,omitempty"`
+		Unit      string      `json:"unit,omitempty"`
+	}
+	var a alias
+	if err := json.Unmarshal(b, &a); err != nil {
+		return err
+	}
+	t.Origins = a.Origins
+	t.Periods = make([]int, len(a.Periods))
+	for i, f := range a.Periods {
+		t.Periods[i] = int(f)
+	}
+	t.Values = a.Values
+	t.View = a.View
+	t.ValueType = a.ValueType
+	t.Unit = a.Unit
+	return nil
 }
 
 // DiagonalConfig controls latest-diagonal highlighting.
@@ -140,8 +165,8 @@ type DiagonalConfig struct {
 
 // FactorsConfig controls development factor display.
 type FactorsConfig struct {
-	Show     bool   `json:"show,omitempty"`
-	Position string `json:"position,omitempty"`
+	Show   bool      `json:"show,omitempty"`
+	Values []float64 `json:"values,omitempty"`
 }
 
 // ColorScaleConfig controls cell color-scale.

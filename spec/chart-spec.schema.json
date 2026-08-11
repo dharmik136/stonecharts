@@ -280,8 +280,8 @@
       "required": ["origins", "periods", "values"],
       "properties": {
         "origins": { "type": "array", "items": { "type": "string" }, "description": "Row labels (accident years or origin periods)." },
-        "periods": { "type": "array", "items": { "type": "number" }, "description": "Column labels (development periods in months)." },
-        "values": { "type": "array", "items": { "type": "array", "items": { "type": "number" } }, "description": "Jagged matrix: values[i] has at most len(periods) - i entries." },
+        "periods": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "uniqueItems": true, "description": "Column labels (development periods in months). Must be non-negative integers, strictly increasing." },
+        "values": { "type": "array", "items": { "type": "array", "items": { "type": "number" }, "minItems": 1 }, "description": "Matrix: each row has 1..len(periods) contiguous values, row lengths non-increasing." },
         "view": { "type": "string", "enum": ["cumulative", "incremental"], "default": "cumulative" },
         "valueType": { "type": "string", "enum": ["incurred", "paid"], "default": "incurred" },
         "unit": { "type": "string", "default": "", "description": "Display unit label (e.g. 'millions')." }
@@ -297,10 +297,10 @@
     },
     "factors": {
       "type": "object",
-      "description": "Development-triangle: development factor display options.",
+      "description": "Development-triangle: supplied development factor display options.",
       "properties": {
         "show": { "type": "boolean", "default": false },
-        "position": { "type": "string", "enum": ["below", "right"], "default": "below" }
+        "values": { "type": "array", "items": { "type": "number" }, "description": "Supplied development factors. Required when show is true. Length must equal len(periods) - 1." }
       }
     },
     "colorScale": {

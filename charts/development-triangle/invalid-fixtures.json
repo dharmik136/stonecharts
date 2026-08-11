@@ -46,5 +46,89 @@
     "errors": [
       "$.triangle.view: expected \"cumulative\" or \"incremental\""
     ]
+  },
+  {
+    "description": "period is boolean (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [true],
+        "values": [[100]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods[0]: expected integer, received boolean"
+    ]
+  },
+  {
+    "description": "period is non-integer float (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12.5],
+        "values": [[100]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods[0]: expected integer, received non-integer number"
+    ]
+  },
+  {
+    "description": "period is negative (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [-1],
+        "values": [[100]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods[0]: expected non-negative integer, received -1"
+    ]
+  },
+  {
+    "description": "periods not strictly increasing (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12, 12],
+        "values": [[100, 200]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods: must be strictly increasing"
+    ]
+  },
+  {
+    "description": "value is boolean (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12],
+        "values": [[true]]
+      }
+    },
+    "errors": [
+      "$.triangle.values[0][0]: expected number, received boolean"
+    ]
+  },
+  {
+    "description": "zero-length row (WP4)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021", "2022"],
+        "periods": [12, 24],
+        "values": [[100, 200], []]
+      }
+    },
+    "errors": [
+      "$.triangle.values[1]: row must have at least 1 value"
+    ]
   }
 ]

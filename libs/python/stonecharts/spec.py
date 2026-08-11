@@ -175,7 +175,7 @@ class DiagonalConfig:
 @dataclass
 class FactorsConfig:
     show: bool = False
-    position: str = "below"
+    values: list[float] = field(default_factory=list)
 
 
 @dataclass
@@ -883,7 +883,7 @@ class ChartSpec:
             ) if isinstance(d.get("diagonal"), dict) else None,
             factors_config=FactorsConfig(
                 show=bool(d["factors"].get("show", False)),
-                position=d["factors"].get("position") or "below",
+                values=[float(v) for v in d["factors"].get("values", [])],
             ) if isinstance(d.get("factors"), dict) else None,
             color_scale=ColorScaleConfig(
                 scale_type=d["colorScale"].get("type") or "sequential",
