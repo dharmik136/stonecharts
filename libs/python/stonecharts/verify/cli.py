@@ -24,7 +24,7 @@ from typing import Any
 
 from stonecharts import ChartSpec
 from stonecharts import __version__ as PY_STONECHARTS_VERSION
-from stonecharts.capabilities import CapabilityError
+from stonecharts.capabilities import CapabilityError, capabilities
 from stonecharts.limits import MAX_SPEC_BYTES, ResourceLimitError
 from stonecharts.render import render_svg
 from stonecharts.validate import SpecError
@@ -43,6 +43,7 @@ EXIT_USAGE = 2
 EXIT_INVALID_SPEC = 3
 EXIT_ADAPTER = 4
 EXIT_RESOURCE_LIMIT = 5
+EXIT_ASSURANCE_TIER = 6
 EXIT_INTERNAL = 70
 STONEVERIFY_VERSION = "1.0.0"
 GO_BINARY_ENV = "STONEVERIFY_GO_BINARY"
@@ -240,6 +241,27 @@ def validate_manifest_shape(manifest: dict[str, Any]) -> list[str]:
             errors.append("manifest.baseline must be an object")
         elif baseline.get("status") not in {"pass", "fail", "not-checked"}:
             errors.append("manifest.baseline.status must be pass, fail, or not-checked")
+
+    assurance = manifest.get("assurance")
+    if assurance is not None:
+        if not isinstance(assurance, dict):
+            errors.append("manifest.assurance must be an object")
+        else:
+            if assurance.get("profile") not in {"certified", "evaluation"}:
+                errors.append("manifest.assurance.profile must be certified or evaluation")
+            if not isinstance(assurance.get("chartType"), str) or not assurance.get("chartType"):
+                errors.append("manifest.assurance.chartType must be a non-empty string")
+            if assurance.get("tier") not in {"certified", "candidate", "experimental"}:
+                errors.append("manifest.assurance.tier must be certified, candidate, or experimental")
+            if not isinstance(assurance.get("eligibleForCertifiedGuarantee"), bool):
+                errors.append("manifest.assurance.eligibleForCertifiedGuarantee must be a boolean")
+            if assurance.get("profile") == "certified":
+                if assurance.get("tier") != "certified":
+                    errors.append("manifest.assurance: certified profile requires certified tier")
+                if assurance.get("eligibleForCertifiedGuarantee") is not True:
+                    errors.append(
+                        "manifest.assurance: certified profile requires eligibleForCertifiedGuarantee to be true"
+                    )
 
     advisories = manifest.get("presentationAdvisories")
     if advisories is not None:
@@ -1552,6 +1574,12 @@ def main() -> int:
         help="Development fallback for --runtime go: run the Go adapter from this source checkout with go run.",
     )
     parser.add_argument(
+        "--profile",
+        choices=["certified", "evaluation"],
+        default="certified",
+        help="Assurance profile (default: certified)",
+    )
+    parser.add_argument(
         "--output-format",
         choices=["human", "json"],
         default="human",
@@ -1652,6 +1680,19 @@ def main() -> int:
     has_dual_axis = isinstance(spec_data.get("secondaryYAxis"), dict)
     spec_bytes = canonical_json_bytes(spec_data)
 
+    chart_type = spec_data.get("type", "")
+    caps = capabilities()
+    tier_value = caps["chartTypes"].get(chart_type, {}).get("tier", "experimental")
+    profile = args.profile
+
+    if profile == "certified" and tier_value != "certified":
+        print(
+            f'E_ASSURANCE_TIER: chart type "{chart_type}" has tier "{tier_value}"; '
+            f"certified profile requires certified tier",
+            file=sys.stderr,
+        )
+        return EXIT_ASSURANCE_TIER
+
     evidence.parent.mkdir(parents=True, exist_ok=True)
     try:
         with tempfile.TemporaryDirectory(dir=evidence.parent, prefix=f".{evidence.name}.tmp-") as tmpdir:
@@ -1720,6 +1761,12 @@ def main() -> int:
                     stoneverify_version=STONEVERIFY_VERSION,
                     go_version=go_version,
                 ),
+                "assurance": {
+                    "profile": profile,
+                    "chartType": chart_type,
+                    "tier": tier_value,
+                    "eligibleForCertifiedGuarantee": tier_value == "certified",
+                },
             }
             if has_dual_axis:
                 manifest["presentationAdvisories"] = [

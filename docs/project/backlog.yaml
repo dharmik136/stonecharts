@@ -3250,6 +3250,7 @@ items:
   dependencies:
   - GATE-VERIFY-PILOT-001
   - WORK-GTM-011
+  - GATE-ASSURANCE-TIERS-001
   compatibility: Adds one pilot record and its measurement data, kept outside source
     control per the existing rule for real customer/prospect data (see WORK-GTM-010);
     does not change renderer output, schemas, or the proprietary licensing boundary.
@@ -3964,3 +3965,22 @@ items:
   - Cross-render tests pass
   verification:
   - automated testing
+- id: GATE-ASSURANCE-TIERS-001
+  title: StoneVerify enforces certification tier assurance
+  item_type: Release Gate
+  status: Done
+  priority: P0
+  workstream: WS-03 Conformance
+  stage: S5 Expansion
+  target: Unscheduled
+  outcome: >
+    StoneVerify issues certified evidence only for chart families whose
+    canonical capability tier is certified. Candidate and experimental
+    charts can be verified in evaluation mode but their evidence is
+    explicitly labeled as non-certified.
+  acceptance:
+    - --profile certified rejects non-certified chart types with exit code 6
+    - --profile evaluation allows all types but labels evidence accordingly
+    - assurance metadata appears in every evidence bundle
+    - result schema validates assurance fields
+    - candidate/experimental evidence says eligibleForCertifiedGuarantee false
