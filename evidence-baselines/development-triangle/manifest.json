@@ -1,0 +1,82 @@
+{
+  "assurance": {
+    "chartType": "development-triangle",
+    "eligibleForCertifiedGuarantee": false,
+    "profile": "evaluation",
+    "tier": "candidate"
+  },
+  "baseline": {
+    "identity": null,
+    "inputEqual": null,
+    "message": "No baseline evidence directory was provided.",
+    "note": null,
+    "runtimes": [],
+    "schemaVersion": 1,
+    "status": "not-checked",
+    "supersedes": null
+  },
+  "comparison": "comparison.json",
+  "demoDrift": "none",
+  "environment": {
+    "arch": "AMD64",
+    "goVersion": "go version go1.26.0 windows/amd64",
+    "locale": "English_India",
+    "os": "Windows",
+    "pythonVersion": "3.13.14",
+    "schemaVersion": 1,
+    "stonechartsVersion": "0.0.0.32",
+    "stoneverifyVersion": "1.0.0",
+    "timezone": "+0530"
+  },
+  "evidence": {
+    "artifacts": {
+      "go-output.svg": {
+        "algorithm": "sha-256",
+        "value": "b9dc64bf9d2e5a82513ad0074a34590264e395bfeaf781b18e84efcb9ade08ee"
+      },
+      "python-output.svg": {
+        "algorithm": "sha-256",
+        "value": "b9dc64bf9d2e5a82513ad0074a34590264e395bfeaf781b18e84efcb9ade08ee"
+      }
+    },
+    "inputSpec": {
+      "algorithm": "sha-256",
+      "value": "7a3e2dc09d1d5de4c68551c02608cce859ead769fb5a259e489fdd5e10a81a64"
+    }
+  },
+  "generatedAt": "2026-08-11T17:57:46.333761+00:00",
+  "input": {
+    "bytes": 288,
+    "file": "input-spec.json",
+    "sha256": "7a3e2dc09d1d5de4c68551c02608cce859ead769fb5a259e489fdd5e10a81a64",
+    "source": "C:\\Users\\remoteadmin\\stonecharts\\charts\\development-triangle\\examples\\basic.json"
+  },
+  "report": "report.html",
+  "runtimes": [
+    {
+      "bytes": 6011,
+      "demoDriftApplied": "none",
+      "implementation": "CPython",
+      "output": "python-output.svg",
+      "pythonVersion": "3.13.14",
+      "runtime": "python",
+      "sha256": "b9dc64bf9d2e5a82513ad0074a34590264e395bfeaf781b18e84efcb9ade08ee",
+      "stonechartsVersion": "0.0.0.32"
+    },
+    {
+      "bytes": 6011,
+      "demoDriftApplied": "none",
+      "goAdapterVersion": "source-fallback",
+      "goVersion": "go version go1.26.0 windows/amd64",
+      "module": "stonecharts",
+      "output": "go-output.svg",
+      "runtime": "go",
+      "sha256": "b9dc64bf9d2e5a82513ad0074a34590264e395bfeaf781b18e84efcb9ade08ee",
+      "stonechartsVersion": "0.0.0.32"
+    }
+  ],
+  "schemaVersion": 1,
+  "status": "pass",
+  "tool": "stonecharts_verify",
+  "toolVersion": 1
+}

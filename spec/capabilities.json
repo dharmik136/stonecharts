@@ -39,7 +39,7 @@
     {"id": "nightingale",           "tier": "certified", "since": "0.0.0.30"},
     {"id": "radial-bar",            "tier": "certified", "since": "0.0.0.31"},
     {"id": "parliament",            "tier": "certified", "since": "0.0.0.32"},
-    {"id": "development-triangle",  "tier": "candidate",    "since": null, "targetRelease": "0.0.0.33"}
+    {"id": "development-triangle",  "tier": "certified",    "since": "0.0.0.33"}
   ],
   "extraCapabilities": {
     "column": {

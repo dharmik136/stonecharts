@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>StoneVerify Report</title>
+  <style>
+    body { font: 14px/1.45 Segoe UI, Arial, sans-serif; margin: 32px; color: #202124; }
+    code, pre { font-family: Consolas, monospace; }
+    pre { background: #f6f8fa; padding: 12px; overflow: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>StoneVerify Report: PASS</h1>
+  <p>All requested runtime outputs are byte-identical.</p>
+  <p>Demo drift: <code>none</code></p>
+  <p>Spec hash: <code>7a3e2dc09d1d5de4c68551c02608cce859ead769fb5a259e489fdd5e10a81a64</code></p>
+  <table>
+    <thead><tr><th>Runtime</th><th>Output</th><th>SHA-256</th><th>Bytes</th></tr></thead>
+    <tbody><tr><td>python</td><td><code>python-output.svg</code></td><td><code>b9dc64bf9d2e5a82513ad0074a34590264e395bfeaf781b18e84efcb9ade08ee</code></td><td>6011</td></tr><tr><td>go</td><td><code>go-output.svg</code></td><td><code>b9dc64bf9d2e5a82513ad0074a34590264e395bfeaf781b18e84efcb9ade08ee</code></td><td>6011</td></tr></tbody>
+  </table>
+  
+  <h2>go vs python</h2><p>Status: <strong>PASS</strong></p><p>Likely cause: none</p><p>Category: <strong>unknown-structural</strong>; equality: <strong>byte</strong>; confidence: <strong>high</strong></p><pre>none</pre>
+</body>
+</html>

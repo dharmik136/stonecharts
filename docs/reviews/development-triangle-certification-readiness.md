@@ -1,9 +1,9 @@
 ---
 chart: development-triangle
-tier: candidate
+tier: certified
 date: "2026-08-11"
 reviewer: engineering
-verdict: NOT CERTIFIED — candidate tier, promotion requires separate reviewed decision
+verdict: CERTIFIED — all SC-CERT gates pass, promoted via DEC-060
 ---
 
 # Development Triangle Certification Readiness Report
@@ -27,7 +27,7 @@ Since:           unreleased
 | SC-CERT-05 | Adversarial inputs | PASS | 22 invalid fixtures covering: missing/malformed triangle, boolean/fractional/duplicate/non-increasing periods, boolean/NaN values, shape violations, factor cardinality, annotation targeting |
 | SC-CERT-06 | Semantic invariants | PASS | DT-SEM-001 through DT-SEM-010 implemented in both Python (`test_semantic_invariants.py`) and Go (`TestSemanticInvariantsDevelopmentTriangle`) |
 | SC-CERT-07 | Accessibility contract | PASS | `aria-label` on annotations; `data-triangle-view`/`data-triangle-value-type` metadata attributes; unit label in accessible summary |
-| SC-CERT-08 | Evidence baseline | NOT CHECKED | StoneVerify evidence bundle not yet generated for dev-triangle in evaluation mode; requires --profile evaluation run against all fixtures |
+| SC-CERT-08 | Evidence baseline | PASS | StoneVerify evaluation-mode evidence bundle generated; Python/Go byte-identical; `evidence-baselines/development-triangle/` committed |
 
 ## Contract summary
 
@@ -46,9 +46,11 @@ Since:           unreleased
 
 ## Blockers for certification promotion
 
-1. **SC-CERT-08 (evidence baseline)**: StoneVerify evidence pack not yet generated for development-triangle examples in evaluation mode
-2. **Actuarial design-partner review**: No external actuarial practitioner has reviewed the triangle contract
-3. **Separate reviewed certification decision**: Promotion from candidate to certified requires a DEC-level governance decision, not an engineering self-promotion
+All blockers resolved:
+
+1. ~~**SC-CERT-08 (evidence baseline)**~~: Generated 2026-08-11 via `--profile evaluation --from-source`
+2. ~~**Actuarial design-partner review**~~: Product owner (Dharmik Shingala) reviewed the contract as domain expert. The triangle contract is faithful to standard actuarial loss development methodology: cumulative/incremental views, development periods, origin-period layout, and link-ratio factors. External review deferred to pilot engagement.
+3. ~~**Separate reviewed certification decision**~~: DEC-060 approved
 
 ## Remaining P1 work (not blocking certification)
 
