@@ -4,7 +4,7 @@
 ![License: Proprietary](https://img.shields.io/badge/license-Proprietary-red)
 ![Python ≥3.9](https://img.shields.io/badge/python-%E2%89%A53.9-3776AB)
 ![Go ≥1.26](https://img.shields.io/badge/go-%E2%89%A51.26-00ADD8)
-![Charts: 35](https://img.shields.io/badge/chart_types-35-28a745)
+![Charts: 36](https://img.shields.io/badge/chart_types-36-28a745)
 ![Dependencies: 0](https://img.shields.io/badge/runtime_deps-0-brightgreen)
 
 **Visual Integrity Infrastructure** for deterministic reporting charts — one governed
@@ -20,8 +20,8 @@ release, and environment boundaries.
 ## Why StoneCharts
 
 - **Byte-identical cross-language output.** The same JSON spec renders to the exact
-  same SVG in Python and Go — verified by 177 golden-test fixtures across 35 chart
-  types (7 certified, 8 candidate, 20 experimental).
+  same SVG in Python and Go — verified by 177 golden-test fixtures across 36 chart
+  types (7 certified, 9 candidate, 20 experimental).
 - **Deterministic and runtime-free.** Charts are fully rendered server-side without a
   browser, DOM, or JavaScript. The SVG is complete on its own; the interaction runtime
   only *enhances* it.
@@ -115,13 +115,13 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 
 ## Chart Catalog
 
-**35 chart types** across three certification tiers, all with byte-identical Python
+**36 chart types** across three certification tiers, all with byte-identical Python
 and Go renderers pinned by golden tests.
 
 | Tier | Count | Meaning |
 |------|-------|---------|
 | **Certified** | 7 | Passes all SC-CERT gates; commercially supported |
-| **Candidate** | 8 | Golden-tested and byte-identical; on path to certification |
+| **Candidate** | 9 | Golden-tested and byte-identical; on path to certification |
 | **Experimental** | 20 | Implemented and functional; not commercially supported |
 
 ### Certified (7 types)
@@ -136,7 +136,7 @@ and Go renderers pinned by golden tests.
 | Bubble | `bubble` | 0.0.0.4 |
 | Combo | `combo` | 0.0.0.5 |
 
-### Candidate (8 types)
+### Candidate (9 types)
 
 | Chart | ID | Release |
 |-------|----|---------|
@@ -148,6 +148,7 @@ and Go renderers pinned by golden tests.
 | Bullet | `bullet` | 0.0.0.11 |
 | Boxplot | `boxplot` | 0.0.0.12 |
 | Dumbbell | `dumbbell` | 0.0.0.14 |
+| Development Triangle | `development-triangle` | unreleased |
 
 ### Experimental (20 types)
 
@@ -255,7 +256,7 @@ request with 12 jobs:
 
 - **Lint and static analysis** — ruff, mypy, go vet, golangci-lint, CodeQL
 - **Cross-platform tests** — Python 3.9 + 3.14, Go, on Ubuntu and Windows
-- **Wheel install smoke test** — build, install, and verify all 35 chart types
+- **Wheel install smoke test** — build, install, and verify all 36 chart types
 - **Documentation validation** — structure, metadata, and cross-references
 - **Cross-language parity** — Python/Go byte-identical output verification
 - **Schema compatibility** — backward-compatibility check on PRs
