@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from ..spec import ChartSpec
 from ..util import esc, fmt_num
-from ._cartesian import a11y_summary
 
 CELL_W = 72.0
 CELL_H = 28.0
@@ -33,10 +32,28 @@ def render_svg(spec: ChartSpec) -> str:
     theme = spec.theme
     cid = esc(spec.id)
 
+    tri = spec.triangle
+    origins = tri.origins if tri else []
+    periods = tri.periods if tri else []
+    values = tri.values if tri else []
+    n_rows = len(origins)
+    n_cols = len(periods)
+    view = tri.view if tri else "cumulative"
+    value_type = tri.value_type if tri else "incurred"
+    unit = tri.unit if tri else ""
+
+    # --- a11y summary (WP7: include view, valueType, unit) ---
     a11y_attr = ""
     a11y_desc = ""
     if spec.a11y:
-        _sum = esc(a11y_summary(spec, "Development triangle"))
+        parts: list[str] = []
+        if spec.title:
+            parts.append(f"{esc(spec.title)}.")
+        if unit:
+            parts.append(f"Unit: {esc(unit)}.")
+        parts.append(f"Development triangle, view: {esc(view)}, value type: {esc(value_type)}.")
+        parts.append(f"{n_rows} origins, {n_cols} periods.")
+        _sum = " ".join(parts)
         a11y_attr = f' role="img" aria-label="{_sum}"'
         a11y_desc = f"<desc>{_sum}</desc>"
 
@@ -45,6 +62,8 @@ def render_svg(spec: ChartSpec) -> str:
         m_top += 26
     if spec.subtitle:
         m_top += 18
+    if unit:
+        m_top += 16
     m_left: float = 22
     m_right: float = 22
     m_bottom: float = 20
@@ -58,13 +77,6 @@ def render_svg(spec: ChartSpec) -> str:
             m_right = m.right
         if m.bottom is not None:
             m_bottom = m.bottom
-
-    tri = spec.triangle
-    origins = tri.origins if tri else []
-    periods = tri.periods if tri else []
-    values = tri.values if tri else []
-    n_rows = len(origins)
-    n_cols = len(periods)
 
     show_factors = spec.factors_config is not None and spec.factors_config.show
     use_color = spec.color_scale is not None
@@ -120,6 +132,20 @@ def render_svg(spec: ChartSpec) -> str:
             f'<text class="sc-subtitle" x="{W / 2:.1f}" y="{ty}" text-anchor="middle" '
             f'font-size="12" fill="{theme.subtitle_color}">{esc(spec.subtitle)}</text>'
         )
+        ty += 16
+
+    # --- WP7: unit label ---
+    if unit:
+        p.append(
+            f'<text class="sc-dt-unit" x="{W / 2:.1f}" y="{ty}" text-anchor="middle" '
+            f'font-size="11" fill="{theme.subtitle_color}">Unit: {esc(unit)}</text>'
+        )
+
+    # --- WP7: wrapping group with data attributes ---
+    p.append(
+        f'<g class="sc-dt-triangle" data-triangle-view="{esc(view)}" '
+        f'data-triangle-value-type="{esc(value_type)}">'
+    )
 
     p.append('<g class="sc-dt-headers">')
     for c in range(n_cols):
@@ -171,19 +197,21 @@ def render_svg(spec: ChartSpec) -> str:
         p.append("</g>")
     p.append("</g>")
 
+    # --- WP5: fixed latest-diagonal (rightmost populated cell) ---
     if diag_on:
         p.append('<g class="sc-dt-diagonal">')
         for r in range(n_rows):
-            c = n_rows - 1 - r
             row = values[r] if r < len(values) else []
-            if c < len(row):
-                x = grid_x + c * CELL_W
-                y = grid_y + r * CELL_H
-                p.append(
-                    f'<rect class="sc-dt-diag" data-origin="{r}" data-period="{c}" '
-                    f'x="{x:.1f}" y="{y:.1f}" width="{CELL_W:.1f}" height="{CELL_H:.1f}" '
-                    f'fill="none" stroke="{diag_color}" stroke-width="2"/>'
-                )
+            if len(row) == 0:
+                continue
+            c = len(row) - 1
+            x = grid_x + c * CELL_W
+            y = grid_y + r * CELL_H
+            p.append(
+                f'<rect class="sc-dt-diag" data-origin="{r}" data-period="{c}" '
+                f'x="{x:.1f}" y="{y:.1f}" width="{CELL_W:.1f}" height="{CELL_H:.1f}" '
+                f'fill="none" stroke="{diag_color}" stroke-width="2"/>'
+            )
         if spec.diagonal and spec.diagonal.label:
             lx = grid_x + n_cols * CELL_W + 8
             ly = grid_y + CELL_H / 2 + 4
@@ -193,17 +221,9 @@ def render_svg(spec: ChartSpec) -> str:
             )
         p.append("</g>")
 
-    if show_factors:
-        factors: list[float] = []
-        for c in range(n_cols - 1):
-            num = 0.0
-            den = 0.0
-            for r in range(n_rows):
-                row = values[r] if r < len(values) else []
-                if c + 1 < len(row):
-                    num += row[c + 1]
-                    den += row[c]
-            factors.append(num / den if den > 0 else 0.0)
+    # --- WP6: render supplied factors (no computation) ---
+    if show_factors and spec.factors_config is not None:
+        factor_values = spec.factors_config.values
         fy = grid_y + n_rows * CELL_H
         flx = grid_x - 8
         fly = fy + CELL_H / 2 + 4
@@ -212,14 +232,15 @@ def render_svg(spec: ChartSpec) -> str:
             f'<text class="sc-dt-factor-header" x="{flx:.1f}" y="{fly:.1f}" '
             f'text-anchor="end" font-size="10" font-weight="600" fill="{header_color}">Factors</text>'
         )
-        for c in range(len(factors)):
+        for c in range(len(factor_values)):
             fx = grid_x + c * CELL_W + CELL_W / 2 + CELL_W / 2
             p.append(
                 f'<text class="sc-dt-factor" x="{fx:.1f}" y="{fly:.1f}" '
-                f'text-anchor="middle" font-size="10" fill="{text_color}">{factors[c]:.3f}</text>'
+                f'text-anchor="middle" font-size="10" fill="{text_color}">{factor_values[c]:.3f}</text>'
             )
         p.append("</g>")
 
+    # --- WP7: annotations with text in accessible metadata ---
     if spec.triangle_annotations:
         origin_idx = {o: i for i, o in enumerate(origins)}
         period_idx = {int(periods[i]): i for i in range(n_cols)}
@@ -232,6 +253,11 @@ def render_svg(spec: ChartSpec) -> str:
                 if ci < len(row):
                     ax = grid_x + ci * CELL_W + CELL_W - 6
                     ay = grid_y + ri * CELL_H + 6
+                    escaped_text = esc(ann.text)
+                    p.append(
+                        f'<g class="sc-dt-annotation-group" aria-label="{escaped_text}">'
+                    )
+                    p.append(f'<title>{escaped_text}</title>')
                     p.append(
                         f'<circle class="sc-dt-annotation" cx="{ax:.1f}" cy="{ay:.1f}" '
                         f'r="4" fill="{ann_color}" opacity="0.8"/>'
@@ -240,7 +266,11 @@ def render_svg(spec: ChartSpec) -> str:
                         f'<text class="sc-dt-annotation-text" x="{ax:.1f}" y="{ay + 3:.1f}" '
                         f'text-anchor="middle" font-size="7" font-weight="700" fill="#ffffff">!</text>'
                     )
+                    p.append("</g>")
         p.append("</g>")
+
+    # Close the wrapping triangle group
+    p.append("</g>")
 
     p.append("</svg>")
     return "".join(p)
