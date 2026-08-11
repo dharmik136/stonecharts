@@ -1303,6 +1303,59 @@ def test_range_data_validation():
     assert errs == [], errs
 
 
+def test_development_triangle_spec_coverage():
+    """Every dev-triangle public field must have an observable SVG effect."""
+    # Base spec with all optional features enabled (annotations tested separately
+    # because changing origins/periods invalidates annotation cross-references)
+    base = {
+        "type": "development-triangle",
+        "title": "Test",
+        "triangle": {
+            "origins": ["2021", "2022", "2023"],
+            "periods": [12, 24, 36],
+            "values": [[100, 200, 300], [110, 220], [130]],
+            "view": "cumulative",
+            "valueType": "incurred",
+            "unit": "millions",
+        },
+        "diagonal": {"highlight": True, "label": "Latest"},
+        "factors": {"show": True, "values": [1.5, 1.2]},
+        "colorScale": {"type": "sequential", "domain": "auto"},
+    }
+    base_svg = render_svg(ChartSpec.from_dict(base))
+
+    # For rendering fields: changing the value must change the SVG
+    rendering_fields = [
+        ("triangle.origins", {"triangle": {**base["triangle"], "origins": ["A", "B", "C"]}}),
+        ("triangle.periods", {"triangle": {**base["triangle"], "periods": [1, 2, 3]}}),
+        ("triangle.values", {"triangle": {**base["triangle"], "values": [[999, 888, 777], [666, 555], [444]]}}),
+        ("triangle.unit", {"triangle": {**base["triangle"], "unit": "thousands"}}),
+        ("diagonal.highlight", {"diagonal": {"highlight": False}}),
+        ("diagonal.label", {"diagonal": {"highlight": True, "label": "Changed"}}),
+        ("factors.show", {"factors": {"show": False}}),
+        ("factors.values", {"factors": {"show": True, "values": [2.0, 1.5]}}),
+    ]
+
+    for field_name, override in rendering_fields:
+        modified = {**base, **override}
+        # Ensure triangle is complete
+        if "triangle" not in override:
+            modified["triangle"] = base["triangle"]
+        mod_svg = render_svg(ChartSpec.from_dict(modified))
+        assert mod_svg != base_svg, f"Field {field_name} had no observable SVG effect"
+
+    # Annotations: must have observable effect and appear in SVG
+    ann_spec = {**base, "annotations": [{"origin": "2021", "period": 12, "text": "AdjNote"}]}
+    ann_svg = render_svg(ChartSpec.from_dict(ann_spec))
+    assert ann_svg != base_svg, "annotations had no observable SVG effect"
+    assert "AdjNote" in ann_svg, "annotation text missing from SVG"
+
+    # For metadata fields: value must appear in SVG
+    assert 'data-triangle-view="cumulative"' in base_svg, "view metadata missing from SVG"
+    assert 'data-triangle-value-type="incurred"' in base_svg, "valueType metadata missing from SVG"
+    assert "millions" in base_svg, "unit label missing from SVG"
+
+
 if __name__ == "__main__":
     for _n in LINE_CASES:
         _check("line-basic", _n)
