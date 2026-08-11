@@ -4002,3 +4002,30 @@ items:
   verification:
     - python -m pytest libs/python/tests/test_stonecharts_verify.py -q
     - python tools/check_docs.py
+- id: WORK-CI-001
+  title: Upgrade CI actions before Node.js 20 and CodeQL v3 deprecation
+  item_type: Work Package
+  status: Ready
+  priority: P2
+  workstream: WS-01 Governance
+  stage: S5 Expansion
+  target: Unscheduled
+  outcome: >
+    All CI workflow actions target supported Node.js runtimes and
+    non-deprecated action versions. No deprecation warnings in CI logs.
+  traceability:
+    - REQ-REL-001
+  risks:
+    - RISK-009
+  evidence:
+    - TEST-DOCS-CONTROL
+  dependencies: []
+  compatibility: CI-only change; no renderer or schema impact.
+  areas:
+    - release
+  acceptance:
+    - golangci-lint-action targets a Node.js 22+ compatible version
+    - CodeQL action upgraded from v3 to v4 or later
+    - No deprecation warnings in CI job logs
+  verification:
+    - GitHub Actions workflow run with zero deprecation annotations
