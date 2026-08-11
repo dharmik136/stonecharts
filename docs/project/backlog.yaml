@@ -4029,3 +4029,33 @@ items:
     - No deprecation warnings in CI job logs
   verification:
     - GitHub Actions workflow run with zero deprecation annotations
+- id: WORK-SCHEMA-COMPAT-002
+  title: Broaden JSON Schema compatibility checker coverage
+  item_type: Work Package
+  status: Ready
+  priority: P1
+  workstream: WS-03 Conformance
+  stage: S5 Expansion
+  target: Unscheduled
+  outcome: >
+    The schema compatibility checker detects supported classes of
+    backward-incompatible changes. Coverage is extended to include
+    minimum/maximum narrowing, pattern changes, minItems/maxItems,
+    additionalProperties restrictions, and oneOf/allOf topology changes.
+  traceability:
+    - REQ-REL-001
+  risks:
+    - RISK-009
+  evidence:
+    - TEST-DOCS-CONTROL
+  dependencies: []
+  compatibility: Tooling-only change; no renderer or schema impact.
+  areas:
+    - spec
+  acceptance:
+    - Checker detects minimum/maximum/minItems/maxItems narrowing
+    - Checker detects additionalProperties restriction changes
+    - Checker detects pattern and const changes
+    - Test suite covers each new detection class
+  verification:
+    - python tools/check_schema_compat.py with adversarial test schemas

@@ -15,8 +15,7 @@
     "runtimeCoverage",
     "findings",
     "evidence",
-    "environment",
-    "assurance"
+    "environment"
   ],
   "properties": {
     "schemaVersion": { "const": 1 },
