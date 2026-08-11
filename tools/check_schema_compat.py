@@ -104,6 +104,12 @@ def main() -> int:
         type=Path,
         help="Path to the new (candidate) schema file.",
     )
+    parser.add_argument(
+        "--exceptions",
+        type=Path,
+        default=None,
+        help="JSON file listing acknowledged breaking changes that should not fail the check.",
+    )
     args = parser.parse_args()
 
     if not args.old_schema.exists():
@@ -120,17 +126,33 @@ def main() -> int:
     with open(args.new_schema, encoding="utf-8") as f:
         new = json.load(f)
 
+    acknowledged: set[str] = set()
+    if args.exceptions and args.exceptions.exists():
+        with open(args.exceptions, encoding="utf-8") as f:
+            exceptions = json.load(f)
+        acknowledged = set(exceptions.get("acknowledged", []))
+
     breaking: list[str] = []
     _compare_schemas(old, new, "#", breaking)
 
-    for msg in breaking:
+    unacknowledged = [msg for msg in breaking if msg not in acknowledged]
+    ack_matched = [msg for msg in breaking if msg in acknowledged]
+
+    for msg in ack_matched:
+        print(f"ACKNOWLEDGED: {msg}")
+    for msg in unacknowledged:
         print(msg)
 
-    if breaking:
-        print(f"\n{len(breaking)} breaking changes found")
+    if unacknowledged:
+        print(f"\n{len(unacknowledged)} unacknowledged breaking changes found")
+        if ack_matched:
+            print(f"({len(ack_matched)} acknowledged changes skipped)")
         return 1
 
-    print("No breaking changes found")
+    if ack_matched:
+        print(f"\n{len(ack_matched)} acknowledged changes, 0 unacknowledged")
+    else:
+        print("No breaking changes found")
     return 0
 
 

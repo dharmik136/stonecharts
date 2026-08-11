@@ -1,0 +1,12 @@
+{
+  "baseline": "0.0.0.32",
+  "reason": "Development Triangle (candidate/unreleased) required restructuring allOf conditionals to accommodate chart types that use triangle instead of series. No existing chart type contract is narrowed or removed.",
+  "acknowledged": [
+    "REMOVED PROPERTY: #/allOf[0]/if/properties/stacking",
+    "REMOVED PROPERTY: #/allOf[0]/then/properties/series",
+    "NEWLY REQUIRED: #/allOf[0]/then added required field 'triangle'",
+    "NEWLY REQUIRED: #/allOf[1]/if added required field 'stacking'",
+    "REMOVED PROPERTY: #/allOf[2]/if/properties/type",
+    "REMOVED PROPERTY: #/allOf[3]/then/properties/series/items/properties/data/items/oneOf[2]/properties/z"
+  ]
+}
