@@ -1,0 +1,1 @@
+{"series":[{"data":[120,85,-18,-46,-22,9],"name":"Cash flow"}],"subtitle":"Signed deltas per driver, running balance","title":"Monthly Cash Flow","type":"waterfall","xAxis":{"categories":["Opening","Sales","Refunds","Payroll","Marketing","Interest"],"title":"Driver"},"yAxis":{"title":"Cash (USD, thousands)"}}

@@ -1,0 +1,1 @@
+{"bulletRanges":[150,225,300],"bulletTarget":250,"series":[{"data":[275],"name":"2024 Actual"}],"subtitle":"Actual vs target with qualitative bands","title":"Revenue Q4","type":"bullet","xAxis":{"categories":["Revenue"]},"yAxis":{"title":"USD (thousands)"}}

@@ -41,6 +41,125 @@ def _bubbles(svg):
     return out
 
 
+def _candles(svg):
+    out = []
+    for m in re.finditer(r'<g\s[^>]*class="sc-candle sc-point"[^>]*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _slices(svg):
+    out = []
+    for m in re.finditer(r'<(?:path|polygon)\s[^>]*class="sc-slice sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _lollipop_heads(svg):
+    out = []
+    for m in re.finditer(r'<circle\s[^>]*class="[^"]*sc-lollipop-head[^"]*"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _events(svg):
+    out = []
+    for m in re.finditer(r'<circle\s[^>]*class="sc-event sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _barbs(svg):
+    out = []
+    for m in re.finditer(r'<g\s[^>]*class="sc-barb sc-point"[^>]*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _vectors(svg):
+    out = []
+    for m in re.finditer(r'<path\s[^>]*class="sc-vector sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _spans(svg):
+    out = []
+    for m in re.finditer(r'<rect\s[^>]*class="sc-span sc-point"[^>]*/>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _frames(svg):
+    out = []
+    for m in re.finditer(r'<rect\s[^>]*class="sc-frame sc-point"[^>]*/>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _pointers(svg):
+    out = []
+    for m in re.finditer(r'<path\s[^>]*class="sc-pointer sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _gauge_fills(svg):
+    out = []
+    for m in re.finditer(r'<path\s[^>]*class="sc-gauge-fill sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _radar_dots(svg):
+    out = []
+    for m in re.finditer(r'<circle\s[^>]*class="sc-radar-dot sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _polar_dots(svg):
+    out = []
+    for m in re.finditer(r'<circle\s[^>]*class="sc-polar-dot sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _windrose_sectors(svg):
+    out = []
+    for m in re.finditer(r'<path\s[^>]*class="sc-windrose-sector sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _nightingale_sectors(svg):
+    out = []
+    for m in re.finditer(r'<path\s[^>]*class="sc-nightingale-sector sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _radialbar_bars(svg):
+    out = []
+    for m in re.finditer(r'<path\s[^>]*class="sc-radialbar-bar sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _parliament_dots(svg):
+    out = []
+    for m in re.finditer(r'<circle\s[^>]*class="sc-parliament-dot sc-point"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def _point_circles(svg):
+    out = []
+    for m in re.finditer(r'<circle\s[^>]*class="[^"]*sc-point[^"]*"[^>]*/?\s*>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
 # ── SC-SEM-001  Histogram: sum(bin_counts) == len(observations) ──────
 
 
@@ -183,6 +302,956 @@ def test_percent_stack_zero_category():
     totals = list(non_zero.values())
     for t in totals:
         assert abs(t - totals[0]) < 0.5
+
+
+# ── SC-SEM-011  Range family: data-low <= data-high ────────────────────
+
+
+def _range_points(svg):
+    """Extract sc-point elements that carry both data-low and data-high."""
+    out = []
+    for m in re.finditer(r'<(?:circle|rect)\s[^>]*class="[^"]*sc-point[^"]*"[^>]*/?\s*>', svg):
+        attrs = dict(_ATTR_RE.findall(m.group(0)))
+        if "data-low" in attrs and "data-high" in attrs:
+            out.append(attrs)
+    return out
+
+
+def test_arearange_low_le_high():
+    """SC-SEM-011: arearange data-low <= data-high for every rendered point."""
+    spec_path = ROOT / "charts" / "arearange" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no arearange points found"
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        assert lo <= hi, f"point {i}: low {lo} > high {hi}"
+
+
+def test_columnrange_low_le_high():
+    """SC-SEM-011: columnrange data-low <= data-high for every rendered bar."""
+    spec_path = ROOT / "charts" / "columnrange" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no columnrange points found"
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        assert lo <= hi, f"bar {i}: low {lo} > high {hi}"
+
+
+def test_columnrange_bar_height_positive():
+    """SC-SEM-011: columnrange bar has positive pixel height when low != high."""
+    spec_path = ROOT / "charts" / "columnrange" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        if lo != hi:
+            h = float(p.get("height", "0"))
+            assert h > 0, f"bar {i}: low {lo} != high {hi} but height is {h}"
+
+
+def test_dumbbell_low_le_high():
+    """SC-SEM-011: dumbbell data-low <= data-high for every rendered point."""
+    spec_path = ROOT / "charts" / "dumbbell" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no dumbbell points found"
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        assert lo <= hi, f"point {i}: low {lo} > high {hi}"
+
+
+def test_dumbbell_connector_count():
+    """SC-SEM-011: dumbbell has one connector line per data point."""
+    spec_path = ROOT / "charts" / "dumbbell" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    connectors = re.findall(r'class="sc-connector"', svg)
+    n_points = sum(len(s.data) for s in spec.series)
+    assert len(connectors) == n_points, f"connectors {len(connectors)} != points {n_points}"
+
+
+def test_range_family_constructed():
+    """SC-SEM-011: constructed range specs all satisfy low <= high."""
+    specs = {
+        "arearange": {"data": [50, 60, 70], "low": [10, 20, 30]},
+        "columnrange": {"data": [10, 20, 30], "high": [50, 60, 70]},
+        "dumbbell": {"data": [10, 20, 30], "high": [50, 60, 70]},
+    }
+    for chart_type, series_fields in specs.items():
+        d = {
+            "type": chart_type,
+            "xAxis": {"categories": ["A", "B", "C"]},
+            "series": [{"name": "s", **series_fields}],
+        }
+        spec = ChartSpec.from_dict(d)
+        svg = render_svg(spec)
+        points = _range_points(svg)
+        assert len(points) == 3, f"{chart_type}: expected 3 points, got {len(points)}"
+        for i, p in enumerate(points):
+            lo, hi = float(p["data-low"]), float(p["data-high"])
+            assert lo <= hi, f"{chart_type} point {i}: low {lo} > high {hi}"
+
+
+# ── SC-SEM-012  Error-bar: low <= central value <= high ────────────────
+
+
+def test_error_bar_low_le_value_le_high():
+    """SC-SEM-012: error-bar central value lies between its bounds."""
+    spec_path = ROOT / "charts" / "error-bar" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no error-bar points found"
+    for i, p in enumerate(points):
+        lo = float(p["data-low"])
+        y = float(p["data-y"])
+        hi = float(p["data-high"])
+        assert lo <= y <= hi, f"point {i}: low {lo} <= y {y} <= high {hi} violated"
+
+
+def test_error_bar_constructed():
+    """SC-SEM-012: error-bar bounds with constructed spec."""
+    d = {
+        "type": "error-bar",
+        "xAxis": {"categories": ["A", "B", "C"]},
+        "series": [
+            {
+                "name": "test",
+                "data": [50, 100, 75],
+                "low": [30, 80, 60],
+                "high": [70, 120, 90],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) == 3
+    for i, p in enumerate(points):
+        lo = float(p["data-low"])
+        y = float(p["data-y"])
+        hi = float(p["data-high"])
+        assert lo <= y <= hi, f"point {i}: {lo} <= {y} <= {hi} violated"
+
+
+# ── SC-SEM-013  Boxplot: structural integrity ──────────────────────────
+
+
+def _boxes(svg):
+    """Extract sc-box sc-point rect elements."""
+    out = []
+    for m in re.finditer(r'<rect\s[^>]*class="sc-box sc-point"[^>]*/>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def test_boxplot_median_matches_input():
+    """SC-SEM-013: boxplot data-y matches median from boxData input."""
+    spec_path = ROOT / "charts" / "boxplot" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    medians = [bd["median"] for bd in d["series"][0]["boxData"]]
+    assert len(boxes) == len(medians), f"boxes {len(boxes)} != data {len(medians)}"
+    for i, (box, expected) in enumerate(zip(boxes, medians)):
+        actual = float(box["data-y"])
+        assert actual == expected, f"box {i}: data-y {actual} != median {expected}"
+
+
+def test_boxplot_box_height_positive():
+    """SC-SEM-013: boxplot box has positive pixel height (q1 < q3)."""
+    spec_path = ROOT / "charts" / "boxplot" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    for i, box in enumerate(boxes):
+        h = float(box.get("height", "0"))
+        assert h > 0, f"box {i}: height is {h}, expected > 0"
+
+
+def test_boxplot_whisker_cap_count():
+    """SC-SEM-013: boxplot has exactly 2 whisker caps per box."""
+    spec_path = ROOT / "charts" / "boxplot" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    caps = re.findall(r'class="sc-whisker-cap"', svg)
+    assert len(caps) == 2 * len(boxes), f"caps {len(caps)} != 2 * boxes {len(boxes)}"
+
+
+def test_boxplot_constructed():
+    """SC-SEM-013: boxplot with constructed spec verifies structure."""
+    d = {
+        "type": "boxplot",
+        "xAxis": {"categories": ["X", "Y"]},
+        "series": [
+            {
+                "name": "test",
+                "data": [50, 100],
+                "boxData": [
+                    {"low": 10, "q1": 30, "median": 50, "q3": 70, "high": 90},
+                    {"low": 60, "q1": 80, "median": 100, "q3": 120, "high": 140},
+                ],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    assert len(boxes) == 2
+    assert float(boxes[0]["data-y"]) == 50
+    assert float(boxes[1]["data-y"]) == 100
+    caps = re.findall(r'class="sc-whisker-cap"', svg)
+    assert len(caps) == 4
+
+
+# ── SC-SEM-014  Bullet: structural completeness ───────────────────────
+
+
+def test_bullet_measure_matches_input():
+    """SC-SEM-014: bullet data-y matches the measure value from input."""
+    spec_path = ROOT / "charts" / "bullet" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _bars(svg)
+    expected = d["series"][0]["data"]
+    assert len(bars) == len(expected), f"bars {len(bars)} != data {len(expected)}"
+    for i, (bar, val) in enumerate(zip(bars, expected)):
+        actual = float(bar["data-y"])
+        assert actual == val, f"bar {i}: data-y {actual} != data {val}"
+
+
+def test_bullet_range_count():
+    """SC-SEM-014: bullet has one sc-range rect per bulletRanges entry per category."""
+    spec_path = ROOT / "charts" / "bullet" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    ranges = re.findall(r'class="sc-range"', svg)
+    n_cats = len(d["xAxis"]["categories"])
+    n_expected = len(d["bulletRanges"]) * n_cats
+    assert len(ranges) == n_expected, f"ranges {len(ranges)} != {n_expected} ({len(d['bulletRanges'])} * {n_cats})"
+
+
+def test_bullet_target_present():
+    """SC-SEM-014: bullet renders target line when bulletTarget is specified."""
+    spec_path = ROOT / "charts" / "bullet" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    assert "bulletTarget" in d
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    targets = re.findall(r'class="sc-target"', svg)
+    assert len(targets) == 1, f"expected 1 target, got {len(targets)}"
+
+
+def test_bullet_constructed():
+    """SC-SEM-014: bullet with constructed multi-KPI spec."""
+    d = {
+        "type": "bullet",
+        "xAxis": {"categories": ["KPI-A", "KPI-B"]},
+        "series": [{"name": "measure", "data": [75, 120]}],
+        "bulletTarget": 100,
+        "bulletRanges": [50, 100, 150],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _bars(svg)
+    assert len(bars) == 2
+    assert float(bars[0]["data-y"]) == 75
+    assert float(bars[1]["data-y"]) == 120
+    ranges = re.findall(r'class="sc-range"', svg)
+    assert len(ranges) == 6, f"expected 3 ranges * 2 categories = 6, got {len(ranges)}"
+    targets = re.findall(r'class="sc-target"', svg)
+    assert len(targets) == 2, f"expected 1 target * 2 categories = 2, got {len(targets)}"
+
+
+# ── SC-SEM-015  Candlestick: OHLC bounds ────────────────────────────────
+
+
+def test_candlestick_ohlc_bounds():
+    """SC-SEM-015: high >= max(open,close), low <= min(open,close)."""
+    spec_path = ROOT / "charts" / "candlestick" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    candles = _candles(svg)
+    assert len(candles) > 0, "no candles found"
+    for i, c in enumerate(candles):
+        o, h, lo, cl = float(c["data-open"]), float(c["data-high"]), float(c["data-low"]), float(c["data-close"])
+        assert h >= max(o, cl), f"candle {i}: high {h} < max(open {o}, close {cl})"
+        assert lo <= min(o, cl), f"candle {i}: low {lo} > min(open {o}, close {cl})"
+
+
+def test_candlestick_constructed():
+    """SC-SEM-015: candlestick OHLC with constructed spec."""
+    d = {
+        "type": "candlestick",
+        "subtype": "candlestick",
+        "xAxis": {"categories": ["Mon", "Tue"]},
+        "series": [
+            {
+                "name": "Stock",
+                "data": [105, 95],
+                "ohlc": [
+                    {"open": 100, "high": 110, "low": 90, "close": 105},
+                    {"open": 105, "high": 108, "low": 88, "close": 95},
+                ],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    candles = _candles(svg)
+    assert len(candles) == 2
+    for c in candles:
+        o, h, lo, cl = float(c["data-open"]), float(c["data-high"]), float(c["data-low"]), float(c["data-close"])
+        assert h >= max(o, cl)
+        assert lo <= min(o, cl)
+
+
+# ── SC-SEM-016  Lollipop: head count matches data ───────────────────────
+
+
+def test_lollipop_head_count():
+    """SC-SEM-016: lollipop head count matches data points."""
+    spec_path = ROOT / "charts" / "lollipop" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    heads = _lollipop_heads(svg)
+    n_points = sum(len(s.data) for s in spec.series)
+    assert len(heads) == n_points, f"heads {len(heads)} != data points {n_points}"
+
+
+def test_lollipop_constructed():
+    """SC-SEM-016: lollipop with constructed spec."""
+    d = {
+        "type": "lollipop",
+        "xAxis": {"categories": ["A", "B", "C"]},
+        "series": [{"name": "s", "data": [10, 20, 30]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    heads = _lollipop_heads(svg)
+    assert len(heads) == 3
+    stems = re.findall(r'class="sc-stem"', svg)
+    assert len(stems) == 3
+
+
+# ── SC-SEM-017  Funnel: slice count matches categories ──────────────────
+
+
+def test_funnel_slice_count():
+    """SC-SEM-017: funnel slice count matches categories."""
+    spec_path = ROOT / "charts" / "funnel" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    slices = _slices(svg)
+    n_cats = len(d["xAxis"]["categories"])
+    assert len(slices) == n_cats, f"slices {len(slices)} != categories {n_cats}"
+
+
+def test_funnel_constructed():
+    """SC-SEM-017: funnel with constructed spec."""
+    d = {
+        "type": "funnel",
+        "xAxis": {"categories": ["Leads", "Qualified", "Won"]},
+        "series": [{"name": "Pipeline", "data": [1000, 500, 200]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    slices = _slices(svg)
+    assert len(slices) == 3
+    values = [float(s["data-y"]) for s in slices]
+    assert values == [1000, 500, 200]
+
+
+# ── SC-SEM-018  Variwide: width-weight matches input ────────────────────
+
+
+def test_variwide_width_weight():
+    """SC-SEM-018: variwide data-z matches input widths."""
+    spec_path = ROOT / "charts" / "variwide" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _bars(svg)
+    widths = d["series"][0]["widths"]
+    assert len(bars) == len(widths), f"bars {len(bars)} != widths {len(widths)}"
+    for i, (bar, w) in enumerate(zip(bars, widths)):
+        assert float(bar["data-z"]) == w, f"bar {i}: data-z {bar['data-z']} != width {w}"
+
+
+def test_variwide_constructed():
+    """SC-SEM-018: variwide with constructed spec."""
+    d = {
+        "type": "variwide",
+        "xAxis": {"categories": ["X", "Y", "Z"]},
+        "series": [{"name": "s", "data": [30, 50, 20], "widths": [100, 200, 150]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _bars(svg)
+    assert len(bars) == 3
+    for bar, exp_z in zip(bars, [100, 200, 150]):
+        assert float(bar["data-z"]) == exp_z
+
+
+# ── SC-SEM-019  Timeline: event count matches data ──────────────────────
+
+
+def test_timeline_event_count():
+    """SC-SEM-019: timeline event markers match data points."""
+    spec_path = ROOT / "charts" / "timeline" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    events = _events(svg)
+    n_points = sum(len(s.data) for s in spec.series)
+    assert len(events) == n_points, f"events {len(events)} != data points {n_points}"
+
+
+def test_timeline_constructed():
+    """SC-SEM-019: timeline with constructed spec."""
+    d = {
+        "type": "timeline",
+        "xAxis": {"type": "datetime"},
+        "series": [
+            {
+                "name": "Events",
+                "data": [1609459200000, 1612137600000, 1614556800000],
+                "labels": ["Jan", "Feb", "Mar"],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    events = _events(svg)
+    assert len(events) == 3
+    labels = re.findall(r'class="sc-label"', svg)
+    assert len(labels) == 3
+
+
+# ── SC-SEM-020  Windbarb: speed/direction match input ───────────────────
+
+
+def test_windbarb_data_attributes():
+    """SC-SEM-020: windbarb data-speed and data-direction match input."""
+    spec_path = ROOT / "charts" / "windbarb" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    barbs = _barbs(svg)
+    speeds = d["series"][0]["data"]
+    dirs = d["series"][0]["direction"]
+    assert len(barbs) == len(speeds), f"barbs {len(barbs)} != data {len(speeds)}"
+    for i, (b, spd, dr) in enumerate(zip(barbs, speeds, dirs)):
+        assert float(b["data-speed"]) == spd, f"barb {i}: speed mismatch"
+        assert float(b["data-direction"]) == dr, f"barb {i}: direction mismatch"
+
+
+def test_windbarb_constructed():
+    """SC-SEM-020: windbarb with constructed spec."""
+    d = {
+        "type": "windbarb",
+        "xAxis": {"categories": ["00Z", "06Z", "12Z"]},
+        "series": [
+            {
+                "name": "Wind",
+                "data": [15, 25, 5],
+                "direction": [180, 270, 90],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    barbs = _barbs(svg)
+    assert len(barbs) == 3
+    assert float(barbs[0]["data-speed"]) == 15
+    assert float(barbs[1]["data-direction"]) == 270
+
+
+# ── SC-SEM-021  Streamgraph: point count per series matches data ────────
+
+
+def test_streamgraph_point_count():
+    """SC-SEM-021: streamgraph point count matches total data length."""
+    spec_path = ROOT / "charts" / "streamgraph" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _point_circles(svg)
+    total_data = sum(len(s.data) for s in spec.series)
+    assert len(points) == total_data, f"points {len(points)} != data {total_data}"
+
+
+def test_streamgraph_constructed():
+    """SC-SEM-021: streamgraph with constructed spec."""
+    d = {
+        "type": "streamgraph",
+        "offset": "wiggle",
+        "xAxis": {"categories": ["Q1", "Q2", "Q3"]},
+        "series": [
+            {"name": "A", "data": [10, 20, 30]},
+            {"name": "B", "data": [20, 15, 25]},
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _point_circles(svg)
+    assert len(points) == 6
+
+
+# ── SC-SEM-022  Vector-plot: direction/length match input ───────────────
+
+
+def test_vector_plot_attributes():
+    """SC-SEM-022: vector-plot data-direction and data-length match input."""
+    spec_path = ROOT / "charts" / "vector-plot" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    vectors = _vectors(svg)
+    dirs = d["series"][0]["direction"]
+    lengths = d["series"][0]["length"]
+    assert len(vectors) == len(dirs), f"vectors {len(vectors)} != data {len(dirs)}"
+    for i, (v, dr, ln) in enumerate(zip(vectors, dirs, lengths)):
+        assert float(v["data-direction"]) == dr, f"vector {i}: direction mismatch"
+        assert float(v["data-length"]) == ln, f"vector {i}: length mismatch"
+
+
+def test_vector_plot_constructed():
+    """SC-SEM-022: vector-plot with constructed spec."""
+    d = {
+        "type": "vector-plot",
+        "series": [
+            {
+                "name": "Flow",
+                "x": [0, 1, 2],
+                "data": [0, 1, 2],
+                "direction": [45, 90, 135],
+                "length": [1.0, 1.5, 2.0],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    vectors = _vectors(svg)
+    assert len(vectors) == 3
+    assert float(vectors[0]["data-direction"]) == 45
+    assert float(vectors[2]["data-length"]) == 2.0
+
+
+# ── SC-SEM-023  XRange: span start <= end ───────────────────────────────
+
+
+def test_xrange_span_bounds():
+    """SC-SEM-023: xrange data-start <= data-end for every span."""
+    spec_path = ROOT / "charts" / "xrange" / "examples" / "gantt.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    spans = _spans(svg)
+    assert len(spans) > 0, "no xrange spans found"
+    for i, s in enumerate(spans):
+        start, end = float(s["data-start"]), float(s["data-end"])
+        assert start <= end, f"span {i}: start {start} > end {end}"
+
+
+def test_xrange_constructed():
+    """SC-SEM-023: xrange with constructed spec."""
+    d = {
+        "type": "xrange",
+        "xAxis": {"type": "datetime"},
+        "yAxis": {"categories": ["Track A", "Track B"]},
+        "series": [
+            {
+                "name": "Schedule",
+                "data": [],
+                "spans": [
+                    {"x": 1609459200000, "x2": 1609545600000, "y": 0, "id": "s1", "name": "Step 1"},
+                    {"x": 1609545600000, "x2": 1609718400000, "y": 1, "id": "s2", "name": "Step 2"},
+                ],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    spans = _spans(svg)
+    assert len(spans) == 2
+    for s in spans:
+        assert float(s["data-start"]) <= float(s["data-end"])
+
+
+# ── SC-SEM-024  Technical-indicators: overlay series present ────────────
+
+
+def test_technical_indicators_overlay():
+    """SC-SEM-024: indicator overlays present with data-indicator attribute."""
+    spec_path = ROOT / "charts" / "technical-indicators" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    indicators = re.findall(r'data-indicator="(\w+)"', svg)
+    expected = set()
+    for s in d["series"]:
+        for ind in s.get("indicators", []):
+            expected.add(ind["type"])
+    assert set(indicators) == expected, f"indicators {set(indicators)} != expected {expected}"
+
+
+def test_technical_indicators_constructed():
+    """SC-SEM-024: technical-indicators with constructed spec."""
+    d = {
+        "type": "technical-indicators",
+        "xAxis": {"categories": [str(i) for i in range(10)]},
+        "series": [
+            {
+                "name": "Price",
+                "data": [10, 12, 11, 13, 14, 12, 15, 16, 14, 17],
+                "indicators": [{"type": "sma", "period": 3}],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    indicators = re.findall(r'data-indicator="(\w+)"', svg)
+    assert "sma" in indicators
+
+
+# ── SC-SEM-025  Flame-chart: frame structure ────────────────────────────
+
+
+def test_flame_chart_frame_bounds():
+    """SC-SEM-025: flame-chart data-start <= data-end, depth >= 0."""
+    spec_path = ROOT / "charts" / "flame-chart" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    frames = _frames(svg)
+    assert len(frames) > 0, "no flame-chart frames found"
+    for i, f in enumerate(frames):
+        start, end = float(f["data-start"]), float(f["data-end"])
+        depth = int(f["data-depth"])
+        assert start <= end, f"frame {i}: start {start} > end {end}"
+        assert depth >= 0, f"frame {i}: depth {depth} < 0"
+
+
+def test_flame_chart_constructed():
+    """SC-SEM-025: flame-chart with constructed spec."""
+    d = {
+        "type": "flame-chart",
+        "series": [
+            {
+                "name": "Profile",
+                "data": [],
+                "frames": [
+                    {"x": 0, "x2": 100, "depth": 0, "name": "main"},
+                    {"x": 10, "x2": 60, "depth": 1, "name": "foo"},
+                    {"x": 60, "x2": 90, "depth": 1, "name": "bar"},
+                ],
+            }
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    frames = _frames(svg)
+    assert len(frames) == 3
+    for f in frames:
+        assert float(f["data-start"]) <= float(f["data-end"])
+        assert int(f["data-depth"]) >= 0
+
+
+# ── SC-SEM-026  Pie: percentage sum ≈ 100 ──────────────────────────────
+
+
+def test_pie_percentage_sum():
+    """SC-SEM-026: pie slice percentages sum to approximately 100."""
+    spec_path = ROOT / "charts" / "pie" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    slices = _slices(svg)
+    assert len(slices) > 0, "no pie slices found"
+    total_pct = sum(float(s["data-percentage"].rstrip("%")) for s in slices)
+    assert abs(total_pct - 100.0) < 0.5, f"percentages sum to {total_pct}, expected ~100"
+
+
+def test_pie_slice_count():
+    """SC-SEM-026: pie slice count matches non-zero categories."""
+    d = {
+        "type": "pie",
+        "xAxis": {"categories": ["A", "B", "C", "D"]},
+        "series": [{"name": "s", "data": [40, 30, 30, 0]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    slices = _slices(svg)
+    assert len(slices) == 3, f"expected 3 slices (zero skipped), got {len(slices)}"
+    total_pct = sum(float(s["data-percentage"].rstrip("%")) for s in slices)
+    assert abs(total_pct - 100.0) < 0.5
+
+
+# ── SC-SEM-027  Gauge: pointer value within range ──────────────────────
+
+
+def test_gauge_pointer_bounds():
+    """SC-SEM-027: gauge pointer data-y within [gaugeMin, gaugeMax]."""
+    spec_path = ROOT / "charts" / "gauge" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    pointers = _pointers(svg)
+    assert len(pointers) > 0, "no gauge pointers found"
+    g_min, g_max = d["gaugeMin"], d["gaugeMax"]
+    for i, p in enumerate(pointers):
+        val = float(p["data-y"])
+        assert g_min <= val <= g_max, f"pointer {i}: {val} not in [{g_min}, {g_max}]"
+
+
+def test_gauge_constructed():
+    """SC-SEM-027: gauge with constructed spec."""
+    d = {
+        "type": "gauge",
+        "gaugeMin": 0,
+        "gaugeMax": 100,
+        "gaugeBands": [{"from": 0, "to": 50, "color": "#55BF3B"}, {"from": 50, "to": 100, "color": "#DF5353"}],
+        "series": [{"name": "Speed", "data": [72]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    pointers = _pointers(svg)
+    assert len(pointers) == 1
+    assert float(pointers[0]["data-y"]) == 72
+
+
+# ── SC-SEM-028  Solid-gauge: fill value within range ───────────────────
+
+
+def test_solid_gauge_fill_bounds():
+    """SC-SEM-028: solid-gauge fill data-y within [gaugeMin, gaugeMax]."""
+    spec_path = ROOT / "charts" / "solid-gauge" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    fills = _gauge_fills(svg)
+    assert len(fills) > 0, "no solid-gauge fills found"
+    g_min, g_max = d["gaugeMin"], d["gaugeMax"]
+    for i, f in enumerate(fills):
+        val = float(f["data-y"])
+        assert g_min <= val <= g_max, f"fill {i}: {val} not in [{g_min}, {g_max}]"
+
+
+def test_solid_gauge_constructed():
+    """SC-SEM-028: solid-gauge with constructed spec."""
+    d = {
+        "type": "solid-gauge",
+        "gaugeMin": 0,
+        "gaugeMax": 200,
+        "gaugeBands": [{"from": 0, "to": 100, "color": "#55BF3B"}],
+        "series": [{"name": "Progress", "data": [150]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    fills = _gauge_fills(svg)
+    assert len(fills) == 1
+    assert float(fills[0]["data-y"]) == 150
+
+
+# ── SC-SEM-029  Radar: dot count = categories x series ─────────────────
+
+
+def test_radar_dot_count():
+    """SC-SEM-029: radar dot count = categories x series."""
+    spec_path = ROOT / "charts" / "radar" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    dots = _radar_dots(svg)
+    n_cats = len(d["xAxis"]["categories"])
+    n_series = len(d["series"])
+    expected = n_cats * n_series
+    assert len(dots) == expected, f"dots {len(dots)} != {n_cats} x {n_series} = {expected}"
+
+
+def test_radar_constructed():
+    """SC-SEM-029: radar with constructed spec."""
+    d = {
+        "type": "radar",
+        "xAxis": {"categories": ["Speed", "Power", "Range", "Handling"]},
+        "series": [
+            {"name": "Car A", "data": [8, 7, 5, 9]},
+            {"name": "Car B", "data": [6, 9, 8, 5]},
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    dots = _radar_dots(svg)
+    assert len(dots) == 8, f"expected 4 x 2 = 8 dots, got {len(dots)}"
+
+
+# ── SC-SEM-030  Polar: dot count = categories x series ─────────────────
+
+
+def test_polar_dot_count():
+    """SC-SEM-030: polar dot count = categories x series."""
+    spec_path = ROOT / "charts" / "polar" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    dots = _polar_dots(svg)
+    n_cats = len(d["xAxis"]["categories"])
+    n_series = len(d["series"])
+    expected = n_cats * n_series
+    assert len(dots) == expected, f"dots {len(dots)} != {n_cats} x {n_series} = {expected}"
+
+
+def test_polar_constructed():
+    """SC-SEM-030: polar with constructed spec."""
+    d = {
+        "type": "polar",
+        "xAxis": {"categories": ["N", "E", "S", "W"]},
+        "series": [{"name": "Signal", "data": [5, 3, 4, 6]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    dots = _polar_dots(svg)
+    assert len(dots) == 4
+
+
+# ── SC-SEM-031  Wind-rose: sector count = categories x series ──────────
+
+
+def test_windrose_sector_count():
+    """SC-SEM-031: wind-rose sector count = categories x series."""
+    spec_path = ROOT / "charts" / "wind-rose" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    sectors = _windrose_sectors(svg)
+    n_cats = len(d["xAxis"]["categories"])
+    n_series = len(d["series"])
+    expected = n_cats * n_series
+    assert len(sectors) == expected, f"sectors {len(sectors)} != {n_cats} x {n_series} = {expected}"
+
+
+def test_windrose_constructed():
+    """SC-SEM-031: wind-rose with constructed spec."""
+    d = {
+        "type": "wind-rose",
+        "xAxis": {"categories": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]},
+        "series": [
+            {"name": "0-5 kt", "data": [5, 3, 4, 2, 6, 4, 3, 5]},
+            {"name": "5-10 kt", "data": [3, 2, 3, 1, 4, 3, 2, 3]},
+        ],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    sectors = _windrose_sectors(svg)
+    assert len(sectors) == 16, f"expected 8 x 2 = 16, got {len(sectors)}"
+
+
+# ── SC-SEM-032  Nightingale: sector count = categories x series ────────
+
+
+def test_nightingale_sector_count():
+    """SC-SEM-032: nightingale sector count = categories x series."""
+    spec_path = ROOT / "charts" / "nightingale" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    sectors = _nightingale_sectors(svg)
+    n_cats = len(d["xAxis"]["categories"])
+    n_series = len(d["series"])
+    expected = n_cats * n_series
+    assert len(sectors) == expected, f"sectors {len(sectors)} != {n_cats} x {n_series} = {expected}"
+
+
+def test_nightingale_constructed():
+    """SC-SEM-032: nightingale with constructed spec."""
+    d = {
+        "type": "nightingale",
+        "xAxis": {"categories": ["Jan", "Feb", "Mar", "Apr"]},
+        "series": [{"name": "Cases", "data": [10, 20, 15, 25]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    sectors = _nightingale_sectors(svg)
+    assert len(sectors) == 4
+
+
+# ── SC-SEM-033  Radial-bar: bar count = categories x series ────────────
+
+
+def test_radialbar_bar_count():
+    """SC-SEM-033: radial-bar bar count = categories x series."""
+    spec_path = ROOT / "charts" / "radial-bar" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _radialbar_bars(svg)
+    n_cats = len(d["xAxis"]["categories"])
+    n_series = len(d["series"])
+    expected = n_cats * n_series
+    assert len(bars) == expected, f"bars {len(bars)} != {n_cats} x {n_series} = {expected}"
+
+
+def test_radialbar_constructed():
+    """SC-SEM-033: radial-bar with constructed spec."""
+    d = {
+        "type": "radial-bar",
+        "xAxis": {"categories": ["A", "B", "C"]},
+        "yAxis": {"max": 100},
+        "series": [{"name": "Score", "data": [85, 60, 75]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _radialbar_bars(svg)
+    assert len(bars) == 3
+
+
+# ── SC-SEM-034  Parliament: dot count = sum(seat counts) ───────────────
+
+
+def test_parliament_dot_count():
+    """SC-SEM-034: parliament total dots = sum of all seat counts."""
+    spec_path = ROOT / "charts" / "parliament" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    dots = _parliament_dots(svg)
+    total_seats = sum(d["series"][0]["data"])
+    assert len(dots) == total_seats, f"dots {len(dots)} != seats {total_seats}"
+
+
+def test_parliament_constructed():
+    """SC-SEM-034: parliament with constructed spec."""
+    d = {
+        "type": "parliament",
+        "xAxis": {"categories": ["Party A", "Party B", "Party C"]},
+        "series": [{"name": "Seats", "data": [10, 8, 5]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    dots = _parliament_dots(svg)
+    assert len(dots) == 23, f"expected 10+8+5=23 dots, got {len(dots)}"
 
 
 # ── DT-SEM-001  Every rendered data cell maps to exactly one supplied value ──

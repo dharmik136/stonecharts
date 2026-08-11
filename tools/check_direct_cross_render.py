@@ -69,6 +69,15 @@ ACTIVE = {
     "wind-rose": ["basic", "many-directions", "single-series", "themed-dark", "adversarial"],
     "technical-indicators": ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"],
     "xrange": ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"],
+    "development-triangle": [
+        "basic",
+        "diagonal",
+        "factors",
+        "annotated",
+        "themed-dark",
+        "rectangular-3x5",
+        "rectangular-6x4",
+    ],
 }
 
 

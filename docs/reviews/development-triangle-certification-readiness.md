@@ -21,7 +21,7 @@ Since:           unreleased
 | Gate | Name | Status | Evidence |
 |------|------|--------|----------|
 | SC-CERT-01 | Schema strictness | PASS | `chart-spec.schema.json` validates triangle, factors, annotations; integer periods with `uniqueItems: true` |
-| SC-CERT-02 | Cross-language byte parity | PASS | 5 golden SVGs byte-identical Python/Go; `TestGolden` and `test_development_triangle_goldens` pass |
+| SC-CERT-02 | Cross-language byte parity | PASS | 7 golden SVGs byte-identical Python/Go; `TestGolden` and `test_development_triangle_goldens` pass |
 | SC-CERT-03 | Renderer purity | PASS | `test_renderer_purity.py` covers all dev-triangle fixtures; `TestRendererPurity` in Go covers same |
 | SC-CERT-04 | Property/fuzz coverage | PASS | 8 randomized Python cases in `test_property_rendering.py`; 8 Go cases in `TestRandomizedAll36Types`; 7 Go fuzz seeds in `FuzzFromJSON` |
 | SC-CERT-05 | Adversarial inputs | PASS | 22 invalid fixtures covering: missing/malformed triangle, boolean/fractional/duplicate/non-increasing periods, boolean/NaN values, shape violations, factor cardinality, annotation targeting |

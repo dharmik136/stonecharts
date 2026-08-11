@@ -366,6 +366,17 @@ func TestXSSEscaping(t *testing.T) {
 			t.Errorf("raw <script> leaked into %s SVG", ct)
 		}
 	}
+	dtJSON := `{"type":"development-triangle","title":` + jsonStr(x) +
+		`,"triangle":{"origins":[` + jsonStr(x) + `,"2023","2024"],"periods":[12,24,36],` +
+		`"values":[[100,150,170],[110,160],[125]]},"annotations":[{"origin":` + jsonStr(x) +
+		`,"period":12,"text":` + jsonStr(x) + `}]}`
+	dtSpec, err := FromJSON([]byte(dtJSON))
+	if err != nil {
+		t.Fatalf("XSS development-triangle: parse error: %v", err)
+	}
+	if strings.Contains(mustSVG(t, dtSpec), "<script>alert(1)</script>") {
+		t.Error("raw <script> leaked into development-triangle SVG")
+	}
 }
 
 func jsonStr(s string) string {
@@ -1782,6 +1793,1303 @@ func TestSemanticInvariants(t *testing.T) {
 		q3 := byCat["Q3"]
 		if diff := q1 - q3; diff > 0.5 || diff < -0.5 {
 			t.Errorf("Q1 height %.1f != Q3 height %.1f", q1, q3)
+		}
+	})
+
+	// ── SC-SEM-011: Range family: data-low <= data-high ──
+
+	pointRe := regexp.MustCompile(`<(?:circle|rect)\s[^>]*class="[^"]*sc-point[^"]*"[^>]*/?>`)
+
+	extractRangePoints := func(svg string) []map[string]string {
+		matches := pointRe.FindAllString(svg, -1)
+		var out []map[string]string
+		for _, m := range matches {
+			attrs := map[string]string{}
+			for _, a := range attrRe.FindAllStringSubmatch(m, -1) {
+				attrs[a[1]] = a[2]
+			}
+			if _, hasLow := attrs["data-low"]; hasLow {
+				if _, hasHigh := attrs["data-high"]; hasHigh {
+					out = append(out, attrs)
+				}
+			}
+		}
+		return out
+	}
+
+	t.Run("SC-SEM-011/arearange-low-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/arearange/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no arearange points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > hi {
+				t.Errorf("point %d: low %.1f > high %.1f", i, lo, hi)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-011/columnrange-low-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/columnrange/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no columnrange points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > hi {
+				t.Errorf("bar %d: low %.1f > high %.1f", i, lo, hi)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-011/columnrange-bar-height-positive", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/columnrange/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo != hi {
+				h, _ := strconv.ParseFloat(p["height"], 64)
+				if h <= 0 {
+					t.Errorf("bar %d: low %.1f != high %.1f but height is %.1f", i, lo, hi, h)
+				}
+			}
+		}
+	})
+
+	t.Run("SC-SEM-011/dumbbell-low-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/dumbbell/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no dumbbell points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > hi {
+				t.Errorf("point %d: low %.1f > high %.1f", i, lo, hi)
+			}
+		}
+	})
+
+	connectorRe := regexp.MustCompile(`class="sc-connector"`)
+
+	t.Run("SC-SEM-011/dumbbell-connector-count", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/dumbbell/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		connectors := connectorRe.FindAllString(svg, -1)
+		nPoints := 0
+		for _, s := range spec.Series {
+			nPoints += len(s.Data)
+		}
+		if len(connectors) != nPoints {
+			t.Errorf("connectors %d != points %d", len(connectors), nPoints)
+		}
+	})
+
+	t.Run("SC-SEM-011/range-family-constructed", func(t *testing.T) {
+		types := []struct {
+			chartType string
+			raw       string
+		}{
+			{"arearange", `{"type":"arearange","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","data":[50,60,70],"low":[10,20,30]}]}`},
+			{"columnrange", `{"type":"columnrange","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","data":[10,20,30],"high":[50,60,70]}]}`},
+			{"dumbbell", `{"type":"dumbbell","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","data":[10,20,30],"high":[50,60,70]}]}`},
+		}
+		for _, tc := range types {
+			t.Run(tc.chartType, func(t *testing.T) {
+				spec, err := FromJSON([]byte(tc.raw))
+				if err != nil {
+					t.Fatalf("%s: parse: %v", tc.chartType, err)
+				}
+				svg := mustSVG(t, spec)
+				points := extractRangePoints(svg)
+				if len(points) != 3 {
+					t.Fatalf("%s: expected 3 points, got %d", tc.chartType, len(points))
+				}
+				for i, p := range points {
+					lo, _ := strconv.ParseFloat(p["data-low"], 64)
+					hi, _ := strconv.ParseFloat(p["data-high"], 64)
+					if lo > hi {
+						t.Errorf("%s point %d: low %.0f > high %.0f", tc.chartType, i, lo, hi)
+					}
+				}
+			})
+		}
+	})
+
+	// ── SC-SEM-012: Error-bar: low <= central value <= high ──
+
+	t.Run("SC-SEM-012/error-bar-low-le-value-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/error-bar/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no error-bar points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			y, _ := strconv.ParseFloat(p["data-y"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > y || y > hi {
+				t.Errorf("point %d: low %.1f <= y %.1f <= high %.1f violated", i, lo, y, hi)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-012/error-bar-constructed", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "error-bar",
+			"xAxis": {"categories": ["A", "B", "C"]},
+			"series": [{"name": "test", "data": [50, 100, 75], "low": [30, 80, 60], "high": [70, 120, 90]}]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) != 3 {
+			t.Fatalf("expected 3 points, got %d", len(points))
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			y, _ := strconv.ParseFloat(p["data-y"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > y || y > hi {
+				t.Errorf("point %d: %.1f <= %.1f <= %.1f violated", i, lo, y, hi)
+			}
+		}
+	})
+
+	// ── SC-SEM-013: Boxplot structural integrity ──
+
+	boxRe := regexp.MustCompile(`<rect\s[^>]*class="sc-box sc-point"[^>]*/>`)
+	whiskerCapRe := regexp.MustCompile(`class="sc-whisker-cap"`)
+
+	t.Run("SC-SEM-013/boxplot-median-matches-input", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/boxplot/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		series0 := raw["series"].([]interface{})[0].(map[string]interface{})
+		boxData := series0["boxData"].([]interface{})
+		if len(boxes) != len(boxData) {
+			t.Fatalf("boxes %d != boxData %d", len(boxes), len(boxData))
+		}
+		for i, box := range boxes {
+			actual, _ := strconv.ParseFloat(box["data-y"], 64)
+			expected := boxData[i].(map[string]interface{})["median"].(float64)
+			if actual != expected {
+				t.Errorf("box %d: data-y %.1f != median %.1f", i, actual, expected)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-013/boxplot-box-height-positive", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/boxplot/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		for i, box := range boxes {
+			h, _ := strconv.ParseFloat(box["height"], 64)
+			if h <= 0 {
+				t.Errorf("box %d: height is %.1f, expected > 0", i, h)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-013/boxplot-whisker-cap-count", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/boxplot/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		caps := whiskerCapRe.FindAllString(svg, -1)
+		if len(caps) != 2*len(boxes) {
+			t.Errorf("caps %d != 2 * boxes %d", len(caps), len(boxes))
+		}
+	})
+
+	t.Run("SC-SEM-013/boxplot-constructed", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "boxplot",
+			"xAxis": {"categories": ["X", "Y"]},
+			"series": [{"name": "test", "data": [50, 100], "boxData": [
+				{"low": 10, "q1": 30, "median": 50, "q3": 70, "high": 90},
+				{"low": 60, "q1": 80, "median": 100, "q3": 120, "high": 140}
+			]}]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		if len(boxes) != 2 {
+			t.Fatalf("expected 2 boxes, got %d", len(boxes))
+		}
+		v0, _ := strconv.ParseFloat(boxes[0]["data-y"], 64)
+		v1, _ := strconv.ParseFloat(boxes[1]["data-y"], 64)
+		if v0 != 50 {
+			t.Errorf("box 0: data-y %.1f != 50", v0)
+		}
+		if v1 != 100 {
+			t.Errorf("box 1: data-y %.1f != 100", v1)
+		}
+		caps := whiskerCapRe.FindAllString(svg, -1)
+		if len(caps) != 4 {
+			t.Errorf("expected 4 caps, got %d", len(caps))
+		}
+	})
+
+	// ── SC-SEM-014: Bullet structural completeness ──
+
+	rangeRe := regexp.MustCompile(`class="sc-range"`)
+	targetRe := regexp.MustCompile(`class="sc-target"`)
+
+	t.Run("SC-SEM-014/bullet-measure-matches-input", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bullet/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+		if len(bars) != len(spec.Series[0].Data) {
+			t.Fatalf("bars %d != data %d", len(bars), len(spec.Series[0].Data))
+		}
+		for i, bar := range bars {
+			actual, _ := strconv.ParseFloat(bar["data-y"], 64)
+			if actual != spec.Series[0].Data[i] {
+				t.Errorf("bar %d: data-y %.1f != data %.1f", i, actual, spec.Series[0].Data[i])
+			}
+		}
+	})
+
+	t.Run("SC-SEM-014/bullet-range-count", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bullet/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ranges := rangeRe.FindAllString(svg, -1)
+		nRanges := len(raw["bulletRanges"].([]interface{}))
+		nCats := len(raw["xAxis"].(map[string]interface{})["categories"].([]interface{}))
+		expected := nRanges * nCats
+		if len(ranges) != expected {
+			t.Errorf("ranges %d != %d (%d * %d)", len(ranges), expected, nRanges, nCats)
+		}
+	})
+
+	t.Run("SC-SEM-014/bullet-target-present", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bullet/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		targets := targetRe.FindAllString(svg, -1)
+		if len(targets) != 1 {
+			t.Errorf("expected 1 target, got %d", len(targets))
+		}
+	})
+
+	t.Run("SC-SEM-014/bullet-constructed", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "bullet",
+			"xAxis": {"categories": ["KPI-A", "KPI-B"]},
+			"series": [{"name": "measure", "data": [75, 120]}],
+			"bulletTarget": 100,
+			"bulletRanges": [50, 100, 150]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+		if len(bars) != 2 {
+			t.Fatalf("expected 2 bars, got %d", len(bars))
+		}
+		v0, _ := strconv.ParseFloat(bars[0]["data-y"], 64)
+		v1, _ := strconv.ParseFloat(bars[1]["data-y"], 64)
+		if v0 != 75 {
+			t.Errorf("bar 0: data-y %.1f != 75", v0)
+		}
+		if v1 != 120 {
+			t.Errorf("bar 1: data-y %.1f != 120", v1)
+		}
+		ranges := rangeRe.FindAllString(svg, -1)
+		if len(ranges) != 6 {
+			t.Errorf("expected 6 ranges (3 * 2 categories), got %d", len(ranges))
+		}
+		targets := targetRe.FindAllString(svg, -1)
+		if len(targets) != 2 {
+			t.Errorf("expected 2 targets (1 * 2 categories), got %d", len(targets))
+		}
+	})
+
+	// ── Helpers for experimental chart type tests ──
+
+	renderFile := func(t *testing.T, path string) string {
+		t.Helper()
+		specBytes, err := os.ReadFile(root + path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return svg
+	}
+
+	renderRaw := func(t *testing.T, raw string) string {
+		t.Helper()
+		spec, err := FromJSON([]byte(raw))
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return svg
+	}
+
+	candleRe := regexp.MustCompile(`<g\s[^>]*class="sc-candle sc-point"[^>]*>`)
+	sliceRe := regexp.MustCompile(`<(?:path|polygon)\s[^>]*class="sc-slice sc-point"[^>]*/?>`)
+	lollipopHeadRe := regexp.MustCompile(`<circle\s[^>]*class="[^"]*sc-lollipop-head[^"]*"[^>]*/?>`)
+	eventRe := regexp.MustCompile(`<circle\s[^>]*class="sc-event sc-point"[^>]*/?>`)
+	barbRe := regexp.MustCompile(`<g\s[^>]*class="sc-barb sc-point"[^>]*>`)
+	vectorRe := regexp.MustCompile(`<path\s[^>]*class="sc-vector sc-point"[^>]*/?>`)
+	spanRe := regexp.MustCompile(`<rect\s[^>]*class="sc-span sc-point"[^>]*/>`)
+	frameRe := regexp.MustCompile(`<rect\s[^>]*class="sc-frame sc-point"[^>]*/>`)
+	pointerRe := regexp.MustCompile(`<path\s[^>]*class="sc-pointer sc-point"[^>]*/?>`)
+	gaugeFillRe := regexp.MustCompile(`<path\s[^>]*class="sc-gauge-fill sc-point"[^>]*/?>`)
+	radarDotRe := regexp.MustCompile(`<circle\s[^>]*class="sc-radar-dot sc-point"[^>]*/?>`)
+	polarDotRe := regexp.MustCompile(`<circle\s[^>]*class="sc-polar-dot sc-point"[^>]*/?>`)
+	windroseSectorRe := regexp.MustCompile(`<path\s[^>]*class="sc-windrose-sector sc-point"[^>]*/?>`)
+	nightingaleSectorRe := regexp.MustCompile(`<path\s[^>]*class="sc-nightingale-sector sc-point"[^>]*/?>`)
+	radialbarBarRe := regexp.MustCompile(`<path\s[^>]*class="sc-radialbar-bar sc-point"[^>]*/?>`)
+	parliamentDotRe := regexp.MustCompile(`<circle\s[^>]*class="sc-parliament-dot sc-point"[^>]*/?>`)
+	pointCircleRe := regexp.MustCompile(`<circle\s[^>]*class="[^"]*sc-point[^"]*"[^>]*/?>`)
+	stemRe := regexp.MustCompile(`class="sc-stem"`)
+	labelRe := regexp.MustCompile(`class="sc-label"`)
+	indicatorAttrRe := regexp.MustCompile(`data-indicator="(\w+)"`)
+
+	// ── SC-SEM-015: Candlestick OHLC bounds ──
+
+	t.Run("SC-SEM-015/candlestick-ohlc-bounds", func(t *testing.T) {
+		svg := renderFile(t, "charts/candlestick/examples/basic.json")
+		candles := extractAttrs(candleRe, svg)
+		if len(candles) == 0 {
+			t.Fatal("no candles found")
+		}
+		for i, c := range candles {
+			o, _ := strconv.ParseFloat(c["data-open"], 64)
+			h, _ := strconv.ParseFloat(c["data-high"], 64)
+			l, _ := strconv.ParseFloat(c["data-low"], 64)
+			cl, _ := strconv.ParseFloat(c["data-close"], 64)
+			if h < o || h < cl {
+				t.Errorf("candle %d: high %.1f < max(open %.1f, close %.1f)", i, h, o, cl)
+			}
+			if l > o || l > cl {
+				t.Errorf("candle %d: low %.1f > min(open %.1f, close %.1f)", i, l, o, cl)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-015/candlestick-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "candlestick", "subtype": "candlestick",
+			"xAxis": {"categories": ["Mon", "Tue"]},
+			"series": [{"name": "S", "data": [105, 95], "ohlc": [
+				{"open": 100, "high": 110, "low": 90, "close": 105},
+				{"open": 105, "high": 108, "low": 88, "close": 95}
+			]}]
+		}`)
+		candles := extractAttrs(candleRe, svg)
+		if len(candles) != 2 {
+			t.Fatalf("expected 2 candles, got %d", len(candles))
+		}
+		for i, c := range candles {
+			o, _ := strconv.ParseFloat(c["data-open"], 64)
+			h, _ := strconv.ParseFloat(c["data-high"], 64)
+			l, _ := strconv.ParseFloat(c["data-low"], 64)
+			cl, _ := strconv.ParseFloat(c["data-close"], 64)
+			if h < o || h < cl || l > o || l > cl {
+				t.Errorf("candle %d: OHLC bounds violated", i)
+			}
+		}
+	})
+
+	// ── SC-SEM-016: Lollipop head count ──
+
+	t.Run("SC-SEM-016/lollipop-head-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/lollipop/examples/basic.json")
+		heads := lollipopHeadRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/lollipop/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
+		nPoints := 0
+		for _, s := range spec.Series {
+			nPoints += len(s.Data)
+		}
+		if len(heads) != nPoints {
+			t.Errorf("heads %d != data points %d", len(heads), nPoints)
+		}
+	})
+
+	t.Run("SC-SEM-016/lollipop-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "lollipop",
+			"xAxis": {"categories": ["A", "B", "C"]},
+			"series": [{"name": "s", "data": [10, 20, 30]}]
+		}`)
+		heads := lollipopHeadRe.FindAllString(svg, -1)
+		if len(heads) != 3 {
+			t.Errorf("expected 3 heads, got %d", len(heads))
+		}
+		stems := stemRe.FindAllString(svg, -1)
+		if len(stems) != 3 {
+			t.Errorf("expected 3 stems, got %d", len(stems))
+		}
+	})
+
+	// ── SC-SEM-017: Funnel slice count ──
+
+	t.Run("SC-SEM-017/funnel-slice-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/funnel/examples/basic.json")
+		slices := extractAttrs(sliceRe, svg)
+		specBytes, err := os.ReadFile(root + "charts/funnel/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		cats := raw["xAxis"].(map[string]interface{})["categories"].([]interface{})
+		if len(slices) != len(cats) {
+			t.Errorf("slices %d != categories %d", len(slices), len(cats))
+		}
+	})
+
+	t.Run("SC-SEM-017/funnel-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "funnel",
+			"xAxis": {"categories": ["Leads", "Qualified", "Won"]},
+			"series": [{"name": "Pipeline", "data": [1000, 500, 200]}]
+		}`)
+		slices := extractAttrs(sliceRe, svg)
+		if len(slices) != 3 {
+			t.Fatalf("expected 3 slices, got %d", len(slices))
+		}
+		for i, expected := range []float64{1000, 500, 200} {
+			v, _ := strconv.ParseFloat(slices[i]["data-y"], 64)
+			if v != expected {
+				t.Errorf("slice %d: data-y %.0f != %.0f", i, v, expected)
+			}
+		}
+	})
+
+	// ── SC-SEM-018: Variwide width-weight ──
+
+	t.Run("SC-SEM-018/variwide-width-weight", func(t *testing.T) {
+		svg := renderFile(t, "charts/variwide/examples/basic.json")
+		bars := extractAttrs(barRe, svg)
+		specBytes, err := os.ReadFile(root + "charts/variwide/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		series := raw["series"].([]interface{})[0].(map[string]interface{})
+		widths := series["widths"].([]interface{})
+		if len(bars) != len(widths) {
+			t.Fatalf("bars %d != widths %d", len(bars), len(widths))
+		}
+		for i, b := range bars {
+			z, _ := strconv.ParseFloat(b["data-z"], 64)
+			expected := widths[i].(float64)
+			if z != expected {
+				t.Errorf("bar %d: data-z %.0f != %.0f", i, z, expected)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-018/variwide-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "variwide",
+			"xAxis": {"categories": ["X", "Y", "Z"]},
+			"series": [{"name": "s", "data": [30, 50, 20], "widths": [100, 200, 150]}]
+		}`)
+		bars := extractAttrs(barRe, svg)
+		if len(bars) != 3 {
+			t.Fatalf("expected 3 bars, got %d", len(bars))
+		}
+		for i, exp := range []float64{100, 200, 150} {
+			z, _ := strconv.ParseFloat(bars[i]["data-z"], 64)
+			if z != exp {
+				t.Errorf("bar %d: data-z %.0f != %.0f", i, z, exp)
+			}
+		}
+	})
+
+	// ── SC-SEM-019: Timeline event count ──
+
+	t.Run("SC-SEM-019/timeline-event-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/timeline/examples/basic.json")
+		events := eventRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/timeline/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
+		nPoints := 0
+		for _, s := range spec.Series {
+			nPoints += len(s.Data)
+		}
+		if len(events) != nPoints {
+			t.Errorf("events %d != data points %d", len(events), nPoints)
+		}
+	})
+
+	t.Run("SC-SEM-019/timeline-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "timeline",
+			"xAxis": {"type": "datetime"},
+			"series": [{"name": "E", "data": [1609459200000, 1612137600000, 1614556800000],
+				"labels": ["Jan", "Feb", "Mar"]}]
+		}`)
+		events := eventRe.FindAllString(svg, -1)
+		if len(events) != 3 {
+			t.Errorf("expected 3 events, got %d", len(events))
+		}
+		labels := labelRe.FindAllString(svg, -1)
+		if len(labels) != 3 {
+			t.Errorf("expected 3 labels, got %d", len(labels))
+		}
+	})
+
+	// ── SC-SEM-020: Windbarb speed/direction ──
+
+	t.Run("SC-SEM-020/windbarb-data-attributes", func(t *testing.T) {
+		svg := renderFile(t, "charts/windbarb/examples/basic.json")
+		barbs := extractAttrs(barbRe, svg)
+		specBytes, err := os.ReadFile(root + "charts/windbarb/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		series := raw["series"].([]interface{})[0].(map[string]interface{})
+		speeds := series["data"].([]interface{})
+		dirs := series["direction"].([]interface{})
+		if len(barbs) != len(speeds) {
+			t.Fatalf("barbs %d != data %d", len(barbs), len(speeds))
+		}
+		for i, b := range barbs {
+			spd, _ := strconv.ParseFloat(b["data-speed"], 64)
+			dir, _ := strconv.ParseFloat(b["data-direction"], 64)
+			if spd != speeds[i].(float64) {
+				t.Errorf("barb %d: speed mismatch", i)
+			}
+			if dir != dirs[i].(float64) {
+				t.Errorf("barb %d: direction mismatch", i)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-020/windbarb-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "windbarb",
+			"xAxis": {"categories": ["00Z", "06Z", "12Z"]},
+			"series": [{"name": "W", "data": [15, 25, 5], "direction": [180, 270, 90]}]
+		}`)
+		barbs := extractAttrs(barbRe, svg)
+		if len(barbs) != 3 {
+			t.Fatalf("expected 3 barbs, got %d", len(barbs))
+		}
+		spd0, _ := strconv.ParseFloat(barbs[0]["data-speed"], 64)
+		if spd0 != 15 {
+			t.Errorf("barb 0: speed %.0f != 15", spd0)
+		}
+		dir1, _ := strconv.ParseFloat(barbs[1]["data-direction"], 64)
+		if dir1 != 270 {
+			t.Errorf("barb 1: direction %.0f != 270", dir1)
+		}
+	})
+
+	// ── SC-SEM-021: Streamgraph point count ──
+
+	t.Run("SC-SEM-021/streamgraph-point-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/streamgraph/examples/basic.json")
+		points := pointCircleRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/streamgraph/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
+		total := 0
+		for _, s := range spec.Series {
+			total += len(s.Data)
+		}
+		if len(points) != total {
+			t.Errorf("points %d != data %d", len(points), total)
+		}
+	})
+
+	t.Run("SC-SEM-021/streamgraph-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "streamgraph", "offset": "wiggle",
+			"xAxis": {"categories": ["Q1", "Q2", "Q3"]},
+			"series": [{"name": "A", "data": [10, 20, 30]}, {"name": "B", "data": [20, 15, 25]}]
+		}`)
+		points := pointCircleRe.FindAllString(svg, -1)
+		if len(points) != 6 {
+			t.Errorf("expected 6 points, got %d", len(points))
+		}
+	})
+
+	// ── SC-SEM-022: Vector-plot direction/length ──
+
+	t.Run("SC-SEM-022/vector-plot-attributes", func(t *testing.T) {
+		svg := renderFile(t, "charts/vector-plot/examples/basic.json")
+		vectors := extractAttrs(vectorRe, svg)
+		specBytes, err := os.ReadFile(root + "charts/vector-plot/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		series := raw["series"].([]interface{})[0].(map[string]interface{})
+		dirs := series["direction"].([]interface{})
+		lengths := series["length"].([]interface{})
+		if len(vectors) != len(dirs) {
+			t.Fatalf("vectors %d != data %d", len(vectors), len(dirs))
+		}
+		for i, v := range vectors {
+			d, _ := strconv.ParseFloat(v["data-direction"], 64)
+			l, _ := strconv.ParseFloat(v["data-length"], 64)
+			if d != dirs[i].(float64) {
+				t.Errorf("vector %d: direction mismatch", i)
+			}
+			if l != lengths[i].(float64) {
+				t.Errorf("vector %d: length mismatch", i)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-022/vector-plot-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "vector-plot",
+			"series": [{"name": "F", "x": [0, 1, 2], "data": [0, 1, 2],
+				"direction": [45, 90, 135], "length": [1.0, 1.5, 2.0]}]
+		}`)
+		vectors := extractAttrs(vectorRe, svg)
+		if len(vectors) != 3 {
+			t.Fatalf("expected 3 vectors, got %d", len(vectors))
+		}
+		d0, _ := strconv.ParseFloat(vectors[0]["data-direction"], 64)
+		if d0 != 45 {
+			t.Errorf("vector 0: direction %.0f != 45", d0)
+		}
+	})
+
+	// ── SC-SEM-023: XRange span bounds ──
+
+	t.Run("SC-SEM-023/xrange-span-bounds", func(t *testing.T) {
+		svg := renderFile(t, "charts/xrange/examples/gantt.json")
+		spans := extractAttrs(spanRe, svg)
+		if len(spans) == 0 {
+			t.Fatal("no xrange spans found")
+		}
+		for i, s := range spans {
+			start, _ := strconv.ParseFloat(s["data-start"], 64)
+			end, _ := strconv.ParseFloat(s["data-end"], 64)
+			if start > end {
+				t.Errorf("span %d: start %.0f > end %.0f", i, start, end)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-023/xrange-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "xrange",
+			"xAxis": {"type": "datetime"},
+			"yAxis": {"categories": ["Track A", "Track B"]},
+			"series": [{"name": "S", "data": [], "spans": [
+				{"x": 1609459200000, "x2": 1609545600000, "y": 0, "id": "s1", "name": "Step 1"},
+				{"x": 1609545600000, "x2": 1609718400000, "y": 1, "id": "s2", "name": "Step 2"}
+			]}]
+		}`)
+		spans := extractAttrs(spanRe, svg)
+		if len(spans) != 2 {
+			t.Fatalf("expected 2 spans, got %d", len(spans))
+		}
+		for i, s := range spans {
+			start, _ := strconv.ParseFloat(s["data-start"], 64)
+			end, _ := strconv.ParseFloat(s["data-end"], 64)
+			if start > end {
+				t.Errorf("span %d: start > end", i)
+			}
+		}
+	})
+
+	// ── SC-SEM-024: Technical-indicators overlay ──
+
+	t.Run("SC-SEM-024/technical-indicators-overlay", func(t *testing.T) {
+		svg := renderFile(t, "charts/technical-indicators/examples/basic.json")
+		indicators := indicatorAttrRe.FindAllStringSubmatch(svg, -1)
+		found := map[string]bool{}
+		for _, m := range indicators {
+			found[m[1]] = true
+		}
+		specBytes, err := os.ReadFile(root + "charts/technical-indicators/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		for _, s := range raw["series"].([]interface{}) {
+			series := s.(map[string]interface{})
+			if inds, ok := series["indicators"]; ok {
+				for _, ind := range inds.([]interface{}) {
+					indType := ind.(map[string]interface{})["type"].(string)
+					if !found[indType] {
+						t.Errorf("expected indicator %q not found in SVG", indType)
+					}
+				}
+			}
+		}
+	})
+
+	t.Run("SC-SEM-024/technical-indicators-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "technical-indicators",
+			"xAxis": {"categories": ["0","1","2","3","4","5","6","7","8","9"]},
+			"series": [{"name": "P", "data": [10,12,11,13,14,12,15,16,14,17],
+				"indicators": [{"type": "sma", "period": 3}]}]
+		}`)
+		if !strings.Contains(svg, `data-indicator="sma"`) {
+			t.Error("sma indicator not found")
+		}
+	})
+
+	// ── SC-SEM-025: Flame-chart frame structure ──
+
+	t.Run("SC-SEM-025/flame-chart-frame-bounds", func(t *testing.T) {
+		svg := renderFile(t, "charts/flame-chart/examples/basic.json")
+		frames := extractAttrs(frameRe, svg)
+		if len(frames) == 0 {
+			t.Fatal("no flame-chart frames found")
+		}
+		for i, f := range frames {
+			start, _ := strconv.ParseFloat(f["data-start"], 64)
+			end, _ := strconv.ParseFloat(f["data-end"], 64)
+			depth, _ := strconv.Atoi(f["data-depth"])
+			if start > end {
+				t.Errorf("frame %d: start %.0f > end %.0f", i, start, end)
+			}
+			if depth < 0 {
+				t.Errorf("frame %d: depth %d < 0", i, depth)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-025/flame-chart-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "flame-chart",
+			"series": [{"name": "P", "data": [], "frames": [
+				{"x": 0, "x2": 100, "depth": 0, "name": "main"},
+				{"x": 10, "x2": 60, "depth": 1, "name": "foo"},
+				{"x": 60, "x2": 90, "depth": 1, "name": "bar"}
+			]}]
+		}`)
+		frames := extractAttrs(frameRe, svg)
+		if len(frames) != 3 {
+			t.Fatalf("expected 3 frames, got %d", len(frames))
+		}
+		for i, f := range frames {
+			start, _ := strconv.ParseFloat(f["data-start"], 64)
+			end, _ := strconv.ParseFloat(f["data-end"], 64)
+			if start > end {
+				t.Errorf("frame %d: start > end", i)
+			}
+		}
+	})
+
+	// ── SC-SEM-026: Pie percentage sum ──
+
+	t.Run("SC-SEM-026/pie-percentage-sum", func(t *testing.T) {
+		svg := renderFile(t, "charts/pie/examples/basic.json")
+		slices := extractAttrs(sliceRe, svg)
+		if len(slices) == 0 {
+			t.Fatal("no pie slices found")
+		}
+		total := 0.0
+		for _, s := range slices {
+			pctStr := strings.TrimSuffix(s["data-percentage"], "%")
+			pct, _ := strconv.ParseFloat(pctStr, 64)
+			total += pct
+		}
+		if total < 99.5 || total > 100.5 {
+			t.Errorf("percentages sum to %.1f, expected ~100", total)
+		}
+	})
+
+	t.Run("SC-SEM-026/pie-slice-count", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "pie",
+			"xAxis": {"categories": ["A", "B", "C", "D"]},
+			"series": [{"name": "s", "data": [40, 30, 30, 0]}]
+		}`)
+		slices := extractAttrs(sliceRe, svg)
+		if len(slices) != 3 {
+			t.Errorf("expected 3 slices (zero skipped), got %d", len(slices))
+		}
+	})
+
+	// ── SC-SEM-027: Gauge pointer bounds ──
+
+	t.Run("SC-SEM-027/gauge-pointer-bounds", func(t *testing.T) {
+		svg := renderFile(t, "charts/gauge/examples/basic.json")
+		pointers := extractAttrs(pointerRe, svg)
+		if len(pointers) == 0 {
+			t.Fatal("no gauge pointers found")
+		}
+		specBytes, err := os.ReadFile(root + "charts/gauge/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		gMin := raw["gaugeMin"].(float64)
+		gMax := raw["gaugeMax"].(float64)
+		for i, p := range pointers {
+			val, _ := strconv.ParseFloat(p["data-y"], 64)
+			if val < gMin || val > gMax {
+				t.Errorf("pointer %d: %.1f not in [%.0f, %.0f]", i, val, gMin, gMax)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-027/gauge-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "gauge", "gaugeMin": 0, "gaugeMax": 100,
+			"gaugeBands": [{"from": 0, "to": 50, "color": "#55BF3B"}, {"from": 50, "to": 100, "color": "#DF5353"}],
+			"series": [{"name": "Speed", "data": [72]}]
+		}`)
+		pointers := extractAttrs(pointerRe, svg)
+		if len(pointers) != 1 {
+			t.Fatalf("expected 1 pointer, got %d", len(pointers))
+		}
+		val, _ := strconv.ParseFloat(pointers[0]["data-y"], 64)
+		if val != 72 {
+			t.Errorf("pointer data-y %.0f != 72", val)
+		}
+	})
+
+	// ── SC-SEM-028: Solid-gauge fill bounds ──
+
+	t.Run("SC-SEM-028/solid-gauge-fill-bounds", func(t *testing.T) {
+		svg := renderFile(t, "charts/solid-gauge/examples/basic.json")
+		fills := extractAttrs(gaugeFillRe, svg)
+		if len(fills) == 0 {
+			t.Fatal("no solid-gauge fills found")
+		}
+		specBytes, err := os.ReadFile(root + "charts/solid-gauge/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		gMin := raw["gaugeMin"].(float64)
+		gMax := raw["gaugeMax"].(float64)
+		for i, f := range fills {
+			val, _ := strconv.ParseFloat(f["data-y"], 64)
+			if val < gMin || val > gMax {
+				t.Errorf("fill %d: %.1f not in [%.0f, %.0f]", i, val, gMin, gMax)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-028/solid-gauge-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "solid-gauge", "gaugeMin": 0, "gaugeMax": 200,
+			"gaugeBands": [{"from": 0, "to": 100, "color": "#55BF3B"}],
+			"series": [{"name": "P", "data": [150]}]
+		}`)
+		fills := extractAttrs(gaugeFillRe, svg)
+		if len(fills) != 1 {
+			t.Fatalf("expected 1 fill, got %d", len(fills))
+		}
+		val, _ := strconv.ParseFloat(fills[0]["data-y"], 64)
+		if val != 150 {
+			t.Errorf("fill data-y %.0f != 150", val)
+		}
+	})
+
+	// ── SC-SEM-029: Radar dot count ──
+
+	t.Run("SC-SEM-029/radar-dot-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/radar/examples/basic.json")
+		dots := radarDotRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/radar/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		cats := raw["xAxis"].(map[string]interface{})["categories"].([]interface{})
+		series := raw["series"].([]interface{})
+		expected := len(cats) * len(series)
+		if len(dots) != expected {
+			t.Errorf("dots %d != %d cats × %d series = %d", len(dots), len(cats), len(series), expected)
+		}
+	})
+
+	t.Run("SC-SEM-029/radar-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "radar",
+			"xAxis": {"categories": ["Speed", "Power", "Range", "Handling"]},
+			"series": [{"name": "A", "data": [8,7,5,9]}, {"name": "B", "data": [6,9,8,5]}]
+		}`)
+		dots := radarDotRe.FindAllString(svg, -1)
+		if len(dots) != 8 {
+			t.Errorf("expected 4×2=8 dots, got %d", len(dots))
+		}
+	})
+
+	// ── SC-SEM-030: Polar dot count ──
+
+	t.Run("SC-SEM-030/polar-dot-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/polar/examples/basic.json")
+		dots := polarDotRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/polar/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		cats := raw["xAxis"].(map[string]interface{})["categories"].([]interface{})
+		series := raw["series"].([]interface{})
+		expected := len(cats) * len(series)
+		if len(dots) != expected {
+			t.Errorf("dots %d != %d × %d = %d", len(dots), len(cats), len(series), expected)
+		}
+	})
+
+	t.Run("SC-SEM-030/polar-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "polar",
+			"xAxis": {"categories": ["N", "E", "S", "W"]},
+			"series": [{"name": "S", "data": [5,3,4,6]}]
+		}`)
+		dots := polarDotRe.FindAllString(svg, -1)
+		if len(dots) != 4 {
+			t.Errorf("expected 4 dots, got %d", len(dots))
+		}
+	})
+
+	// ── SC-SEM-031: Wind-rose sector count ──
+
+	t.Run("SC-SEM-031/windrose-sector-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/wind-rose/examples/basic.json")
+		sectors := windroseSectorRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/wind-rose/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		cats := raw["xAxis"].(map[string]interface{})["categories"].([]interface{})
+		series := raw["series"].([]interface{})
+		expected := len(cats) * len(series)
+		if len(sectors) != expected {
+			t.Errorf("sectors %d != %d × %d = %d", len(sectors), len(cats), len(series), expected)
+		}
+	})
+
+	t.Run("SC-SEM-031/windrose-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "wind-rose",
+			"xAxis": {"categories": ["N","NE","E","SE","S","SW","W","NW"]},
+			"series": [{"name": "0-5", "data": [5,3,4,2,6,4,3,5]}, {"name": "5-10", "data": [3,2,3,1,4,3,2,3]}]
+		}`)
+		sectors := windroseSectorRe.FindAllString(svg, -1)
+		if len(sectors) != 16 {
+			t.Errorf("expected 8×2=16 sectors, got %d", len(sectors))
+		}
+	})
+
+	// ── SC-SEM-032: Nightingale sector count ──
+
+	t.Run("SC-SEM-032/nightingale-sector-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/nightingale/examples/basic.json")
+		sectors := nightingaleSectorRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/nightingale/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		cats := raw["xAxis"].(map[string]interface{})["categories"].([]interface{})
+		series := raw["series"].([]interface{})
+		expected := len(cats) * len(series)
+		if len(sectors) != expected {
+			t.Errorf("sectors %d != %d × %d = %d", len(sectors), len(cats), len(series), expected)
+		}
+	})
+
+	t.Run("SC-SEM-032/nightingale-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "nightingale",
+			"xAxis": {"categories": ["Jan", "Feb", "Mar", "Apr"]},
+			"series": [{"name": "Cases", "data": [10, 20, 15, 25]}]
+		}`)
+		sectors := nightingaleSectorRe.FindAllString(svg, -1)
+		if len(sectors) != 4 {
+			t.Errorf("expected 4 sectors, got %d", len(sectors))
+		}
+	})
+
+	// ── SC-SEM-033: Radial-bar bar count ──
+
+	t.Run("SC-SEM-033/radialbar-bar-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/radial-bar/examples/basic.json")
+		bars := radialbarBarRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/radial-bar/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		cats := raw["xAxis"].(map[string]interface{})["categories"].([]interface{})
+		series := raw["series"].([]interface{})
+		expected := len(cats) * len(series)
+		if len(bars) != expected {
+			t.Errorf("bars %d != %d × %d = %d", len(bars), len(cats), len(series), expected)
+		}
+	})
+
+	t.Run("SC-SEM-033/radialbar-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "radial-bar",
+			"xAxis": {"categories": ["A", "B", "C"]},
+			"yAxis": {"max": 100},
+			"series": [{"name": "Score", "data": [85, 60, 75]}]
+		}`)
+		bars := radialbarBarRe.FindAllString(svg, -1)
+		if len(bars) != 3 {
+			t.Errorf("expected 3 bars, got %d", len(bars))
+		}
+	})
+
+	// ── SC-SEM-034: Parliament dot count ──
+
+	t.Run("SC-SEM-034/parliament-dot-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/parliament/examples/basic.json")
+		dots := parliamentDotRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/parliament/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		series := raw["series"].([]interface{})[0].(map[string]interface{})
+		data := series["data"].([]interface{})
+		totalSeats := 0
+		for _, v := range data {
+			totalSeats += int(v.(float64))
+		}
+		if len(dots) != totalSeats {
+			t.Errorf("dots %d != seats %d", len(dots), totalSeats)
+		}
+	})
+
+	t.Run("SC-SEM-034/parliament-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "parliament",
+			"xAxis": {"categories": ["Party A", "Party B", "Party C"]},
+			"series": [{"name": "Seats", "data": [10, 8, 5]}]
+		}`)
+		dots := parliamentDotRe.FindAllString(svg, -1)
+		if len(dots) != 23 {
+			t.Errorf("expected 10+8+5=23 dots, got %d", len(dots))
 		}
 	})
 }
