@@ -34,6 +34,7 @@ type CapabilityManifest struct {
 	Bar                map[string][]string        `json:"bar"`
 }
 
+// --- BEGIN GENERATED FROM spec/capabilities.json ---
 var activeCapabilities = CapabilityManifest{
 	SpecVersion:        "0.0.0.1",
 	SVGContractVersion: "0.0.0.1",
@@ -48,6 +49,7 @@ var activeCapabilities = CapabilityManifest{
 		"column":               {Tier: "certified", Since: "0.0.0.1"},
 		"columnrange":          {Tier: "candidate", Since: "0.0.0.9"},
 		"combo":                {Tier: "certified", Since: "0.0.0.5"},
+		"development-triangle": {Tier: "candidate", Since: ""},
 		"dumbbell":             {Tier: "candidate", Since: "0.0.0.14"},
 		"error-bar":            {Tier: "candidate", Since: "0.0.0.8"},
 		"flame-chart":          {Tier: "experimental", Since: "0.0.0.23"},
@@ -72,8 +74,7 @@ var activeCapabilities = CapabilityManifest{
 		"waterfall":            {Tier: "candidate", Since: "0.0.0.10"},
 		"wind-rose":            {Tier: "experimental", Since: "0.0.0.29"},
 		"windbarb":             {Tier: "experimental", Since: "0.0.0.18"},
-		"xrange":                  {Tier: "experimental", Since: "0.0.0.21"},
-		"development-triangle":    {Tier: "certified", Since: "0.0.0.33"},
+		"xrange":               {Tier: "experimental", Since: "0.0.0.21"},
 	},
 	Column: map[string][]string{
 		"grouping": {"grouped", "overlay"},
@@ -84,6 +85,7 @@ var activeCapabilities = CapabilityManifest{
 		"stacking": {"none", "normal", "percent-nonnegative"},
 	},
 }
+// --- END GENERATED FROM spec/capabilities.json ---
 
 // ChartTypeNames returns a sorted list of all chart type names.
 func (m CapabilityManifest) ChartTypeNames() []string {

@@ -46,5 +46,288 @@
     "errors": [
       "$.triangle.view: expected \"cumulative\" or \"incremental\""
     ]
+  },
+  {
+    "description": "period is boolean (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [true],
+        "values": [[100]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods[0]: expected integer, received boolean"
+    ]
+  },
+  {
+    "description": "period is non-integer float (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12.5],
+        "values": [[100]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods[0]: expected integer, received non-integer number"
+    ]
+  },
+  {
+    "description": "period is negative (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [-1],
+        "values": [[100]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods[0]: expected non-negative integer, received -1"
+    ]
+  },
+  {
+    "description": "periods not strictly increasing (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12, 12],
+        "values": [[100, 200]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods: must be strictly increasing"
+    ]
+  },
+  {
+    "description": "value is boolean (WP3)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12],
+        "values": [[true]]
+      }
+    },
+    "errors": [
+      "$.triangle.values[0][0]: expected number, received boolean"
+    ]
+  },
+  {
+    "description": "zero-length row (WP4)",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021", "2022"],
+        "periods": [12, 24],
+        "values": [[100, 200], []]
+      }
+    },
+    "errors": [
+      "$.triangle.values[1]: row must have at least 1 value"
+    ]
+  },
+  {
+    "description": "non-increasing periods (decreasing order)",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [24, 12],
+        "values": [[100, 200]]
+      }
+    },
+    "errors": [
+      "$.triangle.periods: must be strictly increasing"
+    ]
+  },
+  {
+    "description": "values row is not an array",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021", "2022"],
+        "periods": [12, 24],
+        "values": [[100, 200], "not-array"]
+      }
+    },
+    "errors": [
+      "$.triangle.values[1]: expected array"
+    ]
+  },
+  {
+    "description": "origin/values row-count mismatch",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021", "2022"],
+        "periods": [12, 24],
+        "values": [[100, 200], [110], [120]]
+      }
+    },
+    "errors": [
+      "$.triangle.values: length must equal origins length"
+    ]
+  },
+  {
+    "description": "row wider than periods",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12],
+        "values": [[100, 200]]
+      }
+    },
+    "errors": [
+      "$.triangle.values[0]: row length 2 exceeds periods length 1"
+    ]
+  },
+  {
+    "description": "row lengths increasing (newer origins wider than older)",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021", "2022", "2023"],
+        "periods": [12, 24, 36],
+        "values": [[100], [200, 210], [300, 310, 320]]
+      }
+    },
+    "errors": [
+      "$.triangle.values[1]: row length 2 exceeds previous row length 1",
+      "$.triangle.values[2]: row length 3 exceeds previous row length 2"
+    ]
+  },
+  {
+    "description": "invalid valueType enum",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12],
+        "values": [[100]],
+        "valueType": "reported"
+      }
+    },
+    "errors": [
+      "$.triangle.valueType: expected \"incurred\" or \"paid\""
+    ]
+  },
+  {
+    "description": "factors.show=true without factors.values",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021", "2022"],
+        "periods": [12, 24],
+        "values": [[100, 200], [110]]
+      },
+      "factors": {
+        "show": true
+      }
+    },
+    "errors": [
+      "$.factors.values: required when factors.show is true"
+    ]
+  },
+  {
+    "description": "factors values wrong cardinality",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021", "2022", "2023"],
+        "periods": [12, 24, 36],
+        "values": [[100, 200, 300], [110, 220], [130]]
+      },
+      "factors": {
+        "show": true,
+        "values": [1.5]
+      }
+    },
+    "errors": [
+      "$.factors.values: expected 2 values (periods length - 1), received 1"
+    ]
+  },
+  {
+    "description": "factor value is boolean",
+    "spec": {
+      "type": "development-triangle",
+      "triangle": {
+        "origins": ["2021", "2022"],
+        "periods": [12, 24],
+        "values": [[100, 200], [110]]
+      },
+      "factors": {
+        "show": true,
+        "values": [true]
+      }
+    },
+    "errors": [
+      "$.factors.values[0]: expected number, received boolean"
+    ]
+  },
+  {
+    "description": "annotation references unknown origin",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12],
+        "values": [[100]]
+      },
+      "annotations": [
+        {"origin": "2099", "period": 12, "text": "Note"}
+      ]
+    },
+    "errors": [
+      "$.annotations[0].origin: unknown origin \"2099\""
+    ]
+  },
+  {
+    "description": "annotation references unknown period",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021"],
+        "periods": [12],
+        "values": [[100]]
+      },
+      "annotations": [
+        {"origin": "2021", "period": 99, "text": "Note"}
+      ]
+    },
+    "errors": [
+      "$.annotations[0].period: unknown period 99"
+    ]
+  },
+  {
+    "description": "annotation targets unpopulated cell",
+    "spec": {
+      "type": "development-triangle",
+      "colorScale": {"type": "invalid"},
+      "triangle": {
+        "origins": ["2021", "2022"],
+        "periods": [12, 24],
+        "values": [[100, 200], [110]]
+      },
+      "annotations": [
+        {"origin": "2022", "period": 24, "text": "Note"}
+      ]
+    },
+    "errors": [
+      "$.annotations[0]: period 24 has no value for origin \"2022\""
+    ]
   }
 ]

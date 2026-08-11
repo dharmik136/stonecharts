@@ -695,8 +695,8 @@ func TestRandomizedSpecsRenderValidSVG(t *testing.T) {
 	}
 }
 
-// TestRandomizedAll35Types extends property coverage to all chart types (DEC-051).
-func TestRandomizedAll35Types(t *testing.T) {
+// TestRandomizedAll36Types extends property coverage to all chart types (DEC-051).
+func TestRandomizedAll36Types(t *testing.T) {
 	rng := rand.New(rand.NewSource(20260810))
 	validate := func(t *testing.T, label string, specJSON []byte) {
 		t.Helper()
@@ -1039,6 +1039,111 @@ func TestRandomizedAll35Types(t *testing.T) {
 			strings.Join(xs, ","), strings.Join(ys, ","), strings.Join(dirs, ","), strings.Join(lens, ","))
 		validate(t, fmt.Sprintf("vector-plot/%d", c), []byte(j))
 	}
+
+	// Development-triangle
+	for c := 0; c < 8; c++ {
+		nOrigins := rng.Intn(7) + 1
+		nPeriods := rng.Intn(7) + 1
+
+		// Build strictly increasing non-negative periods
+		periodSet := map[int]bool{}
+		for len(periodSet) < nPeriods {
+			periodSet[rng.Intn(120)] = true
+		}
+		periodSlice := make([]int, 0, nPeriods)
+		for p := range periodSet {
+			periodSlice = append(periodSlice, p)
+		}
+		// sort
+		for a := 0; a < len(periodSlice); a++ {
+			for b := a + 1; b < len(periodSlice); b++ {
+				if periodSlice[a] > periodSlice[b] {
+					periodSlice[a], periodSlice[b] = periodSlice[b], periodSlice[a]
+				}
+			}
+		}
+
+		origins := make([]string, nOrigins)
+		for i := range origins {
+			origins[i] = fmt.Sprintf(`"Y%d"`, 2020+i)
+		}
+		periodsJSON := make([]string, nPeriods)
+		for i, p := range periodSlice {
+			periodsJSON[i] = strconv.Itoa(p)
+		}
+
+		// Build triangle rows with non-increasing lengths
+		jagged := rng.Intn(2) == 0
+		maxCols := nPeriods
+		rows := make([]string, nOrigins)
+		for r := 0; r < nOrigins; r++ {
+			rowLen := maxCols
+			if jagged {
+				rowLen = maxCols - r
+				if rowLen < 1 {
+					rowLen = 1
+				}
+			}
+			if rowLen > nPeriods {
+				rowLen = nPeriods
+			}
+			vals := make([]string, rowLen)
+			for i := range vals {
+				choice := rng.Intn(3)
+				switch choice {
+				case 0:
+					vals[i] = fmt.Sprintf("%.2f", float64(rng.Intn(50000)+100)/100)
+				case 1:
+					vals[i] = "0"
+				default:
+					vals[i] = fmt.Sprintf("%.2f", -float64(rng.Intn(20000)+100)/100)
+				}
+			}
+			rows[r] = "[" + strings.Join(vals, ",") + "]"
+			if jagged {
+				maxCols = rowLen
+			}
+		}
+
+		triJSON := fmt.Sprintf(`"origins":[%s],"periods":[%s],"values":[%s]`,
+			strings.Join(origins, ","), strings.Join(periodsJSON, ","), strings.Join(rows, ","))
+
+		// Optionally add view/valueType/unit
+		extras := ""
+		if rng.Intn(2) == 0 {
+			views := []string{"cumulative", "incremental"}
+			extras += fmt.Sprintf(`,"view":"%s"`, views[rng.Intn(2)])
+		}
+		if rng.Intn(2) == 0 {
+			vtypes := []string{"paid", "incurred"}
+			extras += fmt.Sprintf(`,"valueType":"%s"`, vtypes[rng.Intn(2)])
+		}
+		if rng.Intn(2) == 0 {
+			extras += fmt.Sprintf(`,"unit":"USD-%d"`, c)
+		}
+
+		spec := fmt.Sprintf(`{"type":"development-triangle","triangle":{%s%s}`, triJSON, extras)
+
+		// Optionally add diagonal
+		if rng.Intn(2) == 0 {
+			spec += `,"diagonal":{"highlight":true}`
+		}
+		// Optionally add colorScale
+		if rng.Intn(2) == 0 {
+			spec += `,"colorScale":{"type":"sequential","domain":"auto"}`
+		}
+		// Optionally add factors
+		if rng.Intn(2) == 0 && nPeriods >= 2 {
+			fvals := make([]string, nPeriods-1)
+			for i := range fvals {
+				fvals[i] = fmt.Sprintf("%.3f", float64(rng.Intn(3000)+500)/1000)
+			}
+			spec += fmt.Sprintf(`,"factors":{"show":true,"values":[%s]}`, strings.Join(fvals, ","))
+		}
+		spec += "}"
+
+		validate(t, fmt.Sprintf("development-triangle/%d", c), []byte(spec))
+	}
 }
 
 func TestCapabilityManifestAndError(t *testing.T) {
@@ -1203,6 +1308,11 @@ func FuzzFromJSON(f *testing.F) {
 		{"funnel", "basic"},
 		{"timeline", "basic"},
 		{"vector-plot", "basic"},
+		{"development-triangle", "basic"},
+		{"development-triangle", "diagonal"},
+		{"development-triangle", "factors"},
+		{"development-triangle", "annotated"},
+		{"development-triangle", "themed-dark"},
 	}
 	for _, s := range seeds {
 		data, err := os.ReadFile("../../charts/" + s.dir + "/examples/" + s.name + ".json")
@@ -1211,6 +1321,11 @@ func FuzzFromJSON(f *testing.F) {
 		}
 		f.Add(data)
 	}
+	// Inline development-triangle seeds for shapes not covered by example files
+	// Rectangular 3x5 (all rows same length)
+	f.Add([]byte(`{"type":"development-triangle","triangle":{"origins":["2021","2022","2023"],"periods":[12,24,36,48,60],"values":[[100,150,170,180,185],[110,160,175,190,195],[120,170,185,200,210]]}}`))
+	// Adversarial minimal 1x1
+	f.Add([]byte(`{"type":"development-triangle","triangle":{"origins":["2025"],"periods":[0],"values":[[0]]}}`))
 	f.Fuzz(func(t *testing.T, data []byte) {
 		spec, err := FromJSON(data)
 		if err != nil {
@@ -1665,6 +1780,361 @@ func TestSemanticInvariants(t *testing.T) {
 		q3 := byCat["Q3"]
 		if diff := q1 - q3; diff > 0.5 || diff < -0.5 {
 			t.Errorf("Q1 height %.1f != Q3 height %.1f", q1, q3)
+		}
+	})
+}
+
+// TestSemanticInvariantsDevelopmentTriangle verifies output correctness properties for development-triangle.
+func TestSemanticInvariantsDevelopmentTriangle(t *testing.T) {
+	root := "../../"
+	dtValueRe := regexp.MustCompile(`<text\s[^>]*class="sc-dt-value"[^>]*>([^<]+)</text>`)
+	dtDiagRe := regexp.MustCompile(`<rect\s[^>]*class="sc-dt-diag"[^>]*/>`)
+	dtFactorRe := regexp.MustCompile(`<text\s[^>]*class="sc-dt-factor"[^>]*>([^<]+)</text>`)
+	attrRe2 := regexp.MustCompile(`([\w-]+)="([^"]*)"`)
+
+	extractDiags := func(svg string) []map[string]string {
+		matches := dtDiagRe.FindAllString(svg, -1)
+		var out []map[string]string
+		for _, m := range matches {
+			attrs := map[string]string{}
+			for _, a := range attrRe2.FindAllStringSubmatch(m, -1) {
+				attrs[a[1]] = a[2]
+			}
+			out = append(out, attrs)
+		}
+		return out
+	}
+
+	// DT-SEM-001: every rendered data cell maps to exactly one supplied triangle value
+	t.Run("DT-SEM-001/cell-count-basic", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/development-triangle/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rendered := dtValueRe.FindAllStringSubmatch(svg, -1)
+		totalValues := 0
+		for _, row := range spec.Triangle.Values {
+			totalValues += len(row)
+		}
+		if len(rendered) != totalValues {
+			t.Errorf("rendered cells %d != supplied values %d", len(rendered), totalValues)
+		}
+	})
+
+	t.Run("DT-SEM-001/cell-count-diagonal", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/development-triangle/examples/diagonal.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rendered := dtValueRe.FindAllStringSubmatch(svg, -1)
+		totalValues := 0
+		for _, row := range spec.Triangle.Values {
+			totalValues += len(row)
+		}
+		if len(rendered) != totalValues {
+			t.Errorf("rendered cells %d != supplied values %d", len(rendered), totalValues)
+		}
+	})
+
+	// DT-SEM-003: latest diagonal highlights rightmost populated cell per row
+	t.Run("DT-SEM-003/diagonal-positions", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/development-triangle/examples/diagonal.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		diags := extractDiags(svg)
+		values := spec.Triangle.Values
+		if len(diags) != len(values) {
+			t.Fatalf("diagonal rects %d != rows %d", len(diags), len(values))
+		}
+		for i, diag := range diags {
+			expectedPeriod := len(values[i]) - 1
+			gotOrigin, _ := strconv.Atoi(diag["data-origin"])
+			gotPeriod, _ := strconv.Atoi(diag["data-period"])
+			if gotOrigin != i {
+				t.Errorf("diagonal rect %d: origin %d != expected %d", i, gotOrigin, i)
+			}
+			if gotPeriod != expectedPeriod {
+				t.Errorf("diagonal rect %d: period %d != expected %d", i, gotPeriod, expectedPeriod)
+			}
+		}
+	})
+
+	t.Run("DT-SEM-003/diagonal-constructed", func(t *testing.T) {
+		specJSON := []byte(`{"type":"development-triangle","triangle":{"origins":["A","B","C"],"periods":[12,24,36],"values":[[10,20,30],[40,50],[60]]},"diagonal":{"highlight":true}}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		diags := extractDiags(svg)
+		if len(diags) != 3 {
+			t.Fatalf("expected 3 diagonal rects, got %d", len(diags))
+		}
+		// Row 0: last cell = period 2, Row 1: last cell = period 1, Row 2: last cell = period 0
+		expected := []int{2, 1, 0}
+		for i, diag := range diags {
+			gotPeriod, _ := strconv.Atoi(diag["data-period"])
+			if gotPeriod != expected[i] {
+				t.Errorf("diagonal %d: period %d != expected %d", i, gotPeriod, expected[i])
+			}
+		}
+	})
+
+	// DT-SEM-005: supplied factor values are rendered exactly (not recalculated)
+	t.Run("DT-SEM-005/factors-rendered-exactly", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/development-triangle/examples/factors.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rendered := dtFactorRe.FindAllStringSubmatch(svg, -1)
+		supplied := spec.Factors.Values
+		if len(rendered) != len(supplied) {
+			t.Fatalf("rendered factors %d != supplied %d", len(rendered), len(supplied))
+		}
+		for i, m := range rendered {
+			expected := fmt.Sprintf("%.3f", supplied[i])
+			if m[1] != expected {
+				t.Errorf("factor %d: rendered %q != expected %q", i, m[1], expected)
+			}
+		}
+	})
+
+	t.Run("DT-SEM-005/factors-constructed", func(t *testing.T) {
+		specJSON := []byte(`{"type":"development-triangle","triangle":{"origins":["X","Y"],"periods":[12,24,36],"values":[[100,200,300],[150,250]]},"factors":{"show":true,"values":[2.000,1.500]}}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rendered := dtFactorRe.FindAllStringSubmatch(svg, -1)
+		expected := []string{"2.000", "1.500"}
+		if len(rendered) != len(expected) {
+			t.Fatalf("rendered factors %d != expected %d", len(rendered), len(expected))
+		}
+		for i, m := range rendered {
+			if m[1] != expected[i] {
+				t.Errorf("factor %d: rendered %q != expected %q", i, m[1], expected[i])
+			}
+		}
+	})
+
+	// DT-SEM-007: annotation resolves to exactly its intended populated cell
+	t.Run("DT-SEM-007/annotation-position", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/development-triangle/examples/annotated.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		annGroupRe := regexp.MustCompile(`<g class="sc-dt-annotation-group"`)
+		annCircleRe := regexp.MustCompile(`<circle class="sc-dt-annotation"`)
+		groups := annGroupRe.FindAllString(svg, -1)
+		circles := annCircleRe.FindAllString(svg, -1)
+		if len(groups) != 1 {
+			t.Errorf("expected 1 annotation group, got %d", len(groups))
+		}
+		if len(circles) != 1 {
+			t.Errorf("expected 1 annotation circle, got %d", len(circles))
+		}
+	})
+
+	t.Run("DT-SEM-007/annotation-constructed", func(t *testing.T) {
+		specJSON := []byte(`{"type":"development-triangle","triangle":{"origins":["R1","R2"],"periods":[6,12],"values":[[10,20],[30]]},"annotations":[{"origin":"R1","period":12,"text":"Check this"}]}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		annGroupRe := regexp.MustCompile(`<g class="sc-dt-annotation-group"`)
+		groups := annGroupRe.FindAllString(svg, -1)
+		if len(groups) != 1 {
+			t.Errorf("expected 1 annotation group, got %d", len(groups))
+		}
+	})
+
+	// DT-SEM-008: annotation text survives into accessible SVG metadata
+	t.Run("DT-SEM-008/annotation-accessible-metadata", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/development-triangle/examples/annotated.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		annText := spec.Annotations[0].Text
+		if !strings.Contains(svg, "<title>"+annText+"</title>") {
+			t.Errorf("annotation text %q not found in <title>", annText)
+		}
+		if !strings.Contains(svg, `aria-label="`+annText+`"`) {
+			t.Errorf("annotation text %q not found in aria-label", annText)
+		}
+	})
+
+	t.Run("DT-SEM-008/annotation-text-constructed", func(t *testing.T) {
+		specJSON := []byte(`{"type":"development-triangle","triangle":{"origins":["A"],"periods":[12],"values":[[99]]},"annotations":[{"origin":"A","period":12,"text":"Special note here"}]}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(svg, "<title>Special note here</title>") {
+			t.Error("expected <title>Special note here</title> in SVG")
+		}
+		if !strings.Contains(svg, `aria-label="Special note here"`) {
+			t.Error(`expected aria-label="Special note here" in SVG`)
+		}
+	})
+
+	// DT-SEM-009: unit/view/valueType survive into deterministic output metadata
+	t.Run("DT-SEM-009/metadata-basic", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/development-triangle/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(svg, `data-triangle-view="cumulative"`) {
+			t.Error("expected data-triangle-view=cumulative")
+		}
+		if !strings.Contains(svg, `data-triangle-value-type="incurred"`) {
+			t.Error("expected data-triangle-value-type=incurred")
+		}
+	})
+
+	t.Run("DT-SEM-009/metadata-with-unit", func(t *testing.T) {
+		specJSON := []byte(`{"type":"development-triangle","title":"Unit test","triangle":{"origins":["2024"],"periods":[12],"values":[[100]],"unit":"GBP thousands","view":"incremental","valueType":"paid"}}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(svg, `data-triangle-view="incremental"`) {
+			t.Error("expected data-triangle-view=incremental")
+		}
+		if !strings.Contains(svg, `data-triangle-value-type="paid"`) {
+			t.Error("expected data-triangle-value-type=paid")
+		}
+		if !strings.Contains(svg, "Unit: GBP thousands") {
+			t.Error("expected unit label text")
+		}
+	})
+
+	t.Run("DT-SEM-009/defaults", func(t *testing.T) {
+		specJSON := []byte(`{"type":"development-triangle","triangle":{"origins":["2025"],"periods":[0],"values":[[42]]}}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(svg, `data-triangle-view="cumulative"`) {
+			t.Error("expected default data-triangle-view=cumulative")
+		}
+		if !strings.Contains(svg, `data-triangle-value-type="incurred"`) {
+			t.Error("expected default data-triangle-value-type=incurred")
+		}
+	})
+
+	// DT-SEM-010: malformed inputs are rejected before rendering
+	t.Run("DT-SEM-010/boolean-value", func(t *testing.T) {
+		_, err := FromJSON([]byte(`{"type":"development-triangle","triangle":{"origins":["A"],"periods":[12],"values":[[true]]}}`))
+		if err == nil {
+			t.Error("expected error for boolean value")
+		}
+	})
+
+	t.Run("DT-SEM-010/fractional-period", func(t *testing.T) {
+		_, err := FromJSON([]byte(`{"type":"development-triangle","triangle":{"origins":["A"],"periods":[12.5],"values":[[100]]}}`))
+		if err == nil {
+			t.Error("expected error for fractional period")
+		}
+	})
+
+	t.Run("DT-SEM-010/increasing-row-lengths", func(t *testing.T) {
+		_, err := FromJSON([]byte(`{"type":"development-triangle","triangle":{"origins":["A","B"],"periods":[12,24,36],"values":[[10],[20,30]]}}`))
+		if err == nil {
+			t.Error("expected error for increasing row lengths")
+		}
+	})
+
+	t.Run("DT-SEM-010/boolean-period", func(t *testing.T) {
+		_, err := FromJSON([]byte(`{"type":"development-triangle","triangle":{"origins":["A"],"periods":[true],"values":[[100]]}}`))
+		if err == nil {
+			t.Error("expected error for boolean period")
+		}
+	})
+
+	t.Run("DT-SEM-010/empty-row", func(t *testing.T) {
+		_, err := FromJSON([]byte(`{"type":"development-triangle","triangle":{"origins":["A","B"],"periods":[12,24],"values":[[100,200],[]]}}`)	)
+		if err == nil {
+			t.Error("expected error for empty row")
 		}
 	})
 }

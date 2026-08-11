@@ -70,7 +70,10 @@ compatibility policy and its evidence requirements.
 
 ## Known limits
 
-- 35 chart types are certified across Family A (Cartesian) and Family B (Polar/radial).
+<!-- BEGIN:GENERATED:capabilities -->
+- 36 chart types exist across three tiers: 7 certified, 9 candidate,
+  20 experimental, spanning Family A (Cartesian) and Family B (Polar/radial).
+<!-- END:GENERATED:capabilities -->
 - Layout uses deterministic defaults and manual margins; there is no automatic text
   measurement, wrapping, collision avoidance, or legend pagination.
 - The default font stack depends on the host viewer and has no pixel identity promise.
