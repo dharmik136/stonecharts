@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-027
 title: DEC-057 Development Triangle Chart Type
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

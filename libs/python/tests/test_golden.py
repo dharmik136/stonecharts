@@ -66,7 +66,15 @@ PARLIAMENT_CASES = ["basic", "multi-series", "single-series", "themed-dark", "ad
 RADIAL_BAR_CASES = ["basic", "multi-series", "single-series", "themed-dark", "adversarial"]
 WIND_ROSE_CASES = ["basic", "many-directions", "single-series", "themed-dark", "adversarial"]
 XRANGE_CASES = ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"]
-DEVELOPMENT_TRIANGLE_CASES = ["basic", "diagonal", "factors", "annotated", "themed-dark"]
+DEVELOPMENT_TRIANGLE_CASES = [
+    "basic",
+    "diagonal",
+    "factors",
+    "annotated",
+    "themed-dark",
+    "rectangular-3x5",
+    "rectangular-6x4",
+]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -1216,11 +1224,16 @@ def test_range_data_parity():
     atomic_arearange = {
         "type": "arearange",
         "xAxis": {"categories": ["A", "B", "C"]},
-        "series": [{"name": "s", "rangeData": [
-            {"low": 60, "high": 120},
-            {"low": 95, "high": 180},
-            {"low": 80, "high": 150},
-        ]}],
+        "series": [
+            {
+                "name": "s",
+                "rangeData": [
+                    {"low": 60, "high": 120},
+                    {"low": 95, "high": 180},
+                    {"low": 80, "high": 150},
+                ],
+            }
+        ],
     }
     assert render_svg(ChartSpec.from_dict(parallel_arearange)) == render_svg(ChartSpec.from_dict(atomic_arearange))
 
@@ -1232,10 +1245,15 @@ def test_range_data_parity():
     atomic_colrange = {
         "type": "columnrange",
         "xAxis": {"categories": ["A", "B"]},
-        "series": [{"name": "s", "rangeData": [
-            {"low": 10, "high": 50},
-            {"low": 20, "high": 70},
-        ]}],
+        "series": [
+            {
+                "name": "s",
+                "rangeData": [
+                    {"low": 10, "high": 50},
+                    {"low": 20, "high": 70},
+                ],
+            }
+        ],
     }
     assert render_svg(ChartSpec.from_dict(parallel_colrange)) == render_svg(ChartSpec.from_dict(atomic_colrange))
 
@@ -1247,10 +1265,15 @@ def test_range_data_parity():
     atomic_errorbar = {
         "type": "error-bar",
         "xAxis": {"categories": ["A", "B"]},
-        "series": [{"name": "s", "rangeData": [
-            {"low": 80, "high": 120, "value": 100},
-            {"low": 170, "high": 230, "value": 200},
-        ]}],
+        "series": [
+            {
+                "name": "s",
+                "rangeData": [
+                    {"low": 80, "high": 120, "value": 100},
+                    {"low": 170, "high": 230, "value": 200},
+                ],
+            }
+        ],
     }
     assert render_svg(ChartSpec.from_dict(parallel_errorbar)) == render_svg(ChartSpec.from_dict(atomic_errorbar))
 
@@ -1262,10 +1285,15 @@ def test_range_data_parity():
     atomic_dumbbell = {
         "type": "dumbbell",
         "xAxis": {"categories": ["A", "B"]},
-        "series": [{"name": "s", "rangeData": [
-            {"low": 10, "high": 50},
-            {"low": 20, "high": 70},
-        ]}],
+        "series": [
+            {
+                "name": "s",
+                "rangeData": [
+                    {"low": 10, "high": 50},
+                    {"low": 20, "high": 70},
+                ],
+            }
+        ],
     }
     assert render_svg(ChartSpec.from_dict(parallel_dumbbell)) == render_svg(ChartSpec.from_dict(atomic_dumbbell))
 

@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-007
 title: StoneCharts DEC-008 Runtime Matrix Decision Brief
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

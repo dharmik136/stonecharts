@@ -51,6 +51,7 @@ def by_tier(chart_types: list[dict], tier: str) -> list[dict]:
 # Python capabilities.py generation
 # ---------------------------------------------------------------------------
 
+
 def generate_python_capabilities(registry: dict) -> str:
     """Generate the full capabilities.py content."""
     lines = [
@@ -79,13 +80,9 @@ def generate_python_capabilities(registry: dict) -> str:
         padding_tier = " " * (14 - len(tier))
         if since is None:
             since_str = "None"
-            lines.append(
-                f'        "{cid}": {padding_id}{{"tier": "{tier}",{padding_tier}"since": {since_str}}},'
-            )
+            lines.append(f'        "{cid}": {padding_id}{{"tier": "{tier}",{padding_tier}"since": {since_str}}},')
         else:
-            lines.append(
-                f'        "{cid}": {padding_id}{{"tier": "{tier}",{padding_tier}"since": "{since}"}},'
-            )
+            lines.append(f'        "{cid}": {padding_id}{{"tier": "{tier}",{padding_tier}"since": "{since}"}},')
 
     lines.append("    },")
 
@@ -103,10 +100,10 @@ def generate_python_capabilities(registry: dict) -> str:
     lines.append("# --- END GENERATED FROM spec/capabilities.json ---")
     lines.append("")
     lines.append("")
-    lines.append('class CapabilityError(Exception):')
+    lines.append("class CapabilityError(Exception):")
     lines.append('    """Typed non-fatal error for unsupported renderer capabilities."""')
     lines.append("")
-    lines.append('    def __init__(self, code: str, path: str, message: str, details: dict[str, Any] | None = None):')
+    lines.append("    def __init__(self, code: str, path: str, message: str, details: dict[str, Any] | None = None):")
     lines.append("        super().__init__(message)")
     lines.append("        self.code = code")
     lines.append("        self.path = path")
@@ -128,6 +125,7 @@ def generate_python_capabilities(registry: dict) -> str:
 # ---------------------------------------------------------------------------
 # Go capabilities.go generation
 # ---------------------------------------------------------------------------
+
 
 def generate_go_capabilities(registry: dict) -> str:
     """Generate the full capabilities.go content."""
@@ -183,9 +181,7 @@ def generate_go_capabilities(registry: dict) -> str:
         tier = ct["tier"]
         since = ct["since"] if ct["since"] is not None else ""
         padding = " " * (max_id_len - len(cid))
-        lines.append(
-            f'\t\t"{cid}": {padding}{{Tier: "{tier}", Since: "{since}"}},'
-        )
+        lines.append(f'\t\t"{cid}": {padding}{{Tier: "{tier}", Since: "{since}"}},')
 
     lines.append("\t},")
 
@@ -230,6 +226,7 @@ def generate_go_capabilities(registry: dict) -> str:
 # ---------------------------------------------------------------------------
 # Doc checking helpers
 # ---------------------------------------------------------------------------
+
 
 def extract_generated_block(text: str) -> str | None:
     """Extract content between GENERATED markers, or None if markers absent."""
@@ -301,11 +298,9 @@ def check_charts_md(registry: dict, errors: list[str]) -> None:
 
     for ct in registry["chartTypes"]:
         cid = ct["id"]
-        tier = ct["tier"]
-        # development-triangle may have a special status
         if cid == "development-triangle":
             if cid not in text:
-                errors.append(f"CHARTS.md: development-triangle must be listed")
+                errors.append("CHARTS.md: development-triangle must be listed")
             continue
 
         # Check that the chart is present
@@ -338,7 +333,6 @@ def _chart_id_to_display(cid: str) -> str:
 def check_capability_matrix(registry: dict, errors: list[str]) -> None:
     """Check docs/product/capability-matrix.md for accurate tiers and counts."""
     text = CAPABILITY_MATRIX.read_text(encoding="utf-8")
-    counts = tier_counts(registry["chartTypes"])
 
     # Check generated block exists
     if GENERATED_BEGIN not in text:
@@ -353,7 +347,6 @@ def check_capability_matrix(registry: dict, errors: list[str]) -> None:
     # Check every chart type is in the generated block
     for ct in registry["chartTypes"]:
         cid = ct["id"]
-        tier = ct["tier"].capitalize()
         display = _chart_id_to_display(cid)
         if cid not in block and display not in block:
             errors.append(f"capability-matrix.md: '{cid}' (display: '{display}') missing from generated block")
@@ -454,6 +447,7 @@ def check_go_capabilities(registry: dict, errors: list[str]) -> None:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate/verify capabilities from canonical registry")

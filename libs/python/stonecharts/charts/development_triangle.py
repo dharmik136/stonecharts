@@ -30,8 +30,6 @@ def _scale_color(t: float) -> str:
 def render_svg(spec: ChartSpec) -> str:
     W, H = spec.width, spec.height
     theme = spec.theme
-    cid = esc(spec.id)
-
     tri = spec.triangle
     origins = tri.origins if tri else []
     periods = tri.periods if tri else []
@@ -65,8 +63,8 @@ def render_svg(spec: ChartSpec) -> str:
     if unit:
         m_top += 16
     m_left: float = 22
-    m_right: float = 22
-    m_bottom: float = 20
+    _m_right: float = 22
+    _m_bottom: float = 20
     if spec.layout and spec.layout.margin:
         m = spec.layout.margin
         if m.top is not None:
@@ -74,9 +72,9 @@ def render_svg(spec: ChartSpec) -> str:
         if m.left is not None:
             m_left = m.left
         if m.right is not None:
-            m_right = m.right
+            _m_right = m.right
         if m.bottom is not None:
-            m_bottom = m.bottom
+            _m_bottom = m.bottom
 
     show_factors = spec.factors_config is not None and spec.factors_config.show
     use_color = spec.color_scale is not None
@@ -91,8 +89,6 @@ def render_svg(spec: ChartSpec) -> str:
 
     grid_x = m_left + HEADER_W
     grid_y = m_top + HEADER_H
-    factor_h = CELL_H if show_factors else 0.0
-
     cell_color = theme.grid_color or "#d8d8e0"
     text_color = theme.title_color or "#22223a"
     header_color = theme.axis_label_color or "#666"
@@ -143,8 +139,7 @@ def render_svg(spec: ChartSpec) -> str:
 
     # --- WP7: wrapping group with data attributes ---
     p.append(
-        f'<g class="sc-dt-triangle" data-triangle-view="{esc(view)}" '
-        f'data-triangle-value-type="{esc(value_type)}">'
+        f'<g class="sc-dt-triangle" data-triangle-view="{esc(view)}" data-triangle-value-type="{esc(value_type)}">'
     )
 
     p.append('<g class="sc-dt-headers">')
@@ -154,7 +149,7 @@ def render_svg(spec: ChartSpec) -> str:
         p.append(
             f'<text class="sc-dt-period-header" x="{cx:.1f}" y="{cy:.1f}" '
             f'text-anchor="middle" font-size="11" font-weight="600" fill="{header_color}">'
-            f'{esc(fmt_num(float(periods[c])))}</text>'
+            f"{esc(fmt_num(float(periods[c])))}</text>"
         )
     p.append("</g>")
 
@@ -165,7 +160,7 @@ def render_svg(spec: ChartSpec) -> str:
         p.append(
             f'<text class="sc-dt-origin-header" x="{ox:.1f}" y="{oy:.1f}" '
             f'text-anchor="end" font-size="11" font-weight="600" fill="{header_color}">'
-            f'{esc(origins[r])}</text>'
+            f"{esc(origins[r])}</text>"
         )
     p.append("</g>")
 
@@ -254,10 +249,8 @@ def render_svg(spec: ChartSpec) -> str:
                     ax = grid_x + ci * CELL_W + CELL_W - 6
                     ay = grid_y + ri * CELL_H + 6
                     escaped_text = esc(ann.text)
-                    p.append(
-                        f'<g class="sc-dt-annotation-group" aria-label="{escaped_text}">'
-                    )
-                    p.append(f'<title>{escaped_text}</title>')
+                    p.append(f'<g class="sc-dt-annotation-group" aria-label="{escaped_text}">')
+                    p.append(f"<title>{escaped_text}</title>")
                     p.append(
                         f'<circle class="sc-dt-annotation" cx="{ax:.1f}" cy="{ay:.1f}" '
                         f'r="4" fill="{ann_color}" opacity="0.8"/>'

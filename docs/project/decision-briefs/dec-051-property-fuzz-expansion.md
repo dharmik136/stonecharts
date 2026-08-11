@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-021
 title: DEC-051 Property and Fuzz Test Expansion
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

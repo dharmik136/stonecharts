@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-015
 title: StoneCharts DEC-011 Publication Decision Brief
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

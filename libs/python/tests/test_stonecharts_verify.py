@@ -1383,9 +1383,7 @@ def test_validate_manifest_shape_rejects_malformed_advisory():
                 "demoDriftApplied": "none",
             }
         ],
-        "presentationAdvisories": [
-            {"code": "", "severity": "critical", "message": "", "recommendation": ""}
-        ],
+        "presentationAdvisories": [{"code": "", "severity": "critical", "message": "", "recommendation": ""}],
     }
     errors = stonecharts_verify.validate_manifest_shape(manifest)
     advisory_errors = [e for e in errors if "presentationAdvisories" in e]
@@ -1395,6 +1393,7 @@ def test_validate_manifest_shape_rejects_malformed_advisory():
 # ---------------------------------------------------------------------------
 # Assurance tier enforcement tests (WP11 / WP12)
 # ---------------------------------------------------------------------------
+
 
 def test_certified_profile_accepts_certified_chart(tmp_path):
     spec_path = (ROOT / "charts/line-basic/examples/basic.json").resolve()

@@ -330,7 +330,11 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
             errs.append(f'{path}.yAxis: expected one of 0, 1, received "{int(v["yAxis"])}"')
     _range_types = {"arearange", "columnrange", "error-bar", "dumbbell"}
     has_range_data = isinstance(v.get("rangeData"), list) and len(v.get("rangeData", [])) > 0
-    if "data" not in v and chart_type not in ("boxplot", "flame-chart") and not (chart_type in _range_types and has_range_data):
+    if (
+        "data" not in v
+        and chart_type not in ("boxplot", "flame-chart")
+        and not (chart_type in _range_types and has_range_data)
+    ):
         errs.append(f"{path}.data: required")
     elif "data" not in v:
         pass
@@ -603,7 +607,9 @@ def _validate_triangle(d: dict, errs: list[str]) -> None:
                 errs.append(f"{fp}.values: required when factors.show is true")
             else:
                 if periods_ok and len(fv) != n_periods - 1:
-                    errs.append(f"{fp}.values: expected {n_periods - 1} values (periods length - 1), received {len(fv)}")
+                    errs.append(
+                        f"{fp}.values: expected {n_periods - 1} values (periods length - 1), received {len(fv)}"
+                    )
                 for i, v in enumerate(fv):
                     _num(v, f"{fp}.values[{i}]", errs)
 
@@ -862,12 +868,12 @@ def validate(d: Any) -> list[str]:
                 keys = ("low", "q1", "median", "q3", "high")
                 vals = [b.get(k) for k in keys]
                 if all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in vals):
-                    fv = [float(v) for v in vals]
-                    for k in range(len(fv) - 1):
-                        if fv[k] > fv[k + 1]:
+                    fv = [float(v) for v in vals if isinstance(v, (int, float))]
+                    for ki in range(len(fv) - 1):
+                        if fv[ki] > fv[ki + 1]:
                             errs.append(
-                                f"$.series[{i}].boxData[{j}]: {keys[k]} ({fmt_num(fv[k])})"
-                                f" must be <= {keys[k + 1]} ({fmt_num(fv[k + 1])})"
+                                f"$.series[{i}].boxData[{j}]: {keys[ki]} ({fmt_num(fv[ki])})"
+                                f" must be <= {keys[ki + 1]} ({fmt_num(fv[ki + 1])})"
                             )
     if ct in ("arearange", "columnrange", "error-bar", "dumbbell") and isinstance(d.get("series"), list):
         for i, s in enumerate(d["series"]):
@@ -915,21 +921,29 @@ def validate(d: Any) -> list[str]:
             high = s.get("high")
             if ct == "arearange":
                 if low is None or (isinstance(low, list) and len(low) == 0):
-                    errs.append(f"$.series[{i}].low: required for arearange, received {len(low) if isinstance(low, list) else 0} values for {data_len} data points")
+                    errs.append(
+                        f"$.series[{i}].low: required for arearange, received {len(low) if isinstance(low, list) else 0} values for {data_len} data points"
+                    )
                 elif isinstance(low, list) and len(low) != data_len:
                     errs.append(f"$.series[{i}].low: length ({len(low)}) must match data length ({data_len})")
             if ct in ("columnrange", "dumbbell"):
                 if high is None or (isinstance(high, list) and len(high) == 0):
-                    errs.append(f"$.series[{i}].high: required for {ct}, received {len(high) if isinstance(high, list) else 0} values for {data_len} data points")
+                    errs.append(
+                        f"$.series[{i}].high: required for {ct}, received {len(high) if isinstance(high, list) else 0} values for {data_len} data points"
+                    )
                 elif isinstance(high, list) and len(high) != data_len:
                     errs.append(f"$.series[{i}].high: length ({len(high)}) must match data length ({data_len})")
             if ct == "error-bar":
                 if low is None or (isinstance(low, list) and len(low) == 0):
-                    errs.append(f"$.series[{i}].low: required for error-bar, received {len(low) if isinstance(low, list) else 0} values for {data_len} data points")
+                    errs.append(
+                        f"$.series[{i}].low: required for error-bar, received {len(low) if isinstance(low, list) else 0} values for {data_len} data points"
+                    )
                 elif isinstance(low, list) and len(low) != data_len:
                     errs.append(f"$.series[{i}].low: length ({len(low)}) must match data length ({data_len})")
                 if high is None or (isinstance(high, list) and len(high) == 0):
-                    errs.append(f"$.series[{i}].high: required for error-bar, received {len(high) if isinstance(high, list) else 0} values for {data_len} data points")
+                    errs.append(
+                        f"$.series[{i}].high: required for error-bar, received {len(high) if isinstance(high, list) else 0} values for {data_len} data points"
+                    )
                 elif isinstance(high, list) and len(high) != data_len:
                     errs.append(f"$.series[{i}].high: length ({len(high)}) must match data length ({data_len})")
             if isinstance(low, list):

@@ -53,7 +53,7 @@ func TestGolden(t *testing.T) {
 		"wind-rose":           {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
 		"technical-indicators": {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
 		"xrange":                {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
-		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark"},
+		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark", "rectangular-3x5", "rectangular-6x4"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -1313,6 +1313,8 @@ func FuzzFromJSON(f *testing.F) {
 		{"development-triangle", "factors"},
 		{"development-triangle", "annotated"},
 		{"development-triangle", "themed-dark"},
+		{"development-triangle", "rectangular-3x5"},
+		{"development-triangle", "rectangular-6x4"},
 	}
 	for _, s := range seeds {
 		data, err := os.ReadFile("../../charts/" + s.dir + "/examples/" + s.name + ".json")
@@ -1462,7 +1464,7 @@ func TestRendererPurity(t *testing.T) {
 		"wind-rose":             {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
 		"technical-indicators":  {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
 		"xrange":                {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
-		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark"},
+		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark", "rectangular-3x5", "rectangular-6x4"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
