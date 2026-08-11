@@ -154,6 +154,57 @@ def test_build_verification_result_validates_against_schema():
     assert errors == [], f"schema validation errors: {errors}"
 
 
+def test_legacy_v1_result_without_assurance_validates():
+    env = capture_environment(
+        stonecharts_version="0.0.0.4",
+        stoneverify_version="1.0.0",
+    )
+    result = build_verification_result(
+        status="pass",
+        comparison_mode="cross-runtime",
+        baseline=None,
+        candidate={"runtimes": ["python", "go"]},
+        inputs={"specSha256": "abc"},
+        runtime_coverage={"shared": ["python", "go"], "onlyLeft": [], "onlyRight": []},
+        findings=[],
+        evidence={},
+        environment=env,
+    )
+    assert "assurance" not in result
+    errors = validate_against_schema(result)
+    assert errors == [], f"legacy v1 result without assurance should be valid: {errors}"
+
+
+def test_new_stoneverify_evidence_includes_assurance():
+    env = capture_environment(
+        stonecharts_version="0.0.0.4",
+        stoneverify_version="1.0.0",
+    )
+    assurance = {
+        "profile": "certified",
+        "chartType": "line",
+        "tier": "certified",
+        "eligibleForCertifiedGuarantee": True,
+    }
+    result = build_verification_result(
+        status="pass",
+        comparison_mode="cross-runtime",
+        baseline=None,
+        candidate={"runtimes": ["python", "go"]},
+        inputs={"specSha256": "abc"},
+        runtime_coverage={"shared": ["python", "go"], "onlyLeft": [], "onlyRight": []},
+        findings=[],
+        evidence={},
+        environment=env,
+        assurance=assurance,
+    )
+    assert "assurance" in result
+    assert result["assurance"]["profile"] == "certified"
+    assert result["assurance"]["eligibleForCertifiedGuarantee"] is True
+    errors = validate_against_schema(result)
+    assert errors == [], f"new evidence with assurance should be valid: {errors}"
+
+
 def test_canonical_result_schema_is_valid_json_schema():
     import json
     import pathlib

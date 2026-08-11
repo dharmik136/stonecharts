@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-014
 title: StoneCharts DEC-009 Performance Budgets Decision Brief
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

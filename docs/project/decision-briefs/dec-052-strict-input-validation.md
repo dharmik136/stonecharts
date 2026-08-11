@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-022
 title: DEC-052 Strict Input Validation
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

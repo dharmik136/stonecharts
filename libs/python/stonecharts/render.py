@@ -20,9 +20,9 @@ from .charts import bubble as _bubble
 from .charts import bullet as _bullet
 from .charts import candlestick as _candlestick
 from .charts import column as _column
-from .charts import development_triangle as _development_triangle
 from .charts import columnrange as _columnrange
 from .charts import combo as _combo
+from .charts import development_triangle as _development_triangle
 from .charts import dumbbell as _dumbbell
 from .charts import error_bar as _error_bar
 from .charts import flame_chart as _flame_chart

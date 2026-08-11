@@ -295,14 +295,46 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
+      - name: Resolve released baseline
+        id: baseline
+        run: |
+          if [ ! -f spec/released/current.json ]; then echo "No release manifest, skipping"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          RELEASE_DIR=$(python -c "import json; m=json.load(open('spec/released/current.json')); print('spec/released/' + m['schemas']['chartSpec']['path'].rsplit('/',1)[0])")
+          echo "dir=${RELEASE_DIR}" >> "$GITHUB_OUTPUT"
+          echo "Baseline: $(python -c "import json; print(json.load(open('spec/released/current.json'))['release'])")"
+      - name: Verify baseline integrity
+        if: steps.baseline.outputs.skip != 'true'
+        run: |
+          python -c "
+          import hashlib, json, pathlib, sys
+          m = json.load(open('spec/released/current.json'))
+          ok = True
+          for key in ('chartSpec', 'stoneverifyResult'):
+              entry = m['schemas'][key]
+              path = pathlib.Path('spec/released') / entry['path']
+              if not path.exists():
+                  print(f'MISSING: {path}'); ok = False; continue
+              actual = hashlib.sha256(path.read_bytes()).hexdigest()
+              if actual != entry['sha256']:
+                  print(f'TAMPERED: {path} (expected {entry[\"sha256\"][:12]}..., got {actual[:12]}...)'); ok = False
+              else:
+                  print(f'OK: {path}')
+          sys.exit(0 if ok else 1)
+          "
       - name: Check chart-spec schema backward compatibility
+        if: steps.baseline.outputs.skip != 'true'
         run: |
-          git show origin/main:spec/chart-spec.schema.json > /tmp/main-chart-spec.json 2>/dev/null || exit 0
-          python tools/check_schema_compat.py /tmp/main-chart-spec.json spec/chart-spec.schema.json
+          EXCEPTIONS="${{ steps.baseline.outputs.dir }}/chart-spec-compat-exceptions.json"
+          ARGS=""
+          if [ -f "$EXCEPTIONS" ]; then ARGS="--exceptions $EXCEPTIONS"; fi
+          python tools/check_schema_compat.py "${{ steps.baseline.outputs.dir }}/chart-spec.schema.json" spec/chart-spec.schema.json $ARGS
       - name: Check stoneverify-result schema backward compatibility
+        if: steps.baseline.outputs.skip != 'true'
         run: |
-          git show origin/main:spec/stoneverify-result.schema.json > /tmp/main-result-schema.json 2>/dev/null || exit 0
-          python tools/check_schema_compat.py /tmp/main-result-schema.json spec/stoneverify-result.schema.json
+          EXCEPTIONS="${{ steps.baseline.outputs.dir }}/stoneverify-result-compat-exceptions.json"
+          ARGS=""
+          if [ -f "$EXCEPTIONS" ]; then ARGS="--exceptions $EXCEPTIONS"; fi
+          python tools/check_schema_compat.py "${{ steps.baseline.outputs.dir }}/stoneverify-result.schema.json" spec/stoneverify-result.schema.json $ARGS
 
   chart-admission:
     runs-on: ubuntu-latest

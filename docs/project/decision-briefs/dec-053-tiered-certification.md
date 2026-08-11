@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-023
 title: DEC-053 Tiered Certification Model
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

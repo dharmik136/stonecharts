@@ -92,11 +92,13 @@ def _compute_bins(spec):
                     if spec.out_of_range == "clip":
                         b = max(0, min(k - 1, b))
                     else:
-                        raise SpecError([
-                            f"histogram: observation {fmt_num(float(v))} is outside bin range"
-                            f" [{fmt_num(lo)}, {fmt_num(lo + w * k)}];"
-                            f' set outOfRange to "clip" to clamp into edge bins'
-                        ])
+                        raise SpecError(
+                            [
+                                f"histogram: observation {fmt_num(float(v))} is outside bin range"
+                                f" [{fmt_num(lo)}, {fmt_num(lo + w * k)}];"
+                                f' set outOfRange to "clip" to clamp into edge bins'
+                            ]
+                        )
             sc[b] += 1.0
         counts.append(sc)
         ns = len(s.data)

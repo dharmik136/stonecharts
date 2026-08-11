@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-026
 title: DEC-056 Combo Dual-Axis Presentation Safety Policy
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

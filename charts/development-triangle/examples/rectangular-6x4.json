@@ -1,0 +1,19 @@
+{
+  "type": "development-triangle",
+  "title": "Rectangular 6x4 Paid Triangle",
+  "triangle": {
+    "origins": ["2019", "2020", "2021", "2022", "2023", "2024"],
+    "periods": [12, 24, 36, 48],
+    "values": [
+      [80, 142, 178, 195],
+      [92, 158, 191, 207],
+      [105, 170, 203, 218],
+      [118, 185, 216, 230],
+      [130, 196, 227, 241],
+      [143, 209, 238, 252]
+    ],
+    "view": "cumulative",
+    "valueType": "paid",
+    "unit": "EUR (000s)"
+  }
+}

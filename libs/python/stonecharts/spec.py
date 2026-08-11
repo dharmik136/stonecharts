@@ -876,19 +876,27 @@ class ChartSpec:
                 view=d["triangle"].get("view") or "cumulative",
                 value_type=d["triangle"].get("valueType") or "incurred",
                 unit=d["triangle"].get("unit") or "",
-            ) if isinstance(d.get("triangle"), dict) else None,
+            )
+            if isinstance(d.get("triangle"), dict)
+            else None,
             diagonal=DiagonalConfig(
                 highlight=bool(d["diagonal"].get("highlight", False)),
                 label=d["diagonal"].get("label") or "",
-            ) if isinstance(d.get("diagonal"), dict) else None,
+            )
+            if isinstance(d.get("diagonal"), dict)
+            else None,
             factors_config=FactorsConfig(
                 show=bool(d["factors"].get("show", False)),
                 values=[float(v) for v in d["factors"].get("values", [])],
-            ) if isinstance(d.get("factors"), dict) else None,
+            )
+            if isinstance(d.get("factors"), dict)
+            else None,
             color_scale=ColorScaleConfig(
                 scale_type=d["colorScale"].get("type") or "sequential",
                 domain=d["colorScale"].get("domain") or "auto",
-            ) if isinstance(d.get("colorScale"), dict) else None,
+            )
+            if isinstance(d.get("colorScale"), dict)
+            else None,
             triangle_annotations=[
                 TriangleAnnotation(
                     origin=str(a["origin"]),
@@ -896,5 +904,7 @@ class ChartSpec:
                     text=str(a["text"]),
                 )
                 for a in d["annotations"]
-            ] if isinstance(d.get("annotations"), list) else None,
+            ]
+            if isinstance(d.get("annotations"), list)
+            else None,
         )

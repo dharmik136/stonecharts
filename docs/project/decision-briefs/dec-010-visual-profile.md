@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-008
 title: StoneCharts DEC-010 Visual Profile Decision Brief
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer
