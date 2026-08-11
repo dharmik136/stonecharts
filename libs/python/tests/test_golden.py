@@ -648,6 +648,23 @@ def test_xss_escaping():
         assert payload not in svg, f"XSS in SVG for {chart_type}"
         assert payload not in html, f"XSS in HTML for {chart_type}"
 
+    dt_spec = ChartSpec.from_dict(
+        {
+            "type": "development-triangle",
+            "title": x,
+            "triangle": {
+                "origins": [x, "2023", "2024"],
+                "periods": [12, 24, 36],
+                "values": [[100, 150, 170], [110, 160], [125]],
+            },
+            "annotations": [{"origin": x, "period": 12, "text": x}],
+        }
+    )
+    svg = render_svg(dt_spec)
+    html = render_html(dt_spec)
+    assert payload not in svg, "XSS in SVG for development-triangle"
+    assert payload not in html, "XSS in HTML for development-triangle"
+
 
 def test_valid_edges_render():
     """Absent/degenerate-but-valid specs still render (absent != malformed)."""

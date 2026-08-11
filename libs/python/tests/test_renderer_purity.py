@@ -1,6 +1,6 @@
 """Renderer purity invariant (SC-CERT-03): render_svg must not mutate spec.
 
-For every golden example across all 35 chart types, render the spec and
+For every golden example across all 36 chart types, render the spec and
 verify that the ChartSpec object is unchanged afterward. A failure here
 means a renderer is writing back to the caller's input, which breaks
 evidence provenance and determinism under repeated render.
@@ -63,6 +63,7 @@ CHART_CASES = {
     "wind-rose": ["basic", "many-directions", "single-series", "themed-dark", "adversarial"],
     "technical-indicators": ["basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"],
     "xrange": ["trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"],
+    "development-triangle": ["basic", "diagonal", "factors", "annotated", "themed-dark", "rectangular-3x5", "rectangular-6x4"],
 }
 
 
