@@ -1,5 +1,5 @@
 ---
-id: SC-OPS-024
+id: SC-OPS-028
 title: DEC-058 Batch Candidate-to-Certified Promotion
 status: approved
 classification: informative
@@ -7,8 +7,8 @@ owner: product-owner
 approver: maintainer
 review_mode: self
 applies_to: 0.0.0.32 and later
-requirements: [DEC-050, DEC-053]
-evidence: [SC-CERT-01 through SC-CERT-08]
+requirements: []
+evidence: [TEST-DOCS-CONTROL]
 last_reviewed: "2026-08-11"
 review_due: "2026-09-11"
 supersedes: null

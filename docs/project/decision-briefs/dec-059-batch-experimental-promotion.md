@@ -1,5 +1,5 @@
 ---
-id: SC-OPS-025
+id: SC-OPS-029
 title: DEC-059 Batch Experimental-to-Certified Promotion
 status: approved
 classification: informative
@@ -7,8 +7,8 @@ owner: product-owner
 approver: maintainer
 review_mode: self
 applies_to: 0.0.0.32 and later
-requirements: [DEC-050, DEC-053, DEC-058]
-evidence: [SC-CERT-01 through SC-CERT-08]
+requirements: []
+evidence: [TEST-DOCS-CONTROL]
 last_reviewed: "2026-08-11"
 review_due: "2026-09-11"
 supersedes: null

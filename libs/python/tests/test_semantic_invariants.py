@@ -601,9 +601,9 @@ def test_candlestick_ohlc_bounds():
     candles = _candles(svg)
     assert len(candles) > 0, "no candles found"
     for i, c in enumerate(candles):
-        o, h, l, cl = float(c["data-open"]), float(c["data-high"]), float(c["data-low"]), float(c["data-close"])
+        o, h, lo, cl = float(c["data-open"]), float(c["data-high"]), float(c["data-low"]), float(c["data-close"])
         assert h >= max(o, cl), f"candle {i}: high {h} < max(open {o}, close {cl})"
-        assert l <= min(o, cl), f"candle {i}: low {l} > min(open {o}, close {cl})"
+        assert lo <= min(o, cl), f"candle {i}: low {lo} > min(open {o}, close {cl})"
 
 
 def test_candlestick_constructed():
@@ -626,9 +626,9 @@ def test_candlestick_constructed():
     candles = _candles(svg)
     assert len(candles) == 2
     for c in candles:
-        o, h, l, cl = float(c["data-open"]), float(c["data-high"]), float(c["data-low"]), float(c["data-close"])
+        o, h, lo, cl = float(c["data-open"]), float(c["data-high"]), float(c["data-low"]), float(c["data-close"])
         assert h >= max(o, cl)
-        assert l <= min(o, cl)
+        assert lo <= min(o, cl)
 
 
 # ── SC-SEM-016  Lollipop: head count matches data ───────────────────────
@@ -1069,11 +1069,11 @@ def test_solid_gauge_constructed():
     assert float(fills[0]["data-y"]) == 150
 
 
-# ── SC-SEM-029  Radar: dot count = categories × series ─────────────────
+# ── SC-SEM-029  Radar: dot count = categories x series ─────────────────
 
 
 def test_radar_dot_count():
-    """SC-SEM-029: radar dot count = categories × series."""
+    """SC-SEM-029: radar dot count = categories x series."""
     spec_path = ROOT / "charts" / "radar" / "examples" / "basic.json"
     d = json.loads(spec_path.read_text(encoding="utf-8"))
     spec = ChartSpec.from_dict(d)
@@ -1082,7 +1082,7 @@ def test_radar_dot_count():
     n_cats = len(d["xAxis"]["categories"])
     n_series = len(d["series"])
     expected = n_cats * n_series
-    assert len(dots) == expected, f"dots {len(dots)} != {n_cats} × {n_series} = {expected}"
+    assert len(dots) == expected, f"dots {len(dots)} != {n_cats} x {n_series} = {expected}"
 
 
 def test_radar_constructed():
@@ -1098,14 +1098,14 @@ def test_radar_constructed():
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
     dots = _radar_dots(svg)
-    assert len(dots) == 8, f"expected 4 × 2 = 8 dots, got {len(dots)}"
+    assert len(dots) == 8, f"expected 4 x 2 = 8 dots, got {len(dots)}"
 
 
-# ── SC-SEM-030  Polar: dot count = categories × series ─────────────────
+# ── SC-SEM-030  Polar: dot count = categories x series ─────────────────
 
 
 def test_polar_dot_count():
-    """SC-SEM-030: polar dot count = categories × series."""
+    """SC-SEM-030: polar dot count = categories x series."""
     spec_path = ROOT / "charts" / "polar" / "examples" / "basic.json"
     d = json.loads(spec_path.read_text(encoding="utf-8"))
     spec = ChartSpec.from_dict(d)
@@ -1114,7 +1114,7 @@ def test_polar_dot_count():
     n_cats = len(d["xAxis"]["categories"])
     n_series = len(d["series"])
     expected = n_cats * n_series
-    assert len(dots) == expected, f"dots {len(dots)} != {n_cats} × {n_series} = {expected}"
+    assert len(dots) == expected, f"dots {len(dots)} != {n_cats} x {n_series} = {expected}"
 
 
 def test_polar_constructed():
@@ -1130,11 +1130,11 @@ def test_polar_constructed():
     assert len(dots) == 4
 
 
-# ── SC-SEM-031  Wind-rose: sector count = categories × series ──────────
+# ── SC-SEM-031  Wind-rose: sector count = categories x series ──────────
 
 
 def test_windrose_sector_count():
-    """SC-SEM-031: wind-rose sector count = categories × series."""
+    """SC-SEM-031: wind-rose sector count = categories x series."""
     spec_path = ROOT / "charts" / "wind-rose" / "examples" / "basic.json"
     d = json.loads(spec_path.read_text(encoding="utf-8"))
     spec = ChartSpec.from_dict(d)
@@ -1143,7 +1143,7 @@ def test_windrose_sector_count():
     n_cats = len(d["xAxis"]["categories"])
     n_series = len(d["series"])
     expected = n_cats * n_series
-    assert len(sectors) == expected, f"sectors {len(sectors)} != {n_cats} × {n_series} = {expected}"
+    assert len(sectors) == expected, f"sectors {len(sectors)} != {n_cats} x {n_series} = {expected}"
 
 
 def test_windrose_constructed():
@@ -1159,14 +1159,14 @@ def test_windrose_constructed():
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
     sectors = _windrose_sectors(svg)
-    assert len(sectors) == 16, f"expected 8 × 2 = 16, got {len(sectors)}"
+    assert len(sectors) == 16, f"expected 8 x 2 = 16, got {len(sectors)}"
 
 
-# ── SC-SEM-032  Nightingale: sector count = categories × series ────────
+# ── SC-SEM-032  Nightingale: sector count = categories x series ────────
 
 
 def test_nightingale_sector_count():
-    """SC-SEM-032: nightingale sector count = categories × series."""
+    """SC-SEM-032: nightingale sector count = categories x series."""
     spec_path = ROOT / "charts" / "nightingale" / "examples" / "basic.json"
     d = json.loads(spec_path.read_text(encoding="utf-8"))
     spec = ChartSpec.from_dict(d)
@@ -1175,7 +1175,7 @@ def test_nightingale_sector_count():
     n_cats = len(d["xAxis"]["categories"])
     n_series = len(d["series"])
     expected = n_cats * n_series
-    assert len(sectors) == expected, f"sectors {len(sectors)} != {n_cats} × {n_series} = {expected}"
+    assert len(sectors) == expected, f"sectors {len(sectors)} != {n_cats} x {n_series} = {expected}"
 
 
 def test_nightingale_constructed():
@@ -1191,11 +1191,11 @@ def test_nightingale_constructed():
     assert len(sectors) == 4
 
 
-# ── SC-SEM-033  Radial-bar: bar count = categories × series ────────────
+# ── SC-SEM-033  Radial-bar: bar count = categories x series ────────────
 
 
 def test_radialbar_bar_count():
-    """SC-SEM-033: radial-bar bar count = categories × series."""
+    """SC-SEM-033: radial-bar bar count = categories x series."""
     spec_path = ROOT / "charts" / "radial-bar" / "examples" / "basic.json"
     d = json.loads(spec_path.read_text(encoding="utf-8"))
     spec = ChartSpec.from_dict(d)
@@ -1204,7 +1204,7 @@ def test_radialbar_bar_count():
     n_cats = len(d["xAxis"]["categories"])
     n_series = len(d["series"])
     expected = n_cats * n_series
-    assert len(bars) == expected, f"bars {len(bars)} != {n_cats} × {n_series} = {expected}"
+    assert len(bars) == expected, f"bars {len(bars)} != {n_cats} x {n_series} = {expected}"
 
 
 def test_radialbar_constructed():
