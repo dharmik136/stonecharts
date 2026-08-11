@@ -1946,6 +1946,37 @@ func TestSemanticInvariants(t *testing.T) {
 		}
 	})
 
+	t.Run("SC-SEM-011/range-family-constructed", func(t *testing.T) {
+		types := []struct {
+			chartType string
+			raw       string
+		}{
+			{"arearange", `{"type":"arearange","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","data":[50,60,70],"low":[10,20,30]}]}`},
+			{"columnrange", `{"type":"columnrange","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","data":[10,20,30],"high":[50,60,70]}]}`},
+			{"dumbbell", `{"type":"dumbbell","xAxis":{"categories":["A","B","C"]},"series":[{"name":"s","data":[10,20,30],"high":[50,60,70]}]}`},
+		}
+		for _, tc := range types {
+			t.Run(tc.chartType, func(t *testing.T) {
+				spec, err := FromJSON([]byte(tc.raw))
+				if err != nil {
+					t.Fatalf("%s: parse: %v", tc.chartType, err)
+				}
+				svg := mustSVG(t, spec)
+				points := extractRangePoints(svg)
+				if len(points) != 3 {
+					t.Fatalf("%s: expected 3 points, got %d", tc.chartType, len(points))
+				}
+				for i, p := range points {
+					lo, _ := strconv.ParseFloat(p["data-low"], 64)
+					hi, _ := strconv.ParseFloat(p["data-high"], 64)
+					if lo > hi {
+						t.Errorf("%s point %d: low %.0f > high %.0f", tc.chartType, i, lo, hi)
+					}
+				}
+			})
+		}
+	})
+
 	// ── SC-SEM-012: Error-bar: low <= central value <= high ──
 
 	t.Run("SC-SEM-012/error-bar-low-le-value-le-high", func(t *testing.T) {
@@ -2334,8 +2365,14 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-016/lollipop-head-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/lollipop/examples/basic.json")
 		heads := lollipopHeadRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/lollipop/examples/basic.json")
-		spec, _ := FromJSON(specBytes)
+		specBytes, err := os.ReadFile(root + "charts/lollipop/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
 		nPoints := 0
 		for _, s := range spec.Series {
 			nPoints += len(s.Data)
@@ -2366,7 +2403,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-017/funnel-slice-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/funnel/examples/basic.json")
 		slices := extractAttrs(sliceRe, svg)
-		specBytes, _ := os.ReadFile(root + "charts/funnel/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/funnel/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2400,7 +2440,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-018/variwide-width-weight", func(t *testing.T) {
 		svg := renderFile(t, "charts/variwide/examples/basic.json")
 		bars := extractAttrs(barRe, svg)
-		specBytes, _ := os.ReadFile(root + "charts/variwide/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/variwide/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2442,8 +2485,14 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-019/timeline-event-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/timeline/examples/basic.json")
 		events := eventRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/timeline/examples/basic.json")
-		spec, _ := FromJSON(specBytes)
+		specBytes, err := os.ReadFile(root + "charts/timeline/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
 		nPoints := 0
 		for _, s := range spec.Series {
 			nPoints += len(s.Data)
@@ -2475,7 +2524,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-020/windbarb-data-attributes", func(t *testing.T) {
 		svg := renderFile(t, "charts/windbarb/examples/basic.json")
 		barbs := extractAttrs(barbRe, svg)
-		specBytes, _ := os.ReadFile(root + "charts/windbarb/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/windbarb/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2512,6 +2564,10 @@ func TestSemanticInvariants(t *testing.T) {
 		if spd0 != 15 {
 			t.Errorf("barb 0: speed %.0f != 15", spd0)
 		}
+		dir1, _ := strconv.ParseFloat(barbs[1]["data-direction"], 64)
+		if dir1 != 270 {
+			t.Errorf("barb 1: direction %.0f != 270", dir1)
+		}
 	})
 
 	// ── SC-SEM-021: Streamgraph point count ──
@@ -2519,8 +2575,14 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-021/streamgraph-point-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/streamgraph/examples/basic.json")
 		points := pointCircleRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/streamgraph/examples/basic.json")
-		spec, _ := FromJSON(specBytes)
+		specBytes, err := os.ReadFile(root + "charts/streamgraph/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatalf("parse: %v", err)
+		}
 		total := 0
 		for _, s := range spec.Series {
 			total += len(s.Data)
@@ -2547,7 +2609,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-022/vector-plot-attributes", func(t *testing.T) {
 		svg := renderFile(t, "charts/vector-plot/examples/basic.json")
 		vectors := extractAttrs(vectorRe, svg)
-		specBytes, _ := os.ReadFile(root + "charts/vector-plot/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/vector-plot/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2635,7 +2700,10 @@ func TestSemanticInvariants(t *testing.T) {
 		for _, m := range indicators {
 			found[m[1]] = true
 		}
-		specBytes, _ := os.ReadFile(root + "charts/technical-indicators/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/technical-indicators/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2747,7 +2815,10 @@ func TestSemanticInvariants(t *testing.T) {
 		if len(pointers) == 0 {
 			t.Fatal("no gauge pointers found")
 		}
-		specBytes, _ := os.ReadFile(root + "charts/gauge/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/gauge/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2786,7 +2857,10 @@ func TestSemanticInvariants(t *testing.T) {
 		if len(fills) == 0 {
 			t.Fatal("no solid-gauge fills found")
 		}
-		specBytes, _ := os.ReadFile(root + "charts/solid-gauge/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/solid-gauge/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2822,7 +2896,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-029/radar-dot-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/radar/examples/basic.json")
 		dots := radarDotRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/radar/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/radar/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2852,7 +2929,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-030/polar-dot-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/polar/examples/basic.json")
 		dots := polarDotRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/polar/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/polar/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2882,7 +2962,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-031/windrose-sector-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/wind-rose/examples/basic.json")
 		sectors := windroseSectorRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/wind-rose/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/wind-rose/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2912,7 +2995,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-032/nightingale-sector-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/nightingale/examples/basic.json")
 		sectors := nightingaleSectorRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/nightingale/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/nightingale/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2942,7 +3028,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-033/radialbar-bar-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/radial-bar/examples/basic.json")
 		bars := radialbarBarRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/radial-bar/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/radial-bar/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
@@ -2973,7 +3062,10 @@ func TestSemanticInvariants(t *testing.T) {
 	t.Run("SC-SEM-034/parliament-dot-count", func(t *testing.T) {
 		svg := renderFile(t, "charts/parliament/examples/basic.json")
 		dots := parliamentDotRe.FindAllString(svg, -1)
-		specBytes, _ := os.ReadFile(root + "charts/parliament/examples/basic.json")
+		specBytes, err := os.ReadFile(root + "charts/parliament/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
 		var raw map[string]interface{}
 		if err := json.Unmarshal(specBytes, &raw); err != nil {
 			t.Fatalf("unmarshal: %v", err)
