@@ -1,7 +1,0 @@
-{
-  "baseline": "0.0.0.32",
-  "reason": "Assurance metadata (profile, chartType, tier, eligibleForCertifiedGuarantee) added as a required field to support certification-tier enforcement in StoneVerify. This is new functionality that did not exist at 0.0.0.32.",
-  "acknowledged": [
-    "NEWLY REQUIRED: # added required field 'assurance'"
-  ]
-}
