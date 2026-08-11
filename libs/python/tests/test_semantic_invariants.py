@@ -14,12 +14,13 @@ import re
 import sys
 from collections import defaultdict
 
+import pytest
+
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "libs" / "python"))
 
 from stonecharts import ChartSpec  # noqa: E402
 from stonecharts.render import render_svg  # noqa: E402
-
 
 # ── SVG parsing helpers ──────────────────────────────────────────────
 
@@ -41,6 +42,7 @@ def _bubbles(svg):
 
 
 # ── SC-SEM-001  Histogram: sum(bin_counts) == len(observations) ──────
+
 
 def test_histogram_observation_count():
     spec_path = ROOT / "charts" / "histogram" / "examples" / "basic.json"
@@ -68,12 +70,11 @@ def test_histogram_observation_count_multi_series():
     for si, s in enumerate(spec.series):
         series_bars = [b for b in bars if b["data-series"] == str(si)]
         count = sum(float(b["data-y"]) for b in series_bars)
-        assert count == len(s.data), (
-            f"series {si}: bin counts {count} != observations {len(s.data)}"
-        )
+        assert count == len(s.data), f"series {si}: bin counts {count} != observations {len(s.data)}"
 
 
 # ── SC-SEM-002  Waterfall: closing_total == opening + sum(deltas) ────
+
 
 def test_waterfall_balance():
     spec_path = ROOT / "charts" / "waterfall" / "examples" / "basic.json"
@@ -83,9 +84,7 @@ def test_waterfall_balance():
     bars = _bars(svg)
     last_total = float(bars[-1]["data-total"])
     expected = sum(spec.series[0].data)
-    assert last_total == expected, (
-        f"closing total {last_total} != sum(deltas) {expected}"
-    )
+    assert last_total == expected, f"closing total {last_total} != sum(deltas) {expected}"
 
 
 def test_waterfall_balance_with_intermediate_sums():
@@ -99,12 +98,11 @@ def test_waterfall_balance_with_intermediate_sums():
     expected = sum(v for i, v in enumerate(spec.series[0].data) if i not in skip)
 
     last_total = float(bars[-1]["data-total"])
-    assert last_total == expected, (
-        f"closing total {last_total} != sum(non-sum deltas) {expected}"
-    )
+    assert last_total == expected, f"closing total {last_total} != sum(non-sum deltas) {expected}"
 
 
 # ── SC-SEM-006  Bubble: z[a] > z[b] ⟹ radius[a] >= radius[b] ───────
+
 
 def test_bubble_z_radius_monotonic():
     spec_path = ROOT / "charts" / "bubble" / "examples" / "basic.json"
@@ -117,10 +115,7 @@ def test_bubble_z_radius_monotonic():
     for i, (za, ra) in enumerate(pairs):
         for j, (zb, rb) in enumerate(pairs):
             if za > zb:
-                assert ra >= rb, (
-                    f"bubble {i} (z={za}, r={ra}) smaller than "
-                    f"bubble {j} (z={zb}, r={rb})"
-                )
+                assert ra >= rb, f"bubble {i} (z={za}, r={ra}) smaller than bubble {j} (z={zb}, r={rb})"
 
 
 def test_bubble_z_radius_monotonic_multi_series():
@@ -134,13 +129,11 @@ def test_bubble_z_radius_monotonic_multi_series():
     for i, (za, ra) in enumerate(pairs):
         for j, (zb, rb) in enumerate(pairs):
             if za > zb:
-                assert ra >= rb, (
-                    f"bubble {i} (z={za}, r={ra}) smaller than "
-                    f"bubble {j} (z={zb}, r={rb})"
-                )
+                assert ra >= rb, f"bubble {i} (z={za}, r={ra}) smaller than bubble {j} (z={zb}, r={rb})"
 
 
 # ── SC-SEM-007  Percent stack: each category sums to 100% ────────────
+
 
 def test_percent_stack_bar_heights():
     d = {
@@ -164,9 +157,7 @@ def test_percent_stack_bar_heights():
     totals = list(by_cat.values())
     assert totals[0] > 0, "no bar height rendered"
     for cat, t in by_cat.items():
-        assert abs(t - totals[0]) < 0.5, (
-            f"category {cat} height {t:.1f} != expected {totals[0]:.1f}"
-        )
+        assert abs(t - totals[0]) < 0.5, f"category {cat} height {t:.1f} != expected {totals[0]:.1f}"
 
 
 def test_percent_stack_zero_category():
@@ -187,9 +178,7 @@ def test_percent_stack_zero_category():
     for b in bars:
         by_cat[b["data-x"]] += float(b["height"])
 
-    assert by_cat.get("Q2", 0) < 0.5, (
-        f"zero category Q2 has height {by_cat['Q2']:.1f}"
-    )
+    assert by_cat.get("Q2", 0) < 0.5, f"zero category Q2 has height {by_cat['Q2']:.1f}"
     non_zero = {k: v for k, v in by_cat.items() if k != "Q2"}
     totals = list(non_zero.values())
     for t in totals:
@@ -197,6 +186,7 @@ def test_percent_stack_zero_category():
 
 
 # ── DT-SEM-001  Every rendered data cell maps to exactly one supplied value ──
+
 
 def _dt_cells(svg):
     """Extract development-triangle cell value texts from SVG."""
@@ -230,9 +220,7 @@ def test_dt_sem_001_cell_count_matches_values():
     svg = render_svg(spec)
     rendered = _dt_cells(svg)
     total_values = sum(len(row) for row in d["triangle"]["values"])
-    assert len(rendered) == total_values, (
-        f"rendered cells {len(rendered)} != supplied values {total_values}"
-    )
+    assert len(rendered) == total_values, f"rendered cells {len(rendered)} != supplied values {total_values}"
 
 
 def test_dt_sem_001_cell_count_diagonal():
@@ -243,12 +231,11 @@ def test_dt_sem_001_cell_count_diagonal():
     svg = render_svg(spec)
     rendered = _dt_cells(svg)
     total_values = sum(len(row) for row in d["triangle"]["values"])
-    assert len(rendered) == total_values, (
-        f"rendered cells {len(rendered)} != supplied values {total_values}"
-    )
+    assert len(rendered) == total_values, f"rendered cells {len(rendered)} != supplied values {total_values}"
 
 
 # ── DT-SEM-003  Latest diagonal highlights rightmost populated cell per row ──
+
 
 def test_dt_sem_003_diagonal_positions():
     """DT-SEM-003: latest diagonal highlights exactly the last populated cell in each row."""
@@ -258,14 +245,10 @@ def test_dt_sem_003_diagonal_positions():
     svg = render_svg(spec)
     diags = _dt_diag_rects(svg)
     values = d["triangle"]["values"]
-    assert len(diags) == len(values), (
-        f"diagonal rects {len(diags)} != rows {len(values)}"
-    )
+    assert len(diags) == len(values), f"diagonal rects {len(diags)} != rows {len(values)}"
     for i, diag in enumerate(diags):
         expected_period = len(values[i]) - 1
-        assert int(diag["data-origin"]) == i, (
-            f"diagonal rect {i}: origin {diag['data-origin']} != expected {i}"
-        )
+        assert int(diag["data-origin"]) == i, f"diagonal rect {i}: origin {diag['data-origin']} != expected {i}"
         assert int(diag["data-period"]) == expected_period, (
             f"diagonal rect {i}: period {diag['data-period']} != expected {expected_period}"
         )
@@ -294,6 +277,7 @@ def test_dt_sem_003_diagonal_constructed():
 
 # ── DT-SEM-005  Supplied factor values are rendered exactly ──
 
+
 def test_dt_sem_005_factors_rendered_exactly():
     """DT-SEM-005: supplied factor values are rendered exactly (not recalculated)."""
     spec_path = ROOT / "charts" / "development-triangle" / "examples" / "factors.json"
@@ -307,9 +291,7 @@ def test_dt_sem_005_factors_rendered_exactly():
     )
     for i, (rendered, supplied) in enumerate(zip(rendered_factors, supplied_factors)):
         expected = f"{supplied:.3f}"
-        assert rendered == expected, (
-            f"factor {i}: rendered {rendered!r} != expected {expected!r}"
-        )
+        assert rendered == expected, f"factor {i}: rendered {rendered!r} != expected {expected!r}"
 
 
 def test_dt_sem_005_factors_constructed():
@@ -330,6 +312,7 @@ def test_dt_sem_005_factors_constructed():
 
 
 # ── DT-SEM-007  Annotation resolves to exactly its intended populated cell ──
+
 
 def test_dt_sem_007_annotation_position():
     """DT-SEM-007: annotation resolves to exactly its intended populated cell."""
@@ -354,9 +337,7 @@ def test_dt_sem_007_annotation_constructed():
             "periods": [6, 12],
             "values": [[10, 20], [30]],
         },
-        "annotations": [
-            {"origin": "R1", "period": 12, "text": "Check this"}
-        ],
+        "annotations": [{"origin": "R1", "period": 12, "text": "Check this"}],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -368,6 +349,7 @@ def test_dt_sem_007_annotation_constructed():
 
 # ── DT-SEM-008  Annotation text survives into accessible SVG metadata ──
 
+
 def test_dt_sem_008_annotation_accessible_metadata():
     """DT-SEM-008: annotation text survives into <title> and aria-label."""
     spec_path = ROOT / "charts" / "development-triangle" / "examples" / "annotated.json"
@@ -375,12 +357,8 @@ def test_dt_sem_008_annotation_accessible_metadata():
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
     ann_text = d["annotations"][0]["text"]
-    assert f"<title>{ann_text}</title>" in svg, (
-        f"annotation text {ann_text!r} not found in <title>"
-    )
-    assert f'aria-label="{ann_text}"' in svg, (
-        f"annotation text {ann_text!r} not found in aria-label"
-    )
+    assert f"<title>{ann_text}</title>" in svg, f"annotation text {ann_text!r} not found in <title>"
+    assert f'aria-label="{ann_text}"' in svg, f"annotation text {ann_text!r} not found in aria-label"
 
 
 def test_dt_sem_008_annotation_text_constructed():
@@ -392,9 +370,7 @@ def test_dt_sem_008_annotation_text_constructed():
             "periods": [12],
             "values": [[99]],
         },
-        "annotations": [
-            {"origin": "A", "period": 12, "text": "Special note here"}
-        ],
+        "annotations": [{"origin": "A", "period": 12, "text": "Special note here"}],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -403,6 +379,7 @@ def test_dt_sem_008_annotation_text_constructed():
 
 
 # ── DT-SEM-009  Unit/view/valueType survive into output metadata ──
+
 
 def test_dt_sem_009_metadata_basic():
     """DT-SEM-009: view and valueType in data attributes from basic example."""
@@ -453,6 +430,7 @@ def test_dt_sem_009_defaults():
 
 # ── DT-SEM-010  Malformed numeric and shape inputs fail before rendering ──
 
+
 def test_dt_sem_010_boolean_value_rejected():
     """DT-SEM-010: boolean in values is rejected."""
     d = {
@@ -463,12 +441,9 @@ def test_dt_sem_010_boolean_value_rejected():
             "values": [[True]],
         },
     }
-    try:
+    with pytest.raises((ValueError, TypeError)):
         spec = ChartSpec.from_dict(d)
         render_svg(spec)
-        assert False, "expected validation error for boolean value"
-    except Exception:
-        pass  # expected
 
 
 def test_dt_sem_010_nan_rejected():
@@ -481,12 +456,9 @@ def test_dt_sem_010_nan_rejected():
             "values": [[100]],
         },
     }
-    try:
+    with pytest.raises((ValueError, TypeError)):
         spec = ChartSpec.from_dict(d)
         render_svg(spec)
-        assert False, "expected validation error for NaN period"
-    except Exception:
-        pass  # expected
 
 
 def test_dt_sem_010_fractional_period_rejected():
@@ -499,12 +471,9 @@ def test_dt_sem_010_fractional_period_rejected():
             "values": [[100]],
         },
     }
-    try:
+    with pytest.raises((ValueError, TypeError)):
         spec = ChartSpec.from_dict(d)
         render_svg(spec)
-        assert False, "expected validation error for fractional period"
-    except Exception:
-        pass  # expected
 
 
 def test_dt_sem_010_increasing_row_lengths_rejected():
@@ -517,12 +486,9 @@ def test_dt_sem_010_increasing_row_lengths_rejected():
             "values": [[10], [20, 30]],
         },
     }
-    try:
+    with pytest.raises((ValueError, TypeError)):
         spec = ChartSpec.from_dict(d)
         render_svg(spec)
-        assert False, "expected validation error for increasing row lengths"
-    except Exception:
-        pass  # expected
 
 
 def test_dt_sem_010_boolean_period_rejected():
@@ -535,12 +501,9 @@ def test_dt_sem_010_boolean_period_rejected():
             "values": [[100]],
         },
     }
-    try:
+    with pytest.raises((ValueError, TypeError)):
         spec = ChartSpec.from_dict(d)
         render_svg(spec)
-        assert False, "expected validation error for boolean period"
-    except Exception:
-        pass  # expected
 
 
 def test_dt_sem_010_empty_row_rejected():
@@ -553,9 +516,6 @@ def test_dt_sem_010_empty_row_rejected():
             "values": [[100, 200], []],
         },
     }
-    try:
+    with pytest.raises((ValueError, TypeError)):
         spec = ChartSpec.from_dict(d)
         render_svg(spec)
-        assert False, "expected validation error for empty row"
-    except Exception:
-        pass  # expected

@@ -1,0 +1,16 @@
+{
+  "type": "development-triangle",
+  "title": "Rectangular 3x5 Loss Triangle",
+  "triangle": {
+    "origins": ["2022", "2023", "2024"],
+    "periods": [12, 24, 36, 48, 60],
+    "values": [
+      [100, 155, 189, 204, 210],
+      [115, 172, 198, 213, 219],
+      [128, 186, 210, 225, 231]
+    ],
+    "view": "cumulative",
+    "valueType": "incurred",
+    "unit": "USD (000s)"
+  }
+}

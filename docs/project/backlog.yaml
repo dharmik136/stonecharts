@@ -3978,9 +3978,27 @@ items:
     canonical capability tier is certified. Candidate and experimental
     charts can be verified in evaluation mode but their evidence is
     explicitly labeled as non-certified.
+  traceability:
+    - REQ-VERIFY-002
+  risks:
+    - RISK-009
+  evidence:
+    - TEST-STONEVERIFY-EXIT-CODES
+    - TEST-STONEVERIFY-RESULT-SCHEMA
+  dependencies:
+    - WORK-VERIFY-014A
+  compatibility: >
+    Adds --profile flag and assurance metadata to StoneVerify evidence;
+    existing certified-only workflows are unaffected. No renderer changes.
+  areas:
+    - python
+    - spec
   acceptance:
     - --profile certified rejects non-certified chart types with exit code 6
     - --profile evaluation allows all types but labels evidence accordingly
     - assurance metadata appears in every evidence bundle
     - result schema validates assurance fields
     - candidate/experimental evidence says eligibleForCertifiedGuarantee false
+  verification:
+    - python -m pytest libs/python/tests/test_stonecharts_verify.py -q
+    - python tools/check_docs.py

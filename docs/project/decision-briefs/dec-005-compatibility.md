@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-006
 title: StoneCharts DEC-005 Compatibility Decision Brief
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer

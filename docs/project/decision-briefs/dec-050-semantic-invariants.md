@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-020
 title: DEC-050 Semantic Invariant Tests
-status: accepted
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer
