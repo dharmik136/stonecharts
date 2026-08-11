@@ -143,6 +143,12 @@ def test_build_verification_result_validates_against_schema():
         findings=[],
         evidence={},
         environment=env,
+        assurance={
+            "profile": "certified",
+            "chartType": "line",
+            "tier": "certified",
+            "eligibleForCertifiedGuarantee": True,
+        },
     )
     errors = validate_against_schema(result)
     assert errors == [], f"schema validation errors: {errors}"
