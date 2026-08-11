@@ -50,18 +50,14 @@ def _candles(svg):
 
 def _slices(svg):
     out = []
-    for m in re.finditer(
-        r'<(?:path|polygon)\s[^>]*class="sc-slice sc-point"[^>]*/?\s*>', svg
-    ):
+    for m in re.finditer(r'<(?:path|polygon)\s[^>]*class="sc-slice sc-point"[^>]*/?\s*>', svg):
         out.append(dict(_ATTR_RE.findall(m.group(0))))
     return out
 
 
 def _lollipop_heads(svg):
     out = []
-    for m in re.finditer(
-        r'<circle\s[^>]*class="[^"]*sc-lollipop-head[^"]*"[^>]*/?\s*>', svg
-    ):
+    for m in re.finditer(r'<circle\s[^>]*class="[^"]*sc-lollipop-head[^"]*"[^>]*/?\s*>', svg):
         out.append(dict(_ATTR_RE.findall(m.group(0))))
     return out
 
@@ -131,36 +127,28 @@ def _polar_dots(svg):
 
 def _windrose_sectors(svg):
     out = []
-    for m in re.finditer(
-        r'<path\s[^>]*class="sc-windrose-sector sc-point"[^>]*/?\s*>', svg
-    ):
+    for m in re.finditer(r'<path\s[^>]*class="sc-windrose-sector sc-point"[^>]*/?\s*>', svg):
         out.append(dict(_ATTR_RE.findall(m.group(0))))
     return out
 
 
 def _nightingale_sectors(svg):
     out = []
-    for m in re.finditer(
-        r'<path\s[^>]*class="sc-nightingale-sector sc-point"[^>]*/?\s*>', svg
-    ):
+    for m in re.finditer(r'<path\s[^>]*class="sc-nightingale-sector sc-point"[^>]*/?\s*>', svg):
         out.append(dict(_ATTR_RE.findall(m.group(0))))
     return out
 
 
 def _radialbar_bars(svg):
     out = []
-    for m in re.finditer(
-        r'<path\s[^>]*class="sc-radialbar-bar sc-point"[^>]*/?\s*>', svg
-    ):
+    for m in re.finditer(r'<path\s[^>]*class="sc-radialbar-bar sc-point"[^>]*/?\s*>', svg):
         out.append(dict(_ATTR_RE.findall(m.group(0))))
     return out
 
 
 def _parliament_dots(svg):
     out = []
-    for m in re.finditer(
-        r'<circle\s[^>]*class="sc-parliament-dot sc-point"[^>]*/?\s*>', svg
-    ):
+    for m in re.finditer(r'<circle\s[^>]*class="sc-parliament-dot sc-point"[^>]*/?\s*>', svg):
         out.append(dict(_ATTR_RE.findall(m.group(0))))
     return out
 
@@ -438,12 +426,14 @@ def test_error_bar_constructed():
     d = {
         "type": "error-bar",
         "xAxis": {"categories": ["A", "B", "C"]},
-        "series": [{
-            "name": "test",
-            "data": [50, 100, 75],
-            "low": [30, 80, 60],
-            "high": [70, 120, 90],
-        }],
+        "series": [
+            {
+                "name": "test",
+                "data": [50, 100, 75],
+                "low": [30, 80, 60],
+                "high": [70, 120, 90],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -509,14 +499,16 @@ def test_boxplot_constructed():
     d = {
         "type": "boxplot",
         "xAxis": {"categories": ["X", "Y"]},
-        "series": [{
-            "name": "test",
-            "data": [50, 100],
-            "boxData": [
-                {"low": 10, "q1": 30, "median": 50, "q3": 70, "high": 90},
-                {"low": 60, "q1": 80, "median": 100, "q3": 120, "high": 140},
-            ],
-        }],
+        "series": [
+            {
+                "name": "test",
+                "data": [50, 100],
+                "boxData": [
+                    {"low": 10, "q1": 30, "median": 50, "q3": 70, "high": 90},
+                    {"low": 60, "q1": 80, "median": 100, "q3": 120, "high": 140},
+                ],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -612,14 +604,16 @@ def test_candlestick_constructed():
         "type": "candlestick",
         "subtype": "candlestick",
         "xAxis": {"categories": ["Mon", "Tue"]},
-        "series": [{
-            "name": "Stock",
-            "data": [105, 95],
-            "ohlc": [
-                {"open": 100, "high": 110, "low": 90, "close": 105},
-                {"open": 105, "high": 108, "low": 88, "close": 95},
-            ],
-        }],
+        "series": [
+            {
+                "name": "Stock",
+                "data": [105, 95],
+                "ohlc": [
+                    {"open": 100, "high": 110, "low": 90, "close": 105},
+                    {"open": 105, "high": 108, "low": 88, "close": 95},
+                ],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -739,11 +733,13 @@ def test_timeline_constructed():
     d = {
         "type": "timeline",
         "xAxis": {"type": "datetime"},
-        "series": [{
-            "name": "Events",
-            "data": [1609459200000, 1612137600000, 1614556800000],
-            "labels": ["Jan", "Feb", "Mar"],
-        }],
+        "series": [
+            {
+                "name": "Events",
+                "data": [1609459200000, 1612137600000, 1614556800000],
+                "labels": ["Jan", "Feb", "Mar"],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -776,11 +772,13 @@ def test_windbarb_constructed():
     d = {
         "type": "windbarb",
         "xAxis": {"categories": ["00Z", "06Z", "12Z"]},
-        "series": [{
-            "name": "Wind",
-            "data": [15, 25, 5],
-            "direction": [180, 270, 90],
-        }],
+        "series": [
+            {
+                "name": "Wind",
+                "data": [15, 25, 5],
+                "direction": [180, 270, 90],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -843,13 +841,15 @@ def test_vector_plot_constructed():
     """SC-SEM-022: vector-plot with constructed spec."""
     d = {
         "type": "vector-plot",
-        "series": [{
-            "name": "Flow",
-            "x": [0, 1, 2],
-            "data": [0, 1, 2],
-            "direction": [45, 90, 135],
-            "length": [1.0, 1.5, 2.0],
-        }],
+        "series": [
+            {
+                "name": "Flow",
+                "x": [0, 1, 2],
+                "data": [0, 1, 2],
+                "direction": [45, 90, 135],
+                "length": [1.0, 1.5, 2.0],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -881,14 +881,16 @@ def test_xrange_constructed():
         "type": "xrange",
         "xAxis": {"type": "datetime"},
         "yAxis": {"categories": ["Track A", "Track B"]},
-        "series": [{
-            "name": "Schedule",
-            "data": [],
-            "spans": [
-                {"x": 1609459200000, "x2": 1609545600000, "y": 0, "id": "s1", "name": "Step 1"},
-                {"x": 1609545600000, "x2": 1609718400000, "y": 1, "id": "s2", "name": "Step 2"},
-            ],
-        }],
+        "series": [
+            {
+                "name": "Schedule",
+                "data": [],
+                "spans": [
+                    {"x": 1609459200000, "x2": 1609545600000, "y": 0, "id": "s1", "name": "Step 1"},
+                    {"x": 1609545600000, "x2": 1609718400000, "y": 1, "id": "s2", "name": "Step 2"},
+                ],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -920,11 +922,13 @@ def test_technical_indicators_constructed():
     d = {
         "type": "technical-indicators",
         "xAxis": {"categories": [str(i) for i in range(10)]},
-        "series": [{
-            "name": "Price",
-            "data": [10, 12, 11, 13, 14, 12, 15, 16, 14, 17],
-            "indicators": [{"type": "sma", "period": 3}],
-        }],
+        "series": [
+            {
+                "name": "Price",
+                "data": [10, 12, 11, 13, 14, 12, 15, 16, 14, 17],
+                "indicators": [{"type": "sma", "period": 3}],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
@@ -954,15 +958,17 @@ def test_flame_chart_constructed():
     """SC-SEM-025: flame-chart with constructed spec."""
     d = {
         "type": "flame-chart",
-        "series": [{
-            "name": "Profile",
-            "data": [],
-            "frames": [
-                {"x": 0, "x2": 100, "depth": 0, "name": "main"},
-                {"x": 10, "x2": 60, "depth": 1, "name": "foo"},
-                {"x": 60, "x2": 90, "depth": 1, "name": "bar"},
-            ],
-        }],
+        "series": [
+            {
+                "name": "Profile",
+                "data": [],
+                "frames": [
+                    {"x": 0, "x2": 100, "depth": 0, "name": "main"},
+                    {"x": 10, "x2": 60, "depth": 1, "name": "foo"},
+                    {"x": 60, "x2": 90, "depth": 1, "name": "bar"},
+                ],
+            }
+        ],
     }
     spec = ChartSpec.from_dict(d)
     svg = render_svg(spec)
