@@ -60,6 +60,7 @@ Document status and classification are authoritative in each file's metadata.
 - [DEC-056 combo dual-axis presentation safety](project/decision-briefs/dec-056-dual-axis-policy.md)
 - [DEC-057 development triangle chart type](project/decision-briefs/dec-057-development-triangle.md)
 - [DEC-058 batch candidate-to-certified promotion](project/decision-briefs/dec-058-batch-candidate-promotion.md)
+- [DEC-059 batch experimental-to-certified promotion](project/decision-briefs/dec-059-batch-experimental-promotion.md)
 
 ## Architecture and contracts
 
