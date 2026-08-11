@@ -15,8 +15,7 @@
     "runtimeCoverage",
     "findings",
     "evidence",
-    "environment",
-    "assurance"
+    "environment"
   ],
   "properties": {
     "schemaVersion": { "const": 1 },
@@ -32,34 +31,9 @@
       "items": { "$ref": "#/$defs/finding" }
     },
     "evidence": { "type": "object" },
-    "environment": { "$ref": "#/$defs/environment" },
-    "presentationAdvisories": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/presentationAdvisory" }
-    },
-    "assurance": { "$ref": "#/$defs/assurance" }
+    "environment": { "$ref": "#/$defs/environment" }
   },
   "$defs": {
-    "assurance": {
-      "type": "object",
-      "required": ["profile", "chartType", "tier", "eligibleForCertifiedGuarantee"],
-      "properties": {
-        "profile": { "enum": ["certified", "evaluation"] },
-        "chartType": { "type": "string" },
-        "tier": { "enum": ["certified", "candidate", "experimental"] },
-        "eligibleForCertifiedGuarantee": { "type": "boolean" }
-      }
-    },
-    "presentationAdvisory": {
-      "type": "object",
-      "required": ["code", "severity", "message", "recommendation"],
-      "properties": {
-        "code": { "type": "string" },
-        "severity": { "enum": ["info", "warning"] },
-        "message": { "type": "string" },
-        "recommendation": { "type": "string" }
-      }
-    },
     "digest": {
       "type": "object",
       "required": ["algorithm", "value"],
