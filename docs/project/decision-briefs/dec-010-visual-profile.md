@@ -1,7 +1,7 @@
 ---
 id: SC-OPS-008
 title: StoneCharts DEC-010 Visual Profile Decision Brief
-status: proposed
+status: accepted
 classification: informative
 owner: product-owner
 approver: maintainer
@@ -9,8 +9,8 @@ review_mode: self
 applies_to: 0.0.0.1
 requirements: [REQ-VIS-001, REQ-REL-001]
 evidence: [TEST-DOCS-CONTROL]
-last_reviewed: "2026-07-18"
-review_due: "2026-08-18"
+last_reviewed: "2026-08-11"
+review_due: "2026-09-11"
 supersedes: null
 superseded_by: null
 ---
