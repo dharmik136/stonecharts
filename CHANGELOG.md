@@ -7,7 +7,33 @@ not represented as Semantic Versioning.
 
 ## [Unreleased]
 
-No unreleased changes.
+### Added
+
+- **Development-triangle chart** (`type: "development-triangle"`) — actuarial loss
+  development triangle for reserve adequacy and IBNR estimation (candidate tier,
+  targeting 0.0.0.33).
+- **Canonical capability registry** (`spec/capabilities.json`) — single source of
+  truth for all chart type tiers and version origins.
+- **Capability generation tool** (`tools/generate_capabilities.py`) — generates and
+  verifies Python/Go capability tables and doc consistency from the canonical
+  registry. Supports `--generate` and `--check` modes.
+
+### Changed
+
+- **Certification tier accuracy** (DEC-049 through DEC-057) — corrected all docs
+  and code to use accurate 3-tier classification (certified/candidate/experimental)
+  instead of labeling all chart types as "certified".
+  - `capabilities.py` / `capabilities.go`: development-triangle downgraded from
+    certified to candidate with `since` set to null/empty (unreleased).
+  - `README.md`: updated from 35 to 36 chart types; candidate count from 8 to 9;
+    added development-triangle to candidate table.
+  - `CHARTS.md`: fixed all chart status fields to reflect actual tier instead of
+    universally claiming "certified"; added development-triangle entry.
+  - `docs/product/capability-matrix.md`: added Tier column; corrected all chart
+    type tiers; added development-triangle row; updated counts.
+  - `docs/contracts/guarantees-and-limits.md`: replaced "35 chart types are
+    certified" with accurate tier breakdown (7 certified, 9 candidate,
+    20 experimental, 36 total).
 
 ## [0.0.0.32] - 2026-08-10
 
