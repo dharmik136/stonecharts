@@ -185,6 +185,279 @@ def test_percent_stack_zero_category():
         assert abs(t - totals[0]) < 0.5
 
 
+# ── SC-SEM-011  Range family: data-low <= data-high ────────────────────
+
+
+def _range_points(svg):
+    """Extract sc-point elements that carry both data-low and data-high."""
+    out = []
+    for m in re.finditer(r'<(?:circle|rect)\s[^>]*class="[^"]*sc-point[^"]*"[^>]*/?\s*>', svg):
+        attrs = dict(_ATTR_RE.findall(m.group(0)))
+        if "data-low" in attrs and "data-high" in attrs:
+            out.append(attrs)
+    return out
+
+
+def test_arearange_low_le_high():
+    """SC-SEM-011: arearange data-low <= data-high for every rendered point."""
+    spec_path = ROOT / "charts" / "arearange" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no arearange points found"
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        assert lo <= hi, f"point {i}: low {lo} > high {hi}"
+
+
+def test_columnrange_low_le_high():
+    """SC-SEM-011: columnrange data-low <= data-high for every rendered bar."""
+    spec_path = ROOT / "charts" / "columnrange" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no columnrange points found"
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        assert lo <= hi, f"bar {i}: low {lo} > high {hi}"
+
+
+def test_columnrange_bar_height_positive():
+    """SC-SEM-011: columnrange bar has positive pixel height when low != high."""
+    spec_path = ROOT / "charts" / "columnrange" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        if lo != hi:
+            h = float(p.get("height", "0"))
+            assert h > 0, f"bar {i}: low {lo} != high {hi} but height is {h}"
+
+
+def test_dumbbell_low_le_high():
+    """SC-SEM-011: dumbbell data-low <= data-high for every rendered point."""
+    spec_path = ROOT / "charts" / "dumbbell" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no dumbbell points found"
+    for i, p in enumerate(points):
+        lo, hi = float(p["data-low"]), float(p["data-high"])
+        assert lo <= hi, f"point {i}: low {lo} > high {hi}"
+
+
+def test_dumbbell_connector_count():
+    """SC-SEM-011: dumbbell has one connector line per data point."""
+    spec_path = ROOT / "charts" / "dumbbell" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    connectors = re.findall(r'class="sc-connector"', svg)
+    n_points = sum(len(s.data) for s in spec.series)
+    assert len(connectors) == n_points, f"connectors {len(connectors)} != points {n_points}"
+
+
+def test_range_family_constructed():
+    """SC-SEM-011: constructed range specs all satisfy low <= high."""
+    specs = {
+        "arearange": {"data": [50, 60, 70], "low": [10, 20, 30]},
+        "columnrange": {"data": [10, 20, 30], "high": [50, 60, 70]},
+        "dumbbell": {"data": [10, 20, 30], "high": [50, 60, 70]},
+    }
+    for chart_type, series_fields in specs.items():
+        d = {
+            "type": chart_type,
+            "xAxis": {"categories": ["A", "B", "C"]},
+            "series": [{"name": "s", **series_fields}],
+        }
+        spec = ChartSpec.from_dict(d)
+        svg = render_svg(spec)
+        points = _range_points(svg)
+        assert len(points) == 3, f"{chart_type}: expected 3 points, got {len(points)}"
+        for i, p in enumerate(points):
+            lo, hi = float(p["data-low"]), float(p["data-high"])
+            assert lo <= hi, f"{chart_type} point {i}: low {lo} > high {hi}"
+
+
+# ── SC-SEM-012  Error-bar: low <= central value <= high ────────────────
+
+
+def test_error_bar_low_le_value_le_high():
+    """SC-SEM-012: error-bar central value lies between its bounds."""
+    spec_path = ROOT / "charts" / "error-bar" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) > 0, "no error-bar points found"
+    for i, p in enumerate(points):
+        lo = float(p["data-low"])
+        y = float(p["data-y"])
+        hi = float(p["data-high"])
+        assert lo <= y <= hi, f"point {i}: low {lo} <= y {y} <= high {hi} violated"
+
+
+def test_error_bar_constructed():
+    """SC-SEM-012: error-bar bounds with constructed spec."""
+    d = {
+        "type": "error-bar",
+        "xAxis": {"categories": ["A", "B", "C"]},
+        "series": [{
+            "name": "test",
+            "data": [50, 100, 75],
+            "low": [30, 80, 60],
+            "high": [70, 120, 90],
+        }],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    points = _range_points(svg)
+    assert len(points) == 3
+    for i, p in enumerate(points):
+        lo = float(p["data-low"])
+        y = float(p["data-y"])
+        hi = float(p["data-high"])
+        assert lo <= y <= hi, f"point {i}: {lo} <= {y} <= {hi} violated"
+
+
+# ── SC-SEM-013  Boxplot: structural integrity ──────────────────────────
+
+
+def _boxes(svg):
+    """Extract sc-box sc-point rect elements."""
+    out = []
+    for m in re.finditer(r'<rect\s[^>]*class="sc-box sc-point"[^>]*/>', svg):
+        out.append(dict(_ATTR_RE.findall(m.group(0))))
+    return out
+
+
+def test_boxplot_median_matches_input():
+    """SC-SEM-013: boxplot data-y matches median from boxData input."""
+    spec_path = ROOT / "charts" / "boxplot" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    medians = [bd["median"] for bd in d["series"][0]["boxData"]]
+    assert len(boxes) == len(medians), f"boxes {len(boxes)} != data {len(medians)}"
+    for i, (box, expected) in enumerate(zip(boxes, medians)):
+        actual = float(box["data-y"])
+        assert actual == expected, f"box {i}: data-y {actual} != median {expected}"
+
+
+def test_boxplot_box_height_positive():
+    """SC-SEM-013: boxplot box has positive pixel height (q1 < q3)."""
+    spec_path = ROOT / "charts" / "boxplot" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    for i, box in enumerate(boxes):
+        h = float(box.get("height", "0"))
+        assert h > 0, f"box {i}: height is {h}, expected > 0"
+
+
+def test_boxplot_whisker_cap_count():
+    """SC-SEM-013: boxplot has exactly 2 whisker caps per box."""
+    spec_path = ROOT / "charts" / "boxplot" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    caps = re.findall(r'class="sc-whisker-cap"', svg)
+    assert len(caps) == 2 * len(boxes), f"caps {len(caps)} != 2 * boxes {len(boxes)}"
+
+
+def test_boxplot_constructed():
+    """SC-SEM-013: boxplot with constructed spec verifies structure."""
+    d = {
+        "type": "boxplot",
+        "xAxis": {"categories": ["X", "Y"]},
+        "series": [{
+            "name": "test",
+            "data": [50, 100],
+            "boxData": [
+                {"low": 10, "q1": 30, "median": 50, "q3": 70, "high": 90},
+                {"low": 60, "q1": 80, "median": 100, "q3": 120, "high": 140},
+            ],
+        }],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    boxes = _boxes(svg)
+    assert len(boxes) == 2
+    assert float(boxes[0]["data-y"]) == 50
+    assert float(boxes[1]["data-y"]) == 100
+    caps = re.findall(r'class="sc-whisker-cap"', svg)
+    assert len(caps) == 4
+
+
+# ── SC-SEM-014  Bullet: structural completeness ───────────────────────
+
+
+def test_bullet_measure_matches_input():
+    """SC-SEM-014: bullet data-y matches the measure value from input."""
+    spec_path = ROOT / "charts" / "bullet" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _bars(svg)
+    expected = d["series"][0]["data"]
+    assert len(bars) == len(expected), f"bars {len(bars)} != data {len(expected)}"
+    for i, (bar, val) in enumerate(zip(bars, expected)):
+        actual = float(bar["data-y"])
+        assert actual == val, f"bar {i}: data-y {actual} != data {val}"
+
+
+def test_bullet_range_count():
+    """SC-SEM-014: bullet has one sc-range rect per bulletRanges entry per category."""
+    spec_path = ROOT / "charts" / "bullet" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    ranges = re.findall(r'class="sc-range"', svg)
+    n_cats = len(d["xAxis"]["categories"])
+    n_expected = len(d["bulletRanges"]) * n_cats
+    assert len(ranges) == n_expected, f"ranges {len(ranges)} != {n_expected} ({len(d['bulletRanges'])} * {n_cats})"
+
+
+def test_bullet_target_present():
+    """SC-SEM-014: bullet renders target line when bulletTarget is specified."""
+    spec_path = ROOT / "charts" / "bullet" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    assert "bulletTarget" in d
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    targets = re.findall(r'class="sc-target"', svg)
+    assert len(targets) == 1, f"expected 1 target, got {len(targets)}"
+
+
+def test_bullet_constructed():
+    """SC-SEM-014: bullet with constructed multi-KPI spec."""
+    d = {
+        "type": "bullet",
+        "xAxis": {"categories": ["KPI-A", "KPI-B"]},
+        "series": [{"name": "measure", "data": [75, 120]}],
+        "bulletTarget": 100,
+        "bulletRanges": [50, 100, 150],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    bars = _bars(svg)
+    assert len(bars) == 2
+    assert float(bars[0]["data-y"]) == 75
+    assert float(bars[1]["data-y"]) == 120
+    ranges = re.findall(r'class="sc-range"', svg)
+    assert len(ranges) == 6, f"expected 3 ranges * 2 categories = 6, got {len(ranges)}"
+    targets = re.findall(r'class="sc-target"', svg)
+    assert len(targets) == 2, f"expected 1 target * 2 categories = 2, got {len(targets)}"
+
+
 # ── DT-SEM-001  Every rendered data cell maps to exactly one supplied value ──
 
 
