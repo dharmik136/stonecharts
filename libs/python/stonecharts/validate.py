@@ -489,41 +489,169 @@ def _validate_triangle(d: dict, errs: list[str]) -> None:
         errs.append("$.triangle: required for development-triangle")
         return
     path = "$.triangle"
+
+    # --- origins ---
     origins = tri.get("origins")
+    origins_ok = False
     if not isinstance(origins, list) or len(origins) == 0:
         errs.append(f"{path}.origins: required non-empty array of strings")
-    elif not all(isinstance(o, str) for o in origins):
-        errs.append(f"{path}.origins: all elements must be strings")
+    else:
+        all_str = True
+        for o in origins:
+            if not isinstance(o, str):
+                all_str = False
+                break
+        if not all_str:
+            errs.append(f"{path}.origins: all elements must be strings")
+        else:
+            origins_ok = True
+
+    # --- periods (WP3: strict integer, non-negative, strictly increasing) ---
     periods = tri.get("periods")
+    periods_ok = False
+    n_periods = 0
     if not isinstance(periods, list) or len(periods) == 0:
-        errs.append(f"{path}.periods: required non-empty array of numbers")
-    elif not all(isinstance(p, (int, float)) for p in periods):
-        errs.append(f"{path}.periods: all elements must be numbers")
+        errs.append(f"{path}.periods: required non-empty array of integers")
+    else:
+        n_periods = len(periods)
+        all_valid = True
+        for i, pv in enumerate(periods):
+            pp = f"{path}.periods[{i}]"
+            if isinstance(pv, bool) or not isinstance(pv, (int, float)):
+                errs.append(f"{pp}: expected integer, received {_jtype(pv)}")
+                all_valid = False
+            elif isinstance(pv, float) and (not math.isfinite(pv) or not pv.is_integer()):
+                errs.append(
+                    f"{pp}: expected integer, received "
+                    + ("non-finite number" if not math.isfinite(pv) else "non-integer number")
+                )
+                all_valid = False
+            else:
+                iv = int(pv)
+                if iv < 0:
+                    errs.append(f"{pp}: expected non-negative integer, received {iv}")
+                    all_valid = False
+        if all_valid:
+            int_periods = [int(pv) for pv in periods]
+            increasing = True
+            for i in range(1, len(int_periods)):
+                if int_periods[i] <= int_periods[i - 1]:
+                    increasing = False
+                    break
+            if not increasing:
+                errs.append(f"{path}.periods: must be strictly increasing")
+            else:
+                periods_ok = True
+
+    # --- values (WP3: strict _num for elements; WP4: shape validation) ---
     values = tri.get("values")
+    values_ok = False
     if not isinstance(values, list) or len(values) == 0:
         errs.append(f"{path}.values: required non-empty array")
-    elif isinstance(origins, list) and len(values) != len(origins):
+    elif origins_ok and len(values) != len(origins):
         errs.append(f"{path}.values: length must equal origins length")
-    elif isinstance(periods, list):
+    else:
+        prev_len: int | None = None
+        shape_ok = True
         for i, row in enumerate(values):
             rp = f"{path}.values[{i}]"
             if not isinstance(row, list):
                 errs.append(f"{rp}: expected array")
+                shape_ok = False
                 continue
-            max_cols = len(periods) - i
-            if len(row) > max_cols:
-                errs.append(f"{rp}: at most {max_cols} values allowed (triangular shape)")
+            if len(row) == 0:
+                errs.append(f"{rp}: row must have at least 1 value")
+                shape_ok = False
+                continue
+            if periods_ok and len(row) > n_periods:
+                errs.append(f"{rp}: row length {len(row)} exceeds periods length {n_periods}")
+                shape_ok = False
+            if prev_len is not None and len(row) > prev_len:
+                errs.append(f"{rp}: row length {len(row)} exceeds previous row length {prev_len}")
+                shape_ok = False
+            prev_len = len(row)
             for j, v in enumerate(row):
-                if not isinstance(v, (int, float)):
-                    errs.append(f"{rp}[{j}]: expected number")
+                _num(v, f"{rp}[{j}]", errs)
+        if shape_ok:
+            values_ok = True
+
+    # --- view ---
     if "view" in tri:
         _str(tri["view"], f"{path}.view", errs)
         if isinstance(tri["view"], str) and tri["view"] not in ("cumulative", "incremental"):
             errs.append(f'{path}.view: expected "cumulative" or "incremental"')
+
+    # --- valueType ---
     if "valueType" in tri:
         _str(tri["valueType"], f"{path}.valueType", errs)
         if isinstance(tri["valueType"], str) and tri["valueType"] not in ("incurred", "paid"):
             errs.append(f'{path}.valueType: expected "incurred" or "paid"')
+
+    # --- unit (WP7) ---
+    if "unit" in tri:
+        _str(tri["unit"], f"{path}.unit", errs)
+
+    # --- factors (WP6) ---
+    factors = d.get("factors")
+    if isinstance(factors, dict):
+        fp = "$.factors"
+        if "show" in factors:
+            _bool(factors["show"], f"{fp}.show", errs)
+        if factors.get("show") is True:
+            fv = factors.get("values")
+            if not isinstance(fv, list):
+                errs.append(f"{fp}.values: required when factors.show is true")
+            else:
+                if periods_ok and len(fv) != n_periods - 1:
+                    errs.append(f"{fp}.values: expected {n_periods - 1} values (periods length - 1), received {len(fv)}")
+                for i, v in enumerate(fv):
+                    _num(v, f"{fp}.values[{i}]", errs)
+
+    # --- annotations (WP7: cross-reference validation) ---
+    annotations = d.get("annotations")
+    if isinstance(annotations, list):
+        origin_set = set(origins) if origins_ok else set()
+        period_set: set[int] = set()
+        period_list: list[int] = []
+        if periods_ok:
+            period_list = [int(pv) for pv in periods]
+            period_set = set(period_list)
+        origin_list = list(origins) if origins_ok else []
+        for i, ann in enumerate(annotations):
+            ap = f"$.annotations[{i}]"
+            if not isinstance(ann, dict):
+                errs.append(f"{ap}: expected object, received {_jtype(ann)}")
+                continue
+            if "origin" not in ann:
+                errs.append(f"{ap}.origin: required")
+            else:
+                _str(ann["origin"], f"{ap}.origin", errs)
+            if "period" not in ann:
+                errs.append(f"{ap}.period: required")
+            else:
+                _intnum(ann["period"], f"{ap}.period", errs)
+            if "text" not in ann:
+                errs.append(f"{ap}.text: required")
+            else:
+                _str(ann["text"], f"{ap}.text", errs)
+            # Cross-reference checks (only when triangle data is valid)
+            ann_origin = ann.get("origin")
+            ann_period = ann.get("period")
+            if origins_ok and isinstance(ann_origin, str) and ann_origin not in origin_set:
+                errs.append(f'{ap}.origin: unknown origin "{ann_origin}"')
+            if periods_ok and not isinstance(ann_period, bool) and isinstance(ann_period, (int, float)):
+                if isinstance(ann_period, float) and (not math.isfinite(ann_period) or not ann_period.is_integer()):
+                    pass  # _intnum already reported the error
+                else:
+                    pval = int(ann_period)
+                    if pval not in period_set:
+                        errs.append(f"{ap}.period: unknown period {pval}")
+                    elif values_ok and isinstance(ann_origin, str) and ann_origin in origin_set:
+                        oi = origin_list.index(ann_origin)
+                        ci = period_list.index(pval)
+                        row = values[oi] if oi < len(values) else []
+                        if isinstance(row, list) and ci >= len(row):
+                            errs.append(f'{ap}: period {pval} has no value for origin "{ann_origin}"')
 
 
 _KNOWN_TYPES = {

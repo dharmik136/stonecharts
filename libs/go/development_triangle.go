@@ -30,10 +30,42 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 		theme = &t
 	}
 
+	tri := spec.Triangle
+	var origins []string
+	var periods []int
+	var values [][]float64
+	view := "cumulative"
+	valueType := "incurred"
+	unit := ""
+	if tri != nil {
+		origins = tri.Origins
+		periods = tri.Periods
+		values = tri.Values
+		if tri.View != "" {
+			view = tri.View
+		}
+		if tri.ValueType != "" {
+			valueType = tri.ValueType
+		}
+		unit = tri.Unit
+	}
+	nRows := len(origins)
+	nCols := len(periods)
+
+	// --- a11y summary (WP7: include view, valueType, unit) ---
 	a11yAttr := ""
 	a11yDescStr := ""
 	if spec.a11yOn() {
-		sum := esc(a11ySummary(spec, "Development triangle"))
+		parts := []string{}
+		if spec.Title != "" {
+			parts = append(parts, spec.Title+".")
+		}
+		if unit != "" {
+			parts = append(parts, "Unit: "+unit+".")
+		}
+		parts = append(parts, fmt.Sprintf("Development triangle, view: %s, value type: %s.", view, valueType))
+		parts = append(parts, fmt.Sprintf("%d origins, %d periods.", nRows, nCols))
+		sum := esc(strings.Join(parts, " "))
 		a11yAttr = fmt.Sprintf(` role="img" aria-label="%s"`, sum)
 		a11yDescStr = fmt.Sprintf("<desc>%s</desc>", sum)
 	}
@@ -44,6 +76,9 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 	}
 	if spec.Subtitle != "" {
 		mTop += 18
+	}
+	if unit != "" {
+		mTop += 16
 	}
 	mLeft := 22.0
 	mRight := 22.0
@@ -63,22 +98,8 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 			mBottom = *m.Bottom
 		}
 	}
-	// mRight and mBottom are read to match the Python renderer's locals, but
-	// this chart type does not reference them for layout — suppress the lint.
 	_ = mRight
 	_ = mBottom
-
-	tri := spec.Triangle
-	var origins []string
-	var periods []float64
-	var values [][]float64
-	if tri != nil {
-		origins = tri.Origins
-		periods = tri.Periods
-		values = tri.Values
-	}
-	nRows := len(origins)
-	nCols := len(periods)
 
 	showFactors := spec.Factors != nil && spec.Factors.Show
 	useColor := spec.ColorScaleCfg != nil
@@ -159,7 +180,20 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 		p.WriteString(fmt.Sprintf(
 			`<text class="sc-subtitle" x="%s" y="%d" text-anchor="middle" font-size="12" fill="%s">%s</text>`,
 			f1(float64(W)/2), ty, theme.SubtitleColor, esc(spec.Subtitle)))
+		ty += 16
 	}
+
+	// --- WP7: unit label ---
+	if unit != "" {
+		p.WriteString(fmt.Sprintf(
+			`<text class="sc-dt-unit" x="%s" y="%d" text-anchor="middle" font-size="11" fill="%s">Unit: %s</text>`,
+			f1(float64(W)/2), ty, theme.SubtitleColor, esc(unit)))
+	}
+
+	// --- WP7: wrapping group with data attributes ---
+	p.WriteString(fmt.Sprintf(
+		`<g class="sc-dt-triangle" data-triangle-view="%s" data-triangle-value-type="%s">`,
+		esc(view), esc(valueType)))
 
 	// Period headers
 	p.WriteString(`<g class="sc-dt-headers">`)
@@ -168,7 +202,7 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 		cy := gridY - 6
 		p.WriteString(fmt.Sprintf(
 			`<text class="sc-dt-period-header" x="%s" y="%s" text-anchor="middle" font-size="11" font-weight="600" fill="%s">%s</text>`,
-			f1(cx), f1(cy), headerColor, esc(fmtNum(periods[c]))))
+			f1(cx), f1(cy), headerColor, esc(fmtNum(float64(periods[c])))))
 	}
 	p.WriteString("</g>")
 
@@ -217,22 +251,23 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 	}
 	p.WriteString("</g>")
 
-	// Diagonal highlight
+	// --- WP5: fixed latest-diagonal (rightmost populated cell) ---
 	if diagOn {
 		p.WriteString(`<g class="sc-dt-diagonal">`)
 		for r := 0; r < nRows; r++ {
-			c := nRows - 1 - r
 			var row []float64
 			if r < len(values) {
 				row = values[r]
 			}
-			if c < len(row) {
-				x := gridX + float64(c)*dtCellW
-				y := gridY + float64(r)*dtCellH
-				p.WriteString(fmt.Sprintf(
-					`<rect class="sc-dt-diag" data-origin="%d" data-period="%d" x="%s" y="%s" width="%s" height="%s" fill="none" stroke="%s" stroke-width="2"/>`,
-					r, c, f1(x), f1(y), f1(dtCellW), f1(dtCellH), diagColor))
+			if len(row) == 0 {
+				continue
 			}
+			c := len(row) - 1
+			x := gridX + float64(c)*dtCellW
+			y := gridY + float64(r)*dtCellH
+			p.WriteString(fmt.Sprintf(
+				`<rect class="sc-dt-diag" data-origin="%d" data-period="%d" x="%s" y="%s" width="%s" height="%s" fill="none" stroke="%s" stroke-width="2"/>`,
+				r, c, f1(x), f1(y), f1(dtCellW), f1(dtCellH), diagColor))
 		}
 		if spec.Diagonal != nil && spec.Diagonal.Label != "" {
 			lx := gridX + float64(nCols)*dtCellW + 8
@@ -244,28 +279,9 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 		p.WriteString("</g>")
 	}
 
-	// Development factors
-	if showFactors {
-		factors := make([]float64, 0, nCols-1)
-		for c := 0; c < nCols-1; c++ {
-			num := 0.0
-			den := 0.0
-			for r := 0; r < nRows; r++ {
-				var row []float64
-				if r < len(values) {
-					row = values[r]
-				}
-				if c+1 < len(row) {
-					num += row[c+1]
-					den += row[c]
-				}
-			}
-			if den > 0 {
-				factors = append(factors, num/den)
-			} else {
-				factors = append(factors, 0.0)
-			}
-		}
+	// --- WP6: render supplied factors (no computation) ---
+	if showFactors && spec.Factors != nil {
+		factorValues := spec.Factors.Values
 		fy := gridY + float64(nRows)*dtCellH
 		flx := gridX - 8
 		fly := fy + dtCellH/2 + 4
@@ -273,16 +289,16 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 		p.WriteString(fmt.Sprintf(
 			`<text class="sc-dt-factor-header" x="%s" y="%s" text-anchor="end" font-size="10" font-weight="600" fill="%s">Factors</text>`,
 			f1(flx), f1(fly), headerColor))
-		for c := 0; c < len(factors); c++ {
+		for c := 0; c < len(factorValues); c++ {
 			fx := gridX + float64(c)*dtCellW + dtCellW/2 + dtCellW/2
 			p.WriteString(fmt.Sprintf(
 				`<text class="sc-dt-factor" x="%s" y="%s" text-anchor="middle" font-size="10" fill="%s">%s</text>`,
-				f1(fx), f1(fly), textColor, fmt.Sprintf("%.3f", factors[c])))
+				f1(fx), f1(fly), textColor, fmt.Sprintf("%.3f", factorValues[c])))
 		}
 		p.WriteString("</g>")
 	}
 
-	// Annotations
+	// --- WP7: annotations with text in accessible metadata ---
 	if len(spec.Annotations) > 0 {
 		originIdx := make(map[string]int, len(origins))
 		for i, o := range origins {
@@ -290,7 +306,7 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 		}
 		periodIdx := make(map[int]int, nCols)
 		for i := 0; i < nCols; i++ {
-			periodIdx[int(periods[i])] = i
+			periodIdx[periods[i]] = i
 		}
 		p.WriteString(`<g class="sc-dt-annotations">`)
 		for _, ann := range spec.Annotations {
@@ -304,17 +320,26 @@ func renderDevelopmentTriangleSVG(spec *ChartSpec) string {
 				if ci < len(row) {
 					ax := gridX + float64(ci)*dtCellW + dtCellW - 6
 					ay := gridY + float64(ri)*dtCellH + 6
+					escapedText := esc(ann.Text)
+					p.WriteString(fmt.Sprintf(
+						`<g class="sc-dt-annotation-group" aria-label="%s">`,
+						escapedText))
+					p.WriteString(fmt.Sprintf(`<title>%s</title>`, escapedText))
 					p.WriteString(fmt.Sprintf(
 						`<circle class="sc-dt-annotation" cx="%s" cy="%s" r="4" fill="%s" opacity="0.8"/>`,
 						f1(ax), f1(ay), annColor))
 					p.WriteString(fmt.Sprintf(
 						`<text class="sc-dt-annotation-text" x="%s" y="%s" text-anchor="middle" font-size="7" font-weight="700" fill="#ffffff">!</text>`,
 						f1(ax), f1(ay+3)))
+					p.WriteString("</g>")
 				}
 			}
 		}
 		p.WriteString("</g>")
 	}
+
+	// Close the wrapping triangle group
+	p.WriteString("</g>")
 
 	p.WriteString("</svg>")
 	return p.String()
@@ -328,7 +353,7 @@ func devTriangleDataTable(spec *ChartSpec) string {
 	}
 	var head strings.Builder
 	for _, per := range tri.Periods {
-		head.WriteString(`<th scope="col">` + esc(fmtNum(per)) + "</th>")
+		head.WriteString(`<th scope="col">` + esc(fmtNum(float64(per))) + "</th>")
 	}
 	var rows strings.Builder
 	for i, origin := range tri.Origins {

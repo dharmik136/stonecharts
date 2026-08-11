@@ -118,9 +118,13 @@ func vstrArray(v interface{}, path string, errs *[]string) {
 }
 
 func itoa(i int) string {
-	// small non-negative int -> string (mirrors Python's f"{i}")
+	// small int -> string (mirrors Python's f"{i}")
 	if i == 0 {
 		return "0"
+	}
+	neg := i < 0
+	if neg {
+		i = -i
 	}
 	var b [20]byte
 	p := len(b)
@@ -128,6 +132,10 @@ func itoa(i int) string {
 		p--
 		b[p] = byte('0' + i%10)
 		i /= 10
+	}
+	if neg {
+		p--
+		b[p] = '-'
 	}
 	return string(b[p:])
 }
@@ -1202,81 +1210,263 @@ func vTriangle(d map[string]interface{}, errs *[]string) {
 		return
 	}
 	p := "$.triangle"
+
+	// --- origins ---
 	origRaw, origOk := has(tri, "origins")
 	var origins []interface{}
+	originsOk := false
 	if origOk {
 		origins, ok = origRaw.([]interface{})
 		if !ok || len(origins) == 0 {
 			*errs = append(*errs, p+".origins: required non-empty array of strings")
-			origins = nil
 		} else {
+			allStr := true
 			for _, o := range origins {
 				if _, ok := o.(string); !ok {
-					*errs = append(*errs, p+".origins: all elements must be strings")
+					allStr = false
 					break
 				}
+			}
+			if !allStr {
+				*errs = append(*errs, p+".origins: all elements must be strings")
+			} else {
+				originsOk = true
 			}
 		}
 	} else {
 		*errs = append(*errs, p+".origins: required non-empty array of strings")
 	}
+
+	// --- periods (WP3: strict integer, non-negative, strictly increasing) ---
 	perRaw, perOk := has(tri, "periods")
 	var periods []interface{}
+	periodsOk := false
+	nPeriods := 0
 	if perOk {
 		periods, ok = perRaw.([]interface{})
 		if !ok || len(periods) == 0 {
-			*errs = append(*errs, p+".periods: required non-empty array of numbers")
-			periods = nil
+			*errs = append(*errs, p+".periods: required non-empty array of integers")
 		} else {
-			for _, pv := range periods {
-				if _, ok := pv.(float64); !ok {
-					*errs = append(*errs, p+".periods: all elements must be numbers")
-					break
+			nPeriods = len(periods)
+			allValid := true
+			for i, pv := range periods {
+				pp := p + ".periods[" + itoa(i) + "]"
+				f, fOk := pv.(float64)
+				if !fOk {
+					*errs = append(*errs, pp+": expected integer, received "+jtype(pv))
+					allValid = false
+				} else if math.IsNaN(f) || math.IsInf(f, 0) {
+					*errs = append(*errs, pp+": expected integer, received non-finite number")
+					allValid = false
+				} else if f != math.Trunc(f) {
+					*errs = append(*errs, pp+": expected integer, received non-integer number")
+					allValid = false
+				} else {
+					iv := int(f)
+					if iv < 0 {
+						*errs = append(*errs, pp+": expected non-negative integer, received "+itoa(iv))
+						allValid = false
+					}
+				}
+			}
+			if allValid {
+				intPeriods := make([]int, len(periods))
+				for i, pv := range periods {
+					intPeriods[i] = int(pv.(float64))
+				}
+				increasing := true
+				for i := 1; i < len(intPeriods); i++ {
+					if intPeriods[i] <= intPeriods[i-1] {
+						increasing = false
+						break
+					}
+				}
+				if !increasing {
+					*errs = append(*errs, p+".periods: must be strictly increasing")
+				} else {
+					periodsOk = true
 				}
 			}
 		}
 	} else {
-		*errs = append(*errs, p+".periods: required non-empty array of numbers")
+		*errs = append(*errs, p+".periods: required non-empty array of integers")
 	}
+
+	// --- values (WP3: strict vnum for elements; WP4: shape validation) ---
 	valRaw, valOk := has(tri, "values")
+	valuesOk := false
+	var values []interface{}
 	if valOk {
-		values, ok := valRaw.([]interface{})
+		values, ok = valRaw.([]interface{})
 		if !ok || len(values) == 0 {
 			*errs = append(*errs, p+".values: required non-empty array")
-		} else if origins != nil && len(values) != len(origins) {
+		} else if originsOk && len(values) != len(origins) {
 			*errs = append(*errs, p+".values: length must equal origins length")
-		} else if periods != nil {
+		} else {
+			prevLen := -1
+			shapeOk := true
 			for i, rowRaw := range values {
 				rp := p + ".values[" + itoa(i) + "]"
 				row, ok := rowRaw.([]interface{})
 				if !ok {
 					*errs = append(*errs, rp+": expected array")
+					shapeOk = false
 					continue
 				}
-				maxCols := len(periods) - i
-				if len(row) > maxCols {
-					*errs = append(*errs, rp+": at most "+itoa(maxCols)+" values allowed (triangular shape)")
+				if len(row) == 0 {
+					*errs = append(*errs, rp+": row must have at least 1 value")
+					shapeOk = false
+					continue
 				}
+				if periodsOk && len(row) > nPeriods {
+					*errs = append(*errs, rp+": row length "+itoa(len(row))+" exceeds periods length "+itoa(nPeriods))
+					shapeOk = false
+				}
+				if prevLen >= 0 && len(row) > prevLen {
+					*errs = append(*errs, rp+": row length "+itoa(len(row))+" exceeds previous row length "+itoa(prevLen))
+					shapeOk = false
+				}
+				prevLen = len(row)
 				for j, v := range row {
-					if _, ok := v.(float64); !ok {
-						*errs = append(*errs, rp+"["+itoa(j)+"]: expected number")
-					}
+					vnum(v, rp+"["+itoa(j)+"]", errs)
 				}
+			}
+			if shapeOk {
+				valuesOk = true
 			}
 		}
 	} else {
 		*errs = append(*errs, p+".values: required non-empty array")
 	}
+
+	// --- view ---
 	if vw, ok := has(tri, "view"); ok {
 		vstr(vw, p+".view", errs)
 		if s, ok := vw.(string); ok && s != "cumulative" && s != "incremental" {
 			*errs = append(*errs, p+`.view: expected "cumulative" or "incremental"`)
 		}
 	}
+
+	// --- valueType ---
 	if vt, ok := has(tri, "valueType"); ok {
 		vstr(vt, p+".valueType", errs)
 		if s, ok := vt.(string); ok && s != "incurred" && s != "paid" {
 			*errs = append(*errs, p+`.valueType: expected "incurred" or "paid"`)
+		}
+	}
+
+	// --- unit (WP7) ---
+	if u, ok := has(tri, "unit"); ok {
+		vstr(u, p+".unit", errs)
+	}
+
+	// --- factors (WP6) ---
+	if raw, ok := has(d, "factors"); ok {
+		if factors, ok := raw.(map[string]interface{}); ok {
+			fp := "$.factors"
+			if s, ok := has(factors, "show"); ok {
+				vbool(s, fp+".show", errs)
+			}
+			if s, ok := has(factors, "show"); ok {
+				if sb, ok := s.(bool); ok && sb {
+					fv, fvOk := has(factors, "values")
+					if !fvOk {
+						*errs = append(*errs, fp+".values: required when factors.show is true")
+					} else if fvArr, ok := fv.([]interface{}); !ok {
+						*errs = append(*errs, fp+".values: required when factors.show is true")
+					} else {
+						if periodsOk && len(fvArr) != nPeriods-1 {
+							*errs = append(*errs, fp+".values: expected "+itoa(nPeriods-1)+" values (periods length - 1), received "+itoa(len(fvArr)))
+						}
+						for i, v := range fvArr {
+							vnum(v, fp+".values["+itoa(i)+"]", errs)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// --- annotations (WP7: cross-reference validation) ---
+	if raw, ok := has(d, "annotations"); ok {
+		if annArr, ok := raw.([]interface{}); ok {
+			originSet := map[string]bool{}
+			if originsOk {
+				for _, o := range origins {
+					originSet[o.(string)] = true
+				}
+			}
+			periodSet := map[int]bool{}
+			intPeriods := []int{}
+			if periodsOk {
+				intPeriods = make([]int, len(periods))
+				for i, pv := range periods {
+					intPeriods[i] = int(pv.(float64))
+					periodSet[intPeriods[i]] = true
+				}
+			}
+			originList := []string{}
+			if originsOk {
+				for _, o := range origins {
+					originList = append(originList, o.(string))
+				}
+			}
+			for i, annRaw := range annArr {
+				ap := "$.annotations[" + itoa(i) + "]"
+				ann, ok := annRaw.(map[string]interface{})
+				if !ok {
+					*errs = append(*errs, ap+": expected object, received "+jtype(annRaw))
+					continue
+				}
+				if _, ok := has(ann, "origin"); !ok {
+					*errs = append(*errs, ap+".origin: required")
+				} else {
+					vstr(ann["origin"], ap+".origin", errs)
+				}
+				if _, ok := has(ann, "period"); !ok {
+					*errs = append(*errs, ap+".period: required")
+				} else {
+					vintnum(ann["period"], ap+".period", errs)
+				}
+				if _, ok := has(ann, "text"); !ok {
+					*errs = append(*errs, ap+".text: required")
+				} else {
+					vstr(ann["text"], ap+".text", errs)
+				}
+				// Cross-reference checks
+				annOrigin, _ := ann["origin"].(string)
+				annPeriod, annPeriodOk := ann["period"].(float64)
+				if originsOk && annOrigin != "" && !originSet[annOrigin] {
+					*errs = append(*errs, ap+`.origin: unknown origin "`+annOrigin+`"`)
+				}
+				if periodsOk && annPeriodOk && !math.IsNaN(annPeriod) && !math.IsInf(annPeriod, 0) && annPeriod == math.Trunc(annPeriod) {
+					pval := int(annPeriod)
+					if !periodSet[pval] {
+						*errs = append(*errs, ap+".period: unknown period "+itoa(pval))
+					} else if valuesOk && annOrigin != "" && originSet[annOrigin] {
+						oi := -1
+						for idx, o := range originList {
+							if o == annOrigin {
+								oi = idx
+								break
+							}
+						}
+						ci := -1
+						for idx, pv := range intPeriods {
+							if pv == pval {
+								ci = idx
+								break
+							}
+						}
+						if oi >= 0 && ci >= 0 && oi < len(values) {
+							row, _ := values[oi].([]interface{})
+							if ci >= len(row) {
+								*errs = append(*errs, ap+`: period `+itoa(pval)+` has no value for origin "`+annOrigin+`"`)
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
