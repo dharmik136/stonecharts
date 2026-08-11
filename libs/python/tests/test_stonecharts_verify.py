@@ -930,7 +930,7 @@ def test_manifest_only_adds_schema_version_environment_and_evidence(tmp_path):
         "report",
         "baseline",
     }
-    new_keys = {"schemaVersion", "environment", "evidence"}
+    new_keys = {"schemaVersion", "environment", "evidence", "assurance"}
     assert set(manifest.keys()) == pre_014a_keys | new_keys
 
 
@@ -1390,3 +1390,233 @@ def test_validate_manifest_shape_rejects_malformed_advisory():
     errors = stonecharts_verify.validate_manifest_shape(manifest)
     advisory_errors = [e for e in errors if "presentationAdvisories" in e]
     assert len(advisory_errors) >= 3
+
+
+# ---------------------------------------------------------------------------
+# Assurance tier enforcement tests (WP11 / WP12)
+# ---------------------------------------------------------------------------
+
+def test_certified_profile_accepts_certified_chart(tmp_path):
+    spec_path = (ROOT / "charts/line-basic/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--profile",
+            "certified",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assurance = manifest["assurance"]
+    assert assurance["profile"] == "certified"
+    assert assurance["chartType"] == "line"
+    assert assurance["tier"] == "certified"
+    assert assurance["eligibleForCertifiedGuarantee"] is True
+
+
+def test_certified_profile_rejects_candidate_chart(tmp_path):
+    spec_path = (ROOT / "charts/waterfall/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--profile",
+            "certified",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_ASSURANCE_TIER
+    assert b"E_ASSURANCE_TIER" in proc.stderr
+    assert b"waterfall" in proc.stderr
+    assert b"candidate" in proc.stderr
+
+
+def test_certified_profile_rejects_experimental_chart(tmp_path):
+    spec_path = (ROOT / "charts/parliament/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--profile",
+            "certified",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_ASSURANCE_TIER
+    assert b"E_ASSURANCE_TIER" in proc.stderr
+    assert b"parliament" in proc.stderr
+    assert b"experimental" in proc.stderr
+
+
+def test_evaluation_profile_accepts_candidate_chart(tmp_path):
+    spec_path = (ROOT / "charts/waterfall/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--profile",
+            "evaluation",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assurance = manifest["assurance"]
+    assert assurance["profile"] == "evaluation"
+    assert assurance["chartType"] == "waterfall"
+    assert assurance["tier"] == "candidate"
+    assert assurance["eligibleForCertifiedGuarantee"] is False
+
+
+def test_evaluation_profile_accepts_experimental_chart(tmp_path):
+    spec_path = (ROOT / "charts/parliament/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--profile",
+            "evaluation",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assurance = manifest["assurance"]
+    assert assurance["profile"] == "evaluation"
+    assert assurance["chartType"] == "parliament"
+    assert assurance["tier"] == "experimental"
+    assert assurance["eligibleForCertifiedGuarantee"] is False
+
+
+def test_default_profile_is_certified(tmp_path):
+    spec_path = (ROOT / "charts/line-basic/examples/basic.json").resolve()
+    evidence_dir = tmp_path / "evidence"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(VERIFY_PATH),
+            str(spec_path),
+            "--runtime",
+            "python",
+            "--evidence",
+            str(evidence_dir),
+        ],
+        capture_output=True,
+        cwd=ROOT,
+    )
+
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assurance = manifest["assurance"]
+    assert assurance["profile"] == "certified"
+    assert assurance["tier"] == "certified"
+    assert assurance["eligibleForCertifiedGuarantee"] is True
+
+
+def test_validate_manifest_shape_accepts_valid_assurance():
+    manifest = {
+        "schemaVersion": 1,
+        "tool": "stonecharts_verify",
+        "toolVersion": 1,
+        "generatedAt": "2026-08-10T00:00:00+00:00",
+        "status": "pass",
+        "comparison": "comparison.json",
+        "report": "report.html",
+        "input": {"file": "input-spec.json", "sha256": "a" * 64, "bytes": 100},
+        "runtimes": [
+            {
+                "runtime": "python",
+                "output": "python-output.svg",
+                "sha256": "b" * 64,
+                "bytes": 11,
+                "demoDriftApplied": "none",
+            }
+        ],
+        "assurance": {
+            "profile": "certified",
+            "chartType": "line",
+            "tier": "certified",
+            "eligibleForCertifiedGuarantee": True,
+        },
+    }
+    errors = stonecharts_verify.validate_manifest_shape(manifest)
+    assurance_errors = [e for e in errors if "assurance" in e]
+    assert assurance_errors == []
+
+
+def test_validate_manifest_shape_rejects_malformed_assurance():
+    manifest = {
+        "schemaVersion": 1,
+        "tool": "stonecharts_verify",
+        "toolVersion": 1,
+        "generatedAt": "2026-08-10T00:00:00+00:00",
+        "status": "pass",
+        "comparison": "comparison.json",
+        "report": "report.html",
+        "input": {"file": "input-spec.json", "sha256": "a" * 64, "bytes": 100},
+        "runtimes": [
+            {
+                "runtime": "python",
+                "output": "python-output.svg",
+                "sha256": "b" * 64,
+                "bytes": 11,
+                "demoDriftApplied": "none",
+            }
+        ],
+        "assurance": {
+            "profile": "certified",
+            "chartType": "",
+            "tier": "candidate",
+            "eligibleForCertifiedGuarantee": False,
+        },
+    }
+    errors = stonecharts_verify.validate_manifest_shape(manifest)
+    assurance_errors = [e for e in errors if "assurance" in e]
+    # Should flag: chartType empty, certified profile with non-certified tier,
+    # certified profile with eligibleForCertifiedGuarantee=false
+    assert len(assurance_errors) >= 3
+    assert any("chartType" in e for e in assurance_errors)
+    assert any("certified profile requires certified tier" in e for e in assurance_errors)
+    assert any("eligibleForCertifiedGuarantee" in e for e in assurance_errors)

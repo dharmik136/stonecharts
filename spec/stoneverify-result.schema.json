@@ -15,7 +15,8 @@
     "runtimeCoverage",
     "findings",
     "evidence",
-    "environment"
+    "environment",
+    "assurance"
   ],
   "properties": {
     "schemaVersion": { "const": 1 },
@@ -35,9 +36,20 @@
     "presentationAdvisories": {
       "type": "array",
       "items": { "$ref": "#/$defs/presentationAdvisory" }
-    }
+    },
+    "assurance": { "$ref": "#/$defs/assurance" }
   },
   "$defs": {
+    "assurance": {
+      "type": "object",
+      "required": ["profile", "chartType", "tier", "eligibleForCertifiedGuarantee"],
+      "properties": {
+        "profile": { "enum": ["certified", "evaluation"] },
+        "chartType": { "type": "string" },
+        "tier": { "enum": ["certified", "candidate", "experimental"] },
+        "eligibleForCertifiedGuarantee": { "type": "boolean" }
+      }
+    },
     "presentationAdvisory": {
       "type": "object",
       "required": ["code", "severity", "message", "recommendation"],
