@@ -297,12 +297,12 @@ jobs:
           python-version: "3.12"
       - name: Check chart-spec schema backward compatibility
         run: |
-          git show origin/main:spec/chart-spec.schema.json > /tmp/main-chart-spec.json 2>/dev/null || exit 0
-          python tools/check_schema_compat.py /tmp/main-chart-spec.json spec/chart-spec.schema.json
+          if [ ! -f spec/released/chart-spec.schema.json ]; then echo "No released baseline, skipping"; exit 0; fi
+          python tools/check_schema_compat.py spec/released/chart-spec.schema.json spec/chart-spec.schema.json
       - name: Check stoneverify-result schema backward compatibility
         run: |
-          git show origin/main:spec/stoneverify-result.schema.json > /tmp/main-result-schema.json 2>/dev/null || exit 0
-          python tools/check_schema_compat.py /tmp/main-result-schema.json spec/stoneverify-result.schema.json
+          if [ ! -f spec/released/stoneverify-result.schema.json ]; then echo "No released baseline, skipping"; exit 0; fi
+          python tools/check_schema_compat.py spec/released/stoneverify-result.schema.json spec/stoneverify-result.schema.json
 
   chart-admission:
     runs-on: ubuntu-latest

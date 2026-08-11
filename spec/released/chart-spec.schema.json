@@ -1,0 +1,977 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/dharmik136/stonecharts/blob/main/spec/chart-spec.schema.json",
+  "title": "StoneCharts Chart Spec",
+  "description": "Language-agnostic recipe for one chart. Unknown keys are ignored (forward-compatible); renderers grow field support phase by phase. Keep language spec models (libs/*/spec) in lockstep with this file.",
+  "type": "object",
+  "required": [
+    "type"
+  ],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "line",
+        "column",
+        "area",
+        "bar",
+        "scatter",
+        "bubble",
+        "combo",
+        "dumbbell",
+        "histogram",
+        "candlestick",
+        "error-bar",
+        "flame-chart",
+        "arearange",
+        "columnrange",
+        "waterfall",
+        "bullet",
+        "boxplot",
+        "lollipop",
+        "funnel",
+        "variwide",
+        "streamgraph",
+        "timeline",
+        "vector-plot",
+        "technical-indicators",
+        "windbarb",
+        "xrange",
+        "pie",
+        "gauge",
+        "solid-gauge",
+        "radar",
+        "polar",
+        "wind-rose",
+        "nightingale",
+        "parliament",
+        "radial-bar",
+        "development-triangle"
+      ],
+      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027; 0.0.0.12 admits boxplot per DEC-028; 0.0.0.13 admits lollipop per DEC-029; 0.0.0.14 admits dumbbell per DEC-030; 0.0.0.15 admits funnel per DEC-031; 0.0.0.16 admits variwide per DEC-032; 0.0.0.17 admits timeline per DEC-033; 0.0.0.18 admits windbarb per DEC-034; 0.0.0.19 admits streamgraph per DEC-035; 0.0.0.20 admits vector-plot per DEC-036; 0.0.0.21 admits xrange per DEC-037; 0.0.0.22 admits technical-indicators per DEC-038; 0.0.0.23 admits flame-chart per DEC-039; 0.0.0.24 admits pie per DEC-040; 0.0.0.25 admits gauge per DEC-041; 0.0.0.26 admits solid-gauge per DEC-042; 0.0.0.27 admits radar per DEC-043; 0.0.0.28 admits polar per DEC-044; 0.0.0.29 admits wind-rose per DEC-045; 0.0.0.30 admits nightingale per DEC-046; 0.0.0.31 admits radial-bar per DEC-047; 0.0.0.32 admits parliament per DEC-048; development-triangle is candidate per DEC-057 and not yet admitted to a release); maps to the released chart design and renderer pair."
+    },
+    "id": {
+      "type": "string",
+      "default": "sc",
+      "description": "Chart instance id, used to namespace <defs> ids (gradients/patterns) so multiple charts on one page don't collide. Set a unique value per chart when embedding several."
+    },
+    "theme": {
+      "description": "Color theme. A built-in name ('light' = default, byte-identical to the classic look; 'dark'), or a full theme object. Resolved server-side into concrete SVG attributes (never CSS variables).",
+      "default": "light",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark"
+          ]
+        },
+        {
+          "$ref": "#/definitions/theme"
+        }
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "width": {
+      "type": "integer",
+      "default": 820
+    },
+    "height": {
+      "type": "integer",
+      "default": 460
+    },
+    "responsive": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true the SVG scales to its container (viewBox + preserveAspectRatio + width:100%) instead of a fixed pixel size. Default false keeps fixed width/height."
+    },
+    "legend": {
+      "type": "boolean",
+      "default": true
+    },
+    "a11y": {
+      "type": "boolean",
+      "default": true,
+      "description": "Accessibility (on by default): SVG gets role=\"img\" + a summary aria-label + <desc>; the HTML output adds a visually-hidden data table. Set false to restore the pre-a11y byte output."
+    },
+    "layout": {
+      "type": "object",
+      "description": "Manual chart layout controls. Margin values override the deterministic defaults only when present; they never auto-fit text.",
+      "properties": {
+        "margin": {
+          "type": "object",
+          "properties": {
+            "top": {
+              "type": "number",
+              "minimum": 0
+            },
+            "right": {
+              "type": "number",
+              "minimum": 0
+            },
+            "bottom": {
+              "type": "number",
+              "minimum": 0
+            },
+            "left": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "stacking": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "percent"
+      ],
+      "description": "Stack series values per category. 'normal' = absolute stacked with signed positive/negative accumulators, 'percent' = 100% stacked using non-negative values only. Absent = no stacking."
+    },
+    "grouping": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true (default) multi-series bars/columns sit side-by-side; when false they overlay."
+    },
+    "xAxis": {
+      "$ref": "#/definitions/axis"
+    },
+    "yAxis": {
+      "$ref": "#/definitions/yAxis"
+    },
+    "secondaryYAxis": {
+      "$ref": "#/definitions/yAxis",
+      "description": "Optional second value axis (dual units), drawn on the right. Same shape as yAxis. Series bind to it with series[].yAxis: 1."
+    },
+    "series": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/series"
+      }
+    },
+    "bulletTarget": {
+      "type": "number",
+      "description": "Bullet chart: comparative target value, drawn as a tick mark across the measure bar."
+    },
+    "bulletRanges": {
+      "type": "array",
+      "items": { "type": "number" },
+      "description": "Bullet chart: qualitative range bounds (sorted ascending). Defines graded background bands from 0 to each bound."
+    },
+    "orientation": {
+      "type": "string",
+      "enum": ["vertical", "horizontal"],
+      "default": "vertical",
+      "description": "Coordinate orientation. 'vertical' (default) = categories on x, values on y. 'horizontal' = categories on y, values on x."
+    },
+    "scatterOverlay": {
+      "type": "boolean",
+      "default": false,
+      "description": "Boxplot: when true and samples are present, jittered raw sample points are drawn over each box."
+    },
+    "speedUnit": {
+      "type": "string",
+      "default": "kt",
+      "description": "Windbarb: wind speed unit for tooltip/label. Values: kt (knots), mps (m/s), mph, kmh."
+    },
+    "calmThreshold": {
+      "type": "number",
+      "default": 2,
+      "description": "Windbarb: speeds below this render as the calm glyph (open circle, no staff)."
+    },
+    "hemisphere": {
+      "type": "string",
+      "default": "N",
+      "description": "Windbarb: N (Northern, feathers right) or S (Southern, feathers left)."
+    },
+    "barbLength": {
+      "type": "number",
+      "default": 20,
+      "description": "Windbarb: staff length of the barb glyph in pixels."
+    },
+    "yOffset": {
+      "type": "number",
+      "default": 0,
+      "description": "Windbarb: pixel offset of the barb lane from the plot-area vertical center."
+    },
+    "offset": {
+      "type": "string",
+      "enum": ["wiggle", "silhouette"],
+      "default": "wiggle",
+      "description": "Streamgraph: baseline-offset mode. 'wiggle' = minimal-wiggle spine (classic streamgraph); 'silhouette' = inside-out centered stack spanning [-T/2, +T/2] at each x."
+    },
+    "vectorLength": {
+      "type": "number",
+      "default": 20,
+      "description": "Vector-plot: max arrow pixel length. The longest magnitude maps to this many pixels; every other arrow scales linearly."
+    },
+    "rotationOrigin": {
+      "type": "string",
+      "enum": ["center", "start", "end"],
+      "default": "center",
+      "description": "Vector-plot: where the arrow pivots on its (x,y) anchor. 'center' = midpoint at anchor, 'start' = tail at anchor, 'end' = head at anchor."
+    },
+    "flags": {
+      "type": "array",
+      "description": "Technical-indicators: event markers anchored along the base plot.",
+      "items": {
+        "type": "object",
+        "required": ["x", "title"],
+        "properties": {
+          "x": { "type": "number", "description": "Category index or datetime position." },
+          "title": { "type": "string", "description": "Short label shown on the flag glyph." },
+          "text": { "type": "string", "description": "Longer tooltip text." },
+          "color": { "type": "string", "description": "Flag fill color." },
+          "shape": { "type": "string", "enum": ["flag", "circlepin", "squarepin"], "default": "flag" }
+        }
+      }
+    },
+    "gaugeMin": {
+      "type": "number",
+      "default": 0,
+      "description": "Gauge: minimum value on the gauge scale."
+    },
+    "gaugeMax": {
+      "type": "number",
+      "default": 100,
+      "description": "Gauge: maximum value on the gauge scale."
+    },
+    "gaugeBands": {
+      "type": "array",
+      "description": "Gauge: colored range bands on the gauge arc.",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "color"],
+        "properties": {
+          "from": { "type": "number", "description": "Band start value." },
+          "to": { "type": "number", "description": "Band end value." },
+          "color": { "type": "string", "description": "Band fill color." }
+        }
+      }
+    },
+    "panes": {
+      "type": "array",
+      "description": "Technical-indicators: vertical split of the plot area into stacked panes. panes[0] = base pane; panes[1..] = oscillator panes.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "height": { "type": "number", "description": "Pane height as a fraction (0..1) of the available plot area." },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "title": { "type": "string" }
+        }
+      }
+    },
+    "outOfRange": {
+      "type": "string",
+      "enum": ["error", "clip"],
+      "default": "error",
+      "description": "Histogram: policy for observations outside the computed bin range. 'error' (default) raises a validation error; 'clip' clamps into the nearest edge bin (legacy behavior)."
+    },
+    "triangle": {
+      "type": "object",
+      "description": "Development-triangle: the actuarial loss-development matrix.",
+      "required": ["origins", "periods", "values"],
+      "properties": {
+        "origins": { "type": "array", "items": { "type": "string" }, "description": "Row labels (accident years or origin periods)." },
+        "periods": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "uniqueItems": true, "description": "Column labels (development periods in months). Must be non-negative integers, strictly increasing." },
+        "values": { "type": "array", "items": { "type": "array", "items": { "type": "number" }, "minItems": 1 }, "description": "Matrix: each row has 1..len(periods) contiguous values, row lengths non-increasing." },
+        "view": { "type": "string", "enum": ["cumulative", "incremental"], "default": "cumulative" },
+        "valueType": { "type": "string", "enum": ["incurred", "paid"], "default": "incurred" },
+        "unit": { "type": "string", "default": "", "description": "Display unit label (e.g. 'millions')." }
+      }
+    },
+    "diagonal": {
+      "type": "object",
+      "description": "Development-triangle: latest-diagonal highlight options.",
+      "properties": {
+        "highlight": { "type": "boolean", "default": false },
+        "label": { "type": "string", "default": "" }
+      }
+    },
+    "factors": {
+      "type": "object",
+      "description": "Development-triangle: supplied development factor display options.",
+      "properties": {
+        "show": { "type": "boolean", "default": false },
+        "values": { "type": "array", "items": { "type": "number" }, "description": "Supplied development factors. Required when show is true. Length must equal len(periods) - 1." }
+      }
+    },
+    "colorScale": {
+      "type": "object",
+      "description": "Development-triangle: cell color-scale options.",
+      "properties": {
+        "type": { "type": "string", "enum": ["sequential"], "default": "sequential" },
+        "domain": { "type": "string", "enum": ["auto"], "default": "auto" }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "description": "Development-triangle: cell-level annotation markers.",
+      "items": {
+        "type": "object",
+        "required": ["origin", "period", "text"],
+        "properties": {
+          "origin": { "type": "string" },
+          "period": { "type": "integer", "minimum": 0 },
+          "text": { "type": "string" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "development-triangle" } }
+      },
+      "then": {
+        "required": ["triangle"]
+      },
+      "else": {
+        "required": ["series"]
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "stacking"
+        ],
+        "properties": {
+          "stacking": {
+            "const": "percent"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "not": {
+          "required": ["type"],
+          "properties": {
+            "type": { "enum": ["scatter", "bubble"] }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "scatter" }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "oneOf": [
+                      { "type": "number" },
+                      { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                      {
+                        "type": "object",
+                        "required": ["x", "y"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "x": { "type": "number" },
+                          "y": { "type": "number" }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "bubble" }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "oneOf": [
+                      { "type": "number" },
+                      { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+                      {
+                        "type": "object",
+                        "required": ["x", "y", "z"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "x": { "type": "number" },
+                          "y": { "type": "number" },
+                          "z": { "type": "number" }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "theme": {
+      "type": "object",
+      "description": "Concrete color set. Canonical values live in spec/themes/*.json; a custom object may override any field. Omitted fields fall back to the light theme.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "background": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Chart background; null/absent = transparent (no <rect>)."
+        },
+        "titleColor": {
+          "type": "string"
+        },
+        "subtitleColor": {
+          "type": "string"
+        },
+        "axisLabelColor": {
+          "type": "string"
+        },
+        "axisTitleColor": {
+          "type": "string"
+        },
+        "gridColor": {
+          "type": "string"
+        },
+        "axisLineColor": {
+          "type": "string"
+        },
+        "crosshairColor": {
+          "type": "string"
+        },
+        "markerHalo": {
+          "type": "string"
+        },
+        "legendTextColor": {
+          "type": "string"
+        },
+        "palette": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "gradient": {
+      "type": "object",
+      "description": "Linear gradient. Direction is x1,y1 -> x2,y2 in 0..1 objectBoundingBox coords (default 0,0 -> 0,1 = vertical top-to-bottom). No trig, so both renderers format it identically.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "linearGradient"
+          ],
+          "default": "linearGradient"
+        },
+        "x1": {
+          "type": "number",
+          "default": 0
+        },
+        "y1": {
+          "type": "number",
+          "default": 0
+        },
+        "x2": {
+          "type": "number",
+          "default": 0
+        },
+        "y2": {
+          "type": "number",
+          "default": 1
+        },
+        "stops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "offset": {
+                "type": "number"
+              },
+              "color": {
+                "type": "string"
+              },
+              "opacity": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "pattern": {
+      "type": "object",
+      "description": "Hatch (diagonal-line) fill for the area under the line. Print- and colorblind-friendly. Renders as an SVG <pattern> tile.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "hatch"
+          ],
+          "default": "hatch"
+        },
+        "color": {
+          "type": "string",
+          "default": "#333333",
+          "description": "Hatch line color."
+        },
+        "background": {
+          "type": "string",
+          "description": "Optional solid tile background behind the hatch lines."
+        },
+        "size": {
+          "type": "number",
+          "default": 8,
+          "description": "Tile size in px (line spacing)."
+        },
+        "angle": {
+          "type": "number",
+          "default": 45,
+          "description": "Hatch rotation in degrees."
+        },
+        "strokeWidth": {
+          "type": "number",
+          "default": 1.5
+        }
+      }
+    },
+    "axis": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Category labels. On xAxis, index i of each series maps to categories[i]."
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "opposite": {
+          "type": "boolean",
+          "default": true,
+          "description": "Secondary axis side selector."
+        },
+        "binEdges": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Histogram x-axis bin edges."
+        },
+        "plotBands": {
+          "type": "array",
+          "description": "Shaded regions spanning a range on this axis.",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "color"],
+            "properties": {
+              "from": { "type": "number" },
+              "to": { "type": "number" },
+              "color": { "type": "string" },
+              "label": { "type": "string" },
+              "opacity": { "type": "number" }
+            }
+          }
+        },
+        "plotLines": {
+          "type": "array",
+          "description": "Reference lines at a specific value on this axis.",
+          "items": {
+            "type": "object",
+            "required": ["value", "color"],
+            "properties": {
+              "value": { "type": "number" },
+              "color": { "type": "string" },
+              "width": { "type": "number" },
+              "dashStyle": { "type": "string", "enum": ["solid", "dashed", "dotted"] },
+              "label": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "yAxis": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "gridLine": {
+          "type": "object",
+          "description": "Horizontal gridline styling. Defaults reproduce the built-in look (solid #e8e8ee).",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "color": {
+              "type": "string",
+              "description": "Hex color; default #e8e8ee."
+            },
+            "dashStyle": {
+              "type": "string",
+              "enum": [
+                "solid",
+                "dashed",
+                "dotted"
+              ],
+              "default": "solid"
+            }
+          }
+        },
+        "plotBands": {
+          "type": "array",
+          "description": "Shaded horizontal value regions.",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "color"],
+            "properties": {
+              "from": { "type": "number" },
+              "to": { "type": "number" },
+              "color": { "type": "string" },
+              "label": { "type": "string" },
+              "opacity": { "type": "number" }
+            }
+          }
+        },
+        "plotLines": {
+          "type": "array",
+          "description": "Horizontal reference lines at a value.",
+          "items": {
+            "type": "object",
+            "required": ["value", "color"],
+            "properties": {
+              "value": { "type": "number" },
+              "color": { "type": "string" },
+              "width": { "type": "number" },
+              "dashStyle": { "type": "string", "enum": ["solid", "dashed", "dotted"] },
+              "label": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "RangePoint": {
+      "type": "object",
+      "required": ["low", "high"],
+      "properties": {
+        "low":      { "type": "number", "description": "Lower boundary value." },
+        "high":     { "type": "number", "description": "Upper boundary value." },
+        "value":    { "type": "number", "description": "Center value (required for error-bar)." },
+        "category": { "type": "string", "description": "Optional category label for this point." },
+        "name":     { "type": "string", "description": "Optional point name." }
+      }
+    },
+    "series": {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "number" },
+              { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+              {
+                "type": "object",
+                "required": ["x", "y"],
+                "additionalProperties": false,
+                "properties": {
+                  "x": { "type": "number" },
+                  "y": { "type": "number" }
+                }
+              },
+              { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+              {
+                "type": "object",
+                "required": ["x", "y", "z"],
+                "additionalProperties": false,
+                "properties": {
+                  "x": { "type": "number" },
+                  "y": { "type": "number" },
+                  "z": { "type": "number" }
+                }
+              }
+            ]
+          },
+          "description": "y-values; x comes from xAxis.categories (or 0..n-1). scatter (0.0.0.3, DEC-015) additionally accepts the point model: a positional [x,y] pair or an {x,y} object. bubble (0.0.0.4, DEC-016) additionally accepts [x,y,z] / {x,y,z}. Every other chart type is restricted back to a plain number, and scatter/bubble are each restricted to their own shape, by the type-conditional rules below."
+        },
+        "color": {
+          "description": "Series color: a hex string, or a linear-gradient object (fades between stops). Gradient applies to the stroke and area fill; markers/legend use the first stop's color.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/gradient"
+            }
+          ]
+        },
+        "fillOpacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0,
+          "description": "Fill the area under the line down to the zero baseline at this opacity. 0 = no fill (default). Any value > 0 turns a line chart into an area chart."
+        },
+        "pattern": {
+          "$ref": "#/definitions/pattern"
+        },
+        "lineWidth": {
+          "type": "number",
+          "default": 2
+        },
+        "dashStyle": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "dashed",
+            "dotted"
+          ],
+          "default": "solid"
+        },
+        "step": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after",
+            "center"
+          ],
+          "description": "Draw as a stepped line instead of straight segments."
+        },
+        "curve": {
+          "type": "string",
+          "enum": [
+            "linear",
+            "monotone"
+          ],
+          "description": "Line interpolation. 'monotone' = smooth Fritsch-Carlson spline (no overshoot). Default = straight segments."
+        },
+        "marker": {
+          "type": "object",
+          "description": "Data-point markers. Defaults reproduce the built-in circle (r 3.5).",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "symbol": {
+              "type": "string",
+              "enum": [
+                "circle",
+                "square",
+                "triangle",
+                "diamond"
+              ],
+              "default": "circle"
+            },
+            "radius": {
+              "type": "number",
+              "default": 3.5
+            }
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": ["line", "column", "area"],
+          "default": "column",
+          "description": "Per-series mark kind. 'column' = baseline-anchored rect; 'line' = path + markers; 'area' = path + fill down to the pane floor."
+        },
+        "volume": {
+          "type": "array",
+          "description": "Technical-indicators: per-record volume, aligned to data by index. Required only for a VWAP indicator.",
+          "items": { "type": "number" }
+        },
+        "indicators": {
+          "type": "array",
+          "description": "Technical-indicators: derived overlays computed from this series' data. Each element names a transform type and its parameters.",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": { "type": "string", "enum": ["sma", "ema", "bollinger", "vwap", "macd", "rsi"], "description": "Indicator transform type." },
+              "period": { "type": "integer", "minimum": 1, "description": "Lookback window size." },
+              "color": { "type": "string", "description": "Overlay line color." },
+              "dashStyle": { "type": "string", "enum": ["solid", "dashed", "dotted"] },
+              "params": { "type": "object", "description": "Extra transform parameters (e.g. {stdDev: 2} for Bollinger)." },
+              "pane": { "type": "integer", "minimum": 0, "description": "Target pane index (0 = base, 1+ = oscillator)." }
+            }
+          }
+        },
+        "yAxis": {
+          "type": "integer",
+          "enum": [0, 1],
+          "default": 0,
+          "description": "Which value axis this series is measured against: 0 = primary yAxis (default), 1 = secondaryYAxis."
+        },
+        "boxData": {
+          "type": "array",
+          "description": "Boxplot: 5-number summary per category. Each element is {low, q1, median, q3, high, outliers?}.",
+          "items": {
+            "type": "object",
+            "required": ["low", "q1", "median", "q3", "high"],
+            "properties": {
+              "low": { "type": "number" },
+              "q1": { "type": "number" },
+              "median": { "type": "number" },
+              "q3": { "type": "number" },
+              "high": { "type": "number" },
+              "outliers": {
+                "type": "array",
+                "items": { "type": "number" }
+              }
+            }
+          }
+        },
+        "rangeData": {
+          "type": "array",
+          "description": "Atomic range-point model for arearange, columnrange, error-bar, dumbbell. Each element bundles low/high (and optional value for error-bar) into one object, replacing parallel data[]+low[]+high[] arrays. When present, data/low/high arrays on the same series are ignored.",
+          "items": {
+            "$ref": "#/definitions/RangePoint"
+          }
+        },
+        "samples": {
+          "type": "array",
+          "description": "Boxplot: raw sample arrays per category (renderer computes the 5-number summary).",
+          "items": {
+            "type": "array",
+            "items": { "type": "number" }
+          }
+        },
+        "labels": {
+          "type": "array",
+          "description": "Timeline: per-event label text, aligned to data by index.",
+          "items": { "type": "string" }
+        },
+        "x": {
+          "type": "array",
+          "description": "Vector-plot: per-point numeric x-coordinate, aligned to data (y) by index. If omitted, x defaults to 0-based index.",
+          "items": { "type": "number" }
+        },
+        "direction": {
+          "type": "array",
+          "description": "Windbarb/vector-plot: per-point direction in degrees, aligned to data by index. Windbarb: meteorological 'from' bearing (0-360). Vector-plot: arrow heading (0 = north/up, clockwise).",
+          "items": { "type": "number" }
+        },
+        "length": {
+          "type": "array",
+          "description": "Vector-plot: per-point magnitude, aligned to data by index. Non-negative; drives arrow pixel length via the length-scale.",
+          "items": { "type": "number" }
+        },
+        "spans": {
+          "type": "array",
+          "description": "X-range/Gantt: per-series span objects. Each span has {x, x2, y} required (start, end, lane index), plus optional id, name, dependency (array of predecessor ids), milestone (bool).",
+          "items": {
+            "type": "object",
+            "required": ["x", "x2", "y"],
+            "properties": {
+              "x": { "type": "number", "description": "Span start value (datetime epoch or numeric)." },
+              "x2": { "type": "number", "description": "Span end value (datetime epoch or numeric)." },
+              "y": { "type": "integer", "description": "Lane index into yAxis.categories." },
+              "id": { "type": "string", "description": "Unique span identifier for dependency linking." },
+              "name": { "type": "string", "description": "Human-readable span label." },
+              "dependency": {
+                "type": "array",
+                "description": "Array of predecessor span ids (finish-to-start connectors).",
+                "items": { "type": "string" }
+              },
+              "milestone": { "type": "boolean", "description": "If true, render as a diamond marker instead of a bar." }
+            }
+          }
+        },
+        "frames": {
+          "type": "array",
+          "description": "Flame-chart: per-series call-frame objects. Each frame has {x, x2, depth} required (start, end, stack depth), plus optional name and color.",
+          "items": {
+            "type": "object",
+            "required": ["x", "x2", "depth"],
+            "properties": {
+              "x": { "type": "number", "description": "Frame start time/position." },
+              "x2": { "type": "number", "description": "Frame end time/position." },
+              "depth": { "type": "number", "description": "Stack depth (0 = root at bottom)." },
+              "name": { "type": "string", "description": "Function/frame name." },
+              "color": { "type": "string", "description": "Per-frame color override." }
+            }
+          }
+        }
+      }
+    }
+  }
+}

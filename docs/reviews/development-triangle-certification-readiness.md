@@ -48,8 +48,7 @@ Since:           unreleased
 
 1. **SC-CERT-08 (evidence baseline)**: StoneVerify evidence pack not yet generated for development-triangle examples in evaluation mode
 2. **Actuarial design-partner review**: No external actuarial practitioner has reviewed the triangle contract
-3. **Rectangular triangle goldens**: Only standard triangular golden fixtures exist; add rectangular (e.g., 3x5, 6x4) goldens with parity verification
-4. **Separate reviewed certification decision**: Promotion from candidate to certified requires a DEC-level governance decision, not an engineering self-promotion
+3. **Separate reviewed certification decision**: Promotion from candidate to certified requires a DEC-level governance decision, not an engineering self-promotion
 
 ## Remaining P1 work (not blocking certification)
 
