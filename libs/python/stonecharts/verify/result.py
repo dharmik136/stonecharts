@@ -85,12 +85,13 @@ def build_verification_result(
     findings: list[dict[str, Any]] | None = None,
     evidence: dict[str, Any] | None = None,
     environment: dict[str, Any] | None = None,
+    assurance: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if status not in {"pass", "fail", "not-checked"}:
         raise ValueError(f"unsupported status: {status!r}")
     if comparison_mode not in {"cross-runtime", "baseline", "bundle-compare"}:
         raise ValueError(f"unsupported comparison mode: {comparison_mode!r}")
-    return {
+    result: dict[str, Any] = {
         "schemaVersion": SCHEMA_VERSION,
         "resultSchema": RESULT_SCHEMA_URI,
         "status": status,
@@ -103,6 +104,9 @@ def build_verification_result(
         "evidence": dict(evidence or {}),
         "environment": environment,
     }
+    if assurance is not None:
+        result["assurance"] = assurance
+    return result
 
 
 def check_schema_version(version: Any) -> str | None:
