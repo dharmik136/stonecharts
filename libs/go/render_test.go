@@ -1784,6 +1784,440 @@ func TestSemanticInvariants(t *testing.T) {
 			t.Errorf("Q1 height %.1f != Q3 height %.1f", q1, q3)
 		}
 	})
+
+	// ── SC-SEM-011: Range family: data-low <= data-high ──
+
+	pointRe := regexp.MustCompile(`<(?:circle|rect)\s[^>]*class="[^"]*sc-point[^"]*"[^>]*/?>`)
+
+	extractRangePoints := func(svg string) []map[string]string {
+		matches := pointRe.FindAllString(svg, -1)
+		var out []map[string]string
+		for _, m := range matches {
+			attrs := map[string]string{}
+			for _, a := range attrRe.FindAllStringSubmatch(m, -1) {
+				attrs[a[1]] = a[2]
+			}
+			if _, hasLow := attrs["data-low"]; hasLow {
+				if _, hasHigh := attrs["data-high"]; hasHigh {
+					out = append(out, attrs)
+				}
+			}
+		}
+		return out
+	}
+
+	t.Run("SC-SEM-011/arearange-low-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/arearange/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no arearange points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > hi {
+				t.Errorf("point %d: low %.1f > high %.1f", i, lo, hi)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-011/columnrange-low-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/columnrange/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no columnrange points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > hi {
+				t.Errorf("bar %d: low %.1f > high %.1f", i, lo, hi)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-011/columnrange-bar-height-positive", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/columnrange/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo != hi {
+				h, _ := strconv.ParseFloat(p["height"], 64)
+				if h <= 0 {
+					t.Errorf("bar %d: low %.1f != high %.1f but height is %.1f", i, lo, hi, h)
+				}
+			}
+		}
+	})
+
+	t.Run("SC-SEM-011/dumbbell-low-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/dumbbell/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no dumbbell points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > hi {
+				t.Errorf("point %d: low %.1f > high %.1f", i, lo, hi)
+			}
+		}
+	})
+
+	connectorRe := regexp.MustCompile(`class="sc-connector"`)
+
+	t.Run("SC-SEM-011/dumbbell-connector-count", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/dumbbell/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		connectors := connectorRe.FindAllString(svg, -1)
+		nPoints := 0
+		for _, s := range spec.Series {
+			nPoints += len(s.Data)
+		}
+		if len(connectors) != nPoints {
+			t.Errorf("connectors %d != points %d", len(connectors), nPoints)
+		}
+	})
+
+	// ── SC-SEM-012: Error-bar: low <= central value <= high ──
+
+	t.Run("SC-SEM-012/error-bar-low-le-value-le-high", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/error-bar/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) == 0 {
+			t.Fatal("no error-bar points found")
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			y, _ := strconv.ParseFloat(p["data-y"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > y || y > hi {
+				t.Errorf("point %d: low %.1f <= y %.1f <= high %.1f violated", i, lo, y, hi)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-012/error-bar-constructed", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "error-bar",
+			"xAxis": {"categories": ["A", "B", "C"]},
+			"series": [{"name": "test", "data": [50, 100, 75], "low": [30, 80, 60], "high": [70, 120, 90]}]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		points := extractRangePoints(svg)
+		if len(points) != 3 {
+			t.Fatalf("expected 3 points, got %d", len(points))
+		}
+		for i, p := range points {
+			lo, _ := strconv.ParseFloat(p["data-low"], 64)
+			y, _ := strconv.ParseFloat(p["data-y"], 64)
+			hi, _ := strconv.ParseFloat(p["data-high"], 64)
+			if lo > y || y > hi {
+				t.Errorf("point %d: %.1f <= %.1f <= %.1f violated", i, lo, y, hi)
+			}
+		}
+	})
+
+	// ── SC-SEM-013: Boxplot structural integrity ──
+
+	boxRe := regexp.MustCompile(`<rect\s[^>]*class="sc-box sc-point"[^>]*/>`)
+	whiskerCapRe := regexp.MustCompile(`class="sc-whisker-cap"`)
+
+	t.Run("SC-SEM-013/boxplot-median-matches-input", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/boxplot/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		series0 := raw["series"].([]interface{})[0].(map[string]interface{})
+		boxData := series0["boxData"].([]interface{})
+		if len(boxes) != len(boxData) {
+			t.Fatalf("boxes %d != boxData %d", len(boxes), len(boxData))
+		}
+		for i, box := range boxes {
+			actual, _ := strconv.ParseFloat(box["data-y"], 64)
+			expected := boxData[i].(map[string]interface{})["median"].(float64)
+			if actual != expected {
+				t.Errorf("box %d: data-y %.1f != median %.1f", i, actual, expected)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-013/boxplot-box-height-positive", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/boxplot/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		for i, box := range boxes {
+			h, _ := strconv.ParseFloat(box["height"], 64)
+			if h <= 0 {
+				t.Errorf("box %d: height is %.1f, expected > 0", i, h)
+			}
+		}
+	})
+
+	t.Run("SC-SEM-013/boxplot-whisker-cap-count", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/boxplot/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		caps := whiskerCapRe.FindAllString(svg, -1)
+		if len(caps) != 2*len(boxes) {
+			t.Errorf("caps %d != 2 * boxes %d", len(caps), len(boxes))
+		}
+	})
+
+	t.Run("SC-SEM-013/boxplot-constructed", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "boxplot",
+			"xAxis": {"categories": ["X", "Y"]},
+			"series": [{"name": "test", "data": [50, 100], "boxData": [
+				{"low": 10, "q1": 30, "median": 50, "q3": 70, "high": 90},
+				{"low": 60, "q1": 80, "median": 100, "q3": 120, "high": 140}
+			]}]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boxes := extractAttrs(boxRe, svg)
+		if len(boxes) != 2 {
+			t.Fatalf("expected 2 boxes, got %d", len(boxes))
+		}
+		v0, _ := strconv.ParseFloat(boxes[0]["data-y"], 64)
+		v1, _ := strconv.ParseFloat(boxes[1]["data-y"], 64)
+		if v0 != 50 {
+			t.Errorf("box 0: data-y %.1f != 50", v0)
+		}
+		if v1 != 100 {
+			t.Errorf("box 1: data-y %.1f != 100", v1)
+		}
+		caps := whiskerCapRe.FindAllString(svg, -1)
+		if len(caps) != 4 {
+			t.Errorf("expected 4 caps, got %d", len(caps))
+		}
+	})
+
+	// ── SC-SEM-014: Bullet structural completeness ──
+
+	rangeRe := regexp.MustCompile(`class="sc-range"`)
+	targetRe := regexp.MustCompile(`class="sc-target"`)
+
+	t.Run("SC-SEM-014/bullet-measure-matches-input", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bullet/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+		if len(bars) != len(spec.Series[0].Data) {
+			t.Fatalf("bars %d != data %d", len(bars), len(spec.Series[0].Data))
+		}
+		for i, bar := range bars {
+			actual, _ := strconv.ParseFloat(bar["data-y"], 64)
+			if actual != spec.Series[0].Data[i] {
+				t.Errorf("bar %d: data-y %.1f != data %.1f", i, actual, spec.Series[0].Data[i])
+			}
+		}
+	})
+
+	t.Run("SC-SEM-014/bullet-range-count", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bullet/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ranges := rangeRe.FindAllString(svg, -1)
+		nRanges := len(raw["bulletRanges"].([]interface{}))
+		nCats := len(raw["xAxis"].(map[string]interface{})["categories"].([]interface{}))
+		expected := nRanges * nCats
+		if len(ranges) != expected {
+			t.Errorf("ranges %d != %d (%d * %d)", len(ranges), expected, nRanges, nCats)
+		}
+	})
+
+	t.Run("SC-SEM-014/bullet-target-present", func(t *testing.T) {
+		specBytes, err := os.ReadFile(root + "charts/bullet/examples/basic.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		spec, err := FromJSON(specBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		targets := targetRe.FindAllString(svg, -1)
+		if len(targets) != 1 {
+			t.Errorf("expected 1 target, got %d", len(targets))
+		}
+	})
+
+	t.Run("SC-SEM-014/bullet-constructed", func(t *testing.T) {
+		specJSON := []byte(`{
+			"type": "bullet",
+			"xAxis": {"categories": ["KPI-A", "KPI-B"]},
+			"series": [{"name": "measure", "data": [75, 120]}],
+			"bulletTarget": 100,
+			"bulletRanges": [50, 100, 150]
+		}`)
+		spec, err := FromJSON(specJSON)
+		if err != nil {
+			t.Fatal(err)
+		}
+		svg, err := RenderSVG(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bars := extractAttrs(barRe, svg)
+		if len(bars) != 2 {
+			t.Fatalf("expected 2 bars, got %d", len(bars))
+		}
+		v0, _ := strconv.ParseFloat(bars[0]["data-y"], 64)
+		v1, _ := strconv.ParseFloat(bars[1]["data-y"], 64)
+		if v0 != 75 {
+			t.Errorf("bar 0: data-y %.1f != 75", v0)
+		}
+		if v1 != 120 {
+			t.Errorf("bar 1: data-y %.1f != 120", v1)
+		}
+		ranges := rangeRe.FindAllString(svg, -1)
+		if len(ranges) != 6 {
+			t.Errorf("expected 6 ranges (3 * 2 categories), got %d", len(ranges))
+		}
+		targets := targetRe.FindAllString(svg, -1)
+		if len(targets) != 2 {
+			t.Errorf("expected 2 targets (1 * 2 categories), got %d", len(targets))
+		}
+	})
 }
 
 // TestSemanticInvariantsDevelopmentTriangle verifies output correctness properties for development-triangle.
