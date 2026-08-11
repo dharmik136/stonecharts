@@ -1,0 +1,1 @@
+{"series":[{"data":[90,75,80,65,70],"name":"Proficiency"}],"title":"Skill Levels","type":"radial-bar","xAxis":{"categories":["Python","Go","SQL","JavaScript","TypeScript"]},"yAxis":{"max":100}}

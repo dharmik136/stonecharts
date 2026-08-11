@@ -1,0 +1,1 @@
+{"gaugeBands":[{"color":"#55bf3b","from":0,"to":40},{"color":"#dddf0d","from":40,"to":70},{"color":"#df5353","from":70,"to":100}],"gaugeMax":100,"gaugeMin":0,"height":300,"id":"gauge-basic","series":[{"data":[72],"name":"Speed"}],"title":"Speed","type":"gauge","width":400}

@@ -1,0 +1,1 @@
+{"legend":false,"series":[{"data":[18400,9200,5100,2600,1180],"name":"Conversion"}],"subtitle":"Stage-by-stage drop-off, last 30 days","title":"Signup Conversion Funnel","type":"funnel","xAxis":{"categories":["Visitors","Signups","Trials","Active","Paid"]}}

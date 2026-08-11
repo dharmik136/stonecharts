@@ -1,0 +1,1 @@
+{"gaugeBands":[{"color":"#55bf3b","from":0,"to":40},{"color":"#dddf0d","from":40,"to":70},{"color":"#df5353","from":70,"to":100}],"gaugeMax":100,"gaugeMin":0,"id":"sg-cpu","series":[{"data":[72],"name":"CPU"}],"title":"CPU Usage","type":"solid-gauge"}
