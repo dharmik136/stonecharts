@@ -323,8 +323,95 @@ def _specs():
                         "length": [round(rng.uniform(0, 50), 1) for _ in range(n)]}],
         }
 
+    # ── Development-triangle ──
+    for case in range(8):
+        n_origins = rng.randint(1, 8)
+        n_periods = rng.randint(1, 8)
+        origins = [f"Y{2020 + i}" for i in range(n_origins)]
+        periods = sorted(rng.sample(range(0, 120), min(n_periods, 120)))
+        # Ensure periods are strictly increasing non-negative integers
+        if len(periods) == 0:
+            periods = [0]
+        seen: set[int] = set()
+        deduped: list[int] = []
+        for pv in periods:
+            if pv not in seen:
+                seen.add(pv)
+                deduped.append(pv)
+        periods = deduped[:n_periods] if deduped else [0]
+        n_periods = len(periods)
+
+        # Build triangle rows with non-increasing lengths
+        jagged = rng.choice([True, False])
+        values: list[list[float]] = []
+        max_cols = min(n_periods, n_periods)
+        for r in range(n_origins):
+            if jagged:
+                row_len = max(1, max_cols - r)
+            else:
+                # Rectangular: all rows same length, capped at n_periods
+                row_len = max_cols
+            row_len = min(row_len, n_periods)
+            row: list[float] = []
+            for _ in range(row_len):
+                # Mix of positive, zero, and negative values
+                choice = rng.randint(0, 2)
+                if choice == 0:
+                    row.append(round(rng.uniform(1, 500), 2))
+                elif choice == 1:
+                    row.append(0.0)
+                else:
+                    row.append(round(rng.uniform(-200, -1), 2))
+            values.append(row)
+            if jagged:
+                max_cols = row_len
+
+        spec: dict = {
+            "type": "development-triangle",
+            "title": f"development-triangle property {case}",
+            "triangle": {
+                "origins": origins,
+                "periods": periods,
+                "values": values,
+            },
+        }
+
+        # Randomly add optional fields
+        if rng.random() < 0.5:
+            spec["triangle"]["unit"] = f"USD-{case}"
+        if rng.random() < 0.5:
+            spec["triangle"]["view"] = rng.choice(["cumulative", "incremental"])
+        if rng.random() < 0.5:
+            spec["triangle"]["valueType"] = rng.choice(["paid", "incurred"])
+        if rng.random() < 0.5:
+            spec["diagonal"] = {"highlight": True, "label": f"Diag {case}"}
+        if rng.random() < 0.5:
+            spec["colorScale"] = {"type": "sequential", "domain": "auto"}
+        if rng.random() < 0.5 and n_periods >= 2:
+            factor_vals = [round(rng.uniform(0.5, 3.0), 3) for _ in range(n_periods - 1)]
+            spec["factors"] = {"show": True, "values": factor_vals}
+
+        # Optionally add annotations targeting valid cells
+        if rng.random() < 0.4 and len(values) > 0:
+            ann_row = rng.randint(0, len(values) - 1)
+            ann_col = rng.randint(0, len(values[ann_row]) - 1)
+            spec["annotations"] = [{
+                "origin": origins[ann_row],
+                "period": periods[ann_col],
+                "text": f"Note {case}",
+            }]
+
+        yield spec
+
 
 def _has_marks(spec_dict: dict) -> bool:
+    # development-triangle has no series
+    if spec_dict.get("type") == "development-triangle":
+        tri = spec_dict.get("triangle", {})
+        for row in tri.get("values", []):
+            if row:
+                return True
+        return False
     for s in spec_dict["series"]:
         if s.get("data") or s.get("spans") or s.get("frames"):
             return True
