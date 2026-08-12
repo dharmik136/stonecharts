@@ -9,8 +9,8 @@ review_mode: self
 applies_to: 0.0.0.32 and later
 requirements: []
 evidence: [TEST-DOCS-CONTROL]
-last_reviewed: "2026-08-10"
-review_due: "2026-09-10"
+last_reviewed: "2026-08-12"
+review_due: "2026-09-12"
 supersedes: null
 superseded_by: null
 ---
