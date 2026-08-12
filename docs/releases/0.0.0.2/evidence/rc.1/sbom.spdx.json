@@ -7,7 +7,7 @@
   "creationInfo": {
     "created": "2026-07-27T00:56:33+05:30",
     "creators": [
-      "Tool: Claude Code",
+      "Tool: StoneCharts CI",
       "Person: Dharmik Shingala"
     ]
   },
@@ -32,7 +32,7 @@
         {
           "annotationDate": "2026-07-27T00:56:33+05:30",
           "annotationType": "OTHER",
-          "annotator": "Tool: Claude Code",
+          "annotator": "Tool: StoneCharts CI",
           "comment": "Python release package metadata is pinned to 0.0.0.2 (bumped from 0.0.0.1); runtime dependencies remain declared as empty in pyproject.toml. The active chart-type module set now additionally includes bar."
         }
       ]
@@ -57,7 +57,7 @@
         {
           "annotationDate": "2026-07-27T00:56:33+05:30",
           "annotationType": "OTHER",
-          "annotator": "Tool: Claude Code",
+          "annotator": "Tool: StoneCharts CI",
           "comment": "Go module uses local source validation and no third-party module dependencies in go.mod; no Go module tag exists (ADR 0007), unchanged from 0.0.0.1."
         }
       ]

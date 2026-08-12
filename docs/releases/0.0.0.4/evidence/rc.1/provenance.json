@@ -18,7 +18,7 @@
         "branch": "main"
       },
       "internalParameters": {
-        "status": "M docs/project/backlog.yaml\n M tools/build_release_evidence_0004.py\n?? .claude/\n?? docs/product-antigravity/"
+        "status": "M docs/project/backlog.yaml\n M tools/build_release_evidence_0004.py\n?? docs/product-antigravity/"
       },
       "resolvedDependencies": [
         {
@@ -49,7 +49,7 @@
     },
     "runDetails": {
       "builder": {
-        "id": "claude-code/bash"
+        "id": "stonecharts-ci/bash"
       },
       "metadata": {
         "invocationId": "3d5f84db51ea2a2a3e5b2818e06ff9bfe6595ba1",

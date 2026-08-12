@@ -854,7 +854,7 @@ Real code dependency order (not just backlog governance dependencies, which only
 2. **`WORK-VERIFY-009`** (semantic classification) — next, because it's the other item that most changes `classify_difference()`'s actual behavior; sequencing it right after 014A means it can call `build_finding()` from day one instead of being retrofitted later.
 3. **`WORK-VERIFY-010`** (exit codes + CI test folding) — after 009, since its "distinguish comparison-fail from adapter-failure from resource-limit" exit codes read naturally off the `status`/`findings` shape 009 populates.
 4. **`WORK-VERIFY-008`** (installable packaging) — this one is the most orthogonal of the five (it's about *how* the CLI is invoked and installed, not about the data it produces), so it could actually move earlier in the sequence without much rework cost if there's a reason to prioritize it (e.g. wanting a wheel to hand to WORK-VERIFY-013's evaluation kit sooner).
-5. **`WORK-VERIFY-012`** (testing gaps + resource limits) — mostly touches `libs/python/stonecharts/validate.py`, `libs/go/validate.go`, and new test files rather than `tools/stonecharts_verify.py` directly; low conflict risk with the rest, could genuinely run in parallel with 2-4 above if there's a second engineer or a second Claude session available, since its file footprint barely overlaps.
+5. **`WORK-VERIFY-012`** (testing gaps + resource limits) — mostly touches `libs/python/stonecharts/validate.py`, `libs/go/validate.go`, and new test files rather than `tools/stonecharts_verify.py` directly; low conflict risk with the rest, could genuinely run in parallel with 2-4 above if there's a second engineer available, since its file footprint barely overlaps.
 
 ## What can run in genuine parallel, starting right now
 

@@ -2451,7 +2451,7 @@ items:
   - docs
   acceptance:
   - The standalone interaction-runtime test is invoked from the same command documented
-    in .claude/project-brief.md's baseline checks, or that document is updated to
+    in the project baseline checks, or that document is updated to
     list it explicitly, so it can't silently stop running.
   - stoneverify returns distinct, stable exit codes for at minimum - verification
     passed, verification completed with differences, CLI usage error, invalid or unsupported

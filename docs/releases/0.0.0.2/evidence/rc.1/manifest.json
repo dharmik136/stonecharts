@@ -16,7 +16,7 @@
     "runtime": "node:test browser and DOM harness current"
   },
   "environment": {
-    "builder": "Claude Code / bash",
+    "builder": "StoneCharts CI / bash",
     "python": "Python 3.14.4",
     "go": "go version go1.26.4 windows/amd64",
     "os": "Windows 11 Pro 10.0.26200",

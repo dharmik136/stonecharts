@@ -1,6 +1,6 @@
 # Handoff
 
-- From: Claude Code
+- From: build agent
 - To: next worker
 - Branch or worktree: `main`
 - Commit or state: working tree (uncommitted), all changes are local

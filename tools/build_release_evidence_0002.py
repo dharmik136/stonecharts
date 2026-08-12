@@ -146,7 +146,7 @@ ecosystem-mapping decision that does not yet exist, per ADR 0007).
         "creationInfo": {
             "created": generated_at,
             "creators": [
-                "Tool: Claude Code",
+                "Tool: StoneCharts CI",
                 "Person: Dharmik Shingala",
             ],
         },
@@ -171,7 +171,7 @@ ecosystem-mapping decision that does not yet exist, per ADR 0007).
                     {
                         "annotationDate": generated_at,
                         "annotationType": "OTHER",
-                        "annotator": "Tool: Claude Code",
+                        "annotator": "Tool: StoneCharts CI",
                         "comment": "Python release package metadata is pinned to 0.0.0.2 (bumped from 0.0.0.1); runtime dependencies remain declared as empty in pyproject.toml. The active chart-type module set now additionally includes bar.",
                     }
                 ],
@@ -196,7 +196,7 @@ ecosystem-mapping decision that does not yet exist, per ADR 0007).
                     {
                         "annotationDate": generated_at,
                         "annotationType": "OTHER",
-                        "annotator": "Tool: Claude Code",
+                        "annotator": "Tool: StoneCharts CI",
                         "comment": "Go module uses local source validation and no third-party module dependencies in go.mod; no Go module tag exists (ADR 0007), unchanged from 0.0.0.1.",
                     }
                 ],
@@ -247,7 +247,7 @@ ecosystem-mapping decision that does not yet exist, per ADR 0007).
                 ],
             },
             "runDetails": {
-                "builder": {"id": "claude-code/bash"},
+                "builder": {"id": "stonecharts-ci/bash"},
                 "metadata": {
                     "invocationId": commit,
                     "completed": generated_at,
@@ -405,7 +405,7 @@ here specifically exercises `bar`, the chart type this release adds.
             "runtime": "node:test browser and DOM harness current",
         },
         "environment": {
-            "builder": "Claude Code / bash",
+            "builder": "StoneCharts CI / bash",
             "python": python_version,
             "go": go_version,
             "os": "Windows 11 Pro 10.0.26200",

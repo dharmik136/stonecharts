@@ -18,7 +18,7 @@
         "branch": "main"
       },
       "internalParameters": {
-        "status": "M docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256\n M docs/releases/0.0.0.1/evidence/rc.1/manifest.json\n M docs/releases/0.0.0.1/evidence/rc.1/provenance.json\n M docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md\n M docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json\n M tools/build_release_evidence.py\n?? .claude/\n?? docs/product-antigravity/"
+        "status": "M docs/releases/0.0.0.1/evidence/rc.1/hashes.sha256\n M docs/releases/0.0.0.1/evidence/rc.1/manifest.json\n M docs/releases/0.0.0.1/evidence/rc.1/provenance.json\n M docs/releases/0.0.0.1/evidence/rc.1/qualification-checklist.md\n M docs/releases/0.0.0.1/evidence/rc.1/sbom.spdx.json\n M tools/build_release_evidence.py\n?? docs/product-antigravity/"
       },
       "resolvedDependencies": [
         {
