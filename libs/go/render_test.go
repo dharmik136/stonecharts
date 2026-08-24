@@ -1217,6 +1217,9 @@ func TestSaveHTML(t *testing.T) {
 	if !strings.Contains(html, "<svg") {
 		t.Error("expected SVG in HTML output")
 	}
+	if !strings.Contains(html, "window.StoneCharts") {
+		t.Error("expected embedded interaction runtime in HTML output")
+	}
 }
 
 func TestRenderHTMLPointModelDataTable(t *testing.T) {

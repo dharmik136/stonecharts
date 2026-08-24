@@ -72,8 +72,14 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-      - run: python -m pip install "jsonschema>=4.23,<5" "markdown-it-py>=3,<5" "PyYAML>=6,<7"
+      - run: python -m pip install "jsonschema>=4.23,<5" "markdown-it-py>=3,<5" "PyYAML>=6,<7" "pytest>=8,<10"
       - run: python tools/check_docs.py
+      - run: python tools/generate_capabilities.py --check
+      - run: python tools/generate_runtime_assets.py --check
+      - run: python tools/generate_certification_baselines.py --check
+      - run: python tools/generate_certification_ledger.py --check
+      - run: python tools/check_certification_matrix.py --structural-only
+      - run: python tools/prepare_release_schema_0034.py --check
 
   python:
     runs-on: ${{ matrix.os }}
@@ -105,7 +111,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - run: python -m pip install "build>=1,<2"
+      - run: python -m pip install "build>=1,<2" "setuptools>=77"
+      - run: python tools/check_package_install.py
       - run: python -m build --wheel --outdir dist libs/python
       - run: python -m venv /tmp/install-test-venv
       - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-*.whl
@@ -172,6 +179,10 @@ jobs:
           db_spec = ChartSpec.from_dict({'type':'dumbbell','title':'DB Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','data':[10.0,20.0],'high':[30.0,40.0]}]})
           db_svg = render_svg(db_spec)
           assert db_svg.startswith('<svg'), 'dumbbell render failed'
+          from stonecharts.render import render_html
+          html = render_html(spec)
+          assert 'window.StoneCharts' in html, 'packaged interaction runtime missing'
+          assert 'runtime not found' not in html, 'packaged interaction runtime fallback used'
           print('installed-wheel smoke test OK,', len(svg), 'bytes')
           "
       - name: Smoke-test installed stoneverify console script
@@ -383,20 +394,20 @@ jobs:
           STONEVERIFY_RENDER_TIMEOUT: "30"
         run: |
           failed=0
-          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo dumbbell error-bar histogram line-basic lollipop scatter waterfall; do
+          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo development-triangle dumbbell error-bar flame-chart funnel gauge histogram line-basic lollipop nightingale parliament pie polar radar radial-bar scatter solid-gauge streamgraph technical-indicators timeline variwide vector-plot waterfall wind-rose windbarb xrange; do
             for spec in charts/${chart_type}/examples/*.json; do
               name=$(basename "$spec" .json)
-            evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
-            python tools/stonecharts_verify.py "$spec" \
-              --runtime python \
-              --evidence "$evidence_dir" 2>/dev/null || true
-            if [ -d "$evidence_dir" ]; then
-              result=$(python tools/stonecharts_verify.py --check-evidence "$evidence_dir" 2>&1) || true
-              if echo "$result" | grep -qi "fail"; then
-                echo "::error::Evidence bundle validation failed for ${chart_type}/${name}"
-                failed=1
+              evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
+              python tools/stonecharts_verify.py "$spec" \
+                --runtime python \
+                --evidence "$evidence_dir" 2>/dev/null || true
+              if [ -d "$evidence_dir" ]; then
+                result=$(python tools/stonecharts_verify.py --check-evidence "$evidence_dir" 2>&1) || true
+                if echo "$result" | grep -qi "fail"; then
+                  echo "::error::Evidence bundle validation failed for ${chart_type}/${name}"
+                  failed=1
+                fi
               fi
-            fi
             done
           done
           exit $failed

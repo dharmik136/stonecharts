@@ -5,6 +5,7 @@
 ![Python ≥3.9](https://img.shields.io/badge/python-%E2%89%A53.9-3776AB)
 ![Go ≥1.26](https://img.shields.io/badge/go-%E2%89%A51.26-00ADD8)
 ![Charts: 36](https://img.shields.io/badge/chart_types-36-28a745)
+![Release: 0.0.0.34](https://img.shields.io/badge/release-0.0.0.34-6f42c1)
 ![Dependencies: 0](https://img.shields.io/badge/runtime_deps-0-brightgreen)
 
 **Visual Integrity Infrastructure** for deterministic reporting charts — one governed
@@ -30,8 +31,8 @@ release, and environment boundaries.
 - **Formal conformance proofs.** [StoneVerify](#stoneverify) produces local evidence
   bundles proving visual integrity between releases — auditable artifacts, not just
   test assertions.
-- **Governed engineering.** 48 formal decisions, requirements traceability, evidence
-  packs, and a [12-job CI pipeline](#ci). Every chart type is admitted through a
+- **Governed engineering.** 60 formal decisions, requirements traceability, evidence
+  packs, and a [14-job CI pipeline](#ci). Every chart type is admitted through a
   governed process with its own decision record.
 
 ## Architecture
@@ -116,7 +117,9 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 ## Chart Catalog
 
 **36 chart types**, all certified with byte-identical Python and Go renderers pinned
-by golden tests.
+by golden tests and requalified together in `0.0.0.34`. The executable
+[`36 × 8` certification ledger](docs/quality/certification-ledger.json) records the
+evidence behind every chart and gate.
 
 | Tier | Count | Meaning |
 |------|-------|---------|
@@ -250,9 +253,10 @@ CHANGELOG.md     Full release history
 | Guarantees and limits | [`docs/contracts/guarantees-and-limits.md`](docs/contracts/guarantees-and-limits.md) |
 | Capability matrix | [`docs/product/capability-matrix.md`](docs/product/capability-matrix.md) |
 | Test strategy | [`docs/quality/test-strategy.md`](docs/quality/test-strategy.md) |
+| Certification matrix | [`docs/quality/certification-matrix.md`](docs/quality/certification-matrix.md) |
 | StoneVerify quick start | [`docs/quality/stoneverify-quickstart.md`](docs/quality/stoneverify-quickstart.md) |
 | Threat model | [`docs/security/threat-model.md`](docs/security/threat-model.md) |
-| Decision log (48 decisions) | [`docs/project/decisions.md`](docs/project/decisions.md) |
+| Decision log (60 decisions) | [`docs/project/decisions.md`](docs/project/decisions.md) |
 
 Execution is tracked in the private
 [StoneCharts GitHub Project](https://github.com/users/dharmik136/projects/2).
@@ -260,7 +264,7 @@ Execution is tracked in the private
 ## CI
 
 The [quality workflow](.github/workflows/quality.yml) runs on every push and pull
-request with 12 jobs:
+request with 14 jobs:
 
 - **Lint and static analysis** — ruff, mypy, go vet, golangci-lint, CodeQL
 - **Cross-platform tests** — Python 3.9 + 3.14, Go, on Ubuntu and Windows
@@ -269,7 +273,8 @@ request with 12 jobs:
 - **Cross-language parity** — Python/Go byte-identical output verification
 - **Schema compatibility** — backward-compatibility check on PRs
 - **StoneVerify pilot gate** — full conformance proof with artifact upload
-- **Browser qualification** — Playwright interaction and accessibility tests
+- **Browser qualification** — one Playwright interaction/accessibility test per
+  certified chart type
 
 ## Contributing
 

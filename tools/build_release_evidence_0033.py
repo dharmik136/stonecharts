@@ -12,7 +12,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = "0.0.0.33"
 CANDIDATE = "rc.1"
@@ -72,7 +71,7 @@ superseded_by: null
 # StoneCharts {RELEASE} release-candidate checklist
 
 Candidate: `{CANDIDATE}`
-Source commit: `{git('rev-parse', 'HEAD')}`
+Source commit: `{git("rev-parse", "HEAD")}`
 Status: proposed; publication approval remains a separate gate.
 
 ## Automated evidence
@@ -110,8 +109,18 @@ approve publication or create a public tag.
             "documentNamespace": f"https://stonecharts.dev/sbom/{RELEASE}/{CANDIDATE}",
             "creationInfo": {"created": "2026-08-24T12:30:00+05:30", "creators": ["Tool: StoneCharts release builder"]},
             "packages": [
-                {"SPDXID": "SPDXRef-Package-stonecharts-python", "name": "stonecharts", "versionInfo": RELEASE, "downloadLocation": "NOASSERTION"},
-                {"SPDXID": "SPDXRef-Package-stonecharts-go", "name": "stonecharts-go", "versionInfo": RELEASE, "downloadLocation": "NOASSERTION"},
+                {
+                    "SPDXID": "SPDXRef-Package-stonecharts-python",
+                    "name": "stonecharts",
+                    "versionInfo": RELEASE,
+                    "downloadLocation": "NOASSERTION",
+                },
+                {
+                    "SPDXID": "SPDXRef-Package-stonecharts-go",
+                    "name": "stonecharts-go",
+                    "versionInfo": RELEASE,
+                    "downloadLocation": "NOASSERTION",
+                },
             ],
         },
     )
@@ -140,7 +149,7 @@ superseded_by: null
 | Python package metadata | `{RELEASE}` | `libs/python/pyproject.toml`, `libs/python/stonecharts/__init__.py` |
 | Go runtime metadata | `{RELEASE}` | `libs/go/version.go` |
 | Active schemas | `{RELEASE}` | `spec/released/current.json`, `spec/released/{RELEASE}/` |
-| Source verification | `{git('rev-parse', 'HEAD')}` | clean-tree check recorded in `provenance.json` |
+| Source verification | `{git("rev-parse", "HEAD")}` | clean-tree check recorded in `provenance.json` |
 
 This is a source-candidate evidence pack; publication and registry upload remain gated.
 """,
@@ -180,30 +189,89 @@ This is a source-candidate evidence pack; publication and registry upload remain
     ]
     artifacts: list[dict[str, object]] = []
     artifact_paths: set[str] = set()
-    for path in [EVIDENCE_DIR / "manifest.schema.json", *[ROOT / p for p in sorted(evidence_paths)], *extra, RC_DIR / "qualification-checklist.md", RC_DIR / "sbom.spdx.json", RC_DIR / "provenance.json", RC_DIR / "package-install-matrix.md"]:
+    for path in [
+        EVIDENCE_DIR / "manifest.schema.json",
+        *[ROOT / p for p in sorted(evidence_paths)],
+        *extra,
+        RC_DIR / "qualification-checklist.md",
+        RC_DIR / "sbom.spdx.json",
+        RC_DIR / "provenance.json",
+        RC_DIR / "package-install-matrix.md",
+    ]:
         if not path.exists() or rel(path) in artifact_paths:
             continue
         artifact_paths.add(rel(path))
-        artifacts.append({"name": path.name, "kind": "documentation" if path.suffix in {".md", ".json", ".yaml", ".toml"} else "other", "path": rel(path), "sha256": sha256(path), "bytes": path.stat().st_size})
+        artifacts.append(
+            {
+                "name": path.name,
+                "kind": "documentation" if path.suffix in {".md", ".json", ".yaml", ".toml"} else "other",
+                "path": rel(path),
+                "sha256": sha256(path),
+                "bytes": path.stat().st_size,
+            }
+        )
 
     manifest = {
         "release": RELEASE,
         "candidate": CANDIDATE,
-        "source": {"repository": "dharmik136/stonecharts", "commit": git("rev-parse", "HEAD"), "tag": RELEASE, "treeClean": False},
-        "versions": {"product": RELEASE, "python": RELEASE, "go": None, "schema": "manifest.schema.json v1", "svgContract": "spec/svg-contract.md current", "runtime": "node:test browser and DOM harness current"},
-        "environment": {"builder": "StoneCharts release builder / Python", "python": platform.python_version(), "go": subprocess.check_output(["go", "version"], text=True).strip(), "os": platform.platform(), "architecture": platform.machine()},
+        "source": {
+            "repository": "dharmik136/stonecharts",
+            "commit": git("rev-parse", "HEAD"),
+            "tag": RELEASE,
+            "treeClean": False,
+        },
+        "versions": {
+            "product": RELEASE,
+            "python": RELEASE,
+            "go": None,
+            "schema": "manifest.schema.json v1",
+            "svgContract": "spec/svg-contract.md current",
+            "runtime": "node:test browser and DOM harness current",
+        },
+        "environment": {
+            "builder": "StoneCharts release builder / Python",
+            "python": platform.python_version(),
+            "go": subprocess.check_output(["go", "version"], text=True).strip(),
+            "os": platform.platform(),
+            "architecture": platform.machine(),
+        },
         "artifacts": artifacts,
         "evidence": evidence,
-        "risks": [{"id": f"RISK-{n:03d}", "disposition": "accepted", "expires": None, "rationale": "Candidate review remains open until publication approval."} for n in range(1, 15)],
-        "knownLimits": ["Go module publication remains behind the governed release gate.", "Pixel identity is only claimed under a certified export profile.", "The release tag is the publication record; package registry publication remains separately governed."],
-        "review": {"mode": "self", "productOwner": "dharmik136", "maintainer": "dharmik136", "approvedAt": "2026-08-24T12:30:00+05:30"},
+        "risks": [
+            {
+                "id": f"RISK-{n:03d}",
+                "disposition": "accepted",
+                "expires": None,
+                "rationale": "Candidate review remains open until publication approval.",
+            }
+            for n in range(1, 15)
+        ],
+        "knownLimits": [
+            "Go module publication remains behind the governed release gate.",
+            "Pixel identity is only claimed under a certified export profile.",
+            "The release tag is the publication record; package registry publication remains separately governed.",
+        ],
+        "review": {
+            "mode": "self",
+            "productOwner": "dharmik136",
+            "maintainer": "dharmik136",
+            "approvedAt": "2026-08-24T12:30:00+05:30",
+        },
     }
 
     # Hashes cover every declared artifact except hashes.sha256 itself.
     hashes_path = RC_DIR / "hashes.sha256"
     hash_lines = [f"{entry['sha256']}  {entry['path']}" for entry in artifacts]
     hashes_path.write_text("\n".join(hash_lines) + "\n", encoding="utf-8")
-    artifacts.append({"name": "hashes.sha256", "kind": "other", "path": rel(hashes_path), "sha256": sha256(hashes_path), "bytes": hashes_path.stat().st_size})
+    artifacts.append(
+        {
+            "name": "hashes.sha256",
+            "kind": "other",
+            "path": rel(hashes_path),
+            "sha256": sha256(hashes_path),
+            "bytes": hashes_path.stat().st_size,
+        }
+    )
     manifest_path = RC_DIR / "manifest.json"
     write_json(manifest_path, manifest)
     print(f"built {rel(manifest_path)}")

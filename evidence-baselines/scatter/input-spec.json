@@ -1,0 +1,1 @@
+{"series":[{"data":[42,55,38,61,47,90,52,44,73,58,49,66,51,39,63],"marker":{"radius":4,"symbol":"circle"},"name":"checkout-api"}],"subtitle":"One unconnected point per request","title":"Response Latency by Sample","type":"scatter","xAxis":{"title":"Sample #"},"yAxis":{"title":"Latency (ms)"}}

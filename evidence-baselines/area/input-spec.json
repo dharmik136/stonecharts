@@ -1,0 +1,1 @@
+{"series":[{"data":[420,460,510,540,505,530],"fillOpacity":0.35,"name":"us-east"},{"data":[300,330,355,390,410,400],"fillOpacity":0.35,"name":"eu-west"}],"subtitle":"Resident set over time, overlaid areas","title":"Memory Usage by Region","type":"area","xAxis":{"categories":["10:00","10:05","10:10","10:15","10:20","10:25"],"title":"Time"},"yAxis":{"title":"RSS (MB)"}}

@@ -53,9 +53,10 @@ An authorized user of a certified release can:
 
 Current certified chart types, customization surface, and language support are
 tracked authoritatively in [`SC-PROD-004`](capability-matrix.md); this document does
-not restate that table. As of `0.0.0.33` the certified set includes 36 chart types
-across two complete families — Family A (Cartesian, 26 types) and Family B
-(Polar/radial, 9 types) — with certified language implementations in Python and Go.
+not restate that table. As of `0.0.0.34` the certified set includes 36 chart types:
+two complete families — Family A (Cartesian, 26 types) and Family B (Polar/radial,
+9 types) — plus development-triangle, with certified implementations in Python and
+Go. All 36 share the same executable eight-gate certification ledger.
 
 The `0.0.0.1` initial release scope (historical, satisfies `REQ-SCOPE-001`) was:
 

@@ -1,0 +1,84 @@
+{
+  "assurance": {
+    "chartType": "scatter",
+    "eligibleForCertifiedGuarantee": true,
+    "profile": "certified",
+    "tier": "certified"
+  },
+  "baseline": {
+    "identity": null,
+    "inputEqual": null,
+    "message": "No baseline evidence directory was provided.",
+    "note": null,
+    "runtimes": [],
+    "schemaVersion": 1,
+    "status": "not-checked",
+    "supersedes": null
+  },
+  "comparison": "comparison.json",
+  "demoDrift": "none",
+  "environment": {
+    "arch": "AMD64",
+    "goVersion": "go version go1.26.4 windows/amd64",
+    "locale": "English_India",
+    "os": "Windows",
+    "pythonVersion": "3.14.4",
+    "schemaVersion": 1,
+    "stonechartsVersion": "0.0.0.34",
+    "stoneverifyVersion": "1.0.0",
+    "timezone": "+0530"
+  },
+  "evidence": {
+    "artifacts": {
+      "go-output.svg": {
+        "algorithm": "sha-256",
+        "value": "3707cc27b94fdaad1b2439952733ad9f05f0300d4e55f0f52fd61f806a519d3d"
+      },
+      "python-output.svg": {
+        "algorithm": "sha-256",
+        "value": "3707cc27b94fdaad1b2439952733ad9f05f0300d4e55f0f52fd61f806a519d3d"
+      }
+    },
+    "inputSpec": {
+      "algorithm": "sha-256",
+      "value": "f8a5de4a36bf38885416aafc1595c9362cd71169a8b55c18f97d6c7bd29d8532"
+    }
+  },
+  "generatedAt": "2026-08-24T00:00:00+00:00",
+  "input": {
+    "bytes": 294,
+    "file": "input-spec.json",
+    "sha256": "f8a5de4a36bf38885416aafc1595c9362cd71169a8b55c18f97d6c7bd29d8532",
+    "source": "charts/scatter/examples/basic.json"
+  },
+  "report": "report.html",
+  "runtimes": [
+    {
+      "bytes": 6006,
+      "demoDriftApplied": "none",
+      "implementation": "CPython",
+      "output": "python-output.svg",
+      "pythonVersion": "3.14.4",
+      "runtime": "python",
+      "sha256": "3707cc27b94fdaad1b2439952733ad9f05f0300d4e55f0f52fd61f806a519d3d",
+      "stonechartsVersion": "0.0.0.34"
+    },
+    {
+      "bytes": 6006,
+      "demoDriftApplied": "none",
+      "goAdapterVersion": "1.0.0",
+      "goBinary": "stoneverify-go-render.exe",
+      "goBinarySha256": "ca6c208f6fb7cebb04a86f040233ab6d7b92264457abc54eee1a7dd64456d3c1",
+      "goVersion": "go version go1.26.4 windows/amd64",
+      "module": "stonecharts",
+      "output": "go-output.svg",
+      "runtime": "go",
+      "sha256": "3707cc27b94fdaad1b2439952733ad9f05f0300d4e55f0f52fd61f806a519d3d",
+      "stonechartsVersion": "0.0.0.34"
+    }
+  ],
+  "schemaVersion": 1,
+  "status": "pass",
+  "tool": "stonecharts_verify",
+  "toolVersion": 1
+}

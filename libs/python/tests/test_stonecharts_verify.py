@@ -1275,9 +1275,10 @@ def test_go_runtime_uses_explicit_adapter_binary(tmp_path, stoneverify_go_binary
     go_runtime = manifest["runtimes"][0]
     assert go_runtime["runtime"] == "go"
     assert go_runtime["module"] == "stonecharts"
-    assert go_runtime["stonechartsVersion"] == "0.0.0.33"
+    assert go_runtime["stonechartsVersion"] == "0.0.0.34"
     assert go_runtime["goAdapterVersion"] == "1.0.0"
-    assert go_runtime["goBinary"] == str(stoneverify_go_binary)
+    assert go_runtime["goBinary"] == stoneverify_go_binary.name
+    assert go_runtime["goBinarySha256"] == stonecharts_verify.sha256_file(stoneverify_go_binary)
 
 
 def test_dual_axis_advisory_present_in_manifest(tmp_path):

@@ -70,19 +70,15 @@ def generate_python_capabilities(registry: dict) -> str:
     ]
 
     chart_types = sorted(registry["chartTypes"], key=lambda c: c["id"])
-    max_id_len = max(len(ct["id"]) for ct in chart_types)
-
     for ct in chart_types:
         cid = ct["id"]
         tier = ct["tier"]
         since = ct["since"]
-        padding_id = " " * (max_id_len - len(cid))
-        padding_tier = " " * (14 - len(tier))
         if since is None:
             since_str = "None"
-            lines.append(f'        "{cid}": {padding_id}{{"tier": "{tier}",{padding_tier}"since": {since_str}}},')
+            lines.append(f'        "{cid}": {{"tier": "{tier}", "since": {since_str}}},')
         else:
-            lines.append(f'        "{cid}": {padding_id}{{"tier": "{tier}",{padding_tier}"since": "{since}"}},')
+            lines.append(f'        "{cid}": {{"tier": "{tier}", "since": "{since}"}},')
 
     lines.append("    },")
 

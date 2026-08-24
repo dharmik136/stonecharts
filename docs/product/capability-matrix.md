@@ -6,10 +6,10 @@ classification: informative
 owner: product-owner
 approver: maintainer
 review_mode: independent
-applies_to: 0.0.0.33 and later
+applies_to: 0.0.0.34 and later
 requirements: []
 evidence: [TEST-DOCS-CONTROL]
-last_reviewed: "2026-08-10"
+last_reviewed: "2026-08-24"
 review_due: "2026-08-28"
 supersedes: null
 superseded_by: null
@@ -22,7 +22,8 @@ marketing, and pilot documents should link here instead of restating release sco
 
 ## Current technical capabilities
 
-36 chart types, all certified through the SC-CERT gate model.
+36 chart types, all requalified in `0.0.0.34` through the executable eight-gate
+SC-CERT model.
 
 <!-- BEGIN:GENERATED:capabilities -->
 | Capability | Tier | First release | Notes |

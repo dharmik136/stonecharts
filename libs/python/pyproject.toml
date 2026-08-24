@@ -1,17 +1,18 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "stonecharts"
-version = "0.0.0.33"
+version = "0.0.0.34"
 description = "StoneCharts — Visual Integrity Infrastructure for deterministic reporting charts (Python renderer)"
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "Proprietary — All Rights Reserved" }
+license = "LicenseRef-Proprietary"
+license-files = ["LICENSE"]
 authors = [{ name = "Dharmik Shingala" }]
 keywords = ["charts", "svg", "visualization", "plotting"]
-classifiers = ["License :: Other/Proprietary License", "Private :: Do Not Upload"]
+classifiers = ["Private :: Do Not Upload"]
 dependencies = []
 
 [project.scripts]
@@ -39,3 +40,6 @@ check_untyped_defs = true
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["stonecharts*"]
+
+[tool.setuptools.package-data]
+stonecharts = ["_assets/*.js"]

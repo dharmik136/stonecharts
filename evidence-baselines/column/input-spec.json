@@ -1,0 +1,1 @@
+{"series":[{"data":[1820,1640,1975,2510,3120,2890,2440,2010],"name":"Requests"}],"subtitle":"Throughput sampled every 5 minutes","title":"HTTP Requests per Interval","type":"column","xAxis":{"categories":["00:00","00:05","00:10","00:15","00:20","00:25","00:30","00:35"],"title":"Interval"},"yAxis":{"title":"Requests"}}

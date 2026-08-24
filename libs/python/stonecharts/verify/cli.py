@@ -487,7 +487,8 @@ def render_go(
         "runtime": "go",
         **version_metadata,
         "goVersion": _go_version(),
-        "goBinary": str(binary),
+        "goBinary": binary.name,
+        "goBinarySha256": sha256_file(binary),
     }
     return proc.stdout, metadata
 
@@ -1218,7 +1219,7 @@ def write_report(path: pathlib.Path, manifest: dict[str, Any], comparison: dict[
 </body>
 </html>
 """
-    path.write_text(document, encoding="utf-8")
+    path.write_text("\n".join(line.rstrip() for line in document.splitlines()) + "\n", encoding="utf-8")
 
 
 def _junit_failure_text(findings: list[dict[str, Any]], fallback: str) -> str:
@@ -1507,7 +1508,7 @@ def write_compare_report(path: pathlib.Path, comparison: dict[str, Any]) -> None
 </body>
 </html>
 """
-    path.write_text(document, encoding="utf-8")
+    path.write_text("\n".join(line.rstrip() for line in document.splitlines()) + "\n", encoding="utf-8")
 
 
 def main() -> int:
@@ -1662,6 +1663,7 @@ def main() -> int:
     if args.evidence is None:
         parser.error("--evidence is required unless --check-evidence or --compare-evidence is used")
 
+    spec_source = args.spec.as_posix()
     spec_path = args.spec.resolve()
     evidence = args.evidence.resolve()
     runtimes = args.runtime or (["python"] if args.baseline_evidence else ["python", "go"])
@@ -1748,7 +1750,7 @@ def main() -> int:
                 "status": comparison["status"],
                 "demoDrift": args.demo_drift,
                 "input": {
-                    "source": str(spec_path),
+                    "source": spec_source,
                     "file": "input-spec.json",
                     "sha256": sha256_bytes(spec_bytes),
                     "bytes": len(spec_bytes),

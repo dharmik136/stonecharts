@@ -7,11 +7,46 @@ not represented as Semantic Versioning.
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [0.0.0.34] - 2026-08-24
+
+### Added
+
+- **Executable certification ledger** — a machine-readable record of all eight
+  SC-CERT gates for each of the 36 certified chart types, backed by executable
+  structural, semantic, property, purity, browser, and evidence checks.
+- **Portfolio browser qualification** — one real Chromium subtest per chart type,
+  covering tooltips, keyboard navigation, focus, legends, ARIA state, accessible
+  tables, and browser-console cleanliness.
+- **Certified dual-runtime baselines** — reproducible StoneVerify evidence bundles
+  for all 36 charts at `0.0.0.34`, with Python/Go byte parity and repository-relative
+  provenance.
+
+### Changed
+
+- Requalified the complete 36-chart portfolio against the same eight-gate standard
+  originally established by the seven seed charts.
+- Embedded a generated, byte-checked copy of the governed interaction runtime in
+  both the Python package and Go module so installed packages retain interactive
+  HTML behavior outside the source checkout.
+- Optimized the direct cross-render sweep to build the Go adapter once; 184 valid
+  examples remain byte-identical across Python and Go.
+- Updated Python packaging metadata to the current license-expression format and
+  added package documentation for warning-free wheel and source builds.
+
+### Fixed
+
+- Prevented the interaction runtime from assigning `null` crosshair coordinates on
+  non-Cartesian marks. Gauge, solid-gauge, radar, polar, wind-rose, nightingale, and
+  radial-bar now complete hover interactions without browser console errors.
+
+## [0.0.0.33] - 2026-08-24
+
 ### Added
 
 - **Development-triangle chart** (`type: "development-triangle"`) — actuarial loss
-  development triangle for reserve adequacy and IBNR estimation (certified tier,
-  targeting 0.0.0.33).
+  development triangle for reserve adequacy and IBNR estimation (certified tier).
 - **Canonical capability registry** (`spec/capabilities.json`) — single source of
   truth for all chart type tiers and version origins.
 - **Capability generation tool** (`tools/generate_capabilities.py`) — generates and

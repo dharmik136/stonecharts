@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-StoneCharts is pre-release software at version `0.0.0.33` with 36 certified chart
+StoneCharts is pre-release software at version `0.0.0.34` with 36 certified chart
 types. No version is currently designated for production security support. Security
 evidence is included in release qualification evidence packs (see `docs/releases/`).
 

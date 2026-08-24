@@ -1,0 +1,1 @@
+{"series":[{"data":[182,164,97,88,64,41],"name":"Requests"}],"subtitle":"Last 24 hours, ranked","title":"Top API Endpoints by Request Volume","type":"bar","xAxis":{"categories":["/api/login","/api/search","/api/orders","/api/profile","/api/checkout","/api/logout"],"title":"Endpoint"},"yAxis":{"title":"Requests (thousands)"}}

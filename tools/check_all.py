@@ -15,6 +15,24 @@ CHECKS: list[tuple[str, list[str]]] = [
     ("ruff format", [sys.executable, "-m", "ruff", "format", "--check", "libs/python/", "tools/"]),
     ("pytest", [sys.executable, "-m", "pytest", "libs/python/tests", "-q"]),
     ("doc checks", [sys.executable, "tools/check_docs.py"]),
+    ("capability generation", [sys.executable, "tools/generate_capabilities.py", "--check"]),
+    ("runtime assets", [sys.executable, "tools/generate_runtime_assets.py", "--check"]),
+    (
+        "certification baselines",
+        [sys.executable, "tools/generate_certification_baselines.py", "--check"],
+    ),
+    (
+        "certification ledger",
+        [sys.executable, "tools/generate_certification_ledger.py", "--check"],
+    ),
+    (
+        "certification matrix",
+        [sys.executable, "tools/check_certification_matrix.py", "--structural-only"],
+    ),
+    (
+        "release schema snapshot",
+        [sys.executable, "tools/prepare_release_schema_0034.py", "--check"],
+    ),
     ("cross-language parity", [sys.executable, "tools/check_cross_language_parity.py"]),
     (
         "schema compat (identity)",

@@ -48,7 +48,7 @@
         "radial-bar",
         "development-triangle"
       ],
-        "description": "Chart type id for the active release scope; all 36 chart types are certified in 0.0.0.33 and map to the released chart design and renderer pair."
+        "description": "Chart type id for the active release scope; all 36 chart types are requalified in 0.0.0.34 and map to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",

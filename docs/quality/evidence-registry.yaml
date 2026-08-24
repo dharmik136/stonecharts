@@ -12,7 +12,7 @@ evidence:
   - id: TEST-CERTIFICATION-MATRIX
     kind: test
     status: implemented
-    description: "Verifies that all 36 certified chart types carry the seed-chart SC-CERT evidence surface: design, fixtures, goldens, schema presence, cross-language test references, property, semantic, purity, and StoneVerify coverage."
+    description: "Executes the 36-chart by 8-gate certification ledger: schema/validation, golden and direct parity, purity, property corpus, invalid corpus, semantic invariants, real-browser accessibility/interactions, and certified StoneVerify baselines."
     command: py -3 tools/check_certification_matrix.py
     location: tools/check_certification_matrix.py
     requirements: [REQ-CHART-001, REQ-DET-001, REQ-VAL-001, REQ-A11Y-001, REQ-REL-001]
@@ -75,9 +75,9 @@ evidence:
   - id: TEST-RUNTIME-BROWSER
     kind: test
     status: implemented
-    description: Exercises tooltip, keyboard, focus, legend, adaptive placement, and DOM state through a local HTTP Chromium browser harness.
-    command: node --test runtime/browser-qualification.test.js
-    location: runtime/browser-qualification.test.js
+    description: Exercises tooltip, keyboard, focus, legend, accessible tables, ARIA state, adaptive placement, and console cleanliness for all 36 certified chart types through a local HTTP Chromium harness.
+    command: node --test runtime/all-charts-browser-qualification.test.js
+    location: runtime/all-charts-browser-qualification.test.js
     requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
   - id: TEST-RUNTIME-SMOKE
     kind: test
@@ -212,6 +212,13 @@ evidence:
     command: py -3 -m pytest libs/python/tests/test_stonecharts_verify.py -q
     location: libs/python/tests/test_stonecharts_verify.py
     requirements: [REQ-VERIFY-001]
+  - id: TEST-PACKAGE-INSTALL
+    kind: test
+    status: implemented
+    description: Builds warning-free wheel and source artifacts, verifies the embedded runtime and license metadata, installs the wheel in an isolated environment, and renders SVG plus interactive HTML for all 36 certified chart types.
+    command: py -3 tools/check_package_install.py
+    location: tools/check_package_install.py
+    requirements: [REQ-REL-001, REQ-RUNTIME-001, REQ-A11Y-001]
   - id: TEST-STONEVERIFY-RESULT-SCHEMA
     kind: test
     status: implemented

@@ -87,10 +87,10 @@ streaming, a browser-based library is the right tool.
 
 ## What we built
 
-We built this for seven chart types (line, column, area, bar, scatter, bubble,
-combo) with certified Python and Go renderers, a JSON specification, and a
-conformance tool that proves cross-runtime byte identity. Currently in private
-preview.
+We built this for 36 chart types with certified Python and Go renderers, a JSON
+specification, and a conformance tool that proves cross-runtime byte identity for
+the governed corpus. Every chart now passes the same eight-gate certification
+standard. Currently in private preview.
 
 [Request early access to the interactive demo](#) if this approach fits your
 workflow.

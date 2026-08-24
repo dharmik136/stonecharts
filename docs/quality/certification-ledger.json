@@ -1,0 +1,2840 @@
+{
+  "schemaVersion": 1,
+  "release": "0.0.0.34",
+  "chartCount": 36,
+  "seedCharts": [
+    "line",
+    "column",
+    "area",
+    "bar",
+    "scatter",
+    "bubble",
+    "combo"
+  ],
+  "qualificationCommands": [
+    "py -3 tools/check_certification_matrix.py",
+    "py -3 -m pytest libs/python/tests -q",
+    "go test ./... (from libs/go)",
+    "npm test",
+    "py -3 tools/check_direct_cross_render.py",
+    "py -3 tools/generate_certification_baselines.py --check",
+    "py -3 tools/generate_runtime_assets.py --check",
+    "py -3 tools/check_package_install.py"
+  ],
+  "charts": [
+    {
+      "id": "line",
+      "directory": "line-basic",
+      "tier": "certified",
+      "since": "0.0.0.1",
+      "examples": [
+        "adversarial",
+        "basic",
+        "dark",
+        "gradient",
+        "gradient-partial",
+        "markers",
+        "spline",
+        "styled"
+      ],
+      "invalidFixtureCount": 21,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/line-basic/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/line-basic/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/line-basic/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/line-basic/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/line/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "column",
+      "directory": "column",
+      "tier": "certified",
+      "since": "0.0.0.1",
+      "examples": [
+        "adversarial",
+        "basic",
+        "dark",
+        "grouped",
+        "stacked",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 6,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-007"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/column/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/column/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/column/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/column/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/column/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "bar",
+      "directory": "bar",
+      "tier": "certified",
+      "since": "0.0.0.2",
+      "examples": [
+        "adversarial",
+        "basic",
+        "grouped",
+        "stacked",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 5,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-007"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/bar/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/bar/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/bar/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/bar/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/bar/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "area",
+      "directory": "area",
+      "tier": "certified",
+      "since": "0.0.0.3",
+      "examples": [
+        "basic",
+        "percent",
+        "stacked",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 10,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/area/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/area/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/area/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/area/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/area/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "scatter",
+      "directory": "scatter",
+      "tier": "certified",
+      "since": "0.0.0.3",
+      "examples": [
+        "adversarial",
+        "basic",
+        "correlation",
+        "regression",
+        "themed-dark",
+        "xy-points"
+      ],
+      "invalidFixtureCount": 5,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/scatter/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/scatter/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/scatter/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/scatter/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/scatter/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "bubble",
+      "directory": "bubble",
+      "tier": "certified",
+      "since": "0.0.0.4",
+      "examples": [
+        "adversarial",
+        "basic",
+        "multi-series",
+        "themed-dark",
+        "uniform-z"
+      ],
+      "invalidFixtureCount": 5,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-006"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/bubble/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/bubble/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/bubble/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/bubble/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/bubble/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "combo",
+      "directory": "combo",
+      "tier": "certified",
+      "since": "0.0.0.5",
+      "examples": [
+        "adversarial",
+        "basic",
+        "dark",
+        "dual-axis"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/combo/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/combo/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/combo/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/combo/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/combo/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "histogram",
+      "directory": "histogram",
+      "tier": "certified",
+      "since": "0.0.0.6",
+      "examples": [
+        "adversarial",
+        "basic",
+        "pareto",
+        "prebinned",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-001"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/histogram/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/histogram/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/histogram/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/histogram/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/histogram/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "candlestick",
+      "directory": "candlestick",
+      "tier": "certified",
+      "since": "0.0.0.7",
+      "examples": [
+        "adversarial",
+        "basic",
+        "heikin-ashi",
+        "ohlc",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-015"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/candlestick/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/candlestick/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/candlestick/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/candlestick/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/candlestick/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-bar",
+      "directory": "error-bar",
+      "tier": "certified",
+      "since": "0.0.0.8",
+      "examples": [
+        "adversarial",
+        "asymmetric",
+        "basic",
+        "overlay-grouped",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 6,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-012"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/error-bar/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/error-bar/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/error-bar/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/error-bar/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/error-bar/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "arearange",
+      "directory": "arearange",
+      "tier": "certified",
+      "since": "0.0.0.9",
+      "examples": [
+        "adversarial",
+        "basic",
+        "spline-range",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 7,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-011"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/arearange/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/arearange/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/arearange/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/arearange/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/arearange/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "columnrange",
+      "directory": "columnrange",
+      "tier": "certified",
+      "since": "0.0.0.9",
+      "examples": [
+        "adversarial",
+        "basic",
+        "grouped",
+        "horizontal",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 6,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-011"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/columnrange/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/columnrange/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/columnrange/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/columnrange/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/columnrange/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "waterfall",
+      "directory": "waterfall",
+      "tier": "certified",
+      "since": "0.0.0.10",
+      "examples": [
+        "adversarial",
+        "basic",
+        "intermediate-sums",
+        "profit-bridge",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-002"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/waterfall/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/waterfall/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/waterfall/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/waterfall/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/waterfall/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "bullet",
+      "directory": "bullet",
+      "tier": "certified",
+      "since": "0.0.0.11",
+      "examples": [
+        "adversarial",
+        "basic",
+        "multi-kpi",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-014"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/bullet/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/bullet/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/bullet/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/bullet/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/bullet/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "boxplot",
+      "directory": "boxplot",
+      "tier": "certified",
+      "since": "0.0.0.12",
+      "examples": [
+        "adversarial",
+        "basic",
+        "grouped",
+        "outliers",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 3,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-013"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/boxplot/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/boxplot/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/boxplot/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/boxplot/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/boxplot/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "lollipop",
+      "directory": "lollipop",
+      "tier": "certified",
+      "since": "0.0.0.13",
+      "examples": [
+        "adversarial",
+        "basic",
+        "grouped",
+        "horizontal",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-016"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/lollipop/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/lollipop/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/lollipop/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/lollipop/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/lollipop/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dumbbell",
+      "directory": "dumbbell",
+      "tier": "certified",
+      "since": "0.0.0.14",
+      "examples": [
+        "adversarial",
+        "basic",
+        "grouped",
+        "horizontal",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 6,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-011"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/dumbbell/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/dumbbell/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/dumbbell/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/dumbbell/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/dumbbell/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "funnel",
+      "directory": "funnel",
+      "tier": "certified",
+      "since": "0.0.0.15",
+      "examples": [
+        "adversarial",
+        "basic",
+        "neck",
+        "pyramid",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-017"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/funnel/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/funnel/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/funnel/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/funnel/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/funnel/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "variwide",
+      "directory": "variwide",
+      "tier": "certified",
+      "since": "0.0.0.16",
+      "examples": [
+        "adversarial",
+        "basic",
+        "dark",
+        "negative"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-018"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/variwide/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/variwide/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/variwide/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/variwide/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/variwide/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "timeline",
+      "directory": "timeline",
+      "tier": "certified",
+      "since": "0.0.0.17",
+      "examples": [
+        "adversarial",
+        "basic",
+        "multi",
+        "vertical"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-019"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/timeline/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/timeline/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/timeline/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/timeline/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/timeline/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "windbarb",
+      "directory": "windbarb",
+      "tier": "certified",
+      "since": "0.0.0.18",
+      "examples": [
+        "adversarial",
+        "basic",
+        "datetime",
+        "southern-hemisphere",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-020"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/windbarb/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/windbarb/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/windbarb/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/windbarb/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/windbarb/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "streamgraph",
+      "directory": "streamgraph",
+      "tier": "certified",
+      "since": "0.0.0.19",
+      "examples": [
+        "adversarial",
+        "basic",
+        "silhouette",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 4,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-021"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/streamgraph/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/streamgraph/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/streamgraph/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/streamgraph/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/streamgraph/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "vector-plot",
+      "directory": "vector-plot",
+      "tier": "certified",
+      "since": "0.0.0.20",
+      "examples": [
+        "adversarial",
+        "basic",
+        "field",
+        "themed-dark",
+        "uniform-length"
+      ],
+      "invalidFixtureCount": 8,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-022"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/vector-plot/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/vector-plot/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/vector-plot/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/vector-plot/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/vector-plot/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "xrange",
+      "directory": "xrange",
+      "tier": "certified",
+      "since": "0.0.0.21",
+      "examples": [
+        "adversarial",
+        "gantt",
+        "swimlanes",
+        "themed-dark",
+        "trace-waterfall"
+      ],
+      "invalidFixtureCount": 8,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-023"
+      ],
+      "browserFixture": "adversarial",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/xrange/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/xrange/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/xrange/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/xrange/examples/adversarial.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/xrange/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "technical-indicators",
+      "directory": "technical-indicators",
+      "tier": "certified",
+      "since": "0.0.0.22",
+      "examples": [
+        "adversarial",
+        "basic",
+        "bollinger",
+        "rsi-pane",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 18,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-024"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/technical-indicators/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/technical-indicators/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/technical-indicators/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/technical-indicators/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/technical-indicators/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "flame-chart",
+      "directory": "flame-chart",
+      "tier": "certified",
+      "since": "0.0.0.23",
+      "examples": [
+        "adversarial",
+        "basic",
+        "deep-stack",
+        "multi-series",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 10,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-025"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/flame-chart/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/flame-chart/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/flame-chart/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/flame-chart/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/flame-chart/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pie",
+      "directory": "pie",
+      "tier": "certified",
+      "since": "0.0.0.24",
+      "examples": [
+        "adversarial",
+        "basic",
+        "donut",
+        "donut-dark",
+        "donut-single",
+        "many-slices",
+        "single-slice",
+        "themed-dark",
+        "variable-radius"
+      ],
+      "invalidFixtureCount": 10,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-026"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/pie/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/pie/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/pie/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/pie/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/pie/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "gauge",
+      "directory": "gauge",
+      "tier": "certified",
+      "since": "0.0.0.25",
+      "examples": [
+        "adversarial",
+        "basic",
+        "full-scale",
+        "no-bands",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 10,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-027"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/gauge/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/gauge/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/gauge/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/gauge/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/gauge/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "solid-gauge",
+      "directory": "solid-gauge",
+      "tier": "certified",
+      "since": "0.0.0.26",
+      "examples": [
+        "adversarial",
+        "basic",
+        "full-scale",
+        "no-bands",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 10,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-028"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/solid-gauge/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/solid-gauge/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/solid-gauge/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/solid-gauge/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/solid-gauge/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "radar",
+      "directory": "radar",
+      "tier": "certified",
+      "since": "0.0.0.27",
+      "examples": [
+        "adversarial",
+        "basic",
+        "line-only",
+        "single-series",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 9,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-029"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/radar/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/radar/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/radar/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/radar/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/radar/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "polar",
+      "directory": "polar",
+      "tier": "certified",
+      "since": "0.0.0.28",
+      "examples": [
+        "adversarial",
+        "basic",
+        "line-only",
+        "single-series",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 9,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-030"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/polar/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/polar/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/polar/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/polar/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/polar/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "wind-rose",
+      "directory": "wind-rose",
+      "tier": "certified",
+      "since": "0.0.0.29",
+      "examples": [
+        "adversarial",
+        "basic",
+        "many-directions",
+        "single-series",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 9,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-031"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/wind-rose/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/wind-rose/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/wind-rose/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/wind-rose/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/wind-rose/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "nightingale",
+      "directory": "nightingale",
+      "tier": "certified",
+      "since": "0.0.0.30",
+      "examples": [
+        "adversarial",
+        "basic",
+        "multi-series",
+        "single-series",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 9,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-032"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/nightingale/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/nightingale/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/nightingale/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/nightingale/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/nightingale/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "radial-bar",
+      "directory": "radial-bar",
+      "tier": "certified",
+      "since": "0.0.0.31",
+      "examples": [
+        "adversarial",
+        "basic",
+        "multi-series",
+        "single-series",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 9,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-033"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/radial-bar/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/radial-bar/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/radial-bar/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/radial-bar/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/radial-bar/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "parliament",
+      "directory": "parliament",
+      "tier": "certified",
+      "since": "0.0.0.32",
+      "examples": [
+        "adversarial",
+        "basic",
+        "multi-series",
+        "single-series",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 9,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-034"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/parliament/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/parliament/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/parliament/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/parliament/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/parliament/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "development-triangle",
+      "directory": "development-triangle",
+      "tier": "certified",
+      "since": "0.0.0.33",
+      "examples": [
+        "annotated",
+        "basic",
+        "diagonal",
+        "factors",
+        "rectangular-3x5",
+        "rectangular-6x4",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 22,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "DT-SEM-001",
+        "DT-SEM-003",
+        "DT-SEM-005",
+        "DT-SEM-007",
+        "DT-SEM-008",
+        "DT-SEM-009",
+        "DT-SEM-010"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/development-triangle/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/development-triangle/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/development-triangle/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/development-triangle/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/development-triangle/manifest.json"
+          ]
+        }
+      }
+    }
+  ]
+}

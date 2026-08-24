@@ -123,12 +123,21 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmpdir:
         helper = pathlib.Path(tmpdir) / "crossrender.go"
         helper.write_text(GO_HELPER, encoding="utf-8")
+        binary = pathlib.Path(tmpdir) / ("crossrender.exe" if sys.platform == "win32" else "crossrender")
+        build = subprocess.run(
+            ["go", "build", "-o", str(binary), str(helper)],
+            cwd=go_dir,
+            capture_output=True,
+        )
+        if build.returncode != 0:
+            sys.stderr.write(build.stderr.decode("utf-8", errors="replace"))
+            return build.returncode
 
         for path in paths:
             spec = json.loads(path.read_text(encoding="utf-8"))
             py = render_svg(ChartSpec.from_dict(spec)).encode("utf-8")
             proc = subprocess.run(
-                ["go", "run", str(helper), str(path)],
+                [str(binary), str(path)],
                 cwd=go_dir,
                 capture_output=True,
             )

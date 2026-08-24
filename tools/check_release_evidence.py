@@ -24,6 +24,7 @@ except ImportError as exc:  # pragma: no cover - bootstrap path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "docs" / "releases" / "0.0.0.1" / "evidence" / "rc.1" / "manifest.json"
 EVIDENCE_REGISTRY = ROOT / "docs" / "quality" / "evidence-registry.yaml"
+RISK_REGISTRY = ROOT / "docs" / "governance" / "risk-register.yaml"
 
 
 def schema_for(manifest_path: Path) -> Path:
@@ -57,6 +58,15 @@ def load_yaml(path: Path) -> dict[str, Any]:
 def error(message: str) -> None:
     print(f"release evidence validation failed: {message}", file=sys.stderr)
     raise SystemExit(1)
+
+
+def repository_path(path_value: str, label: str) -> Path:
+    target = (ROOT / path_value).resolve()
+    try:
+        target.relative_to(ROOT.resolve())
+    except ValueError:
+        error(f"{label}: path escapes the repository: {path_value}")
+    return target
 
 
 def validate_schema(manifest: dict[str, Any], schema_path: Path) -> None:
@@ -115,7 +125,7 @@ def validate_manifest(manifest_path: Path, manifest: dict[str, Any]) -> None:
         if status == "passed":
             if path_value is None or sha_value is None:
                 error(f"{evidence_id}: passed evidence must include path and sha256")
-            target = (ROOT / path_value).resolve()
+            target = repository_path(path_value, evidence_id)
             if not target.exists():
                 error(f"{evidence_id}: missing evidence file {path_value}")
             if sha256(target) != sha_value:
@@ -134,7 +144,7 @@ def validate_manifest(manifest_path: Path, manifest: dict[str, Any]) -> None:
         if path_value in artifact_paths:
             error(f"duplicate artifact path: {path_value}")
         artifact_paths.add(path_value)
-        target = (ROOT / path_value).resolve()
+        target = repository_path(path_value, "artifact")
         validate_artifact(target, artifact["sha256"])
         if target.stat().st_size != artifact["bytes"]:
             error(f"byte count mismatch for {path_value}")
@@ -154,6 +164,65 @@ def validate_manifest(manifest_path: Path, manifest: dict[str, Any]) -> None:
             error(f"hash file missing entry for {artifact['path']}")
         if actual != expected:
             error(f"hash file mismatch for {artifact['path']}")
+
+    if manifest["release"] == "0.0.0.34":
+        validate_0034(manifest, artifact_paths)
+
+
+def validate_0034(manifest: dict[str, Any], artifact_paths: set[str]) -> None:
+    """Enforce the hardened release contract introduced in 0.0.0.34."""
+    if manifest["source"]["treeClean"] is not True:
+        error("0.0.0.34 source must have been qualified from a clean tree")
+    if any(entry["status"] != "passed" for entry in manifest["evidence"]):
+        error("0.0.0.34 requires every implemented evidence item to pass")
+
+    qualification_paths = [path for path in artifact_paths if path.endswith("/qualification-results.json")]
+    if len(qualification_paths) != 1:
+        error("0.0.0.34 must declare exactly one qualification-results.json artifact")
+    qualification = load_json(repository_path(qualification_paths[0], "qualification results"))
+    commands = qualification.get("commands", [])
+    if qualification.get("status") != "pass" or not commands:
+        error("0.0.0.34 qualification results are not passing")
+    failed_commands = [item.get("id", "<unknown>") for item in commands if item.get("status") != "pass"]
+    if failed_commands:
+        error(f"0.0.0.34 has failed qualification commands: {', '.join(failed_commands)}")
+    if qualification.get("sourceCommit") != manifest["source"]["commit"]:
+        error("qualification source commit differs from manifest source commit")
+
+    provenance_paths = [path for path in artifact_paths if path.endswith("/provenance.json")]
+    if len(provenance_paths) != 1:
+        error("0.0.0.34 must declare exactly one provenance.json artifact")
+    provenance = load_json(repository_path(provenance_paths[0], "provenance"))
+    expected_provenance = {
+        "release": manifest["release"],
+        "candidate": manifest["candidate"],
+        "repository": manifest["source"]["repository"],
+        "commit": manifest["source"]["commit"],
+        "tag": manifest["source"]["tag"],
+        "treeCleanAtStart": True,
+    }
+    for key, expected in expected_provenance.items():
+        if provenance.get(key) != expected:
+            error(f"provenance.{key} differs from the release manifest")
+
+    if not any(path.endswith(".whl") for path in artifact_paths):
+        error("0.0.0.34 is missing a qualified Python wheel artifact")
+    if not any(path.endswith(".tar.gz") for path in artifact_paths):
+        error("0.0.0.34 is missing a qualified Python source artifact")
+
+    risk_rows = load_yaml(RISK_REGISTRY)["risks"]
+    expected_risks = {row["id"]: row for row in risk_rows}
+    actual_risks = {row["id"]: row for row in manifest["risks"]}
+    if set(actual_risks) != set(expected_risks):
+        error("0.0.0.34 risk dispositions do not cover the complete governed risk register")
+    for risk_id, governed in expected_risks.items():
+        expected_disposition = governed["status"] if governed["status"] in {"closed", "accepted"} else "not-applicable"
+        actual = actual_risks[risk_id]
+        if actual["disposition"] != expected_disposition:
+            error(f"{risk_id}: disposition differs from the governed risk register")
+        rationale = actual.get("rationale") or ""
+        if governed["title"] not in rationale or governed["mitigation"] not in rationale:
+            error(f"{risk_id}: rationale must include its specific title and mitigation")
 
 
 def main() -> int:

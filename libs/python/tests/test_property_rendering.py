@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import json
+import pathlib
 import random
 
+import pytest
 from stonecharts import ChartSpec
 from stonecharts.render import render_svg
+
+ROOT = pathlib.Path(__file__).resolve().parents[3]
 
 
 def _series_data(rng: random.Random, count: int) -> list[float]:
@@ -424,21 +429,32 @@ def _has_marks(spec_dict: dict) -> bool:
     return any(s.get("data") or s.get("spans") or s.get("frames") for s in spec_dict["series"])
 
 
-def test_randomized_specs_render_valid_svg_without_nonfinite_output():
-    for spec_dict in _specs():
-        svg = render_svg(ChartSpec.from_dict(spec_dict))
-
-        assert svg.startswith("<svg")
-        assert 'role="img"' in svg
-        assert "NaN" not in svg
-        assert "Infinity" not in svg
-        if _has_marks(spec_dict):
-            assert 'class="sc-' in svg
+PROPERTY_SPECS = list(_specs())
+PROPERTY_IDS = [f"{spec['type']}/{index}" for index, spec in enumerate(PROPERTY_SPECS)]
 
 
-def test_render_determinism():
-    for spec_dict in _specs():
-        spec = ChartSpec.from_dict(spec_dict)
-        first = render_svg(spec)
-        for _ in range(4):
-            assert render_svg(spec) == first, f"non-deterministic render for {spec_dict['type']}"
+def test_property_corpus_covers_every_certified_chart():
+    registry = json.loads((ROOT / "spec" / "capabilities.json").read_text(encoding="utf-8"))
+    expected = {item["id"] for item in registry["chartTypes"] if item["tier"] == "certified"}
+    actual = {spec["type"] for spec in PROPERTY_SPECS}
+    assert actual == expected
+
+
+@pytest.mark.parametrize("spec_dict", PROPERTY_SPECS, ids=PROPERTY_IDS)
+def test_randomized_spec_renders_valid_svg_without_nonfinite_output(spec_dict):
+    svg = render_svg(ChartSpec.from_dict(spec_dict))
+
+    assert svg.startswith("<svg")
+    assert 'role="img"' in svg
+    assert "NaN" not in svg
+    assert "Infinity" not in svg
+    if _has_marks(spec_dict):
+        assert 'class="sc-' in svg
+
+
+@pytest.mark.parametrize("spec_dict", PROPERTY_SPECS, ids=PROPERTY_IDS)
+def test_render_determinism(spec_dict):
+    spec = ChartSpec.from_dict(spec_dict)
+    first = render_svg(spec)
+    for _ in range(4):
+        assert render_svg(spec) == first, f"non-deterministic render for {spec_dict['type']}"

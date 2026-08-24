@@ -6,7 +6,7 @@ classification: normative
 owner: maintainer
 approver: product-owner
 review_mode: self
-applies_to: 0.0.0.33 and later
+applies_to: 0.0.0.34 and later
 requirements: [REQ-CHART-001, REQ-DET-001, REQ-VAL-001, REQ-A11Y-001, REQ-REL-001]
 evidence: [TEST-CERTIFICATION-MATRIX]
 last_reviewed: "2026-08-24"
@@ -23,20 +23,31 @@ is certified only when its contract, fixtures, Python/Go parity, validation,
 property, semantic, purity, accessibility, StoneVerify, and release evidence gates
 are present and passing.
 
-The machine-enforced inventory check is:
+The machine-readable source is
+[`certification-ledger.json`](certification-ledger.json). It contains exactly 36 chart
+records and eight named gates per record. Generate and verify it with:
+
+```text
+py -3 tools/generate_certification_ledger.py --generate --check
+```
+
+The executable matrix check is:
 
 ```text
 py -3 tools/check_certification_matrix.py
 ```
 
-The matrix intentionally checks both chart-specific evidence (design, examples,
-goldens, invalid fixtures, and source references) and shared portfolio gates. The
-full qualification commands remain the authority for execution results:
+The matrix checks the chart-specific fixtures and goldens directly; executes schema
+and runtime validation; verifies renderer purity, named property cases, semantic
+invariant IDs, real-browser fixtures, and certified dual-runtime baseline hashes;
+then runs the focused Python, Go, browser, and direct-parity suites. The full release
+qualification commands remain the authority for the complete repository:
 
 - `py -3 -m pytest libs/python/tests -q`
 - `go test ./...` from `libs/go`
 - `npm test`
-- `py -3 tools/check_release_evidence.py --manifest docs/releases/0.0.0.33/evidence/rc.1/manifest.json`
+- `py -3 tools/generate_certification_baselines.py --check`
+- `py -3 tools/check_release_evidence.py --manifest docs/releases/0.0.0.34/evidence/rc.1/manifest.json`
 
 No chart may be moved back to candidate or experimental solely by documentation
 editing; any tier change must be generated from the canonical capability registry

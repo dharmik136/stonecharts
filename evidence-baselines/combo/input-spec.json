@@ -1,0 +1,1 @@
+{"series":[{"data":[8,5,11,6,9],"name":"Deploys","type":"column"},{"color":"#e0703c","data":[8,7,8,7.3,8.7],"name":"3-day avg","type":"line"}],"subtitle":"Daily count (columns) vs 3-day average (line)","title":"Deploys per Day","type":"combo","xAxis":{"categories":["Mon","Tue","Wed","Thu","Fri"],"title":"Day"},"yAxis":{"title":"Deploys"}}

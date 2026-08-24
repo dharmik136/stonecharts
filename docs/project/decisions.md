@@ -97,7 +97,9 @@ receive an ADR; bounded operating decisions name their controlling project docum
 ## Open decisions
 
 No implementation decisions are currently open. The next decision is the release
-candidate scope and evidence approval for `0.0.0.33`.
+channel authorization and customer-pilot execution after the `0.0.0.34` engineering
+release. Both are intentionally deferred and must not be inferred from certification,
+tagging, or local package artifacts.
 
 ## Discussion order
 
