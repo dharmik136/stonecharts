@@ -38,3 +38,9 @@ staggered offsets in `Asia/Calcutta`:
 |---|---|---|---|---|
 | 2026-07-29 | notetaker | main | coordinator | Reviewed every local and remote branch for unmerged work before deleting: `pmf-positioning-alignment` (local, 0 unique commits vs `main`), `stage0-stage1-approved-scope` (local, 0 unique commits, remote already gone, merged via PR #36), `origin/master` (0 unique commits vs `main`, superseded default branch; `origin/HEAD` now correctly points to `main`). All three confirmed fully-merged ancestors of `main` via `git merge-base --is-ancestor` before deletion; nothing was lost. Repository now has exactly one branch, `main`, locally and on `origin`. |
 | 2026-07-29 | notetaker | main | coordinator | Reset `.agents/state/branch-lock.md` and `.agents/state/handoff.md` off a stale, never-closed 2026-07-19 draft-agent-roster handoff to a clean idle state, so the next agent (Codex, Antigravity, or otherwise) does not read a dangling lock/handoff that no longer matches reality. Current ground truth: single branch `main`; `docs/project/backlog.yaml` 62/62 items `Done`; GATE-S0 through GATE-S14 closed; releases `0.0.0.1`-`0.0.0.4` tagged; DEC-017 pauses further chart/language expansion pending paid validation evidence. |
+
+## 2026-08-24 - distribution and pilot readiness continuation
+
+| Time | Role | Branch or worktree | Owner | Launch note |
+|---|---|---|---|---|
+| 2026-08-24 | release / compliance | main | Codex | Audited the two deferred outcomes after `0.0.0.34`; hardened and CI-qualified the current StoneVerify evaluation kit; pushed commit `f0ed994`; confirmed quality run `32721981417` green; and staged qualified artifacts in a private GitHub Release draft. Public publication and `WORK-GTM-012` remain at the explicit commercial-authorization and named-customer boundary. |

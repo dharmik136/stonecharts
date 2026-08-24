@@ -1,40 +1,53 @@
 # Handoff
 
-- From: build agent
-- To: next worker
+- From: Codex
+- To: product owner or next worker
 - Branch or worktree: `main`
-- Commit or state: working tree (uncommitted), all changes are local
-- Local pipeline status:
-  - Combo chart (build rank 6) fully implemented in Python and Go with byte-identical parity.
-  - Version bumped to `0.0.0.5` across `pyproject.toml`, `version.go`, `__init__.py`.
-  - All seven certified chart types: line, column, area, bar, scatter, bubble, combo.
-  - Two pre-existing cross-language parity bugs fixed (area monotone spline, bar margin orientation).
-  - 9 pre-existing mypy errors fixed; 51 pre-existing `check_docs.py` issues fixed.
-  - Go fuzz test (`FuzzFromJSON`) added with 10 seed corpus entries from all 7 chart types.
-  - Go benchmarks added (`BenchmarkRender`, `BenchmarkRenderComplex`, `BenchmarkFromJSON`).
-  - Go test coverage improved from 85.5% to 88.7%.
-  - Cross-language fuzz property check report now correctly counts 120 specs.
-  - Browser qualification tests for all 7 chart types (Playwright + Chromium): 6/6 pass.
-  - Python test coverage: 88% overall (139 passed, 6 skipped).
-  - Module highlights: validate.py 99%, capabilities.py 100%, combo.py 99%, spec.py 99%, area.py 99%.
-  - Site updated with combo gallery, specs, SVGs; builds clean.
-  - Wheel builds as `stonecharts-0.0.0.5-py3-none-any.whl`.
+- Implementation commit: `f0ed994526ea9a3e82623338bf7af62ee60d0000`
+- Working state at handoff: clean after this state update is committed
+- Completed outcome:
+  - `0.0.0.34` remains the qualified engineering release for all 36 certified charts.
+  - The StoneVerify evaluation-kit builder now derives the active package version,
+    reuses the exact qualified wheel, rejects Go inputs that differ from the release
+    tag, and bundles the current license, support, security, capability, and release
+    evidence materials.
+  - The packaged kit installs and runs offline against an external fixture locally and
+    in GitHub Actions.
+  - A private, prerelease GitHub Release draft exists for tag `0.0.0.34` with the
+    qualified wheel, source distribution, hashes, manifest, provenance, SBOM, and
+    qualification records. It is not publicly published.
 - Verification completed:
-  - `python -m ruff check .` -> All checks passed.
-  - `python -m ruff format --check .` -> 27 files already formatted.
-  - `python -m mypy stonecharts/` -> Success: no issues found in 19 source files.
-  - `python -m pytest tests/ -q` -> 139 passed, 6 skipped, 88% coverage.
-  - `npm test` -> 6/6 browser qualification tests pass (line, column, bar, scatter, bubble, area, combo).
-  - `python tools/check_docs.py` -> PASS: 97 documents, 23 requirements, 33 evidence, 14 risks, 89 items.
-- Files changed this session:
-  - `runtime/area-browser-qualification.test.js` (fixed keyboard nav assertions)
-  - `libs/python/tests/test_golden.py` (added test_validation_deep_coverage, test_util_fmt_num_edge_cases, test_capability_error_str_empty_path, test_limits_edge_cases, test_theme_resolve_edge_cases, test_scatter_direct_construction_normalizes, test_empty_series_data_renders, test_verify_result_edge_cases, test_combo_line_area_fill_and_data_overflow)
-  - `CHANGELOG.md` (browser tests, validation coverage, overall coverage entries)
-  - `.agents/state/handoff.md` (this file)
-- Remaining work:
-  - All changes are uncommitted — needs commit + push.
-  - No 0.0.0.5 release evidence pack yet (qualification checklist, release gate, etc.).
-  - verify/cli.py at 69% is the largest remaining coverage gap (828 statements) — complex CLI I/O.
-  - _cartesian.py at 98% — remaining misses are geometry degenerate cases (8 lines).
-  - GTM items (WORK-GTM-012 pilot, WORK-GTM-014 name clearance, WORK-GTM-015 content) require human action.
-  - DEC-017 blocks new chart types (Rank 7 Histogram is next) unless overridden.
+  - `python -m pytest libs/python/tests -q` -> 1,108 passed.
+  - `go test ./...` -> passed.
+  - Ruff `0.11.12` check and format check -> passed.
+  - `python tools/check_docs.py` -> passed.
+  - `python tools/check_release_evidence.py --manifest docs/releases/0.0.0.34/evidence/rc.1/manifest.json` -> passed.
+  - Local packaged-kit demo -> passed with the expected intentional-drift result.
+  - GitHub quality run `32721981417` -> passed, including the packaged
+    `stoneverify-pilot-gate` job.
+- Explicit approval boundary:
+  - Do not publish the GitHub Release or upload to PyPI until a written distribution,
+    access, support, and commercial-use decision satisfying `SC-CON-018`, `SC-CON-019`,
+    `SC-CON-020`, and `DEC-018` is recorded.
+  - Python metadata still says `Private :: Do Not Upload`; no PyPI credentials are
+    configured. The `stonecharts` name returned HTTP 404 on PyPI on 2026-08-24.
+  - Do not publish a Go module tag until a valid SemVer mapping and module path are
+    approved; never invent `v0.0.0.34`.
+  - A real pilot requires a named customer/contact, a written agreement or
+    authorization reference, and a real anonymizable fixture. Store customer records
+    outside this Git repository.
+- Next bounded action:
+  - Record the owner's chosen distribution channel/license boundary and the named pilot
+    customer. Then publish the prepared draft through that channel and execute
+    `WORK-GTM-012` against the supplied fixture.
+
+## Socratic self-check
+
+- Exact claim: engineering and pilot-package readiness are proved; public distribution
+  and a real customer pilot are not complete.
+- Evidence: commit `f0ed994`, GitHub run `32721981417`, the `0.0.0.34` evidence pack,
+  and the private GitHub Release draft.
+- Unproved assumption avoided: no customer, commercial grant, public-package channel,
+  or Go version mapping was inferred.
+- Out of scope: public registry upload, public Release publication, customer outreach,
+  contracting, pricing approval, and legal clearance.
