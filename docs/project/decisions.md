@@ -88,16 +88,16 @@ receive an ADR; bounded operating decisions name their controlling project docum
 | DEC-053 | Tiered certification model | Three-tier model (certified/candidate/experimental) implemented in `capabilities.json`; all 36 chart types promoted to certified through DEC-058, DEC-059, DEC-060. Model operational and complete. | [DEC-053 brief](decision-briefs/dec-053-tiered-certification.md), [DEC-058](decision-briefs/dec-058-batch-candidate-promotion.md), [DEC-059](decision-briefs/dec-059-batch-experimental-promotion.md), [DEC-060](decision-briefs/dec-060-development-triangle-certification.md) | 2026-08-12 |
 | DEC-055 | Technical indicators boundary | Overtaken by events — technical-indicators promoted to certified tier via DEC-059 batch promotion after passing all SC-CERT gates. No experimental demotion needed; code separation deferred until customer need. | [DEC-055 brief](decision-briefs/dec-055-technical-indicators-boundary.md), [DEC-059](decision-briefs/dec-059-batch-experimental-promotion.md) | 2026-08-12 |
 | DEC-057 | Development triangle chart type | Built and certified. Full renderer in Python and Go with 10 semantic invariants, 22 adversarial fixtures, 7 golden SVGs, evidence baseline. Promoted to certified via DEC-060. | [DEC-057 brief](decision-briefs/dec-057-development-triangle.md), [DEC-060](decision-briefs/dec-060-development-triangle-certification.md) | 2026-08-12 |
+| DEC-049 | Renderer purity invariant | Implemented across Python and Go renderers with cross-chart purity gates; `render_svg` and `RenderSVG` leave input specifications unchanged. | [DEC-049 brief](decision-briefs/dec-049-renderer-purity.md), [SC-CERT-03 tests](../quality/test-strategy.md) | 2026-08-12 |
+| DEC-051 | Property and fuzz test expansion | Expanded randomized property and Go fuzz coverage across all 36 chart types, organized by chart data model. | [DEC-051 brief](decision-briefs/dec-051-property-fuzz-expansion.md), [DEC-050](decision-briefs/dec-050-semantic-invariants.md) | 2026-08-12 |
+| DEC-052 | Strict input validation | Implemented strict rejection of invalid range cardinality, range ordering, pie negatives, invalid gauge bounds, and histogram out-of-range data unless explicit clipping is requested. | [DEC-052 brief](decision-briefs/dec-052-strict-input-validation.md), [validation tests](../quality/test-strategy.md) | 2026-08-12 |
+| DEC-054 | Range-point schema unification | Added canonical `rangeData` atomic points across arearange, columnrange, error-bar, and dumbbell, with compatibility for parallel-array inputs and parity tests. | [DEC-054 brief](decision-briefs/dec-054-range-point-schema.md) | 2026-08-12 |
+| DEC-056 | Combo dual-axis presentation safety | Added advisory dual-axis presentation metadata to StoneVerify evidence without changing rendering bytes. | [DEC-056 brief](decision-briefs/dec-056-dual-axis-policy.md) | 2026-08-12 |
 
 ## Open decisions
 
-| Priority | ID | Decision | Current recommendation | Decide before |
-|---:|---|---|---|---|
-| 1 | DEC-049 | Renderer purity invariant | Mandate that `render_svg`/`RenderSVG` must not mutate the input `ChartSpec`; fix 4 Python and 2 Go renderers that currently violate this; add a cross-chart purity test gate | Before next release |
-| 2 | DEC-052 | Strict input validation | Replace silent fallbacks (histogram bin clamping, arearange missing low values) with explicit `SpecError` or opt-in policy flags; add validation for boxplot ordering, pie negatives, gauge bounds | Before next release |
-| 3 | DEC-051 | Property and fuzz test expansion | Extend randomized property tests and Go fuzz seeds from the current 7 chart types to all 36, organized by data model family in 4 phases | After DEC-049 |
-| 4 | DEC-054 | Range-point schema unification | Replace parallel-array range data model with atomic `{low, high}` range-point objects across arearange, columnrange, error-bar, dumbbell | After DEC-052 |
-| 5 | DEC-056 | Combo dual-axis presentation safety | Introduce advisory metadata in StoneVerify evidence for dual-axis combo charts flagging visual-correlation risk | Independent |
+No implementation decisions are currently open. The next decision is the release
+candidate scope and evidence approval for `0.0.0.33`.
 
 ## Discussion order
 

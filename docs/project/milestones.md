@@ -27,7 +27,7 @@ Milestones are exited by evidence, not elapsed time.
 | S2: Qualification | Claims are backed by repeatable conformance, browser, security, visual, accessibility, and performance evidence | `GATE-S1` passes | Python/Go parity, direct sweep, invalid/fuzz tests, browser suite, manual review, benchmark baseline, and threat review pass | Complete |
 | S3: Release candidate | Installable artifacts and release documentation can be reproduced from one commit | `GATE-S2` passes | Version mapping, package checks, SBOM, provenance, hashes, changelog, known limits, support matrix, and evidence manifest are complete | Complete |
 | S4: Release 0.0.0.1 | A deliberately bounded first release is available to its approved audience | `GATE-S3` passes | Authorized source tag and artifacts published; evidence archived; support and feedback channels active | Complete |
-| S5: Expansion admission | New charts and languages can enter without weakening the core contract | `GATE-S4` passes and release findings are reviewed | Expansion order, conformance kit, compatibility policy, and next release scope approved | Complete (0.0.0.2–0.0.0.32: 32 chart types admitted via DEC-014 through DEC-048; Family A Cartesian and Family B Polar/radial both complete at 35 total chart types) |
+| S5: Expansion admission | New charts and languages can enter without weakening the core contract | `GATE-S4` passes and release findings are reviewed | Expansion order, conformance kit, compatibility policy, and next release scope approved | Complete (0.0.0.2–0.0.0.33: 33 chart types admitted via DEC-014 through DEC-060; complete 36-chart certified portfolio) |
 
 ## Critical dependency chain
 
