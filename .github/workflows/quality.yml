@@ -229,6 +229,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.14"
@@ -262,6 +264,23 @@ jobs:
             ]
           }
           JSON
+      - name: Build and verify current evaluation kit
+        run: |
+          python tools/build_stoneverify_eval_kit.py
+          VERSION=$(grep -m1 'version' libs/python/pyproject.toml | cut -d'"' -f2)
+          python - "$VERSION" <<'PY'
+          import json
+          import sys
+
+          manifest = json.load(open("dist/stoneverify-evaluation-kit/manifest.json", encoding="utf-8"))
+          assert manifest["version"] == sys.argv[1], manifest
+          assert manifest["distributionAuthorized"] is False, manifest
+          PY
+          cmp \
+            "docs/releases/${VERSION}/evidence/rc.1/packages/stonecharts-${VERSION}-py3-none-any.whl" \
+            "dist/stoneverify-evaluation-kit/packages/stonecharts-${VERSION}-py3-none-any.whl"
+          python dist/stoneverify-evaluation-kit/scripts/run_demo.py \
+            --spec /tmp/stoneverify-external-fixture.json
       - name: Run StoneVerify pilot gate demo
         id: stoneverify_demo
         env:

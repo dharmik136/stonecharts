@@ -16,7 +16,28 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "dist" / "stoneverify-evaluation-kit"
-KIT_VERSION = "0.0.0.4"
+
+
+def read_package_version() -> str:
+    """Read the current StoneCharts version without adding a TOML dependency."""
+    pyproject = ROOT / "libs" / "python" / "pyproject.toml"
+    in_project = False
+    for raw_line in pyproject.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if line.startswith("[") and line.endswith("]"):
+            in_project = line == "[project]"
+            continue
+        if in_project and line.startswith("version"):
+            key, separator, value = line.partition("=")
+            if separator and key.strip() == "version":
+                version = value.strip().strip('"')
+                if version:
+                    return version
+    raise RuntimeError(f"unable to read [project].version from {pyproject}")
+
+
+KIT_VERSION = read_package_version()
+RELEASE_EVIDENCE = ROOT / "docs" / "releases" / KIT_VERSION / "evidence" / "rc.1"
 
 
 def run(args: list[str], *, cwd: Path = ROOT) -> None:
@@ -52,6 +73,14 @@ def write_text(path: Path, content: str) -> None:
 
 
 def build_python_wheel(packages_dir: Path) -> Path:
+    qualified_wheels = sorted((RELEASE_EVIDENCE / "packages").glob(f"stonecharts-{KIT_VERSION}-*.whl"))
+    if len(qualified_wheels) > 1:
+        raise RuntimeError(f"expected at most one qualified StoneCharts wheel, found {qualified_wheels}")
+    if qualified_wheels:
+        destination = packages_dir / qualified_wheels[0].name
+        copy_file(qualified_wheels[0], destination)
+        return destination
+
     run(
         [
             sys.executable,
@@ -70,7 +99,32 @@ def build_python_wheel(packages_dir: Path) -> Path:
     return wheels[0]
 
 
+def assert_go_source_matches_release() -> None:
+    if not RELEASE_EVIDENCE.exists():
+        return
+    completed = subprocess.run(
+        [
+            "git",
+            "diff",
+            "--quiet",
+            KIT_VERSION,
+            "--",
+            "libs/go",
+            "runtime",
+            "spec",
+        ],
+        cwd=ROOT,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"Go adapter inputs differ from qualified release tag {KIT_VERSION}; "
+            "build the pilot kit from the qualified source"
+        )
+
+
 def build_go_adapter(bin_dir: Path) -> Path:
+    assert_go_source_matches_release()
     exe = "stoneverify-go-render.exe" if os.name == "nt" else "stoneverify-go-render"
     output = bin_dir / exe
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -83,6 +137,8 @@ def write_kit_readme(kit: Path, wheel: Path, adapter: Path) -> None:
         kit / "README.md",
         f"""\
         # StoneVerify Evaluation Kit
+
+        Version: `{KIT_VERSION}`
 
         **Internal/build-only artifact.** This kit is for internal review of the
         StoneVerify pilot workflow. It does not authorize external distribution,
@@ -97,8 +153,12 @@ def write_kit_readme(kit: Path, wheel: Path, adapter: Path) -> None:
           `stoneverify --runtime go`.
         - `sample-specs/bubble-basic.json`: small certified demo fixture.
         - `schemas/`: chart-spec and StoneVerify result schemas.
-        - `docs/`: quickstart, limits, robustness, security, and supply-chain
-          notes copied from the governed repository docs.
+        - `docs/`: quickstart, limits, capability, robustness, security, and
+          supply-chain notes copied from the governed repository docs.
+        - `release-evidence/`: the qualified release manifest, hashes, SBOM,
+          provenance, package-install matrix, and qualification checklist.
+        - `LICENSE`, `SUPPORT.md`, and `SECURITY.md`: the active proprietary,
+          support, and vulnerability-reporting boundaries.
         - `scripts/run_demo.py`: installs from the local wheel only and runs a
           deliberate demo-drift proof.
 
@@ -150,9 +210,7 @@ def write_kit_readme(kit: Path, wheel: Path, adapter: Path) -> None:
 
 
 def write_demo_runner(kit: Path) -> None:
-    write_text(
-        kit / "scripts" / "run_demo.py",
-        """\
+    runner = """\
         #!/usr/bin/env python3
         from __future__ import annotations
 
@@ -212,7 +270,7 @@ def write_demo_runner(kit: Path) -> None:
                     "--no-index",
                     "--find-links",
                     str(ROOT / "packages"),
-                    "stonecharts==0.0.0.4",
+                    "stonecharts==__STONECHARTS_VERSION__",
                 ]
             )
 
@@ -254,7 +312,10 @@ def write_demo_runner(kit: Path) -> None:
 
         if __name__ == "__main__":
             raise SystemExit(main())
-        """,
+        """
+    write_text(
+        kit / "scripts" / "run_demo.py",
+        runner.replace("__STONECHARTS_VERSION__", KIT_VERSION),
     )
 
 
@@ -346,6 +407,21 @@ def main() -> int:
     copy_file(ROOT / "docs" / "robustness.md", kit / "docs" / "robustness.md")
     copy_file(ROOT / "docs" / "security" / "threat-model.md", kit / "docs" / "threat-model.md")
     copy_file(ROOT / "docs" / "security" / "supply-chain.md", kit / "docs" / "supply-chain.md")
+    copy_file(ROOT / "docs" / "product" / "capability-matrix.md", kit / "docs" / "capability-matrix.md")
+    copy_file(ROOT / "LICENSE", kit / "LICENSE")
+    copy_file(ROOT / "SUPPORT.md", kit / "SUPPORT.md")
+    copy_file(ROOT / "SECURITY.md", kit / "SECURITY.md")
+
+    if RELEASE_EVIDENCE.exists():
+        for name in (
+            "hashes.sha256",
+            "manifest.json",
+            "package-install-matrix.md",
+            "provenance.json",
+            "qualification-checklist.md",
+            "sbom.spdx.json",
+        ):
+            copy_file(RELEASE_EVIDENCE / name, kit / "release-evidence" / name)
 
     write_kit_readme(kit, wheel, adapter)
     write_demo_runner(kit)

@@ -7,7 +7,15 @@ not represented as Semantic Versioning.
 
 ## [Unreleased]
 
-No unreleased changes.
+### Changed
+
+- StoneVerify evaluation kits now derive the active package version, reuse the exact
+  qualified release wheel, reject Go adapter inputs that differ from the release tag,
+  and include the current license, support policy, security policy, capability matrix,
+  and release-verification evidence.
+- The pilot-readiness CI gate now builds and runs the packaged evaluation kit against
+  an external fixture, verifies that its wheel is byte-identical to the qualified
+  artifact, and preserves the explicit internal-only distribution state.
 
 ## [0.0.0.34] - 2026-08-24
 
