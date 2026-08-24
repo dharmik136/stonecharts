@@ -1,0 +1,31 @@
+{
+  "type": "candlestick",
+  "title": "Fruitco — Hollow Candlestick (Dark)",
+  "subtitle": "Hollow subtype, dark theme, datetime axis, one doji (open == close)",
+  "theme": "dark",
+  "subtype": "hollow",
+  "upColor": "#3fd08a",
+  "downColor": "#ff6b6b",
+  "xAxis": {
+    "title": "Date",
+    "type": "datetime",
+    "categories": ["2024-06-03", "2024-06-04", "2024-06-05", "2024-06-06", "2024-06-07", "2024-06-10", "2024-06-11", "2024-06-12"]
+  },
+  "yAxis": { "title": "Price (USD)" },
+  "series": [
+    {
+      "name": "FRT",
+      "data": [190.6, 189.4, 186.2, 189.5, 194.2, 194.2, 197.4, 196.5],
+      "ohlc": [
+        { "open": 188.4, "high": 191.0, "low": 187.2, "close": 190.6 },
+        { "open": 190.6, "high": 192.3, "low": 189.1, "close": 189.4 },
+        { "open": 189.4, "high": 190.0, "low": 185.6, "close": 186.2 },
+        { "open": 186.2, "high": 189.9, "low": 185.9, "close": 189.5 },
+        { "open": 189.5, "high": 194.8, "low": 189.0, "close": 194.2 },
+        { "open": 194.2, "high": 196.5, "low": 192.7, "close": 194.2 },
+        { "open": 194.2, "high": 198.0, "low": 192.9, "close": 197.4 },
+        { "open": 197.4, "high": 199.6, "low": 196.0, "close": 196.5 }
+      ]
+    }
+  ]
+}

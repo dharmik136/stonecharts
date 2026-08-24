@@ -1,8 +1,9 @@
 # Support Policy
 
-StoneCharts is currently an internal proprietary pre-release project. There is no public
-support commitment, uptime promise, maintenance window, backward-compatibility term,
-or vulnerability response SLA.
+StoneCharts is a publicly visible, proprietary pre-release project. Repository
+visibility does not grant use or distribution rights. There is no public support
+commitment, uptime promise, maintenance window, backward-compatibility term, or
+vulnerability response SLA.
 
 Authorized users should provide:
 
@@ -21,3 +22,14 @@ Commercial support tiers, response targets, long-term support, and end-of-life p
 will be defined before they are offered. They must not be inferred from repository
 activity.
 
+## Feedback
+
+During private preview, evaluation feedback, feature requests, and integration
+questions are collected through
+[GitHub Discussions](https://github.com/dharmik136/stonecharts/discussions/147).
+Do not post proprietary fixtures, personal data, credentials, or vulnerability details
+there.
+
+Suspected vulnerabilities must use the private reporting process in
+[SECURITY.md](SECURITY.md). For other non-public evaluator material, contact the
+repository owner through GitHub first to establish an appropriate private channel.

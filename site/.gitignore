@@ -1,7 +1,7 @@
 # Astro generated types
 .astro/
 
-# Build output (served by Cloudflare Pages, not committed)
+# Generated static build output (not committed)
 dist/
 
 # Dependencies

@@ -1,0 +1,25 @@
+{
+  "type": "funnel",
+  "theme": "dark",
+  "title": "Checkout Funnel",
+  "subtitle": "Dark theme, single gradient funnel paint, minWidth floor",
+  "legend": false,
+  "minWidth": 0.08,
+  "xAxis": {
+    "categories": ["Cart", "Shipping", "Payment", "Review", "Purchased"]
+  },
+  "series": [
+    {
+      "name": "Sessions",
+      "data": [42000, 28500, 19300, 15100, 9800],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      }
+    }
+  ]
+}

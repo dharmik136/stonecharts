@@ -1,0 +1,27 @@
+{
+  "type": "lollipop",
+  "theme": "dark",
+  "title": "Heap Delta by Allocation Class",
+  "subtitle": "Dark theme, gradient stem, square heads, signed values",
+  "xAxis": {
+    "title": "Allocation class",
+    "categories": ["[]byte", "string", "map", "goroutine stack", "sync.Pool"]
+  },
+  "yAxis": { "title": "Net heap change (MB)" },
+  "series": [
+    {
+      "name": "Net delta",
+      "data": [128, 46, 73, -34, -12],
+      "lineWidth": 2,
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      },
+      "marker": { "symbol": "square", "radius": 6 }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "type": "histogram",
+  "theme": "dark",
+  "title": "GC Pause Distribution",
+  "subtitle": "Dark theme, bell-curve fit overlay, gradient bar fill",
+  "binning": { "count": 12 },
+  "overlay": "bellcurve",
+  "xAxis": { "title": "Pause (ms)" },
+  "yAxis": { "title": "Frequency" },
+  "series": [
+    {
+      "name": "GC pauses",
+      "data": [
+        8, 12, 6, 15, 22, 9, 11, 18, 25, 14,
+        7, 10, 19, 28, 13, 16, 21, 30, 5, 12,
+        24, 17, 9, 33, 20, 14, 26, 11, 38, 23,
+        15, 29, 18, 42, 27, 19, 34, 22, 48, 31,
+        24, 39, 28, 55, 36, 26, 44, 60
+      ],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#7a5cff" }
+        ]
+      }
+    }
+  ]
+}

@@ -1,5 +1,10 @@
 ---
 import DemoLayout from '../../layouts/DemoLayout.astro';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+const registry = JSON.parse(await readFile(join(process.cwd(), '..', 'spec', 'capabilities.json'), 'utf-8'));
+const certifiedCount = registry.chartTypes.filter((chart) => chart.tier === 'certified').length;
 ---
 <DemoLayout title="Overview" activeNav="overview">
   <h1 style="margin-bottom: 0.5rem;">StoneCharts Demo</h1>
@@ -12,9 +17,9 @@ import DemoLayout from '../../layouts/DemoLayout.astro';
   <!-- Quick stats -->
   <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem;">
     <div class="stat card" style="padding: 1.5rem;">
-      <div class="stat-value">22</div>
+      <div class="stat-value">{certifiedCount}</div>
       <div class="stat-label">Certified chart types</div>
-      <div class="stat-context">Line, column, area, bar, scatter, bubble, combo, and 15 more</div>
+      <div class="stat-context">The complete active capability portfolio</div>
     </div>
     <div class="stat card" style="padding: 1.5rem;">
       <div class="stat-value">2</div>
@@ -36,7 +41,7 @@ import DemoLayout from '../../layouts/DemoLayout.astro';
         <span class="badge">Interactive</span>
       </div>
       <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
-        Twenty-one chart types with tooltips, crosshair, legend toggle, and keyboard
+        {certifiedCount} chart types with tooltips, crosshair, legend toggle, and keyboard
         navigation. Light and dark themes. Every SVG is actual golden output from
         certified renderers.
       </p>

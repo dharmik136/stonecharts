@@ -1,0 +1,22 @@
+{
+  "type": "xrange",
+  "title": "Checkout Request — Distributed Trace",
+  "subtitle": "Span waterfall, one lane per service (elapsed ms from root)",
+  "id": "trace",
+  "xAxis": { "title": "Elapsed (ms)", "type": "datetime", "min": 0, "max": 900 },
+  "yAxis": { "title": "Service", "categories": ["gateway", "auth", "cart", "payment", "ledger"] },
+  "series": [
+    {
+      "name": "checkout-trace",
+      "color": "#2f7ed8",
+      "data": [0, 40, 120, 210, 520],
+      "spans": [
+        { "x": 0,   "x2": 900, "y": 0, "id": "root",  "name": "POST /checkout" },
+        { "x": 40,  "x2": 190, "y": 1, "id": "authz", "name": "verify token",  "dependency": ["root"] },
+        { "x": 120, "x2": 500, "y": 2, "id": "cart",  "name": "load cart",     "dependency": ["root"] },
+        { "x": 210, "x2": 760, "y": 3, "id": "pay",   "name": "charge card",   "dependency": ["cart"] },
+        { "x": 520, "x2": 700, "y": 4, "id": "post",  "name": "post ledger",   "dependency": ["pay"] }
+      ]
+    }
+  ]
+}

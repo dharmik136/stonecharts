@@ -56,13 +56,11 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: github/codeql-action/init@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
+      - uses: github/codeql-action/init@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
         with:
           languages: python, go
-      - uses: github/codeql-action/autobuild@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
-      - uses: github/codeql-action/analyze@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
-        with:
-          upload: never
+      - uses: github/codeql-action/autobuild@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+      - uses: github/codeql-action/analyze@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
 
   documentation:
     runs-on: ubuntu-latest
@@ -114,79 +112,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: python -m pip install "build>=1,<2" "setuptools>=77"
-      - run: python tools/check_package_install.py
-      - run: python -m build --wheel --outdir dist libs/python
+      - name: Qualify installed wheel across all 36 certified chart types
+        run: python tools/check_package_install.py --outdir dist
       - run: python -m venv /tmp/install-test-venv
       - run: /tmp/install-test-venv/bin/python -m pip install dist/stonecharts-*.whl
-      - name: Smoke-test the installed wheel from a neutral directory
-        working-directory: /tmp
-        run: |
-          /tmp/install-test-venv/bin/python -c "
-          import stonecharts
-          assert 'site-packages' in stonecharts.__file__, f'resolved from source tree, not the installed wheel: {stonecharts.__file__}'
-          from stonecharts import ChartSpec, Axis, Series
-          from stonecharts.render import render_svg
-          spec = ChartSpec(type='line', title='Install Smoke Test', x_axis=Axis(categories=['Jan','Feb','Mar']), series=[Series(name='S', data=[1.0,2.0,3.0])])
-          svg = render_svg(spec)
-          assert svg.startswith('<svg'), 'render failed'
-          from stonecharts.charts import bar
-          bar_spec = ChartSpec(type='bar', title='Bar Smoke Test', x_axis=Axis(categories=['Jan','Feb','Mar']), series=[Series(name='S', data=[1.0,2.0,3.0])])
-          bar_svg = render_svg(bar_spec)
-          assert bar_svg.startswith('<svg'), 'bar render failed'
-          from stonecharts.charts import scatter
-          scatter_spec = ChartSpec(type='scatter', title='Scatter Smoke Test', x_axis=Axis(title='X'), series=[Series(name='S', data=[[1.0,2.0],[3.0,4.0]])])
-          scatter_svg = render_svg(scatter_spec)
-          assert scatter_svg.startswith('<svg'), 'scatter render failed'
-          from stonecharts.charts import bubble
-          bubble_spec = ChartSpec(type='bubble', title='Bubble Smoke Test', x_axis=Axis(title='X'), series=[Series(name='S', data=[[1.0,2.0,3.0],[4.0,5.0,6.0]])])
-          bubble_svg = render_svg(bubble_spec)
-          assert bubble_svg.startswith('<svg'), 'bubble render failed'
-          from stonecharts.charts import combo
-          combo_spec = ChartSpec(type='combo', title='Combo Smoke Test', x_axis=Axis(categories=['Jan','Feb']), series=[Series(name='Rev', data=[10.0,20.0], type='column'), Series(name='Trend', data=[12.0,18.0], type='line')])
-          combo_svg = render_svg(combo_spec)
-          assert combo_svg.startswith('<svg'), 'combo render failed'
-          from stonecharts.charts import candlestick
-          candlestick_spec = ChartSpec.from_dict({'type':'candlestick','title':'Candle Smoke','xAxis':{'categories':['Mon','Tue']},'series':[{'name':'S','data':[1.0,2.0],'ohlc':[{'open':10.0,'high':15.0,'low':8.0,'close':12.0},{'open':12.0,'high':16.0,'low':11.0,'close':14.0}]}]})
-          candlestick_svg = render_svg(candlestick_spec)
-          assert candlestick_svg.startswith('<svg'), 'candlestick render failed'
-          from stonecharts.charts import error_bar
-          eb_spec = ChartSpec.from_dict({'type':'error-bar','title':'EB Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','data':[10.0,20.0],'low':[8.0,17.0],'high':[12.0,23.0]}]})
-          eb_svg = render_svg(eb_spec)
-          assert eb_svg.startswith('<svg'), 'error-bar render failed'
-          from stonecharts.charts import arearange
-          ar_spec = ChartSpec.from_dict({'type':'arearange','title':'AR Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[12.0,23.0,18.0],'low':[8.0,17.0,14.0]}]})
-          ar_svg = render_svg(ar_spec)
-          assert ar_svg.startswith('<svg'), 'arearange render failed'
-          from stonecharts.charts import columnrange
-          cr_spec = ChartSpec.from_dict({'type':'columnrange','title':'CR Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[5.0,10.0,8.0],'high':[15.0,25.0,20.0]}]})
-          cr_svg = render_svg(cr_spec)
-          assert cr_svg.startswith('<svg'), 'columnrange render failed'
-          from stonecharts.charts import waterfall
-          wf_spec = ChartSpec.from_dict({'type':'waterfall','title':'WF Smoke','xAxis':{'categories':['Rev','Cost','Profit']},'series':[{'name':'S','data':[100.0,-60.0,40.0]}],'sumIndices':[2]})
-          wf_svg = render_svg(wf_spec)
-          assert wf_svg.startswith('<svg'), 'waterfall render failed'
-          from stonecharts.charts import bullet
-          bu_spec = ChartSpec.from_dict({'type':'bullet','title':'BU Smoke','xAxis':{'categories':['Revenue']},'series':[{'name':'S','data':[275.0]}],'bulletTarget':250.0,'bulletRanges':[150.0,225.0,300.0]})
-          bu_svg = render_svg(bu_spec)
-          assert bu_svg.startswith('<svg'), 'bullet render failed'
-          from stonecharts.charts import boxplot
-          bp_spec = ChartSpec.from_dict({'type':'boxplot','title':'BP Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','boxData':[{'low':1.0,'q1':3.0,'median':5.0,'q3':7.0,'high':9.0},{'low':2.0,'q1':4.0,'median':6.0,'q3':8.0,'high':10.0}]}]})
-          bp_svg = render_svg(bp_spec)
-          assert bp_svg.startswith('<svg'), 'boxplot render failed'
-          from stonecharts.charts import lollipop
-          lo_spec = ChartSpec.from_dict({'type':'lollipop','title':'LO Smoke','xAxis':{'categories':['A','B','C']},'series':[{'name':'S','data':[10.0,20.0,15.0]}]})
-          lo_svg = render_svg(lo_spec)
-          assert lo_svg.startswith('<svg'), 'lollipop render failed'
-          from stonecharts.charts import dumbbell
-          db_spec = ChartSpec.from_dict({'type':'dumbbell','title':'DB Smoke','xAxis':{'categories':['A','B']},'series':[{'name':'S','data':[10.0,20.0],'high':[30.0,40.0]}]})
-          db_svg = render_svg(db_spec)
-          assert db_svg.startswith('<svg'), 'dumbbell render failed'
-          from stonecharts.render import render_html
-          html = render_html(spec)
-          assert 'window.StoneCharts' in html, 'packaged interaction runtime missing'
-          assert 'runtime not found' not in html, 'packaged interaction runtime fallback used'
-          print('installed-wheel smoke test OK,', len(svg), 'bytes')
-          "
       - name: Smoke-test installed stoneverify console script
         working-directory: /tmp
         run: |
@@ -413,25 +342,7 @@ jobs:
       - name: Generate and validate evidence for certified chart types
         env:
           STONEVERIFY_RENDER_TIMEOUT: "30"
-        run: |
-          failed=0
-          for chart_type in area arearange bar boxplot bubble bullet candlestick column columnrange combo development-triangle dumbbell error-bar flame-chart funnel gauge histogram line-basic lollipop nightingale parliament pie polar radar radial-bar scatter solid-gauge streamgraph technical-indicators timeline variwide vector-plot waterfall wind-rose windbarb xrange; do
-            for spec in charts/${chart_type}/examples/*.json; do
-              name=$(basename "$spec" .json)
-              evidence_dir="/tmp/evidence-regression/${chart_type}/${name}"
-              python tools/stonecharts_verify.py "$spec" \
-                --runtime python \
-                --evidence "$evidence_dir" 2>/dev/null || true
-              if [ -d "$evidence_dir" ]; then
-                result=$(python tools/stonecharts_verify.py --check-evidence "$evidence_dir" 2>&1) || true
-                if echo "$result" | grep -qi "fail"; then
-                  echo "::error::Evidence bundle validation failed for ${chart_type}/${name}"
-                  failed=1
-                fi
-              fi
-            done
-          done
-          exit $failed
+        run: python tools/check_evidence_regression.py --prove-fail-closed
 
   runtime-browser:
     runs-on: ubuntu-latest

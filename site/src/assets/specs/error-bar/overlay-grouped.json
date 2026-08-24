@@ -1,0 +1,25 @@
+{
+  "type": "error-bar",
+  "title": "Throughput by Region with Standard Error",
+  "subtitle": "Two build variants, whiskers centered per sub-band",
+  "grouping": true,
+  "xAxis": {
+    "title": "Region",
+    "categories": ["us-east", "us-west", "eu-central", "ap-south"]
+  },
+  "yAxis": { "title": "Requests/s (thousands)" },
+  "series": [
+    {
+      "name": "v2.4",
+      "data": [42, 38, 51, 29],
+      "low":  [39, 35, 47, 26],
+      "high": [45, 41, 55, 32]
+    },
+    {
+      "name": "v2.5",
+      "data": [48, 44, 57, 34],
+      "low":  [45, 40, 53, 31],
+      "high": [52, 47, 61, 38]
+    }
+  ]
+}

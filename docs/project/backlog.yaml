@@ -4005,7 +4005,7 @@ items:
 - id: WORK-CI-001
   title: Upgrade CI actions before Node.js 20 and CodeQL v3 deprecation
   item_type: Work Package
-  status: Ready
+  status: Done
   priority: P2
   workstream: WS-01 Governance
   stage: S5 Expansion
@@ -4032,7 +4032,7 @@ items:
 - id: WORK-SCHEMA-COMPAT-002
   title: Broaden JSON Schema compatibility checker coverage
   item_type: Work Package
-  status: Ready
+  status: Done
   priority: P1
   workstream: WS-03 Conformance
   stage: S5 Expansion

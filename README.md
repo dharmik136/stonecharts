@@ -10,8 +10,8 @@
 
 **Visual Integrity Infrastructure** for deterministic reporting charts — one governed
 JSON specification, certified Python and Go renderers producing byte-identical SVG,
-and formal conformance proofs that every visual stays consistent across language,
-release, and environment boundaries.
+and conformance evidence that checks certified fixtures across language and release
+boundaries within the documented environment profile.
 
 > **Not** a fork or copy of any commercial charting library. Every renderer is written
 > from scratch. All rights reserved.
@@ -31,8 +31,8 @@ release, and environment boundaries.
 - **Formal conformance proofs.** [StoneVerify](#stoneverify) produces local evidence
   bundles proving visual integrity between releases — auditable artifacts, not just
   test assertions.
-- **Governed engineering.** 60 formal decisions, requirements traceability, evidence
-  packs, and a [14-job CI pipeline](#ci). Every chart type is admitted through a
+- **Governed engineering.** Formal decisions, requirements traceability, evidence
+  packs, and a [multi-job CI pipeline](#ci). Every chart type is admitted through a
   governed process with its own decision record.
 
 ## Architecture
@@ -77,6 +77,25 @@ release, and environment boundaries.
 
 Both renderers have **zero runtime dependencies**. Dev/test dependencies are listed
 in [`pyproject.toml`](libs/python/pyproject.toml) and [`go.mod`](libs/go/go.mod).
+
+## Distribution and installation status
+
+`0.0.0.34` is the canonical StoneCharts source tag and has a qualified release-evidence
+pack. The repository is publicly visible under a proprietary license, but no PyPI,
+npm, or public Go-module publication is authorized. Do not infer package-use rights
+from repository visibility.
+
+- Development checkout: install Python with
+  `python -m pip install -e "libs/python[dev]"`; use the Go module from `libs/go`.
+- Authorized evaluation: install the exact qualified wheel supplied with the
+  evaluation kit, then verify its checksums and evidence manifest.
+- Public registry install: unavailable. In particular, no supported `pip install
+  stonecharts` or `go get` path is currently claimed.
+
+The four-part product identifier is intentionally not Semantic Versioning. A public Go
+module requires an approved ecosystem mapping; the project must not invent a
+`v0.0.0.34` tag. See
+[`ADR 0007`](docs/architecture/adr/0007-release-identifier.md).
 
 ## Quickstart
 
@@ -123,7 +142,7 @@ evidence behind every chart and gate.
 
 | Tier | Count | Meaning |
 |------|-------|---------|
-| **Certified** | 36 | Passes all SC-CERT gates; commercially supported |
+| **Certified** | 36 | Passes all SC-CERT gates within the documented guarantee boundary |
 | **Candidate** | 0 | No chart types are awaiting certification |
 | **Experimental** | 0 | No chart types are outside the certified tier |
 

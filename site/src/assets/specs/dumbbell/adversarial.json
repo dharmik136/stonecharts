@@ -1,0 +1,18 @@
+{
+  "type": "dumbbell",
+  "title": "Adversarial <dumbbell> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "range <script>&\"'</script>",
+      "data": [20, 30, 25],
+      "high": [80, 90, 75],
+      "marker": { "symbol": "circle", "radius": 5 }
+    }
+  ]
+}

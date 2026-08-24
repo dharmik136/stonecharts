@@ -1,0 +1,18 @@
+{
+  "type": "variwide",
+  "title": "Variwide <script>alert('xss')</script> & \"parity\" test",
+  "subtitle": "Hostile strings in every marks-emitted field: name, category & custom color",
+  "xAxis": {
+    "title": "Category <b>x</b>",
+    "categories": ["<script>a</script>", "b & \"c\"", "<img src=x onerror=alert(1)>", "d'e"]
+  },
+  "yAxis": { "title": "Value <y> & \"z\"" },
+  "series": [
+    {
+      "name": "series <script>&\"'</script>",
+      "data": [42, 18, 60, 33],
+      "widths": [120, 300, 75, 210],
+      "color": "#e0663e"
+    }
+  ]
+}

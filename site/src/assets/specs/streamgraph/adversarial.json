@@ -1,0 +1,22 @@
+{
+  "type": "streamgraph",
+  "title": "Stream <script>alert('x')</script> & \"co\"",
+  "subtitle": "Hostile strings in every marks-emitted field",
+  "offset": "wiggle",
+  "xAxis": {
+    "title": "Bucket <b>x</b>",
+    "categories": ["<b>A</b>", "B & C", "\"D\"", "E<f>"]
+  },
+  "series": [
+    {
+      "name": "</g><script>alert(1)</script>",
+      "data": [12, 18, 9, 24],
+      "color": "#c42525"
+    },
+    {
+      "name": "Ampersand & <Angle>",
+      "data": [8, 14, 6, 20],
+      "color": "#2f7ed8"
+    }
+  ]
+}

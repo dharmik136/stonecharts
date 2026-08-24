@@ -1,0 +1,23 @@
+{
+  "type": "timeline",
+  "title": "Audit <timeline> & \"events\" — dark theme",
+  "subtitle": "Hostile strings in every marks-emitted field (XSS) + dark theme",
+  "theme": "dark",
+  "orientation": "horizontal",
+  "leaders": true,
+  "xAxis": {
+    "type": "datetime",
+    "title": "When <t> & why"
+  },
+  "series": [
+    {
+      "name": "Events <script>alert('x')</script> & \"more\"",
+      "color": "#e04b4b",
+      "data": [1770681600000, 1771891200000],
+      "labels": [
+        "config change <b>drift</b> & \"rollback\"",
+        "policy <script>steal()</script> update & audit"
+      ]
+    }
+  ]
+}

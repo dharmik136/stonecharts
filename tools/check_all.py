@@ -36,6 +36,10 @@ CHECKS: list[tuple[str, list[str]]] = [
     ),
     ("cross-language parity", [sys.executable, "tools/check_cross_language_parity.py"]),
     (
+        "evidence regression",
+        [sys.executable, "tools/check_evidence_regression.py", "--prove-fail-closed"],
+    ),
+    (
         "schema compat (identity)",
         [
             sys.executable,

@@ -1,0 +1,26 @@
+{
+  "type": "variwide",
+  "theme": "dark",
+  "title": "GDP per Capita, Weighted by Population",
+  "subtitle": "Dark theme, gradient fill; bar height = GDP per capita (k USD), bar width = population (millions)",
+  "xAxis": {
+    "title": "Country",
+    "categories": ["Norway", "Germany", "Brazil", "India", "Nigeria"]
+  },
+  "yAxis": { "title": "GDP per capita (k USD)" },
+  "series": [
+    {
+      "name": "GDP per capita",
+      "data": [89.2, 51.4, 8.9, 2.4, 2.1],
+      "widths": [5.4, 84, 214, 1417, 218],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      }
+    }
+  ]
+}

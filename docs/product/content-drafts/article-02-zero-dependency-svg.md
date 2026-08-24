@@ -66,7 +66,7 @@ This is not free:
 - **Static SVG at generation time.** Interactivity (tooltips, legend toggle,
   keyboard navigation) is added afterward by a lightweight vanilla JS runtime
   in the browser — not during server-side rendering.
-- **Seven chart types.** A browser library with years of development has
+- **Thirty-six chart types.** A browser library with years of development has
   hundreds of configurations. A native renderer prioritizing determinism over
   breadth ships fewer.
 - **No ecosystem.** No plugins, no themes marketplace, no community

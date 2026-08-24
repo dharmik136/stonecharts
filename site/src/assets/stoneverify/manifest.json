@@ -43,7 +43,7 @@
     "bytes": 317,
     "file": "input-spec.json",
     "sha256": "10a399ed3e390eb3a848364c18692a21070184cf244360a1048588dab3457f49",
-    "source": "C:\\Users\\Dharmik Shingala\\stonecharts\\charts\\bubble\\examples\\basic.json"
+    "source": "charts/bubble/examples/basic.json"
   },
   "report": "report.html",
   "runtimes": [

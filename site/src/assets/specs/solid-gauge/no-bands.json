@@ -1,0 +1,8 @@
+{
+  "type": "solid-gauge",
+  "id": "sg-progress",
+  "title": "Progress",
+  "series": [{ "name": "Done", "data": [65] }],
+  "gaugeMin": 0,
+  "gaugeMax": 100
+}

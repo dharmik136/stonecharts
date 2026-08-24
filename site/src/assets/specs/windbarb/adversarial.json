@@ -1,0 +1,17 @@
+{
+  "type": "windbarb",
+  "title": "X<script>alert(1)</script>",
+  "subtitle": "Sub &\"'<b>bold</b>",
+  "xAxis": {
+    "categories": ["A<b>", "B&C", "D\"E"]
+  },
+  "yAxis": { "title": "Speed" },
+  "series": [
+    {
+      "name": "S<script>alert(2)</script>",
+      "color": "#e04b4b",
+      "data": [10, 25, 0],
+      "direction": [180, 270, 0]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "error-bar",
+  "title": "Adversarial <error-bar> & \"escaping\"",
+  "subtitle": "hostile strings in every marks-emitted field",
+  "xAxis": {
+    "title": "x & <axis>",
+    "categories": ["<cat1>", "cat&2", "cat\"3", "cat'4", "cat<5>"]
+  },
+  "yAxis": { "title": "y \"value\" <units>" },
+  "series": [
+    {
+      "name": "errors <script>&\"'</script>",
+      "data": [50, 62, 45, 71, 58],
+      "low":  [42, 54, 38, 63, 49],
+      "high": [59, 70, 53, 80, 67],
+      "color": "#e04040",
+      "marker": { "enabled": true, "symbol": "square", "radius": 4 }
+    }
+  ]
+}

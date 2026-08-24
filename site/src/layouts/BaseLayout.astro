@@ -15,7 +15,9 @@ const {
   jsonLd,
 } = Astro.props;
 
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://example.com');
+const canonicalUrl = Astro.site ? new URL(Astro.url.pathname, Astro.site) : null;
+const shouldNoIndex = noIndex || !Astro.site;
+const resolvedOgImage = ogImage && Astro.site ? new URL(ogImage, Astro.site).href : ogImage;
 ---
 <!doctype html>
 <html lang="en" data-theme="light">
@@ -24,17 +26,17 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site || 'https://example.
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
   <meta name="description" content={description} />
-  {noIndex ? (
+  {shouldNoIndex ? (
     <meta name="robots" content="noindex, nofollow" />
   ) : (
     <meta name="robots" content="index, follow" />
   )}
-  <link rel="canonical" href={canonicalUrl.href} />
+  {canonicalUrl && <link rel="canonical" href={canonicalUrl.href} />}
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content={canonicalUrl.href} />
-  {ogImage && <meta property="og:image" content={ogImage} />}
+  {canonicalUrl && <meta property="og:url" content={canonicalUrl.href} />}
+  {resolvedOgImage && <meta property="og:image" content={resolvedOgImage} />}
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />

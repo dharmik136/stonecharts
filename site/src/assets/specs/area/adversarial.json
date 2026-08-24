@@ -1,0 +1,23 @@
+{
+  "type": "area",
+  "id": "\"><script>alert(1)</script>",
+  "title": "\"><script>alert(1)</script>",
+  "subtitle": "Escaping and numeric boundary coverage",
+  "xAxis": {
+    "title": "b&<c",
+    "categories": ["\"><script>alert(1)</script>", "b&<c", "d\"e", "zero"]
+  },
+  "yAxis": { "title": "value < units" },
+  "series": [
+    {
+      "name": "\"><script>alert(1)</script>",
+      "data": [0.0000005, 0.30000000000000004, 1234567, -0.0],
+      "fillOpacity": 0.35
+    },
+    {
+      "name": "safe & bounded",
+      "data": [2.675, -2.5, 7.7, 0.0000000001],
+      "fillOpacity": 0.55
+    }
+  ]
+}

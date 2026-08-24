@@ -1,0 +1,14 @@
+{
+  "type": "development-triangle",
+  "title": "Development Factors",
+  "triangle": {
+    "origins": ["2021", "2022", "2023"],
+    "periods": [12, 24, 36],
+    "values": [
+      [100, 150, 170],
+      [110, 160],
+      [125]
+    ]
+  },
+  "factors": {"show": true, "values": [1.476, 1.133]}
+}

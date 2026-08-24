@@ -1,0 +1,18 @@
+{
+  "type": "columnrange",
+  "title": "Compensation Band by Role",
+  "subtitle": "Min–max base salary, horizontal range bars (orientation subtype)",
+  "orientation": "horizontal",
+  "xAxis": {
+    "title": "Role",
+    "categories": ["Support", "SRE", "Backend", "Staff Eng", "Director"]
+  },
+  "yAxis": { "title": "Base salary (USD thousands)" },
+  "series": [
+    {
+      "name": "Salary band",
+      "data": [52, 84, 96, 150, 205],
+      "high": [78, 128, 152, 224, 310]
+    }
+  ]
+}

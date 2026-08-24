@@ -151,7 +151,7 @@ Which properties belong on the chart, the axis, the series, or a global theme.
 
 ## 6. Repo pointers (only if the agent has access)
 
-`C:\Users\Dharmik Shingala\stonecharts` (private, github.com/dharmik136/stonecharts):
+Repository root (`github.com/dharmik136/stonecharts`):
 `spec/chart-spec.schema.json`, `spec/svg-contract.md`, `runtime/chart-interactions.js`,
 `libs/python/stonecharts/charts/line.py`, `libs/go/line.go`,
 `charts/line-basic/design.md`, `CHARTS.md`.

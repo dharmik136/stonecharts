@@ -9,7 +9,7 @@ review_mode: self
 applies_to: 0.0.0.4 and later
 requirements: []
 evidence: []
-last_reviewed: "2026-07-30"
+last_reviewed: "2026-08-24"
 review_due: "2026-08-30"
 supersedes: null
 superseded_by: null
@@ -49,8 +49,8 @@ terms.
 - **Not a claim about product scope.** Every structure below is bounded to the
   commercial pilot scope already defined in
   [`SC-PROD-004`](capability-matrix.md#commercial-pilot-scope): Python and Go only,
-  the certified `line`/`column`/`bar`/`area`/`scatter`/`bubble` chart set, local
-  evidence bundles, no hosted storage.
+  a named subset of the active certified chart portfolio, local evidence bundles,
+  and no hosted storage.
 
 ## Why three structures, not one
 
@@ -86,6 +86,17 @@ to:
 - **Evidence-report delivery** — the `manifest.json` / `comparison.json` /
   `report.html` / `checksums.txt` bundle `SC-QUAL-004` already produces, handed to the
   prospect as the deliverable artifact, not a slide deck describing it.
+
+## Out of scope for the initial pilot
+
+The following known limits are not implied deliverables and must not be promised as
+part of any candidate structure:
+
+- Locale-specific number or date formatting.
+- Automatic text measurement, wrapping, collision avoidance, or legend pagination.
+- Certified PDF, PNG, or email export; those remain downstream conversions.
+- Pixel-identical output across different host font configurations.
+- Whole-page WCAG conformance for an integrating application.
 
 ## Candidate structure 1 — Low-friction paid assessment
 

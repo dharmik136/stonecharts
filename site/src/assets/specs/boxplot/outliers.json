@@ -1,0 +1,23 @@
+{
+  "type": "boxplot",
+  "title": "Daily Request Latency with Outliers",
+  "subtitle": "Tukey whiskers; points beyond 1.5*IQR flagged as outliers",
+  "xAxis": {
+    "title": "Day",
+    "categories": ["Mon", "Tue", "Wed", "Thu", "Fri"]
+  },
+  "yAxis": { "title": "Latency (ms)" },
+  "series": [
+    {
+      "name": "Latency (ms)",
+      "data": [55, 52, 62, 50, 58],
+      "boxData": [
+        { "low": 30, "q1": 45, "median": 55, "q3": 70, "high": 95,  "outliers": [140, 165] },
+        { "low": 28, "q1": 42, "median": 52, "q3": 66, "high": 88,  "outliers": [] },
+        { "low": 35, "q1": 50, "median": 62, "q3": 80, "high": 110, "outliers": [180] },
+        { "low": 25, "q1": 40, "median": 50, "q3": 64, "high": 90,  "outliers": [150, 175, 210] },
+        { "low": 32, "q1": 48, "median": 58, "q3": 72, "high": 100, "outliers": [] }
+      ]
+    }
+  ]
+}

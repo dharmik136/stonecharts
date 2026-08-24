@@ -1,0 +1,19 @@
+{
+  "type": "error-bar",
+  "title": "Response Time Percentile Spread",
+  "subtitle": "Center = p50, whisker = p05..p95 (asymmetric)",
+  "xAxis": {
+    "title": "Hour (UTC)",
+    "categories": ["00", "04", "08", "12", "16", "20"]
+  },
+  "yAxis": { "title": "Latency (ms)", "min": 0 },
+  "series": [
+    {
+      "name": "API gateway",
+      "data": [120, 118, 165, 240, 288, 176],
+      "low":  [96, 92, 128, 181, 214, 132],
+      "high": [210, 205, 320, 470, 560, 300],
+      "marker": { "enabled": true, "symbol": "circle", "radius": 3.5 }
+    }
+  ]
+}

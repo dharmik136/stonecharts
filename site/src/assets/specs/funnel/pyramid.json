@@ -1,0 +1,11 @@
+{
+  "type": "funnel",
+  "subtype": "pyramid",
+  "title": "Engineering Org by Level",
+  "subtitle": "Headcount pyramid, apex at top",
+  "legend": false,
+  "xAxis": { "categories": ["VP", "Director", "Manager", "Senior", "Junior"] },
+  "series": [
+    { "name": "Headcount", "data": [3, 11, 34, 96, 210] }
+  ]
+}

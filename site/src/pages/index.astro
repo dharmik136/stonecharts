@@ -11,13 +11,13 @@ const jsonLd = {
   "offers": {
     "@type": "Offer",
     "availability": "https://schema.org/PreOrder",
-    "description": "Private preview — request early access"
+    "description": "Private preview — evaluation feedback is collected through GitHub Discussions"
   }
 };
 ---
 <BaseLayout
   title="Deterministic Chart Rendering for Regulated Reporting"
-  description="Byte-identical SVG chart rendering across Python and Go. Zero runtime dependencies. 184x faster cold-start than Highcharts Export Server. Built for regulated reporting."
+  description="Byte-identical SVG chart rendering across Python and Go. Zero runtime dependencies. Up to 184x faster Go cold-start than Highcharts Export Server in vendor-run measurements. Built for regulated reporting."
   ogImage="/og-preview.svg"
   jsonLd={jsonLd}
 >
@@ -46,7 +46,7 @@ const jsonLd = {
       <p style="max-width: 540px; margin: 0 auto 2.5rem; font-size: 1.125rem; color: var(--text-secondary); line-height: 1.6;">
         When your Python analysis pipeline and Go production service render the same
         chart and the output drifts, someone has to explain it. We built a system
-        where that drift cannot happen.
+        where that drift is caught before it ships.
       </p>
       <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
         <a href="#request-access" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 2rem;">
@@ -93,7 +93,7 @@ const jsonLd = {
         <div class="stat">
           <div class="stat-value">184x</div>
           <div class="stat-label">Faster cold-start</div>
-          <div class="stat-context">vs. Highcharts Export Server</div>
+          <div class="stat-context">Go cold-start vs. Highcharts Export Server</div>
         </div>
         <div class="stat">
           <div class="stat-value">6,570</div>
@@ -198,26 +198,16 @@ const jsonLd = {
         The interactive demo includes:
       </p>
       <ul style="text-align: left; max-width: 420px; margin: 0 auto 2rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8;">
-        <li>Twenty-four certified chart types with interactive tooltips, legend toggle, and keyboard navigation</li>
+        <li>Thirty-six certified chart types with interactive tooltips, legend toggle, and keyboard navigation</li>
         <li>Measured benchmarks against five chart rendering systems</li>
         <li>A real conformance proof — byte-identical SVG from Python and Go, with SHA-256 hashes</li>
+        <li>Share evaluation feedback and integration questions through <a href="https://github.com/dharmik136/stonecharts/discussions/147">GitHub Discussions</a></li>
       </ul>
-      <form id="access-form" aria-label="Request demo access" style="display: flex; gap: 0.5rem; max-width: 440px; margin: 0 auto;">
-        <input
-          type="email"
-          name="email"
-          placeholder="you@company.com"
-          required
-          autocomplete="email"
-          style="flex: 1; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.9rem; background: var(--bg-surface-raised); color: var(--text);"
-        />
-        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Request access</button>
-      </form>
-      <p id="form-success" style="display: none; margin-top: 0.75rem; font-size: 0.875rem; color: var(--success); font-weight: 500;">
-        Thanks — we'll be in touch within one business day.
-      </p>
-      <p id="form-hint" style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-tertiary);">
-        Access granted within one business day. No sales call required.
+      <a href="https://github.com/dharmik136/stonecharts/discussions/147" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+        Open the feedback channel
+      </a>
+      <p style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-tertiary);">
+        Do not post proprietary fixtures or vulnerability details publicly. See the repository support and security policies for private reporting.
       </p>
     </div>
   </section>
@@ -232,7 +222,7 @@ const jsonLd = {
     </div>
   </footer>
 
-  <!-- Theme toggle + form handler -->
+  <!-- Theme toggle -->
   <script is:inline>
     (function() {
       var btn = document.getElementById('theme-toggle');
@@ -243,20 +233,6 @@ const jsonLd = {
           var next = current === 'light' ? 'dark' : 'light';
           html.setAttribute('data-theme', next);
           localStorage.setItem('sc-theme', next);
-        });
-      }
-
-      var form = document.getElementById('access-form');
-      if (form) {
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-          var email = form.querySelector('[name="email"]').value;
-          var subject = encodeURIComponent('Demo access request');
-          var body = encodeURIComponent('Email: ' + email + '\nRequested: ' + new Date().toISOString());
-          window.location.href = 'mailto:demo-access@example.com?subject=' + subject + '&body=' + body;
-          document.getElementById('form-success').style.display = 'block';
-          document.getElementById('form-hint').style.display = 'none';
-          form.querySelector('[name="email"]').value = '';
         });
       }
     })();

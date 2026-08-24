@@ -1,0 +1,29 @@
+{
+  "type": "streamgraph",
+  "theme": "dark",
+  "title": "CDN Egress by Region",
+  "subtitle": "Dark theme, wiggle baseline, gradient ribbon, smooth boundaries",
+  "offset": "wiggle",
+  "xAxis": {
+    "title": "Week",
+    "categories": ["Wk 1", "Wk 2", "Wk 3", "Wk 4", "Wk 5", "Wk 6"]
+  },
+  "yAxis": { "title": "Egress (TB)" },
+  "series": [
+    {
+      "name": "us-east",
+      "data": [42, 55, 61, 78, 90, 120],
+      "curve": "monotone",
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 0, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#7a5cf0" }
+        ]
+      }
+    },
+    { "name": "eu-west",  "data": [30, 38, 44, 52, 60, 71], "curve": "monotone" },
+    { "name": "ap-south", "data": [18, 22, 27, 33, 40, 52], "curve": "monotone" }
+  ]
+}

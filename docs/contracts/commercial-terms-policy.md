@@ -25,8 +25,8 @@ recorded.
 
 Until then, the project remains proprietary by default. External access, source
 contributions, distribution rights, support expectations, and commercial use terms
-must not be inferred from technical progress, private repository access, or internal
-planning status.
+must not be inferred from technical progress, repository visibility or access, or
+internal planning status.
 
 ## Required approvals
 

@@ -1,0 +1,27 @@
+{
+  "type": "candlestick",
+  "title": "GC Pause Windows — Heikin-Ashi",
+  "subtitle": "Smoothed candles with custom up/down colors",
+  "subtype": "heikin-ashi",
+  "upColor": "#2e9e6b",
+  "downColor": "#d84a4a",
+  "xAxis": {
+    "title": "Window",
+    "categories": ["W1", "W2", "W3", "W4", "W5", "W6"]
+  },
+  "yAxis": { "title": "Pause (ms)" },
+  "series": [
+    {
+      "name": "GC pause",
+      "data": [43.8, 43.1, 41.0, 42.5, 45.9, 44.6],
+      "ohlc": [
+        { "open": 42.0, "high": 44.5, "low": 41.2, "close": 43.8 },
+        { "open": 43.8, "high": 45.0, "low": 42.9, "close": 43.1 },
+        { "open": 43.1, "high": 43.6, "low": 40.5, "close": 41.0 },
+        { "open": 41.0, "high": 42.8, "low": 40.7, "close": 42.5 },
+        { "open": 42.5, "high": 46.2, "low": 42.3, "close": 45.9 },
+        { "open": 45.9, "high": 46.4, "low": 44.1, "close": 44.6 }
+      ]
+    }
+  ]
+}

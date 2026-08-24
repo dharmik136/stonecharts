@@ -1,0 +1,27 @@
+{
+  "type": "vector-plot",
+  "theme": "dark",
+  "title": "Magnetic Field Lines",
+  "subtitle": "Dark theme, gradient arrow paint, tail-anchored glyphs",
+  "rotationOrigin": "start",
+  "xAxis": { "title": "x (mm)" },
+  "yAxis": { "title": "y (mm)" },
+  "series": [
+    {
+      "name": "B-field",
+      "x":         [-40, 0, 40, -40, 0, 40, -40, 0, 40],
+      "data":      [-40, -40, -40, 0, 0, 0, 40, 40, 40],
+      "direction": [135, 90, 45, 180, 0, 0, 225, 270, 315],
+      "length":    [3.1, 4.4, 3.0, 2.6, 5.0, 2.7, 3.3, 4.2, 3.4],
+      "color": {
+        "type": "linearGradient",
+        "x1": 0, "y1": 0, "x2": 1, "y2": 1,
+        "stops": [
+          { "offset": 0, "color": "#3ec8e0" },
+          { "offset": 1, "color": "#b57ae0" }
+        ]
+      },
+      "lineWidth": 2
+    }
+  ]
+}

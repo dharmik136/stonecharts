@@ -17,7 +17,7 @@
   <!-- Stats -->
   <text x="80" y="440" font-family="Segoe UI, system-ui, sans-serif" font-size="18" fill="#6b6b80">0 dependencies</text>
   <circle cx="230" cy="435" r="2.5" fill="#45455a"/>
-  <text x="245" y="440" font-family="Segoe UI, system-ui, sans-serif" font-size="18" fill="#6b6b80">184x faster cold-start</text>
+  <text x="245" y="440" font-family="Segoe UI, system-ui, sans-serif" font-size="18" fill="#6b6b80">Up to 184x faster cold-start (Go)</text>
   <circle cx="465" cy="435" r="2.5" fill="#45455a"/>
   <text x="480" y="440" font-family="Segoe UI, system-ui, sans-serif" font-size="18" fill="#6b6b80">byte-identical SVG</text>
   <!-- Badge -->

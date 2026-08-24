@@ -40,10 +40,21 @@ const CHART_TYPES = [
   { id: 'nightingale', label: 'Nightingale', desc: 'Rose/coxcomb chart with equal-angle wedges from center and value-dependent radius for categorical magnitude comparison.' },
   { id: 'radial-bar', label: 'Radial Bar', desc: 'Concentric progress rings where each category gets its own track, with arc fill proportional to value.' },
   { id: 'parliament', label: 'Parliament', desc: 'Semicircular hemicycle of unit dots in concentric arcs, colored by category for proportional seat allocation views.' },
+  { id: 'development-triangle', label: 'Development Triangle', desc: 'Triangular origin-period and development-period matrix for cumulative values, factors, and actuarial annotations.' },
 ];
 
 const chartsDir = join(process.cwd(), 'src', 'assets', 'charts');
 const specsDir = join(process.cwd(), 'src', 'assets', 'specs');
+const registry = JSON.parse(await readFile(join(process.cwd(), '..', 'spec', 'capabilities.json'), 'utf-8'));
+const certifiedDirectories = registry.chartTypes
+  .filter((chart) => chart.tier === 'certified')
+  .map((chart) => chart.id === 'line' ? 'line-basic' : chart.id);
+const metadataById = new Map(CHART_TYPES.map((chart) => [chart.id, chart]));
+const missingMetadata = certifiedDirectories.filter((id) => !metadataById.has(id));
+const extraMetadata = CHART_TYPES.map((chart) => chart.id).filter((id) => !certifiedDirectories.includes(id));
+if (missingMetadata.length || extraMetadata.length) {
+  throw new Error(`Gallery metadata drift: missing=${missingMetadata.join(',')} extra=${extraMetadata.join(',')}`);
+}
 
 type ChartData = {
   id: string;
@@ -56,7 +67,8 @@ type ChartData = {
 
 const charts: ChartData[] = [];
 
-for (const ct of CHART_TYPES) {
+for (const directory of certifiedDirectories) {
+  const ct = metadataById.get(directory)!;
   const goldenDir = join(chartsDir, ct.id);
   const files = await readdir(goldenDir);
 
@@ -81,7 +93,7 @@ for (const ct of CHART_TYPES) {
   <div style="margin-bottom: 2.5rem;">
     <h1 style="margin-bottom: 0.5rem;">Chart Gallery</h1>
     <p style="color: var(--text-secondary); max-width: 640px; margin-bottom: 1rem;">
-      Thirty-five certified chart types, each rendered identically in Python and Go.
+      {charts.length} certified chart types, each rendered identically in Python and Go.
       Every SVG below is actual golden output from the certified renderers —
       not a screenshot, not a mockup.
     </p>

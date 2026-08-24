@@ -6,10 +6,10 @@ classification: normative
 owner: security-contact
 approver: maintainer
 review_mode: self
-applies_to: 0.0.0.1
+applies_to: 0.0.0.1 and later
 requirements: [REQ-SEC-001, REQ-CUST-001, REQ-CAP-001]
 evidence: [TEST-XSS-ESCAPING, TEST-CAPABILITY-MATRIX, TEST-RUNTIME-BROWSER]
-last_reviewed: "2026-07-18"
+last_reviewed: "2026-08-24"
 review_due: "2026-09-18"
 supersedes: null
 superseded_by: null
@@ -43,11 +43,11 @@ tool, or included in reports.
 | CSS/style injection | No raw CSS in certified spec; hex color and enum allowlists are enforced | Future style grammars must extend the allowlist deliberately |
 | Identifier/reference injection | Escaped IDs and scoped defs | Pure-static multi-chart IDs require unique chart IDs |
 | Runtime DOM XSS | Runtime encodes tooltip text | Inline color insertion requires validated color grammar |
-| Denial of service | Dimension and input validation | Formal data-size and complexity limits not yet set |
-| Panic/exception on input | Planned typed capability boundary | Current dispatch can still panic/throw |
-| Supply-chain substitution | Planned hashes, SBOM, provenance | No release pipeline yet |
+| Denial of service | Enforced spec, series, point, label, output, timeout, and evidence-size limits | Multi-tenant service limits require a separate service profile |
+| Panic/exception on input | Typed capability validation, hostile-input tests, and stable error categories | New schema fields require the same admission review |
+| Supply-chain substitution | Qualified wheel/source artifacts, hashes, SBOM, provenance, and release-evidence validation | Public registry channels remain unauthorized |
 | Malicious downstream converter | Certified exporters will be pinned | Arbitrary converters remain outside guarantees |
-| Accessibility spoofing or loss | Contracted names, table, keyboard tests | Browser and assistive-technology qualification pending |
+| Accessibility spoofing or loss | Contracted names, table, keyboard tests, and browser qualification | Independent assistive-technology review remains pending |
 
 ## Security rules
 

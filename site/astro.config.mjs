@@ -1,14 +1,18 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
+const publicSiteUrl = process.env.PUBLIC_SITE_URL?.trim();
+
 export default defineConfig({
-  site: 'https://example.com',
+  site: publicSiteUrl || undefined,
   output: 'static',
-  integrations: [
-    sitemap({
-      filter: (page) => !page.includes('/demo/'),
-    }),
-  ],
+  integrations: publicSiteUrl
+    ? [
+        sitemap({
+          filter: (page) => !page.includes('/demo/'),
+        }),
+      ]
+    : [],
   build: {
     assets: '_assets',
   },

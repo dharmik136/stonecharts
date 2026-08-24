@@ -1,0 +1,31 @@
+{
+  "type": "xrange",
+  "title": "<img onerror=alert(1)> &amp; \"quotes\"",
+  "subtitle": "Zero-duration spans, reversed start/end, XSS in names",
+  "id": "adv",
+  "xAxis": { "title": "X <script>", "type": "datetime", "min": -10, "max": 100 },
+  "yAxis": {
+    "title": "Lane &amp;",
+    "categories": ["<b>lane0</b>", "lane\"1", "lane 2"]
+  },
+  "series": [
+    {
+      "name": "<script>alert(1)</script>",
+      "data": [50, 0, 80],
+      "spans": [
+        { "x": 50, "x2": 20, "y": 0, "id": "rev", "name": "reversed start>end" },
+        { "x": 0,  "x2": 0,  "y": 1, "id": "zero", "name": "zero-duration", "dependency": ["rev"] },
+        { "x": 80, "x2": 80, "y": 2, "id": "mile", "name": "milestone", "milestone": true, "dependency": ["zero"] }
+      ]
+    },
+    {
+      "name": "S2",
+      "color": "#c42525",
+      "data": [10, 40],
+      "spans": [
+        { "x": 10, "x2": 30, "y": 0, "id": "s2a", "name": "normal" },
+        { "x": 40, "x2": 90, "y": 1, "id": "s2b", "name": "long span", "dependency": ["s2a"] }
+      ]
+    }
+  ]
+}

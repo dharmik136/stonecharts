@@ -3,8 +3,10 @@
 ## Supported versions
 
 StoneCharts is pre-release software at version `0.0.0.34` with 36 certified chart
-types. No version is currently designated for production security support. Security
-evidence is included in release qualification evidence packs (see `docs/releases/`).
+types. The current release branch receives security fixes on a best-effort basis; no
+version is designated for production security support. Binding production support
+requires a separate written agreement. Security evidence is included in release
+qualification evidence packs (see `docs/releases/`).
 
 ## Reporting a vulnerability
 
@@ -21,10 +23,11 @@ Include:
 - Relevant environment and embedding mode.
 - Whether the issue is already public or under active exploitation.
 
-The current project does not promise a response-time SLA. Receipt, severity,
-remediation, coordination, and disclosure decisions are handled by the
-`security-contact` role defined in `docs/governance/roles.yaml`. Commercial response
-obligations require a separate written support agreement.
+The project targets initial triage within five business days for privately reported
+vulnerabilities. This is an operational target, not a response-time SLA or remediation
+deadline. Receipt, severity, remediation, coordination, and disclosure decisions are
+handled by the `security-contact` role defined in `docs/governance/roles.yaml`.
+Commercial response obligations require a separate written support agreement.
 
 ## Scope priorities
 

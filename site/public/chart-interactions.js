@@ -103,9 +103,14 @@
         escapeHtml(name) + ": <b>" + escapeHtml(pt.getAttribute("data-y")) + "</b></div>";
       tip.style.display = "block";
       if (crosshair) {
-        crosshair.setAttribute("x1", pt.getAttribute("cx"));
-        crosshair.setAttribute("x2", pt.getAttribute("cx"));
-        crosshair.style.display = "";
+        var pointX = pt.getAttribute("cx");
+        if (pointX !== null) {
+          crosshair.setAttribute("x1", pointX);
+          crosshair.setAttribute("x2", pointX);
+          crosshair.style.display = "";
+        } else {
+          crosshair.style.display = "none";
+        }
       }
       if (atPoint) {
         var pr = pt.getBoundingClientRect();
