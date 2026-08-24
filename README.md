@@ -115,16 +115,16 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 
 ## Chart Catalog
 
-**36 chart types** across three certification tiers, all with byte-identical Python
-and Go renderers pinned by golden tests.
+**36 chart types**, all certified with byte-identical Python and Go renderers pinned
+by golden tests.
 
 | Tier | Count | Meaning |
 |------|-------|---------|
-| **Certified** | 7 | Passes all SC-CERT gates; commercially supported |
-| **Candidate** | 9 | Golden-tested and byte-identical; on path to certification |
-| **Experimental** | 20 | Implemented and functional; not commercially supported |
+| **Certified** | 36 | Passes all SC-CERT gates; commercially supported |
+| **Candidate** | 0 | No chart types are awaiting certification |
+| **Experimental** | 0 | No chart types are outside the certified tier |
 
-### Certified (7 types)
+### Certified (36 types)
 
 | Chart | ID | Release |
 |-------|----|---------|
@@ -135,11 +135,6 @@ and Go renderers pinned by golden tests.
 | Scatter | `scatter` | 0.0.0.3 |
 | Bubble | `bubble` | 0.0.0.4 |
 | Combo | `combo` | 0.0.0.5 |
-
-### Candidate (9 types)
-
-| Chart | ID | Release |
-|-------|----|---------|
 | Histogram | `histogram` | 0.0.0.6 |
 | Error Bar | `error-bar` | 0.0.0.8 |
 | Area Range | `arearange` | 0.0.0.9 |
@@ -148,22 +143,35 @@ and Go renderers pinned by golden tests.
 | Bullet | `bullet` | 0.0.0.11 |
 | Boxplot | `boxplot` | 0.0.0.12 |
 | Dumbbell | `dumbbell` | 0.0.0.14 |
-| Development Triangle | `development-triangle` | unreleased |
+| Development Triangle | `development-triangle` | 0.0.0.33 |
+| Candlestick | `candlestick` | 0.0.0.7 |
+| Lollipop | `lollipop` | 0.0.0.13 |
+| Funnel | `funnel` | 0.0.0.15 |
+| Variwide | `variwide` | 0.0.0.16 |
+| Timeline | `timeline` | 0.0.0.17 |
+| Windbarb | `windbarb` | 0.0.0.18 |
+| Streamgraph | `streamgraph` | 0.0.0.19 |
+| Vector Plot | `vector-plot` | 0.0.0.20 |
+| X-Range | `xrange` | 0.0.0.21 |
+| Tech. Indicators | `technical-indicators` | 0.0.0.22 |
+| Flame Chart | `flame-chart` | 0.0.0.23 |
+| Pie | `pie` | 0.0.0.24 |
+| Gauge | `gauge` | 0.0.0.25 |
+| Solid Gauge | `solid-gauge` | 0.0.0.26 |
+| Radar | `radar` | 0.0.0.27 |
+| Polar | `polar` | 0.0.0.28 |
+| Wind Rose | `wind-rose` | 0.0.0.29 |
+| Nightingale | `nightingale` | 0.0.0.30 |
+| Radial Bar | `radial-bar` | 0.0.0.31 |
+| Parliament | `parliament` | 0.0.0.32 |
 
-### Experimental (20 types)
+### Candidate (0 types)
 
-| Chart | ID | Release | Chart | ID | Release |
-|-------|----|---------|-------|----|---------|
-| Candlestick | `candlestick` | 0.0.0.7 | Pie | `pie` | 0.0.0.24 |
-| Lollipop | `lollipop` | 0.0.0.13 | Gauge | `gauge` | 0.0.0.25 |
-| Funnel | `funnel` | 0.0.0.15 | Solid Gauge | `solid-gauge` | 0.0.0.26 |
-| Variwide | `variwide` | 0.0.0.16 | Radar | `radar` | 0.0.0.27 |
-| Timeline | `timeline` | 0.0.0.17 | Polar | `polar` | 0.0.0.28 |
-| Windbarb | `windbarb` | 0.0.0.18 | Wind Rose | `wind-rose` | 0.0.0.29 |
-| Streamgraph | `streamgraph` | 0.0.0.19 | Nightingale | `nightingale` | 0.0.0.30 |
-| Vector Plot | `vector-plot` | 0.0.0.20 | Radial Bar | `radial-bar` | 0.0.0.31 |
-| X-Range | `xrange` | 0.0.0.21 | Parliament | `parliament` | 0.0.0.32 |
-| Tech. Indicators | `technical-indicators` | 0.0.0.22 | Flame Chart | `flame-chart` | 0.0.0.23 |
+No candidate chart types.
+
+### Experimental (0 types)
+
+No experimental chart types.
 
 Every chart type has a `design.md`, example specs, and golden SVGs in
 [`charts/<id>/`](charts/). See [`CHARTS.md`](CHARTS.md) to look up which chart type

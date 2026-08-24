@@ -1423,7 +1423,7 @@ def test_certified_profile_accepts_certified_chart(tmp_path):
     assert assurance["eligibleForCertifiedGuarantee"] is True
 
 
-def test_certified_profile_rejects_candidate_chart(tmp_path):
+def test_certified_profile_accepts_newly_certified_chart(tmp_path):
     spec_path = (ROOT / "charts/waterfall/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     proc = subprocess.run(
@@ -1442,13 +1442,16 @@ def test_certified_profile_rejects_candidate_chart(tmp_path):
         cwd=ROOT,
     )
 
-    assert proc.returncode == stonecharts_verify.EXIT_ASSURANCE_TIER
-    assert b"E_ASSURANCE_TIER" in proc.stderr
-    assert b"waterfall" in proc.stderr
-    assert b"candidate" in proc.stderr
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assurance = manifest["assurance"]
+    assert assurance["profile"] == "certified"
+    assert assurance["chartType"] == "waterfall"
+    assert assurance["tier"] == "certified"
+    assert assurance["eligibleForCertifiedGuarantee"] is True
 
 
-def test_certified_profile_rejects_experimental_chart(tmp_path):
+def test_certified_profile_accepts_newly_certified_polar_chart(tmp_path):
     spec_path = (ROOT / "charts/parliament/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     proc = subprocess.run(
@@ -1467,13 +1470,16 @@ def test_certified_profile_rejects_experimental_chart(tmp_path):
         cwd=ROOT,
     )
 
-    assert proc.returncode == stonecharts_verify.EXIT_ASSURANCE_TIER
-    assert b"E_ASSURANCE_TIER" in proc.stderr
-    assert b"parliament" in proc.stderr
-    assert b"experimental" in proc.stderr
+    assert proc.returncode == stonecharts_verify.EXIT_PASS, proc.stderr.decode()
+    manifest = json.loads((evidence_dir / "manifest.json").read_text(encoding="utf-8"))
+    assurance = manifest["assurance"]
+    assert assurance["profile"] == "certified"
+    assert assurance["chartType"] == "parliament"
+    assert assurance["tier"] == "certified"
+    assert assurance["eligibleForCertifiedGuarantee"] is True
 
 
-def test_evaluation_profile_accepts_candidate_chart(tmp_path):
+def test_evaluation_profile_reports_certified_chart(tmp_path):
     spec_path = (ROOT / "charts/waterfall/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     proc = subprocess.run(
@@ -1497,11 +1503,11 @@ def test_evaluation_profile_accepts_candidate_chart(tmp_path):
     assurance = manifest["assurance"]
     assert assurance["profile"] == "evaluation"
     assert assurance["chartType"] == "waterfall"
-    assert assurance["tier"] == "candidate"
-    assert assurance["eligibleForCertifiedGuarantee"] is False
+    assert assurance["tier"] == "certified"
+    assert assurance["eligibleForCertifiedGuarantee"] is True
 
 
-def test_evaluation_profile_accepts_experimental_chart(tmp_path):
+def test_evaluation_profile_reports_certified_polar_chart(tmp_path):
     spec_path = (ROOT / "charts/parliament/examples/basic.json").resolve()
     evidence_dir = tmp_path / "evidence"
     proc = subprocess.run(
@@ -1525,8 +1531,8 @@ def test_evaluation_profile_accepts_experimental_chart(tmp_path):
     assurance = manifest["assurance"]
     assert assurance["profile"] == "evaluation"
     assert assurance["chartType"] == "parliament"
-    assert assurance["tier"] == "experimental"
-    assert assurance["eligibleForCertifiedGuarantee"] is False
+    assert assurance["tier"] == "certified"
+    assert assurance["eligibleForCertifiedGuarantee"] is True
 
 
 def test_default_profile_is_certified(tmp_path):

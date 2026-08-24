@@ -10,7 +10,7 @@ not represented as Semantic Versioning.
 ### Added
 
 - **Development-triangle chart** (`type: "development-triangle"`) — actuarial loss
-  development triangle for reserve adequacy and IBNR estimation (candidate tier,
+  development triangle for reserve adequacy and IBNR estimation (certified tier,
   targeting 0.0.0.33).
 - **Canonical capability registry** (`spec/capabilities.json`) — single source of
   truth for all chart type tiers and version origins.

@@ -765,8 +765,8 @@ def test_capability_manifest_and_error():
         "xrange",
     ]
     assert ct["line"]["tier"] == "certified"
-    assert ct["waterfall"]["tier"] == "candidate"
-    assert ct["parliament"]["tier"] == "experimental"
+    assert ct["waterfall"]["tier"] == "certified"
+    assert ct["parliament"]["tier"] == "certified"
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:

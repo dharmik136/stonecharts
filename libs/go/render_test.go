@@ -1168,11 +1168,11 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if tier := caps.ChartTypes["line"].Tier; tier != "certified" {
 		t.Fatalf("expected line tier=certified, got %q", tier)
 	}
-	if tier := caps.ChartTypes["waterfall"].Tier; tier != "candidate" {
-		t.Fatalf("expected waterfall tier=candidate, got %q", tier)
+	if tier := caps.ChartTypes["waterfall"].Tier; tier != "certified" {
+		t.Fatalf("expected waterfall tier=certified, got %q", tier)
 	}
-	if tier := caps.ChartTypes["parliament"].Tier; tier != "experimental" {
-		t.Fatalf("expected parliament tier=experimental, got %q", tier)
+	if tier := caps.ChartTypes["parliament"].Tier; tier != "certified" {
+		t.Fatalf("expected parliament tier=certified, got %q", tier)
 	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}
 	if svg, err := RenderSVG(spec); err != nil {
