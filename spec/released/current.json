@@ -1,14 +1,14 @@
 {
-  "release": "0.0.0.33",
-  "sourceCommit": "19907af",
+  "release": "0.0.0.34",
+  "sourceCommit": "aca04798c3117f2bfc90d685e80fd8d0d7c6d3f7",
   "schemas": {
     "chartSpec": {
-      "path": "0.0.0.33/chart-spec.schema.json",
-      "sha256": "5c147c2dad8aecb09fbc667202f0cc3217018496e89b97fa462acaa0bd4e9df1"
+      "path": "0.0.0.34/chart-spec.schema.json",
+      "sha256": "0a985bcc7ab46cdd8795b0b5833151fff51db382541e4302efc409ee255b142e"
     },
     "stoneverifyResult": {
-      "path": "0.0.0.33/stoneverify-result.schema.json",
-      "sha256": "f7d19ea5c5800f991e903868f28a6a6c4853291cea86bfd1b3143e21695cf0f7"
+      "path": "0.0.0.34/stoneverify-result.schema.json",
+      "sha256": "f5b519709dbb84885576bdc34f6b14706334bc2897ccffcdf3c9fb10e4b6c921"
     }
   }
 }
