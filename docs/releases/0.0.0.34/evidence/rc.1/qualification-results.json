@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "release": "0.0.0.34",
+  "candidate": "rc.1",
+  "sourceCommit": "038b69504bfbc879cfe9fe781e470bb7838b59f9",
+  "startedAt": "2026-08-24T09:09:20.495008+00:00",
+  "completedAt": "2026-08-24T09:12:03.910899+00:00",
+  "status": "pass",
+  "commands": [
+    {
+      "id": "ruff-check",
+      "command": [
+        "<python>",
+        "-m",
+        "ruff",
+        "check",
+        "libs/python",
+        "tools"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.407,
+      "outputSha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "outputSummary": "All checks passed!"
+    },
+    {
+      "id": "ruff-format",
+      "command": [
+        "<python>",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "libs/python",
+        "tools"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.388,
+      "outputSha256": "28f26ffccbf1a980851e61449081ea5cf4e4525642bd63d4085f5b72a4decb90",
+      "outputSummary": "87 files already formatted"
+    },
+    {
+      "id": "python-tests",
+      "command": [
+        "<python>",
+        "-m",
+        "pytest",
+        "libs/python/tests",
+        "-q"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 18.995,
+      "outputSha256": "0bc2de1dedf5ebb9d4e0f763f63548aed493ece14b0e0bf2095e03429224a3c4",
+      "outputSummary": "1108 passed in 18.17s"
+    },
+    {
+      "id": "go-tests",
+      "command": [
+        "go",
+        "test",
+        "./..."
+      ],
+      "cwd": "libs/go",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 2.197,
+      "outputSha256": "a9f420cf27a3fcd0974b2eff41ce5661a4ce8e6c3457636e1e6d06c7e720523b",
+      "outputSummary": "?   \tstonecharts/cmd/stoneverify-go-render\t[no test files]"
+    },
+    {
+      "id": "browser-tests",
+      "command": [
+        "npm.cmd",
+        "test"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 93.98,
+      "outputSha256": "7e00c05b93341c7aaafebef065e36a2bf55cacf7c98bd9c9e80ddbe88a5ce266",
+      "outputSummary": "\u00e2\u201e\u00b9 duration_ms 87127.0752"
+    },
+    {
+      "id": "documentation",
+      "command": [
+        "<python>",
+        "tools/check_docs.py"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 1.335,
+      "outputSha256": "4a4e27f044b69028f4edc196f8c060358fd3c149ee4d0dfba8f8f79c744ae0de",
+      "outputSummary": "documentation control PASS: 114 documents, 23 requirements, 35 evidence definitions, 14 risks, 112 project items"
+    },
+    {
+      "id": "capabilities",
+      "command": [
+        "<python>",
+        "tools/generate_capabilities.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.133,
+      "outputSha256": "eaff97842ffe4871cd05e8bd89fb4b1ae14c9160c02425db28de3896b6625b08",
+      "outputSummary": "All capability checks passed."
+    },
+    {
+      "id": "runtime-assets",
+      "command": [
+        "<python>",
+        "tools/generate_runtime_assets.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.128,
+      "outputSha256": "e7964dfe8e51c214a6521ce3c7e78f23febc0e3e06f64e105bcc5896870eb837",
+      "outputSummary": "runtime assets PASS: 2 package copies match the canonical source"
+    },
+    {
+      "id": "certification-baselines",
+      "command": [
+        "<python>",
+        "tools/generate_certification_baselines.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 8.6,
+      "outputSha256": "b46a0a0156c645a211196ae64661c4308965dd33560284d525f8ba1b1ca02e77",
+      "outputSummary": "certification baselines PASS: 36 certified dual-runtime bundles at 0.0.0.34"
+    },
+    {
+      "id": "certification-ledger",
+      "command": [
+        "<python>",
+        "tools/generate_certification_ledger.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.357,
+      "outputSha256": "3bf2664c987d794d6e04a24865727069e69e6a20d1ab761fb3605db30d92b078",
+      "outputSummary": "certification ledger PASS: 36 charts x 8 SC-CERT gates"
+    },
+    {
+      "id": "certification-matrix",
+      "command": [
+        "<python>",
+        "tools/check_certification_matrix.py",
+        "--structural-only"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.922,
+      "outputSha256": "065fcf8126f2172507a484ff17769c26a0eeeca2a615e2671f841bb1b3e312f8",
+      "outputSummary": "certification matrix PASS: 36 charts x 8 executable SC-CERT gates"
+    },
+    {
+      "id": "chart-admission",
+      "command": [
+        "<python>",
+        "tools/check_chart_admission.py",
+        "--all-certified"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.218,
+      "outputSha256": "56994d3a0963a96b1f946873fc4f335fe0bf0941e38a3165d768a165249f9402",
+      "outputSummary": "All checks passed for 'development-triangle'."
+    },
+    {
+      "id": "direct-cross-render",
+      "command": [
+        "<python>",
+        "tools/check_direct_cross_render.py"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 19.542,
+      "outputSha256": "8d07e36aa0852827c4ffb4ab2eff5abae84828e79b9f35ccbb019e61efdc9243",
+      "outputSummary": "direct cross-render PASS: 186 examples"
+    },
+    {
+      "id": "fuzz-property",
+      "command": [
+        "<python>",
+        "tools/check_fuzz_property.py"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 2.655,
+      "outputSha256": "3d7b94159e8795e5b5914610b2d8d036152045a4f2ee0683f356685905c0190e",
+      "outputSummary": "fuzz property PASS: seed=20260807 cases=120 corpus=854664233d756e3de1abf9b5a945e952b7d97f690a2c4158584ddb3cbd758544"
+    },
+    {
+      "id": "release-schema",
+      "command": [
+        "<python>",
+        "tools/prepare_release_schema_0034.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "outputSha256": "a788c838251300bd2588d98de1edcdd4bdac7788f8d0ebdb6fec7eeac450d201",
+      "outputSummary": "release schema snapshot PASS: 0.0.0.34 (aca04798c3117f2bfc90d685e80fd8d0d7c6d3f7)"
+    },
+    {
+      "id": "package-install",
+      "command": [
+        "<python>",
+        "tools/check_package_install.py",
+        "--outdir",
+        "<repo>/docs/releases/0.0.0.34/evidence/rc.1/packages"
+      ],
+      "cwd": ".",
+      "status": "pass",
+      "exitCode": 0,
+      "durationSeconds": 13.408,
+      "outputSha256": "fa3d09e10fee220faf4f3339f73644f0de626f319424d9c651e81be3a4abbd4f",
+      "outputSummary": "Actual location:    \"<user-home>/AppData/Local/Temp/stonecharts-install-xhtywzkl/venv/Scripts/python.exe\""
+    }
+  ]
+}

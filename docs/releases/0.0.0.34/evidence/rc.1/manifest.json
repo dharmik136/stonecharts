@@ -1,0 +1,903 @@
+{
+  "release": "0.0.0.34",
+  "candidate": "rc.1",
+  "source": {
+    "repository": "dharmik136/stonecharts",
+    "commit": "038b69504bfbc879cfe9fe781e470bb7838b59f9",
+    "tag": "0.0.0.34",
+    "treeClean": true
+  },
+  "versions": {
+    "product": "0.0.0.34",
+    "python": "0.0.0.34",
+    "go": null,
+    "schema": "spec/released/0.0.0.34",
+    "svgContract": "spec/svg-contract.md current",
+    "runtime": "embedded canonical browser runtime; 36-chart Chromium profile"
+  },
+  "environment": {
+    "builder": "tools/build_release_evidence_0034.py",
+    "python": "3.14.4",
+    "go": "go version go1.26.4 windows/amd64",
+    "os": "Windows-11-10.0.26200-SP0",
+    "architecture": "AMD64"
+  },
+  "artifacts": [
+    {
+      "name": "certification-ledger.json",
+      "kind": "documentation",
+      "path": "docs/quality/certification-ledger.json",
+      "sha256": "48147acdd256d4818827f372208db7eba6bd7520b05fea8b7b57c3725cfce28f",
+      "bytes": 77120
+    },
+    {
+      "name": "competitor-benchmark-results-2026-07.md",
+      "kind": "documentation",
+      "path": "docs/quality/competitor-benchmark-results-2026-07.md",
+      "sha256": "6c682639b07179d1161cc26f3888dbf390289be0176d7b722dccb6b70039ec99",
+      "bytes": 33380
+    },
+    {
+      "name": "manual-accessibility-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405",
+      "bytes": 1848
+    },
+    {
+      "name": "performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48",
+      "bytes": 3922
+    },
+    {
+      "name": "visual-profile-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d",
+      "bytes": 1288
+    },
+    {
+      "name": "bar-accessibility-security-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md",
+      "sha256": "d6f0ff8c98868a7dd466f75769461ae38336c1959af5c582d37ba6d3570ffd10",
+      "bytes": 4351
+    },
+    {
+      "name": "bar-performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md",
+      "sha256": "df54b2d840210362e7debd79193c9340a9b9f888791dd9177441310822ce2d60",
+      "bytes": 3310
+    },
+    {
+      "name": "scatter-accessibility-security-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-accessibility-security-review.md",
+      "sha256": "7eded9ca4e0b94352d78b8189ea8c585b77da6f5633aed9635a6c43843a5c962",
+      "bytes": 6929
+    },
+    {
+      "name": "scatter-performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-performance-baseline-review.md",
+      "sha256": "63b128c02216ee2d8b8b7acf05115e169d5feeba597e84e89e718fbef4986087",
+      "bytes": 4883
+    },
+    {
+      "name": "manifest.schema.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.34/evidence/manifest.schema.json",
+      "sha256": "64c4d7b86815dd94823a27a61def76b1ce37a09b60dec90e351e670db69043fb",
+      "bytes": 5745
+    },
+    {
+      "name": "package-install-matrix.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/package-install-matrix.md",
+      "sha256": "01a0f16283a1a9630e7401743650f04520b6d12830d4ef8ba9cacb0b3b47e92d",
+      "bytes": 1010
+    },
+    {
+      "name": "stonecharts-0.0.0.34-py3-none-any.whl",
+      "kind": "python-package",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/packages/stonecharts-0.0.0.34-py3-none-any.whl",
+      "sha256": "a886645ab6b097222e300d74bebbfa7a607e798e5107f4d76da20e348e33d949",
+      "bytes": 133369
+    },
+    {
+      "name": "stonecharts-0.0.0.34.tar.gz",
+      "kind": "python-package",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/packages/stonecharts-0.0.0.34.tar.gz",
+      "sha256": "92b9de65fa89efa3350cd6c56f432474760ea672d0245a9f5cd82b3e192ab093",
+      "bytes": 134747
+    },
+    {
+      "name": "provenance.json",
+      "kind": "provenance",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/provenance.json",
+      "sha256": "eb8edf8c83823f9905ab553a5014b033cc19052ec943302aa201f96c2faa1080",
+      "bytes": 327
+    },
+    {
+      "name": "qualification-checklist.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/qualification-checklist.md",
+      "sha256": "2ea57b821cf1fb66757c3be25094030afc4be8ce2510aa74789f560e5778c98d",
+      "bytes": 979
+    },
+    {
+      "name": "qualification-results.json",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/qualification-results.json",
+      "sha256": "b1af2281011e0f2eaf686ed20f67ae65c019030d6ea8d30cc5d607b4a6cb2016",
+      "bytes": 7091
+    },
+    {
+      "name": "sbom.spdx.json",
+      "kind": "sbom",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/sbom.spdx.json",
+      "sha256": "9ca0689bc74dc10434a785f60b431f17d5f8be349813ae1eabe7ce169b3e9ee9",
+      "bytes": 699
+    },
+    {
+      "name": "bubble-accessibility-security-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.4/evidence/bubble-accessibility-security-review.md",
+      "sha256": "ed644793745045f572c1a68af21dafeff59b6655595e88fa3a4e48031ea40c77",
+      "bytes": 5959
+    },
+    {
+      "name": "bubble-performance-baseline-review.md",
+      "kind": "documentation",
+      "path": "docs/releases/0.0.0.4/evidence/bubble-performance-baseline-review.md",
+      "sha256": "3c34f776a055246031d10504c6056ade913874e4559d2f6e08c8148fe0c36005",
+      "bytes": 4408
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/area/manifest.json",
+      "sha256": "2143ee2ff0b0cf5592dffad61f4e3d58d1998d251d154f887e4dd972b5db1835",
+      "bytes": 2452
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/arearange/manifest.json",
+      "sha256": "e782f51a25a4eb0bd8663edf63f3d5b5866bf1c8cc6e3c340640c9a3e2408f61",
+      "bytes": 2462
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/bar/manifest.json",
+      "sha256": "1fe603c379749057c991a91bb7d3159a9b0dc4e7eb30f0696b7aaae453c2b03e",
+      "bytes": 2450
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/boxplot/manifest.json",
+      "sha256": "a66dbc048959491c06aa804a49a9b8211879e6718500342891752894109940a9",
+      "bytes": 2458
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/bubble/manifest.json",
+      "sha256": "4a468ab012096087e3c5257467ee88f51e6317d3eded420240d8dbca80b2a4d1",
+      "bytes": 2456
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/bullet/manifest.json",
+      "sha256": "ded847e489c098c0dce60ec99af732f0aa397e44466cde48b3780ce073b369ba",
+      "bytes": 2456
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/candlestick/manifest.json",
+      "sha256": "332444a77fdca60192f067fbe6fdb1fb205f30233d885c9e08bb4cbe6be13e27",
+      "bytes": 2466
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/column/manifest.json",
+      "sha256": "6611720580d3f7d082c5a0abf2801fae4f20abe4abc798c7c4a9a6685d3db319",
+      "bytes": 2456
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/columnrange/manifest.json",
+      "sha256": "ffb7f632b6368ea06020316cb9ba2776b167c227c06f6513450b3aa5e9bf9743",
+      "bytes": 2466
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/combo/manifest.json",
+      "sha256": "f3db75889dc27b4ecb7588e808485f7857886d4342b73415659f7d1ce9878713",
+      "bytes": 2454
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/development-triangle/manifest.json",
+      "sha256": "33375eaadaef9f766c86ab1e866e3d6f7e2407b9a6dba1e139e2f3d03310c16f",
+      "bytes": 2484
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/dumbbell/manifest.json",
+      "sha256": "9288a669d7589c99c7360a7e91ca21dd7cd8b24534120423c541def3bf4e045d",
+      "bytes": 2460
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/error-bar/manifest.json",
+      "sha256": "8449bf6dc3ea4c8d0021413b84eb515d6a4428377377a7db5172b6c3664f671a",
+      "bytes": 2462
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/flame-chart/manifest.json",
+      "sha256": "b09489f0c996a35fe417016e24650d1e738c490ddc596a010a1395f0f95e6363",
+      "bytes": 2466
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/funnel/manifest.json",
+      "sha256": "e86c5d63fc3f4439fbd2f8fca246e3fb5e3108bab72c0f06fc628d5d8377bd2a",
+      "bytes": 2456
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/gauge/manifest.json",
+      "sha256": "74377673f8707302ce50019fe416b7e5aee38017b4c4a1a5ae37f406acc5e8c0",
+      "bytes": 2454
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/histogram/manifest.json",
+      "sha256": "3e761f5824ae87624de24827e268192c838d23c829026380981f2fbab22c26f1",
+      "bytes": 2462
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/line/manifest.json",
+      "sha256": "12c1ca289ab0c7963e918f7bd176bfecfab9efefabcaf19a55a00b6440556867",
+      "bytes": 2458
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/lollipop/manifest.json",
+      "sha256": "7e345f52d3bc6d67000f9637bb2df6d1d67a23a83b7274bc4b30a7c6627422c1",
+      "bytes": 2460
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/nightingale/manifest.json",
+      "sha256": "29b3aaf372751ebc9dc5f15b1c43f6b335542b9555b84e98eeb17c9f0de76d20",
+      "bytes": 2466
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/parliament/manifest.json",
+      "sha256": "61a245ce5782d30d7969f3e66d37a749123c1a8466067f5ee4f69cb4a32d8e3d",
+      "bytes": 2466
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/pie/manifest.json",
+      "sha256": "61a45982856c16d0cf95a75b7fee7e10c7ced903b15aa83011669748762f5251",
+      "bytes": 2450
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/polar/manifest.json",
+      "sha256": "5de8d2d90fdd0ac442adddf22f0eba5c87c2730bd0f5bf3135017c306b22f56f",
+      "bytes": 2454
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/radar/manifest.json",
+      "sha256": "0b0852639f2943edd080ee205574d6cae2a4cd82949c5f0d1b1a5c9f7c463b56",
+      "bytes": 2454
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/radial-bar/manifest.json",
+      "sha256": "6a57d5b1d5302ca0e4b39b52c65adcb6a0f2c987406bf3ab994aab850f2fef82",
+      "bytes": 2464
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/scatter/manifest.json",
+      "sha256": "7bbaa797d009720e9b4575d1991cde317b8d1fbd6a6b1ad1df670672c5cd0a5a",
+      "bytes": 2458
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/solid-gauge/manifest.json",
+      "sha256": "94910c7c266f0997838a00c230c31527bece3750aa8749a16e000d17238e0e2e",
+      "bytes": 2466
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/streamgraph/manifest.json",
+      "sha256": "436ab22517970ecc880a22bbbab15b1d6ad7621aba030bfa05af84f52043e150",
+      "bytes": 2468
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/technical-indicators/manifest.json",
+      "sha256": "668cd1808baa7e28737aa11161598fe22669f371b92e369d4744accdc19d3584",
+      "bytes": 2486
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/timeline/manifest.json",
+      "sha256": "70286059268c82ca73c259fe12ea125f4a56f40c2aba1a9fc62aceb8154eba38",
+      "bytes": 2460
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/variwide/manifest.json",
+      "sha256": "32cf7d38c52a5a1edd8d7ce9bfcd82b92735e6cf4da6337a2645f0e187383ed8",
+      "bytes": 2460
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/vector-plot/manifest.json",
+      "sha256": "605bd814fb4417ac0518427a8f7d969ce3fdee7cd16723659690bde33ec9d9c0",
+      "bytes": 2466
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/waterfall/manifest.json",
+      "sha256": "d1a67f2f992e39838fff94034fefc8034980d4d1f6db099c1a1a266b281e3ff9",
+      "bytes": 2462
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/wind-rose/manifest.json",
+      "sha256": "15f2c72ee07b892f36fdc57b7b078c9a10345cd304dd1fc76ee175552357eb14",
+      "bytes": 2464
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/windbarb/manifest.json",
+      "sha256": "8752afd83b350b5a3d3960de9d7b72a5eb0100d93e52589b36ff46a771ba29bf",
+      "bytes": 2460
+    },
+    {
+      "name": "manifest.json",
+      "kind": "documentation",
+      "path": "evidence-baselines/xrange/manifest.json",
+      "sha256": "e694aa55b3eccb0a07a3e975f8033d982f4f87ad395be4c66fe71741f1b6b73f",
+      "bytes": 2456
+    },
+    {
+      "name": "render_test.go",
+      "kind": "documentation",
+      "path": "libs/go/render_test.go",
+      "sha256": "66273af4bb2e3c3eff16e8f82bcc30c380747e80721a5f8d9974948ec0b324b4",
+      "bytes": 118689
+    },
+    {
+      "name": "chart-interactions.js",
+      "kind": "documentation",
+      "path": "libs/go/runtime/chart-interactions.js",
+      "sha256": "654ed5616a9bafa38db0b2626f6c481e27937f3275653d0bd75d8ba98110262e",
+      "bytes": 10229
+    },
+    {
+      "name": "version.go",
+      "kind": "documentation",
+      "path": "libs/go/version.go",
+      "sha256": "9a76c92e757f01e8739fdd125ea01f5c41d669908a2f6391b4b1ae0c544b924e",
+      "bytes": 48
+    },
+    {
+      "name": "LICENSE",
+      "kind": "other",
+      "path": "libs/python/LICENSE",
+      "sha256": "a2121afd3078fc131ee8e2152749b89dcf7262c97fa9be5e23fc1b8efb48580d",
+      "bytes": 1585
+    },
+    {
+      "name": "README.md",
+      "kind": "documentation",
+      "path": "libs/python/README.md",
+      "sha256": "088e826d8339f233517f4e9a3e1d49ade52c872f3f47b28e5d6d4231ef3e1e28",
+      "bytes": 662
+    },
+    {
+      "name": "pyproject.toml",
+      "kind": "documentation",
+      "path": "libs/python/pyproject.toml",
+      "sha256": "2b23d552bbeaa7b3dee54ded010f6b9341c4e858607a84e16352299c26873aed",
+      "bytes": 1092
+    },
+    {
+      "name": "__init__.py",
+      "kind": "documentation",
+      "path": "libs/python/stonecharts/__init__.py",
+      "sha256": "678d45d443b47a0814fb1b1742cfd430140a15f1f4b4d9959cb8d479a49b43ba",
+      "bytes": 1228
+    },
+    {
+      "name": "chart-interactions.js",
+      "kind": "documentation",
+      "path": "libs/python/stonecharts/_assets/chart-interactions.js",
+      "sha256": "654ed5616a9bafa38db0b2626f6c481e27937f3275653d0bd75d8ba98110262e",
+      "bytes": 10229
+    },
+    {
+      "name": "test_golden.py",
+      "kind": "documentation",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "9d73a9cff361d8a64728c59e36a7d1ab5035eb95df720996f6acc9169c1985d5",
+      "bytes": 52618
+    },
+    {
+      "name": "test_stonecharts_verify.py",
+      "kind": "documentation",
+      "path": "libs/python/tests/test_stonecharts_verify.py",
+      "sha256": "9755722f4065501dc2139d99b687451bb84f9fb6bbfe95376094b7f7c9d47971",
+      "bytes": 58829
+    },
+    {
+      "name": "all-charts-browser-qualification.test.js",
+      "kind": "documentation",
+      "path": "runtime/all-charts-browser-qualification.test.js",
+      "sha256": "15dd2e70b851412d8ffde9559d095844689ea40b7792dfeb6d0a32a042b134e6",
+      "bytes": 6139
+    },
+    {
+      "name": "chart-interactions.js",
+      "kind": "documentation",
+      "path": "runtime/chart-interactions.js",
+      "sha256": "654ed5616a9bafa38db0b2626f6c481e27937f3275653d0bd75d8ba98110262e",
+      "bytes": 10229
+    },
+    {
+      "name": "chart-interactions.test.js",
+      "kind": "documentation",
+      "path": "runtime/chart-interactions.test.js",
+      "sha256": "8153df43c010a46a53a4954dcd9167a9c1fd6910d6ea6f469d215d712457dc80",
+      "bytes": 8182
+    },
+    {
+      "name": "chart-spec.schema.json",
+      "kind": "documentation",
+      "path": "spec/chart-spec.schema.json",
+      "sha256": "0a985bcc7ab46cdd8795b0b5833151fff51db382541e4302efc409ee255b142e",
+      "bytes": 32888
+    },
+    {
+      "name": "chart-spec.schema.json",
+      "kind": "documentation",
+      "path": "spec/released/0.0.0.34/chart-spec.schema.json",
+      "sha256": "0a985bcc7ab46cdd8795b0b5833151fff51db382541e4302efc409ee255b142e",
+      "bytes": 32888
+    },
+    {
+      "name": "stoneverify-result.schema.json",
+      "kind": "documentation",
+      "path": "spec/released/0.0.0.34/stoneverify-result.schema.json",
+      "sha256": "f5b519709dbb84885576bdc34f6b14706334bc2897ccffcdf3c9fb10e4b6c921",
+      "bytes": 3706
+    },
+    {
+      "name": "current.json",
+      "kind": "documentation",
+      "path": "spec/released/current.json",
+      "sha256": "e755f2433581df96c8a842c8de396e6105b40f01a71c0bb2b669836e3973555f",
+      "bytes": 441
+    },
+    {
+      "name": "build_release_evidence_0034.py",
+      "kind": "documentation",
+      "path": "tools/build_release_evidence_0034.py",
+      "sha256": "b9f0f6188c822a27b28a2d06e6f773c2381b38481bcde0fc5b7e9621a74139f5",
+      "bytes": 18323
+    },
+    {
+      "name": "check_certification_matrix.py",
+      "kind": "documentation",
+      "path": "tools/check_certification_matrix.py",
+      "sha256": "d8bae34b434e970726ecd925a3d4b47e33325c1f662f9719d315857ce0a6de4b",
+      "bytes": 9982
+    },
+    {
+      "name": "check_direct_cross_render.py",
+      "kind": "documentation",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "731ce3b542ad7f81f8d7d119878362240a239ae53fa2cca350a909c332899ba3",
+      "bytes": 5881
+    },
+    {
+      "name": "check_docs.py",
+      "kind": "documentation",
+      "path": "tools/check_docs.py",
+      "sha256": "9a977c78e9c5d9ddb5e5226543576acfb8d65a45d30990491d014518c2b1a4d9",
+      "bytes": 21406
+    },
+    {
+      "name": "check_fuzz_property.py",
+      "kind": "documentation",
+      "path": "tools/check_fuzz_property.py",
+      "sha256": "0ea7de6e9e18c92b0759a6bc328a59c7d3655c437d059db82729c62473740299",
+      "bytes": 10800
+    },
+    {
+      "name": "check_package_install.py",
+      "kind": "documentation",
+      "path": "tools/check_package_install.py",
+      "sha256": "05541c9d22c76a175d089225f3ac1c2d9c7ca1136072ce9c94d046c4a91012aa",
+      "bytes": 5775
+    },
+    {
+      "name": "check_release_evidence.py",
+      "kind": "documentation",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "d35a225577be15a091565cd5016e6f1095f6f411c7fade2bde505191870c5449",
+      "bytes": 11656
+    },
+    {
+      "name": "stonecharts_verify.py",
+      "kind": "documentation",
+      "path": "tools/stonecharts_verify.py",
+      "sha256": "2814e6990ce3a038b72ffcecc8d3a16d3a13b9b5507cbe1b9f3a03be4079b8c4",
+      "bytes": 401
+    },
+    {
+      "name": "hashes.sha256",
+      "kind": "other",
+      "path": "docs/releases/0.0.0.34/evidence/rc.1/hashes.sha256",
+      "sha256": "4d029dd02071e8c09da522143864e1e9f05a9f8f32524a164ddd470de3460af0",
+      "bytes": 8833
+    }
+  ],
+  "evidence": [
+    {
+      "id": "TEST-DOCS-CONTROL",
+      "status": "passed",
+      "path": "tools/check_docs.py",
+      "sha256": "9a977c78e9c5d9ddb5e5226543576acfb8d65a45d30990491d014518c2b1a4d9"
+    },
+    {
+      "id": "TEST-CERTIFICATION-MATRIX",
+      "status": "passed",
+      "path": "tools/check_certification_matrix.py",
+      "sha256": "d8bae34b434e970726ecd925a3d4b47e33325c1f662f9719d315857ce0a6de4b"
+    },
+    {
+      "id": "TEST-PYTHON-GOLDENS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "9d73a9cff361d8a64728c59e36a7d1ab5035eb95df720996f6acc9169c1985d5"
+    },
+    {
+      "id": "TEST-GO-GOLDENS",
+      "status": "passed",
+      "path": "libs/go/render_test.go",
+      "sha256": "66273af4bb2e3c3eff16e8f82bcc30c380747e80721a5f8d9974948ec0b324b4"
+    },
+    {
+      "id": "TEST-VALIDATION-PARITY",
+      "status": "passed",
+      "path": "spec/chart-spec.schema.json",
+      "sha256": "0a985bcc7ab46cdd8795b0b5833151fff51db382541e4302efc409ee255b142e"
+    },
+    {
+      "id": "TEST-CAPABILITY-MATRIX",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "9d73a9cff361d8a64728c59e36a7d1ab5035eb95df720996f6acc9169c1985d5"
+    },
+    {
+      "id": "TEST-STACK-SIGNED",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "9d73a9cff361d8a64728c59e36a7d1ab5035eb95df720996f6acc9169c1985d5"
+    },
+    {
+      "id": "TEST-PERCENT-DOMAIN",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "9d73a9cff361d8a64728c59e36a7d1ab5035eb95df720996f6acc9169c1985d5"
+    },
+    {
+      "id": "TEST-LAYOUT-MARGINS",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "9d73a9cff361d8a64728c59e36a7d1ab5035eb95df720996f6acc9169c1985d5"
+    },
+    {
+      "id": "TEST-XSS-ESCAPING",
+      "status": "passed",
+      "path": "libs/python/tests/test_golden.py",
+      "sha256": "9d73a9cff361d8a64728c59e36a7d1ab5035eb95df720996f6acc9169c1985d5"
+    },
+    {
+      "id": "TEST-RUNTIME-BROWSER",
+      "status": "passed",
+      "path": "runtime/all-charts-browser-qualification.test.js",
+      "sha256": "15dd2e70b851412d8ffde9559d095844689ea40b7792dfeb6d0a32a042b134e6"
+    },
+    {
+      "id": "TEST-RUNTIME-SMOKE",
+      "status": "passed",
+      "path": "runtime/chart-interactions.test.js",
+      "sha256": "8153df43c010a46a53a4954dcd9167a9c1fd6910d6ea6f469d215d712457dc80"
+    },
+    {
+      "id": "REVIEW-ACCESSIBILITY-MANUAL",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/manual-accessibility-review.md",
+      "sha256": "5ff112dc25bce5b016af06d06c505458a74065547f06ef022b12b144fd6cc405"
+    },
+    {
+      "id": "REVIEW-VISUAL-PROFILE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/visual-profile-review.md",
+      "sha256": "21f6d12ed5445ab4955d2d864a9a9bcf4f451a5763547f6b3c2d534c06aa5a8d"
+    },
+    {
+      "id": "BENCH-RENDER-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.1/evidence/performance-baseline-review.md",
+      "sha256": "6d7866057a66eb9cbc42f5883b4e9956755024d1566bf1fd1c8de8d3d88bfd48"
+    },
+    {
+      "id": "TEST-DIRECT-CROSS-RENDER",
+      "status": "passed",
+      "path": "tools/check_direct_cross_render.py",
+      "sha256": "731ce3b542ad7f81f8d7d119878362240a239ae53fa2cca350a909c332899ba3"
+    },
+    {
+      "id": "TEST-FUZZ-PROPERTY",
+      "status": "passed",
+      "path": "tools/check_fuzz_property.py",
+      "sha256": "0ea7de6e9e18c92b0759a6bc328a59c7d3655c437d059db82729c62473740299"
+    },
+    {
+      "id": "TEST-RELEASE-EVIDENCE",
+      "status": "passed",
+      "path": "tools/check_release_evidence.py",
+      "sha256": "d35a225577be15a091565cd5016e6f1095f6f411c7fade2bde505191870c5449"
+    },
+    {
+      "id": "REVIEW-BAR-ACCESSIBILITY-SECURITY",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.2/evidence/bar-accessibility-security-review.md",
+      "sha256": "d6f0ff8c98868a7dd466f75769461ae38336c1959af5c582d37ba6d3570ffd10"
+    },
+    {
+      "id": "BENCH-BAR-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.2/evidence/bar-performance-baseline-review.md",
+      "sha256": "df54b2d840210362e7debd79193c9340a9b9f888791dd9177441310822ce2d60"
+    },
+    {
+      "id": "REVIEW-SCATTER-ACCESSIBILITY-SECURITY",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-accessibility-security-review.md",
+      "sha256": "7eded9ca4e0b94352d78b8189ea8c585b77da6f5633aed9635a6c43843a5c962"
+    },
+    {
+      "id": "BENCH-SCATTER-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.3/evidence/scatter-performance-baseline-review.md",
+      "sha256": "63b128c02216ee2d8b8b7acf05115e169d5feeba597e84e89e718fbef4986087"
+    },
+    {
+      "id": "REVIEW-BUBBLE-ACCESSIBILITY-SECURITY",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.4/evidence/bubble-accessibility-security-review.md",
+      "sha256": "ed644793745045f572c1a68af21dafeff59b6655595e88fa3a4e48031ea40c77"
+    },
+    {
+      "id": "BENCH-BUBBLE-BASELINE",
+      "status": "passed",
+      "path": "docs/releases/0.0.0.4/evidence/bubble-performance-baseline-review.md",
+      "sha256": "3c34f776a055246031d10504c6056ade913874e4559d2f6e08c8148fe0c36005"
+    },
+    {
+      "id": "BENCH-COMPETITOR-VEGA-20260729",
+      "status": "passed",
+      "path": "docs/quality/competitor-benchmark-results-2026-07.md",
+      "sha256": "6c682639b07179d1161cc26f3888dbf390289be0176d7b722dccb6b70039ec99"
+    },
+    {
+      "id": "BENCH-COMPETITOR-HIGHCHARTS-20260729",
+      "status": "passed",
+      "path": "docs/quality/competitor-benchmark-results-2026-07.md",
+      "sha256": "6c682639b07179d1161cc26f3888dbf390289be0176d7b722dccb6b70039ec99"
+    },
+    {
+      "id": "BENCH-COMPETITOR-QUICKCHART-20260729",
+      "status": "passed",
+      "path": "docs/quality/competitor-benchmark-results-2026-07.md",
+      "sha256": "6c682639b07179d1161cc26f3888dbf390289be0176d7b722dccb6b70039ec99"
+    },
+    {
+      "id": "BENCH-COMPETITOR-ECHARTS-20260729",
+      "status": "passed",
+      "path": "docs/quality/competitor-benchmark-results-2026-07.md",
+      "sha256": "6c682639b07179d1161cc26f3888dbf390289be0176d7b722dccb6b70039ec99"
+    },
+    {
+      "id": "BENCH-COMPETITOR-PLOTLY-20260729",
+      "status": "passed",
+      "path": "docs/quality/competitor-benchmark-results-2026-07.md",
+      "sha256": "6c682639b07179d1161cc26f3888dbf390289be0176d7b722dccb6b70039ec99"
+    },
+    {
+      "id": "TEST-STONEVERIFY-INSTALL",
+      "status": "passed",
+      "path": "libs/python/tests/test_stonecharts_verify.py",
+      "sha256": "9755722f4065501dc2139d99b687451bb84f9fb6bbfe95376094b7f7c9d47971"
+    },
+    {
+      "id": "TEST-PACKAGE-INSTALL",
+      "status": "passed",
+      "path": "tools/check_package_install.py",
+      "sha256": "05541c9d22c76a175d089225f3ac1c2d9c7ca1136072ce9c94d046c4a91012aa"
+    },
+    {
+      "id": "TEST-STONEVERIFY-RESULT-SCHEMA",
+      "status": "passed",
+      "path": "tools/stonecharts_verify.py",
+      "sha256": "2814e6990ce3a038b72ffcecc8d3a16d3a13b9b5507cbe1b9f3a03be4079b8c4"
+    },
+    {
+      "id": "TEST-STONEVERIFY-BASELINE-INTEGRITY",
+      "status": "passed",
+      "path": "libs/python/tests/test_stonecharts_verify.py",
+      "sha256": "9755722f4065501dc2139d99b687451bb84f9fb6bbfe95376094b7f7c9d47971"
+    },
+    {
+      "id": "TEST-STONEVERIFY-EXIT-CODES",
+      "status": "passed",
+      "path": "libs/python/tests/test_stonecharts_verify.py",
+      "sha256": "9755722f4065501dc2139d99b687451bb84f9fb6bbfe95376094b7f7c9d47971"
+    },
+    {
+      "id": "TEST-STONEVERIFY-SEMANTIC-DIFF",
+      "status": "passed",
+      "path": "libs/python/tests/test_stonecharts_verify.py",
+      "sha256": "9755722f4065501dc2139d99b687451bb84f9fb6bbfe95376094b7f7c9d47971"
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-001",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Released schema overstates renderer support. Restrict the active schema to released types and add explicit renderer capability validation."
+    },
+    {
+      "id": "RISK-002",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Schema and handwritten validators disagree. Ratify one rule set, encode it in all three validators, and add shared accept-and-reject fixtures."
+    },
+    {
+      "id": "RISK-003",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Accepted input can panic or throw during dispatch. Make render entry points return canonical typed errors for every user-controlled failure."
+    },
+    {
+      "id": "RISK-004",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Mixed-sign normal stacking has an invalid domain. Use separate positive and negative accumulators in both the domain and mark transforms."
+    },
+    {
+      "id": "RISK-005",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Percent stacking has ambiguous signed semantics. Restrict 0.0.0.1 percent stacking to finite non-negative values and define all-zero categories explicitly."
+    },
+    {
+      "id": "RISK-006",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Unicode legend geometry differs by language. Define one Unicode length model and lock it with cross-language fixtures."
+    },
+    {
+      "id": "RISK-007",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Fixed margins can clip real-world labels. Add validated manual margins and publish the no-auto-fit 0.0.0.1 limitation."
+    },
+    {
+      "id": "RISK-008",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Runtime interaction and accessibility gaps. Ratify runtime semantics and add automated browser plus manual accessibility qualification."
+    },
+    {
+      "id": "RISK-009",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Package version conflicts with planned release. Adopt ecosystem-specific version mappings and verify every emitted package before tagging."
+    },
+    {
+      "id": "RISK-010",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Short category arrays can break generated HTML. Pad short category arrays deterministically with numeric labels and add shared HTML tests."
+    },
+    {
+      "id": "RISK-011",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Byte identity may be misrepresented as pixel identity. Publish separate canonical, embedded-font, and certified-export guarantee profiles."
+    },
+    {
+      "id": "RISK-012",
+      "disposition": "closed",
+      "expires": null,
+      "rationale": "Closed: Release provenance is not yet reproducible. Build the 0.0.0.1 evidence pack and supply-chain workflow before public distribution."
+    },
+    {
+      "id": "RISK-013",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Accepted: No automated branch-protection gate on main. Rely on the governed Stage-gate release process and the solo-maintainer risk-acceptance policy in threat-model.md until the repository qualifies for a tier with branch protection (GitHub Pro, or making the repository public)."
+    },
+    {
+      "id": "RISK-014",
+      "disposition": "accepted",
+      "expires": null,
+      "rationale": "Accepted: No GitHub-native private vulnerability reporting. Enable GitHub-native private vulnerability reporting once available on this repository's tier. Until then, SECURITY.md's documented fallback (contact the repository owner through GitHub to establish a private channel) is the operational reporting path."
+    }
+  ],
+  "knownLimits": [
+    "Package-registry and other external distribution channels remain unapproved and were not used.",
+    "No real customer pilot has been executed; customer validation remains a separate external milestone.",
+    "Pixel identity is claimed only under a named certified export profile, not arbitrary viewers."
+  ],
+  "review": {
+    "mode": "self",
+    "productOwner": "dharmik136",
+    "maintainer": "dharmik136",
+    "approvedAt": "2026-08-24T09:12:03.910899+00:00"
+  }
+}
