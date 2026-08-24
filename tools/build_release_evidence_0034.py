@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import platform
 import shutil
 import subprocess
@@ -22,6 +23,7 @@ CANDIDATE = "rc.1"
 EVIDENCE_DIR = ROOT / "docs" / "releases" / RELEASE / "evidence"
 RC_DIR = EVIDENCE_DIR / CANDIDATE
 PACKAGES_DIR = RC_DIR / "packages"
+NPM_EXECUTABLE = "npm.cmd" if os.name == "nt" else "npm"
 
 
 def now() -> str:
@@ -180,7 +182,7 @@ def run_qualification(commit: str) -> dict[str, Any]:
         ("ruff-format", [sys.executable, "-m", "ruff", "format", "--check", "libs/python", "tools"], ROOT),
         ("python-tests", [sys.executable, "-m", "pytest", "libs/python/tests", "-q"], ROOT),
         ("go-tests", ["go", "test", "./..."], ROOT / "libs/go"),
-        ("browser-tests", ["npm", "test"], ROOT),
+        ("browser-tests", [NPM_EXECUTABLE, "test"], ROOT),
         ("documentation", [sys.executable, "tools/check_docs.py"], ROOT),
         ("capabilities", [sys.executable, "tools/generate_capabilities.py", "--check"], ROOT),
         ("runtime-assets", [sys.executable, "tools/generate_runtime_assets.py", "--check"], ROOT),
