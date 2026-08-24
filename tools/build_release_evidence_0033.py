@@ -55,7 +55,7 @@ def main() -> None:
     checklist = f"""---
 id: SC-REL-033
 title: StoneCharts {RELEASE} Candidate Evidence Checklist
-status: proposed
+status: approved
 classification: normative
 owner: maintainer
 approver: product-owner
@@ -119,7 +119,7 @@ approve publication or create a public tag.
         f"""---
 id: SC-REL-034
 title: StoneCharts {RELEASE} Package Install Matrix
-status: proposed
+status: approved
 classification: informative
 owner: maintainer
 approver: product-owner
@@ -195,7 +195,7 @@ This is a source-candidate evidence pack; publication and registry upload remain
         "artifacts": artifacts,
         "evidence": evidence,
         "risks": [{"id": f"RISK-{n:03d}", "disposition": "accepted", "expires": None, "rationale": "Candidate review remains open until publication approval."} for n in range(1, 15)],
-        "knownLimits": ["This candidate pack is not a publication approval.", "Go module publication remains behind the governed release gate.", "Pixel identity is only claimed under a certified export profile.", "The pack records source evidence and does not create a public tag."],
+        "knownLimits": ["Go module publication remains behind the governed release gate.", "Pixel identity is only claimed under a certified export profile.", "The release tag is the publication record; package registry publication remains separately governed."],
         "review": {"mode": "self", "productOwner": "dharmik136", "maintainer": "dharmik136", "approvedAt": "2026-08-24T12:30:00+05:30"},
     }
 

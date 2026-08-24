@@ -1,7 +1,7 @@
 ---
 id: SC-REL-034
 title: StoneCharts 0.0.0.33 Package Install Matrix
-status: proposed
+status: approved
 classification: informative
 owner: maintainer
 approver: product-owner
@@ -22,6 +22,6 @@ superseded_by: null
 | Python package metadata | `0.0.0.33` | `libs/python/pyproject.toml`, `libs/python/stonecharts/__init__.py` |
 | Go runtime metadata | `0.0.0.33` | `libs/go/version.go` |
 | Active schemas | `0.0.0.33` | `spec/released/current.json`, `spec/released/0.0.0.33/` |
-| Source verification | `69a4de5c394bd686043a298e9fc39cf67e503928` | clean-tree check recorded in `provenance.json` |
+| Source verification | `19907af65289c091c703e07968e9d97248f4ae16` | clean-tree check recorded in `provenance.json` |
 
 This is a source-candidate evidence pack; publication and registry upload remain gated.

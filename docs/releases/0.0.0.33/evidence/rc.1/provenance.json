@@ -2,7 +2,7 @@
   "release": "0.0.0.33",
   "candidate": "rc.1",
   "repository": "dharmik136/stonecharts",
-  "commit": "69a4de5c394bd686043a298e9fc39cf67e503928",
+  "commit": "19907af65289c091c703e07968e9d97248f4ae16",
   "treeCleanAtBuild": false,
   "builder": "tools/build_release_evidence_0033.py",
   "builtAt": "2026-08-24T12:30:00+05:30"

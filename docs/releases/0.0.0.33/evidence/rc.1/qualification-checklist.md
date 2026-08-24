@@ -1,7 +1,7 @@
 ---
 id: SC-REL-033
 title: StoneCharts 0.0.0.33 Candidate Evidence Checklist
-status: proposed
+status: approved
 classification: normative
 owner: maintainer
 approver: product-owner
@@ -18,7 +18,7 @@ superseded_by: null
 # StoneCharts 0.0.0.33 release-candidate checklist
 
 Candidate: `rc.1`
-Source commit: `69a4de5c394bd686043a298e9fc39cf67e503928`
+Source commit: `19907af65289c091c703e07968e9d97248f4ae16`
 Status: proposed; publication approval remains a separate gate.
 
 ## Automated evidence

@@ -3,7 +3,7 @@
   "candidate": "rc.1",
   "source": {
     "repository": "dharmik136/stonecharts",
-    "commit": "69a4de5c394bd686043a298e9fc39cf67e503928",
+    "commit": "19907af65289c091c703e07968e9d97248f4ae16",
     "tag": "0.0.0.33",
     "treeClean": false
   },
@@ -195,7 +195,7 @@
       "name": "current.json",
       "kind": "documentation",
       "path": "spec/released/current.json",
-      "sha256": "8f326696648119cc2b96f630f729761ec73f46153dbe7a127ff9a6bb76690f86",
+      "sha256": "2122f2967146b96ec0805cff3bd07322eb9d7c8eecefe7fa3a65588763eda8e3",
       "bytes": 408
     },
     {
@@ -244,7 +244,7 @@
       "name": "qualification-checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/qualification-checklist.md",
-      "sha256": "9f054cc3cf2cdf5cc40f6b430320dba6d084fefd1ec04d6c0c59c8cb20c60481",
+      "sha256": "6cb3fd39a664fa9befc420b2ca57d27c484f202f761e4ed57cfd95d05c393da4",
       "bytes": 1229
     },
     {
@@ -258,21 +258,21 @@
       "name": "provenance.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/provenance.json",
-      "sha256": "25c7d6c32e382efe7b09a842c2dd7ec0edcce457e990f5c9d1df687d3bfb7f1c",
+      "sha256": "5cce6d4cdd2bb3e9c569b8a938ecbd0fd3638821e42e45dcad6bb37cd81519e5",
       "bytes": 282
     },
     {
       "name": "package-install-matrix.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/package-install-matrix.md",
-      "sha256": "4bebdd61fef28e3a538de1583362fb800f8d03c4b8578423a66181785200ba9f",
+      "sha256": "f914a88a155e5667f4148c5d04a0006ef22f12f24b9443af5dabff1fdc1f44b8",
       "bytes": 940
     },
     {
       "name": "hashes.sha256",
       "kind": "other",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/hashes.sha256",
-      "sha256": "64dabb7a20646854720d44a84fa8bec2b8252fed90b59827626922a2db82b722",
+      "sha256": "a0a64a5c7d3589b9293a2b420a1ee630cd2e1a865e8aef95f93240ce730ef0a2",
       "bytes": 3941
     }
   ],
@@ -569,10 +569,9 @@
     }
   ],
   "knownLimits": [
-    "This candidate pack is not a publication approval.",
     "Go module publication remains behind the governed release gate.",
     "Pixel identity is only claimed under a certified export profile.",
-    "The pack records source evidence and does not create a public tag."
+    "The release tag is the publication record; package registry publication remains separately governed."
   ],
   "review": {
     "mode": "self",
