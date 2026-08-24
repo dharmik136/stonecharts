@@ -18,7 +18,7 @@ superseded_by: null
 # StoneCharts 0.0.0.33 release-candidate checklist
 
 Candidate: `rc.1`  
-Source commit: `5b66d35f7630b03f4abf21c27ed33f695cdbcbe3`  
+Source commit: `855f2511db0f7f02412341d226a494a5ead94101`  
 Status: proposed; publication approval remains a separate gate.
 
 ## Automated evidence

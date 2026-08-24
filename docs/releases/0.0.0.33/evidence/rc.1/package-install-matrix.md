@@ -22,6 +22,6 @@ superseded_by: null
 | Python package metadata | `0.0.0.33` | `libs/python/pyproject.toml`, `libs/python/stonecharts/__init__.py` |
 | Go runtime metadata | `0.0.0.33` | `libs/go/version.go` |
 | Active schemas | `0.0.0.33` | `spec/released/current.json`, `spec/released/0.0.0.33/` |
-| Source verification | `5b66d35f7630b03f4abf21c27ed33f695cdbcbe3` | clean-tree check recorded in `provenance.json` |
+| Source verification | `855f2511db0f7f02412341d226a494a5ead94101` | clean-tree check recorded in `provenance.json` |
 
 This is a source-candidate evidence pack; publication and registry upload remain gated.

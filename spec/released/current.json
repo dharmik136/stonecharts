@@ -1,6 +1,6 @@
 {
   "release": "0.0.0.33",
-  "sourceCommit": "708a5ca",
+  "sourceCommit": "855f251",
   "schemas": {
     "chartSpec": {
       "path": "0.0.0.33/chart-spec.schema.json",
