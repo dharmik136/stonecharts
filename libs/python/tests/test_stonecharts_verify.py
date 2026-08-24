@@ -1275,7 +1275,7 @@ def test_go_runtime_uses_explicit_adapter_binary(tmp_path, stoneverify_go_binary
     go_runtime = manifest["runtimes"][0]
     assert go_runtime["runtime"] == "go"
     assert go_runtime["module"] == "stonecharts"
-    assert go_runtime["stonechartsVersion"] == "0.0.0.32"
+    assert go_runtime["stonechartsVersion"] == "0.0.0.33"
     assert go_runtime["goAdapterVersion"] == "1.0.0"
     assert go_runtime["goBinary"] == str(stoneverify_go_binary)
 

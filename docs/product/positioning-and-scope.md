@@ -53,7 +53,7 @@ An authorized user of a certified release can:
 
 Current certified chart types, customization surface, and language support are
 tracked authoritatively in [`SC-PROD-004`](capability-matrix.md); this document does
-not restate that table. As of `0.0.0.32` the certified set includes 35 chart types
+not restate that table. As of `0.0.0.33` the certified set includes 36 chart types
 across two complete families — Family A (Cartesian, 26 types) and Family B
 (Polar/radial, 9 types) — with certified language implementations in Python and Go.
 
@@ -103,4 +103,3 @@ A chart type, language, export engine, or customization feature may enter the pu
 scope only after its contract, acceptance criteria, conformance fixtures, ownership,
 compatibility matrix, performance evidence, security review, and release documentation
 are complete. Files on disk and passing examples do not establish support.
-

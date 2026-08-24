@@ -18,7 +18,7 @@ superseded_by: null
 # StoneCharts — Chart Families Blueprint & Cartesian Build Roadmap
 
 > **Status:** Long-range engineering roadmap. Family A (Cartesian, 26 types) and
-> Family B (Polar/radial, 9 types) are complete as of 0.0.0.32. Families C–H remain planned.
+> Family B (Polar/radial, 9 types) are complete as of 0.0.0.33. Families C–H remain planned.
 > **Location:** `docs/roadmap/chart-families.md`
 > **Audience:** Anyone planning chart-catalog expansion. Sections 4–5 preserve the
 > detailed implementation procedure that produced Column. Future work must first
@@ -117,7 +117,7 @@ Every family lists its **foundation tax** — the one-time substrate cost paid b
 ### Family B — Polar / radial  *(COMPLETE — 9 types)*
 
 **Substrate:** Polar coordinates (angle θ + radius r); arc/sector path geometry (SVG `A` commands); angular + radial axes instead of x/y.
-**Foundation tax:** **PAID by pie (0.0.0.24).** Polar coordinate system (θ,r ↔ x,y) + arc/sector path builder + angular & radial axes/gridlines + start-angle/end-angle & inner-radius handling. All 9 polar types are certified (0.0.0.24–0.0.0.32).
+**Foundation tax:** **PAID by pie (0.0.0.24).** Polar coordinate system (θ,r ↔ x,y) + arc/sector path builder + angular & radial axes/gridlines + start-angle/end-angle & inner-radius handling. All 9 polar types are certified (0.0.0.24–0.0.0.33).
 
 | Type | Class | Src | Subtypes | Profiling superset use / notes |
 |---|---|---|---|---|

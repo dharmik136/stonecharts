@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-StoneCharts is pre-release software at version `0.0.0.32` with 35 certified chart
+StoneCharts is pre-release software at version `0.0.0.33` with 36 certified chart
 types. No version is currently designated for production security support. Security
 evidence is included in release qualification evidence packs (see `docs/releases/`).
 
@@ -33,4 +33,3 @@ renderer denial of service, package or release substitution, provenance failure,
 sensitive-data exposure, and accessibility behavior that creates a security or fraud
 risk. The current threat model is
 [`docs/security/threat-model.md`](docs/security/threat-model.md).
-

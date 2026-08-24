@@ -1,13 +1,13 @@
 {
-  "release": "0.0.0.32",
-  "sourceCommit": "599e919",
+  "release": "0.0.0.33",
+  "sourceCommit": "88f401a",
   "schemas": {
     "chartSpec": {
-      "path": "0.0.0.32/chart-spec.schema.json",
+      "path": "0.0.0.33/chart-spec.schema.json",
       "sha256": "b24188cad3178ed85a11568153c4f4daf732898a8ced76ba14aa950c2d1ff2c3"
     },
     "stoneverifyResult": {
-      "path": "0.0.0.32/stoneverify-result.schema.json",
+      "path": "0.0.0.33/stoneverify-result.schema.json",
       "sha256": "f7d19ea5c5800f991e903868f28a6a6c4853291cea86bfd1b3143e21695cf0f7"
     }
   }

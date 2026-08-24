@@ -50,8 +50,8 @@ The exact boundary of each promise is defined by
 [`SC-CON-001`](../contracts/guarantees-and-limits.md). Product language MUST NOT turn
 an internal byte-parity oracle into an unsupported claim of universal pixel identity.
 
-The thesis is intentionally aligned with the current baseline: 35 chart types are
-certified across releases `0.0.0.1` through `0.0.0.32`, covering two complete
+The thesis is intentionally aligned with the current baseline: 36 chart types are
+certified across releases `0.0.0.1` through `0.0.0.33`, covering two complete
 families — Family A (Cartesian, 26 types) and Family B (Polar/radial, 9 types)
 (see [`SC-PROD-004`](capability-matrix.md) for the authoritative capability table).
 Per [`DEC-017`](../project/decisions.md), chart expansion beyond `0.0.0.4` required
