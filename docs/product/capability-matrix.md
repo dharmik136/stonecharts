@@ -6,7 +6,7 @@ classification: informative
 owner: product-owner
 approver: maintainer
 review_mode: independent
-applies_to: 0.0.0.32 and later
+applies_to: 0.0.0.33 and later
 requirements: []
 evidence: [TEST-DOCS-CONTROL]
 last_reviewed: "2026-08-10"
@@ -67,7 +67,7 @@ marketing, and pilot documents should link here instead of restating release sco
 | Wind Rose | Certified | 0.0.0.29 | Stacked polar columns for directional distribution. |
 | Nightingale | Certified | 0.0.0.30 | Radius-proportional sectors (rose/coxcomb) with multi-series overlay. |
 | Radial Bar | Certified | 0.0.0.31 | Concentric progress rings for categorical progress views. |
-| Parliament | Certified | 0.0.0.32 | Semicircular hemicycle of unit dots for proportional allocation. |
+| Parliament | Certified | 0.0.0.33 | Semicircular hemicycle of unit dots for proportional allocation. |
 | Development Triangle | Certified | 0.0.0.33 | Actuarial loss development triangle for reserve adequacy and IBNR estimation. |
 <!-- END:GENERATED:capabilities -->
 

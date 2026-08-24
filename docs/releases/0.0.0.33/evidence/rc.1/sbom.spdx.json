@@ -1,0 +1,27 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "stonecharts-0.0.0.33-rc.1",
+  "documentNamespace": "https://stonecharts.dev/sbom/0.0.0.33/rc.1",
+  "creationInfo": {
+    "created": "2026-08-24T12:30:00+05:30",
+    "creators": [
+      "Tool: StoneCharts release builder"
+    ]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-stonecharts-python",
+      "name": "stonecharts",
+      "versionInfo": "0.0.0.33",
+      "downloadLocation": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-stonecharts-go",
+      "name": "stonecharts-go",
+      "versionInfo": "0.0.0.33",
+      "downloadLocation": "NOASSERTION"
+    }
+  ]
+}
