@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -54,6 +55,21 @@ def write_text_lf(path: Path, value: str) -> None:
 
 def write_json(path: Path, value: object) -> None:
     write_text_lf(path, json.dumps(value, indent=2) + "\n")
+
+
+def portable_record_text(value: str) -> str:
+    """Remove machine-specific paths from public qualification metadata."""
+    if value == sys.executable:
+        return "<python>"
+    normalized = value.replace("\\", "/")
+    replacements = (
+        (str(ROOT).replace("\\", "/"), "<repo>"),
+        (str(Path.home()).replace("\\", "/"), "<user-home>"),
+    )
+    for local_path, placeholder in replacements:
+        path_pattern = re.escape(local_path).replace("/", "/+")
+        normalized = re.sub(path_pattern, placeholder, normalized, flags=re.IGNORECASE)
+    return re.sub(r"(?i)\b[A-Z]:/+Users/+[^/\"'\r\n]+", "<user-home>", normalized)
 
 
 def git(*args: str) -> str:
@@ -163,13 +179,13 @@ def command_record(identifier: str, command: list[str], cwd: Path) -> dict[str, 
     duration = round(time.monotonic() - started, 3)
     record = {
         "id": identifier,
-        "command": command,
+        "command": [portable_record_text(argument) for argument in command],
         "cwd": rel(cwd),
         "status": "pass" if process.returncode == 0 else "fail",
         "exitCode": process.returncode,
         "durationSeconds": duration,
         "outputSha256": sha256_text(output),
-        "outputSummary": output_summary,
+        "outputSummary": portable_record_text(output_summary),
     }
     print(f"qualification: {identifier} {record['status'].upper()} ({duration:.3f}s)", flush=True)
     return record
