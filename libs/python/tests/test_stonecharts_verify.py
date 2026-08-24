@@ -31,6 +31,12 @@ SVG_BASIC = (
 )
 
 
+def test_evidence_text_writer_uses_canonical_lf_bytes(tmp_path):
+    output = tmp_path / "canonical.txt"
+    stonecharts_verify.write_text_lf(output, "first\nsecond\n")
+    assert output.read_bytes() == b"first\nsecond\n"
+
+
 @pytest.fixture(scope="session")
 def stoneverify_go_binary(tmp_path_factory):
     if shutil.which("go") is None:

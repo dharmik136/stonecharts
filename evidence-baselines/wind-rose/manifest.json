@@ -68,7 +68,7 @@
       "demoDriftApplied": "none",
       "goAdapterVersion": "1.0.0",
       "goBinary": "stoneverify-go-render.exe",
-      "goBinarySha256": "ca6c208f6fb7cebb04a86f040233ab6d7b92264457abc54eee1a7dd64456d3c1",
+      "goBinarySha256": "974646da69e256f46312b3f6c44792428d9477077d6f0a997c97982c1a607bbc",
       "goVersion": "go version go1.26.4 windows/amd64",
       "module": "stonecharts",
       "output": "go-output.svg",

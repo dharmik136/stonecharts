@@ -114,6 +114,11 @@ def sha256_file(path: pathlib.Path) -> str:
     return digest.hexdigest()
 
 
+def write_text_lf(path: pathlib.Path, value: str) -> None:
+    """Write canonical UTF-8/LF bytes on every operating system."""
+    path.write_bytes(value.encode("utf-8"))
+
+
 def evidence_bundle_size(evidence: pathlib.Path) -> int:
     total = 0
     if not evidence.exists():
@@ -1219,7 +1224,7 @@ def write_report(path: pathlib.Path, manifest: dict[str, Any], comparison: dict[
 </body>
 </html>
 """
-    path.write_text("\n".join(line.rstrip() for line in document.splitlines()) + "\n", encoding="utf-8")
+    write_text_lf(path, "\n".join(line.rstrip() for line in document.splitlines()) + "\n")
 
 
 def _junit_failure_text(findings: list[dict[str, Any]], fallback: str) -> str:
@@ -1508,7 +1513,7 @@ def write_compare_report(path: pathlib.Path, comparison: dict[str, Any]) -> None
 </body>
 </html>
 """
-    path.write_text("\n".join(line.rstrip() for line in document.splitlines()) + "\n", encoding="utf-8")
+    write_text_lf(path, "\n".join(line.rstrip() for line in document.splitlines()) + "\n")
 
 
 def main() -> int:
@@ -1801,23 +1806,19 @@ def main() -> int:
             manifest["status"] = comparison["status"]
             manifest["baseline"] = baseline
 
-            (staging / "comparison.json").write_text(
-                json.dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-            )
+            write_text_lf(staging / "comparison.json", json.dumps(comparison, indent=2, sort_keys=True) + "\n")
             write_report(staging / "report.html", manifest, comparison)
 
             manifest["evidence"] = {
                 "inputSpec": sha256_digest(manifest["input"]["sha256"]),
                 "artifacts": {runtime["output"]: sha256_digest(runtime["sha256"]) for runtime in runtime_metadata},
             }
-            (staging / "manifest.json").write_text(
-                json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-            )
+            write_text_lf(staging / "manifest.json", json.dumps(manifest, indent=2, sort_keys=True) + "\n")
 
             checksum_paths = ["manifest.json", "input-spec.json", "comparison.json", "report.html"]
             checksum_paths.extend(runtime["output"] for runtime in runtime_metadata)
             checksums = [f"{sha256_file(staging / name)}  {name}" for name in sorted(checksum_paths)]
-            (staging / "checksums.txt").write_text("\n".join(checksums) + "\n", encoding="utf-8")
+            write_text_lf(staging / "checksums.txt", "\n".join(checksums) + "\n")
             evidence_bundle_size(staging)
             commit_evidence_bundle(staging, evidence)
     except ResourceLimitError as exc:

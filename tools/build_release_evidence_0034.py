@@ -44,9 +44,14 @@ def rel(path: Path) -> str:
     return path.resolve().relative_to(ROOT.resolve()).as_posix()
 
 
-def write_json(path: Path, value: object) -> None:
+def write_text_lf(path: Path, value: str) -> None:
+    """Write deterministic UTF-8 bytes with caller-provided LF newlines."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+    path.write_bytes(value.encode("utf-8"))
+
+
+def write_json(path: Path, value: object) -> None:
+    write_text_lf(path, json.dumps(value, indent=2) + "\n")
 
 
 def git(*args: str) -> str:
@@ -82,7 +87,8 @@ def write_manifest_schema() -> None:
 
 
 def write_controlled_docs(commit: str) -> None:
-    (RC_DIR / "qualification-checklist.md").write_text(
+    write_text_lf(
+        RC_DIR / "qualification-checklist.md",
         f"""---
 id: SC-REL-035
 title: StoneCharts {RELEASE} Candidate Evidence Checklist
@@ -111,9 +117,9 @@ real Chromium behavior for every chart, installs warning-free Python artifacts i
 isolated environment, and records clean-tag provenance. Package-registry distribution
 and a real customer pilot are explicitly deferred; neither is claimed by this pack.
 """,
-        encoding="utf-8",
     )
-    (RC_DIR / "package-install-matrix.md").write_text(
+    write_text_lf(
+        RC_DIR / "package-install-matrix.md",
         f"""---
 id: SC-REL-036
 title: StoneCharts {RELEASE} Package Install Matrix
@@ -143,7 +149,6 @@ superseded_by: null
 The wheel and source archive are retained as local release evidence. Upload to a
 package registry or another distribution channel is not authorized by this matrix.
 """,
-        encoding="utf-8",
     )
 
 
@@ -152,6 +157,7 @@ def command_record(identifier: str, command: list[str], cwd: Path) -> dict[str, 
     started = time.monotonic()
     process = subprocess.run(command, cwd=cwd, text=True, capture_output=True)
     output = process.stdout + process.stderr
+    output_summary = next((line.strip() for line in reversed(output.splitlines()) if line.strip()), "")
     duration = round(time.monotonic() - started, 3)
     record = {
         "id": identifier,
@@ -161,7 +167,7 @@ def command_record(identifier: str, command: list[str], cwd: Path) -> dict[str, 
         "exitCode": process.returncode,
         "durationSeconds": duration,
         "outputSha256": sha256_text(output),
-        "outputTail": output[-4000:],
+        "outputSummary": output_summary,
     }
     print(f"qualification: {identifier} {record['status'].upper()} ({duration:.3f}s)", flush=True)
     return record
@@ -402,9 +408,9 @@ def main() -> int:
         }
 
         hashes_path = RC_DIR / "hashes.sha256"
-        hashes_path.write_text(
+        write_text_lf(
+            hashes_path,
             "".join(f"{entry['sha256']}  {entry['path']}\n" for entry in artifacts),
-            encoding="utf-8",
         )
         manifest["artifacts"].append(artifact(hashes_path))
         manifest_path = RC_DIR / "manifest.json"
