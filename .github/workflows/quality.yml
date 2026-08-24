@@ -79,6 +79,7 @@ jobs:
       - run: python tools/generate_certification_baselines.py --check
       - run: python tools/generate_certification_ledger.py --check
       - run: python tools/check_certification_matrix.py --structural-only
+      - run: python tools/check_chart_admission.py --all-certified
       - run: python tools/prepare_release_schema_0034.py --check
 
   python:

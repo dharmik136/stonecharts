@@ -23,7 +23,7 @@ from stonecharts.validate import SpecError, validate  # noqa: E402
 
 LINE_CASES = ["basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"]
 COLUMN_CASES = ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"]
-AREA_CASES = ["basic", "stacked", "percent", "themed-dark"]
+AREA_CASES = ["basic", "stacked", "percent", "themed-dark", "adversarial"]
 BAR_CASES = ["basic", "grouped", "stacked", "themed-dark", "adversarial"]
 SCATTER_CASES = ["basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"]
 BUBBLE_CASES = ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"]
@@ -74,6 +74,7 @@ DEVELOPMENT_TRIANGLE_CASES = [
     "themed-dark",
     "rectangular-3x5",
     "rectangular-6x4",
+    "adversarial",
 ]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,

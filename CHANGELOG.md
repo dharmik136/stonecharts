@@ -22,6 +22,9 @@ No unreleased changes.
 - **Certified dual-runtime baselines** — reproducible StoneVerify evidence bundles
   for all 36 charts at `0.0.0.34`, with Python/Go byte parity and repository-relative
   provenance.
+- **Portfolio admission gate** — CI and the local quality runner now execute the
+  complete 11-part admission checklist for every certified chart, rather than only
+  a seed subset.
 
 ### Changed
 
@@ -30,7 +33,7 @@ No unreleased changes.
 - Embedded a generated, byte-checked copy of the governed interaction runtime in
   both the Python package and Go module so installed packages retain interactive
   HTML behavior outside the source checkout.
-- Optimized the direct cross-render sweep to build the Go adapter once; 184 valid
+- Optimized the direct cross-render sweep to build the Go adapter once; 186 valid
   examples remain byte-identical across Python and Go.
 - Updated Python packaging metadata to the current license-expression format and
   added package documentation for warning-free wheel and source builds.
@@ -40,6 +43,8 @@ No unreleased changes.
 - Prevented the interaction runtime from assigning `null` crosshair coordinates on
   non-Cartesian marks. Gauge, solid-gauge, radar, polar, wind-rose, nightingale, and
   radial-bar now complete hover interactions without browser console errors.
+- Added the missing area and development-triangle adversarial fixtures and their
+  shared Python/Go golden SVGs, closing admission coverage for all 36 charts.
 
 ## [0.0.0.33] - 2026-08-24
 

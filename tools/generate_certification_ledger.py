@@ -184,6 +184,7 @@ def build() -> dict:
             "py -3 -m pytest libs/python/tests -q",
             "go test ./... (from libs/go)",
             "npm test",
+            "py -3 tools/check_chart_admission.py --all-certified",
             "py -3 tools/check_direct_cross_render.py",
             "py -3 tools/generate_certification_baselines.py --check",
             "py -3 tools/generate_runtime_assets.py --check",
@@ -200,7 +201,7 @@ def main() -> int:
     args = parser.parse_args()
     generated = json.dumps(build(), indent=2) + "\n"
     if args.generate:
-        OUTPUT.write_text(generated, encoding="utf-8")
+        OUTPUT.write_bytes(generated.encode("utf-8"))
         print(f"generated {OUTPUT.relative_to(ROOT).as_posix()}")
     if args.check or not args.generate:
         if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != generated:

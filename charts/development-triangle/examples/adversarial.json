@@ -1,0 +1,23 @@
+{
+  "type": "development-triangle",
+  "title": "\"><script>alert(1)</script>",
+  "subtitle": "Escaping and numeric boundary coverage",
+  "triangle": {
+    "origins": ["\"><script>alert(1)</script>", "b&<c", "d\"e"],
+    "periods": [0, 12, 2147483647],
+    "values": [
+      [0.0000005, 0.30000000000000004, 1234567],
+      [2.675, 7.7],
+      [0.0000000001]
+    ],
+    "view": "incremental",
+    "valueType": "paid"
+  },
+  "annotations": [
+    {
+      "origin": "\"><script>alert(1)</script>",
+      "period": 12,
+      "text": "b&<c \"quoted\""
+    }
+  ]
+}

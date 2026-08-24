@@ -1,7 +1,8 @@
 """Verify chart types meet the mandatory admission checklist (SC-ARCH-011).
 
-Runs in CI on PRs that touch charts/<type>/ directories.  For each chart type
-passed as an argument, verifies that all required admission phases are complete.
+Runs in CI for the complete certified portfolio or for chart types supplied on the
+command line. For each chart type, verifies that all required admission phases are
+complete.
 """
 
 from __future__ import annotations
@@ -16,11 +17,13 @@ sys.path.insert(0, str(ROOT / "libs" / "python"))
 
 DECISIONS_PATH = ROOT / "docs" / "project" / "decisions.md"
 SCHEMA_PATH = ROOT / "spec" / "chart-spec.schema.json"
+CAPABILITIES_PATH = ROOT / "spec" / "capabilities.json"
 CHARTS_DIR = ROOT / "charts"
 PYTHON_CHARTS_DIR = ROOT / "libs" / "python" / "stonecharts" / "charts"
 GO_DIR = ROOT / "libs" / "go"
 
 DIR_TO_TYPE = {"line-basic": "line"}
+TYPE_TO_DIR = {value: key for key, value in DIR_TO_TYPE.items()}
 
 
 def _load_schema_type_enum() -> list[str]:
@@ -38,6 +41,13 @@ def _load_decisions_text() -> str:
 def _schema_type(chart_dir: str) -> str:
     """Map a chart directory name to its schema type identifier."""
     return DIR_TO_TYPE.get(chart_dir, chart_dir)
+
+
+def _certified_chart_directories() -> list[str]:
+    """Return every certified chart's repository directory in registry order."""
+    registry = json.loads(CAPABILITIES_PATH.read_text(encoding="utf-8"))
+    chart_ids = [item["id"] for item in registry["chartTypes"] if item["tier"] == "certified"]
+    return [TYPE_TO_DIR.get(chart_id, chart_id) for chart_id in chart_ids]
 
 
 def check_decision_document(chart_type: str, decisions_text: str) -> str | None:
@@ -182,15 +192,25 @@ def main() -> int:
     )
     parser.add_argument(
         "chart_types",
-        nargs="+",
+        nargs="*",
         metavar="CHART_TYPE",
         help="One or more chart type names to verify (e.g. line-basic scatter histogram)",
     )
+    parser.add_argument(
+        "--all-certified",
+        action="store_true",
+        help="Verify every chart marked certified in spec/capabilities.json",
+    )
     args = parser.parse_args()
+    if args.all_certified and args.chart_types:
+        parser.error("--all-certified cannot be combined with explicit chart types")
+    chart_types = _certified_chart_directories() if args.all_certified else args.chart_types
+    if not chart_types:
+        parser.error("provide at least one chart type or use --all-certified")
 
     all_passed = True
 
-    for chart_type in args.chart_types:
+    for chart_type in chart_types:
         print(f"\n{'=' * 60}")
         print(f"  Admission checks: {chart_type}")
         print(f"{'=' * 60}")

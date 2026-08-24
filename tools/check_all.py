@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+RELEASE_EVIDENCE = ROOT / "docs" / "releases" / "0.0.0.34" / "evidence" / "rc.1" / "manifest.json"
 
 CHECKS: list[tuple[str, list[str]]] = [
     ("ruff check", [sys.executable, "-m", "ruff", "check", "libs/python/", "tools/"]),
@@ -44,16 +45,11 @@ CHECKS: list[tuple[str, list[str]]] = [
         ],
     ),
     (
-        "chart admission (certified)",
+        "chart admission (all certified)",
         [
             sys.executable,
             "tools/check_chart_admission.py",
-            "line-basic",
-            "column",
-            "area",
-            "bar",
-            "scatter",
-            "bubble",
+            "--all-certified",
         ],
     ),
 ]
@@ -65,6 +61,20 @@ CHECKS_REQUIRING_GO: list[tuple[str, list[str]]] = [
 
 def main() -> int:
     all_checks = list(CHECKS)
+    if RELEASE_EVIDENCE.is_file():
+        all_checks.append(
+            (
+                "release evidence",
+                [
+                    sys.executable,
+                    "tools/check_release_evidence.py",
+                    "--manifest",
+                    RELEASE_EVIDENCE.relative_to(ROOT).as_posix(),
+                ],
+            )
+        )
+    else:
+        print("  SKIP  release evidence (0.0.0.34 archive not present)\n")
     if shutil.which("go"):
         all_checks.extend(CHECKS_REQUIRING_GO)
     else:

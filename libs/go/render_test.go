@@ -18,42 +18,42 @@ import (
 // If this and the Python test both pass, the two libraries are provably in sync.
 func TestGolden(t *testing.T) {
 	cases := map[string][]string{
-		"line-basic":   {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
-		"column":       {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
-		"area":         {"basic", "stacked", "percent", "themed-dark"},
-		"bar":          {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
-		"scatter":      {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
-		"bubble":       {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
-		"combo":        {"basic", "dark", "dual-axis", "adversarial"},
-		"histogram":    {"basic", "prebinned", "pareto", "themed-dark", "adversarial"},
-		"candlestick":  {"basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"},
-		"error-bar":    {"basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"},
-		"arearange":    {"basic", "spline-range", "themed-dark", "adversarial"},
-		"columnrange":  {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
-		"waterfall":    {"basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"},
-		"boxplot":      {"basic", "outliers", "grouped", "themed-dark", "adversarial"},
-		"bullet":       {"basic", "multi-kpi", "themed-dark", "adversarial"},
-		"lollipop":     {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
-		"dumbbell":     {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
-		"funnel":       {"basic", "adversarial", "neck", "pyramid", "themed-dark"},
-		"variwide":     {"basic", "adversarial", "dark", "negative"},
-		"timeline":     {"basic", "multi", "vertical", "adversarial"},
-		"streamgraph":  {"basic", "silhouette", "themed-dark", "adversarial"},
-		"windbarb":     {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
-		"vector-plot":  {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
-		"flame-chart":         {"basic", "multi-series", "deep-stack", "themed-dark", "adversarial"},
-		"pie":                 {"basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"},
-		"gauge":               {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
-		"solid-gauge":         {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
-		"radar":               {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
-		"polar":               {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
-		"nightingale":         {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
-		"parliament":          {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
-		"radial-bar":          {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
-		"wind-rose":           {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
+		"line-basic":           {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
+		"column":               {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":                 {"basic", "stacked", "percent", "themed-dark", "adversarial"},
+		"bar":                  {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
+		"scatter":              {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
+		"bubble":               {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
+		"combo":                {"basic", "dark", "dual-axis", "adversarial"},
+		"histogram":            {"basic", "prebinned", "pareto", "themed-dark", "adversarial"},
+		"candlestick":          {"basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"},
+		"error-bar":            {"basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"},
+		"arearange":            {"basic", "spline-range", "themed-dark", "adversarial"},
+		"columnrange":          {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"waterfall":            {"basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"},
+		"boxplot":              {"basic", "outliers", "grouped", "themed-dark", "adversarial"},
+		"bullet":               {"basic", "multi-kpi", "themed-dark", "adversarial"},
+		"lollipop":             {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"dumbbell":             {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"funnel":               {"basic", "adversarial", "neck", "pyramid", "themed-dark"},
+		"variwide":             {"basic", "adversarial", "dark", "negative"},
+		"timeline":             {"basic", "multi", "vertical", "adversarial"},
+		"streamgraph":          {"basic", "silhouette", "themed-dark", "adversarial"},
+		"windbarb":             {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
+		"vector-plot":          {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
+		"flame-chart":          {"basic", "multi-series", "deep-stack", "themed-dark", "adversarial"},
+		"pie":                  {"basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"},
+		"gauge":                {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
+		"solid-gauge":          {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
+		"radar":                {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
+		"polar":                {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
+		"nightingale":          {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"parliament":           {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"radial-bar":           {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"wind-rose":            {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
 		"technical-indicators": {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
-		"xrange":                {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
-		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark", "rectangular-3x5", "rectangular-6x4"},
+		"xrange":               {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
+		"development-triangle": {"basic", "diagonal", "factors", "annotated", "themed-dark", "rectangular-3x5", "rectangular-6x4", "adversarial"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -485,7 +485,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 	cases := map[string][]string{
 		"line-basic": {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
 		"column":     {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
-		"area":       {"basic", "stacked", "percent", "themed-dark"},
+		"area":       {"basic", "stacked", "percent", "themed-dark", "adversarial"},
 		"bar":        {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
 		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
 		"bubble":     {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
@@ -1224,7 +1224,7 @@ func TestSaveHTML(t *testing.T) {
 
 func TestRenderHTMLPointModelDataTable(t *testing.T) {
 	cases := []struct {
-		name    string
+		name     string
 		specJSON string
 		wantCol  string
 	}{
@@ -1329,6 +1329,7 @@ func FuzzFromJSON(f *testing.F) {
 		{"development-triangle", "themed-dark"},
 		{"development-triangle", "rectangular-3x5"},
 		{"development-triangle", "rectangular-6x4"},
+		{"development-triangle", "adversarial"},
 	}
 	for _, s := range seeds {
 		data, err := os.ReadFile("../../charts/" + s.dir + "/examples/" + s.name + ".json")
@@ -1443,42 +1444,42 @@ func min(a, b int) int {
 // TestRendererPurity verifies that RenderSVG does not mutate the input ChartSpec (SC-CERT-03).
 func TestRendererPurity(t *testing.T) {
 	cases := map[string][]string{
-		"line-basic":            {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
-		"column":                {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
-		"area":                  {"basic", "stacked", "percent", "themed-dark"},
-		"bar":                   {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
-		"scatter":               {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
-		"bubble":                {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
-		"combo":                 {"basic", "dark", "dual-axis", "adversarial"},
-		"histogram":             {"basic", "prebinned", "pareto", "themed-dark", "adversarial"},
-		"candlestick":           {"basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"},
-		"error-bar":             {"basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"},
-		"arearange":             {"basic", "spline-range", "themed-dark", "adversarial"},
-		"columnrange":           {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
-		"waterfall":             {"basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"},
-		"boxplot":               {"basic", "outliers", "grouped", "themed-dark", "adversarial"},
-		"bullet":                {"basic", "multi-kpi", "themed-dark", "adversarial"},
-		"lollipop":              {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
-		"dumbbell":              {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
-		"funnel":                {"basic", "adversarial", "neck", "pyramid", "themed-dark"},
-		"variwide":              {"basic", "adversarial", "dark", "negative"},
-		"timeline":              {"basic", "multi", "vertical", "adversarial"},
-		"streamgraph":           {"basic", "silhouette", "themed-dark", "adversarial"},
-		"windbarb":              {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
-		"vector-plot":           {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
-		"flame-chart":           {"basic", "multi-series", "deep-stack", "themed-dark", "adversarial"},
-		"pie":                   {"basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"},
-		"gauge":                 {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
-		"solid-gauge":           {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
-		"radar":                 {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
-		"polar":                 {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
-		"nightingale":           {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
-		"parliament":            {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
-		"radial-bar":            {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
-		"wind-rose":             {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
-		"technical-indicators":  {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
-		"xrange":                {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
-		"development-triangle":  {"basic", "diagonal", "factors", "annotated", "themed-dark", "rectangular-3x5", "rectangular-6x4"},
+		"line-basic":           {"basic", "styled", "markers", "spline", "gradient", "dark", "adversarial", "gradient-partial"},
+		"column":               {"basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"},
+		"area":                 {"basic", "stacked", "percent", "themed-dark", "adversarial"},
+		"bar":                  {"basic", "grouped", "stacked", "themed-dark", "adversarial"},
+		"scatter":              {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
+		"bubble":               {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
+		"combo":                {"basic", "dark", "dual-axis", "adversarial"},
+		"histogram":            {"basic", "prebinned", "pareto", "themed-dark", "adversarial"},
+		"candlestick":          {"basic", "ohlc", "heikin-ashi", "themed-dark", "adversarial"},
+		"error-bar":            {"basic", "overlay-grouped", "asymmetric", "themed-dark", "adversarial"},
+		"arearange":            {"basic", "spline-range", "themed-dark", "adversarial"},
+		"columnrange":          {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"waterfall":            {"basic", "intermediate-sums", "profit-bridge", "themed-dark", "adversarial"},
+		"boxplot":              {"basic", "outliers", "grouped", "themed-dark", "adversarial"},
+		"bullet":               {"basic", "multi-kpi", "themed-dark", "adversarial"},
+		"lollipop":             {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"dumbbell":             {"basic", "grouped", "horizontal", "themed-dark", "adversarial"},
+		"funnel":               {"basic", "adversarial", "neck", "pyramid", "themed-dark"},
+		"variwide":             {"basic", "adversarial", "dark", "negative"},
+		"timeline":             {"basic", "multi", "vertical", "adversarial"},
+		"streamgraph":          {"basic", "silhouette", "themed-dark", "adversarial"},
+		"windbarb":             {"basic", "datetime", "southern-hemisphere", "themed-dark", "adversarial"},
+		"vector-plot":          {"basic", "field", "themed-dark", "uniform-length", "adversarial"},
+		"flame-chart":          {"basic", "multi-series", "deep-stack", "themed-dark", "adversarial"},
+		"pie":                  {"basic", "many-slices", "single-slice", "themed-dark", "adversarial", "donut", "donut-single", "donut-dark", "variable-radius"},
+		"gauge":                {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
+		"solid-gauge":          {"basic", "no-bands", "full-scale", "themed-dark", "adversarial"},
+		"radar":                {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
+		"polar":                {"basic", "line-only", "single-series", "themed-dark", "adversarial"},
+		"nightingale":          {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"parliament":           {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"radial-bar":           {"basic", "multi-series", "single-series", "themed-dark", "adversarial"},
+		"wind-rose":            {"basic", "many-directions", "single-series", "themed-dark", "adversarial"},
+		"technical-indicators": {"basic", "bollinger", "rsi-pane", "themed-dark", "adversarial"},
+		"xrange":               {"trace-waterfall", "gantt", "swimlanes", "themed-dark", "adversarial"},
+		"development-triangle": {"basic", "diagonal", "factors", "annotated", "themed-dark", "rectangular-3x5", "rectangular-6x4", "adversarial"},
 	}
 	for chartDir, names := range cases {
 		for _, name := range names {
@@ -3445,7 +3446,7 @@ func TestSemanticInvariantsDevelopmentTriangle(t *testing.T) {
 	})
 
 	t.Run("DT-SEM-010/empty-row", func(t *testing.T) {
-		_, err := FromJSON([]byte(`{"type":"development-triangle","triangle":{"origins":["A","B"],"periods":[12,24],"values":[[100,200],[]]}}`)	)
+		_, err := FromJSON([]byte(`{"type":"development-triangle","triangle":{"origins":["A","B"],"periods":[12,24],"values":[[100,200],[]]}}`))
 		if err == nil {
 			t.Error("expected error for empty row")
 		}

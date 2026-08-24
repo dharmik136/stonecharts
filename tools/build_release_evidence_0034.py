@@ -217,6 +217,11 @@ def run_qualification(commit: str) -> dict[str, Any]:
             [sys.executable, "tools/check_certification_matrix.py", "--structural-only"],
             ROOT,
         ),
+        (
+            "chart-admission",
+            [sys.executable, "tools/check_chart_admission.py", "--all-certified"],
+            ROOT,
+        ),
         ("direct-cross-render", [sys.executable, "tools/check_direct_cross_render.py"], ROOT),
         ("fuzz-property", [sys.executable, "tools/check_fuzz_property.py"], ROOT),
         (

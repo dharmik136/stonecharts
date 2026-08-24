@@ -26,7 +26,7 @@ ACTIVE = {
         "gradient-partial",
     ],
     "column": ["basic", "grouped", "stacked", "dark", "themed-dark", "adversarial"],
-    "area": ["basic", "stacked", "percent", "themed-dark"],
+    "area": ["basic", "stacked", "percent", "themed-dark", "adversarial"],
     "bar": ["basic", "grouped", "stacked", "themed-dark", "adversarial"],
     "scatter": ["basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"],
     "bubble": ["basic", "multi-series", "themed-dark", "uniform-z", "adversarial"],
@@ -77,6 +77,7 @@ ACTIVE = {
         "themed-dark",
         "rectangular-3x5",
         "rectangular-6x4",
+        "adversarial",
     ],
 }
 
