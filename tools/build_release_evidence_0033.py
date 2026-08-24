@@ -71,8 +71,8 @@ superseded_by: null
 
 # StoneCharts {RELEASE} release-candidate checklist
 
-Candidate: `{CANDIDATE}`  
-Source commit: `{git('rev-parse', 'HEAD')}`  
+Candidate: `{CANDIDATE}`
+Source commit: `{git('rev-parse', 'HEAD')}`
 Status: proposed; publication approval remains a separate gate.
 
 ## Automated evidence
@@ -147,12 +147,13 @@ This is a source-candidate evidence pack; publication and registry upload remain
         encoding="utf-8",
     )
 
-    # The active schema release is byte-identical to .32; publish it under .33.
+    # Publish the active schemas under the current release directory.
     old_schema_dir = ROOT / "spec/released/0.0.0.32"
     new_schema_dir = ROOT / f"spec/released/{RELEASE}"
     if new_schema_dir.exists():
         shutil.rmtree(new_schema_dir)
     shutil.copytree(old_schema_dir, new_schema_dir)
+    shutil.copy2(ROOT / "spec/chart-spec.schema.json", new_schema_dir / "chart-spec.schema.json")
 
     registry = yaml.safe_load((ROOT / "docs/quality/evidence-registry.yaml").read_text(encoding="utf-8"))
     evidence = []

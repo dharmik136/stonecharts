@@ -3,7 +3,7 @@
   "candidate": "rc.1",
   "source": {
     "repository": "dharmik136/stonecharts",
-    "commit": "855f2511db0f7f02412341d226a494a5ead94101",
+    "commit": "69a4de5c394bd686043a298e9fc39cf67e503928",
     "tag": "0.0.0.33",
     "treeClean": false
   },
@@ -139,8 +139,15 @@
       "name": "chart-spec.schema.json",
       "kind": "documentation",
       "path": "spec/chart-spec.schema.json",
-      "sha256": "356cc18af73ba9da6ee237e17b0223842ed699a05387d312ca2cf0e459e7b5a5",
-      "bytes": 34140
+      "sha256": "532d7832ee9b6b82458e94884364a78b169103aad95a200c4e229f131dd27602",
+      "bytes": 32886
+    },
+    {
+      "name": "check_certification_matrix.py",
+      "kind": "other",
+      "path": "tools/check_certification_matrix.py",
+      "sha256": "bad6bbd28fdc765e81d602ebc8f3adcbde538f4a3f5fb212403c3580408c72e4",
+      "bytes": 3696
     },
     {
       "name": "check_direct_cross_render.py",
@@ -181,22 +188,22 @@
       "name": "development-triangle-certification-readiness.md",
       "kind": "documentation",
       "path": "docs/reviews/development-triangle-certification-readiness.md",
-      "sha256": "c561b0e0da952da9b4badb6dba2bdd246a843e31af2249ae6fec79ee0ee7971b",
-      "bytes": 3676
+      "sha256": "0ffe9e25afaafb6f42606ba37db2db41254e421c6e792a5a68122d737f92045e",
+      "bytes": 3674
     },
     {
       "name": "current.json",
       "kind": "documentation",
       "path": "spec/released/current.json",
-      "sha256": "df7d93c2057214a028d73aa3a22677e5a41d11715f772f15c72a9835bab48524",
+      "sha256": "8f326696648119cc2b96f630f729761ec73f46153dbe7a127ff9a6bb76690f86",
       "bytes": 408
     },
     {
       "name": "chart-spec.schema.json",
       "kind": "documentation",
       "path": "spec/released/0.0.0.33/chart-spec.schema.json",
-      "sha256": "b24188cad3178ed85a11568153c4f4daf732898a8ced76ba14aa950c2d1ff2c3",
-      "bytes": 30022
+      "sha256": "532d7832ee9b6b82458e94884364a78b169103aad95a200c4e229f131dd27602",
+      "bytes": 32886
     },
     {
       "name": "stoneverify-result.schema.json",
@@ -237,8 +244,8 @@
       "name": "qualification-checklist.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/qualification-checklist.md",
-      "sha256": "49cd6d84e0b2dd7daa12f3a08a86098d557dc51c7e5760dc7d018059ebceb961",
-      "bytes": 1233
+      "sha256": "9f054cc3cf2cdf5cc40f6b430320dba6d084fefd1ec04d6c0c59c8cb20c60481",
+      "bytes": 1229
     },
     {
       "name": "sbom.spdx.json",
@@ -251,22 +258,22 @@
       "name": "provenance.json",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/provenance.json",
-      "sha256": "4f02c38216240631f75683eedf982385a9f1a586cba14c7bc7d6d8f31edc9844",
+      "sha256": "25c7d6c32e382efe7b09a842c2dd7ec0edcce457e990f5c9d1df687d3bfb7f1c",
       "bytes": 282
     },
     {
       "name": "package-install-matrix.md",
       "kind": "documentation",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/package-install-matrix.md",
-      "sha256": "ef406bc56bf2ec479be684b85750f269217ac9ca6a36a8c6eaa31bd3f22b21fe",
+      "sha256": "4bebdd61fef28e3a538de1583362fb800f8d03c4b8578423a66181785200ba9f",
       "bytes": 940
     },
     {
       "name": "hashes.sha256",
       "kind": "other",
       "path": "docs/releases/0.0.0.33/evidence/rc.1/hashes.sha256",
-      "sha256": "062a6c543c9e816813eb15db029d86e348e18e332e18606a57e3f0fa3893f042",
-      "bytes": 3838
+      "sha256": "64dabb7a20646854720d44a84fa8bec2b8252fed90b59827626922a2db82b722",
+      "bytes": 3941
     }
   ],
   "evidence": [
@@ -275,6 +282,12 @@
       "status": "passed",
       "path": "tools/check_docs.py",
       "sha256": "9a977c78e9c5d9ddb5e5226543576acfb8d65a45d30990491d014518c2b1a4d9"
+    },
+    {
+      "id": "TEST-CERTIFICATION-MATRIX",
+      "status": "passed",
+      "path": "tools/check_certification_matrix.py",
+      "sha256": "bad6bbd28fdc765e81d602ebc8f3adcbde538f4a3f5fb212403c3580408c72e4"
     },
     {
       "id": "TEST-PYTHON-GOLDENS",
@@ -292,7 +305,7 @@
       "id": "TEST-VALIDATION-PARITY",
       "status": "passed",
       "path": "spec/chart-spec.schema.json",
-      "sha256": "356cc18af73ba9da6ee237e17b0223842ed699a05387d312ca2cf0e459e7b5a5"
+      "sha256": "532d7832ee9b6b82458e94884364a78b169103aad95a200c4e229f131dd27602"
     },
     {
       "id": "TEST-CAPABILITY-MATRIX",

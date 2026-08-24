@@ -4,7 +4,7 @@
   "schemas": {
     "chartSpec": {
       "path": "0.0.0.33/chart-spec.schema.json",
-      "sha256": "b24188cad3178ed85a11568153c4f4daf732898a8ced76ba14aa950c2d1ff2c3"
+      "sha256": "5c147c2dad8aecb09fbc667202f0cc3217018496e89b97fa462acaa0bd4e9df1"
     },
     "stoneverifyResult": {
       "path": "0.0.0.33/stoneverify-result.schema.json",

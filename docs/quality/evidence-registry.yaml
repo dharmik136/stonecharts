@@ -9,6 +9,13 @@ evidence:
     command: py -3 tools/check_docs.py
     location: tools/check_docs.py
     requirements: []
+  - id: TEST-CERTIFICATION-MATRIX
+    kind: test
+    status: implemented
+    description: "Verifies that all 36 certified chart types carry the seed-chart SC-CERT evidence surface: design, fixtures, goldens, schema presence, cross-language test references, property, semantic, purity, and StoneVerify coverage."
+    command: py -3 tools/check_certification_matrix.py
+    location: tools/check_certification_matrix.py
+    requirements: [REQ-CHART-001, REQ-DET-001, REQ-VAL-001, REQ-A11Y-001, REQ-REL-001]
   - id: TEST-PYTHON-GOLDENS
     kind: test
     status: implemented

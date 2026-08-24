@@ -20,8 +20,8 @@ release, and environment boundaries.
 ## Why StoneCharts
 
 - **Byte-identical cross-language output.** The same JSON spec renders to the exact
-  same SVG in Python and Go — verified by 177 golden-test fixtures across 36 chart
-  types (7 certified, 9 candidate, 20 experimental).
+  same SVG in Python and Go — verified by the complete 36-chart certification matrix
+  and shared golden-test corpus.
 - **Deterministic and runtime-free.** Charts are fully rendered server-side without a
   browser, DOM, or JavaScript. The SVG is complete on its own; the interaction runtime
   only *enhances* it.

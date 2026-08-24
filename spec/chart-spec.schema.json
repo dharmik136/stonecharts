@@ -48,7 +48,7 @@
         "radial-bar",
         "development-triangle"
       ],
-      "description": "Chart type id for the active release scope (0.0.0.1: line, column, area; 0.0.0.2 admits bar per DEC-014; 0.0.0.3 admits scatter per DEC-015; 0.0.0.4 admits bubble per DEC-016; 0.0.0.5 admits combo; 0.0.0.6 admits histogram per DEC-021; 0.0.0.7 admits candlestick per DEC-022; 0.0.0.8 admits error-bar per DEC-023; 0.0.0.9 admits arearange per DEC-024 and columnrange per DEC-025; 0.0.0.10 admits waterfall per DEC-026; 0.0.0.11 admits bullet per DEC-027; 0.0.0.12 admits boxplot per DEC-028; 0.0.0.13 admits lollipop per DEC-029; 0.0.0.14 admits dumbbell per DEC-030; 0.0.0.15 admits funnel per DEC-031; 0.0.0.16 admits variwide per DEC-032; 0.0.0.17 admits timeline per DEC-033; 0.0.0.18 admits windbarb per DEC-034; 0.0.0.19 admits streamgraph per DEC-035; 0.0.0.20 admits vector-plot per DEC-036; 0.0.0.21 admits xrange per DEC-037; 0.0.0.22 admits technical-indicators per DEC-038; 0.0.0.23 admits flame-chart per DEC-039; 0.0.0.24 admits pie per DEC-040; 0.0.0.25 admits gauge per DEC-041; 0.0.0.26 admits solid-gauge per DEC-042; 0.0.0.27 admits radar per DEC-043; 0.0.0.28 admits polar per DEC-044; 0.0.0.29 admits wind-rose per DEC-045; 0.0.0.30 admits nightingale per DEC-046; 0.0.0.31 admits radial-bar per DEC-047; 0.0.0.32 admits parliament per DEC-048; development-triangle is candidate per DEC-057 and not yet admitted to a release); maps to the released chart design and renderer pair."
+        "description": "Chart type id for the active release scope; all 36 chart types are certified in 0.0.0.33 and map to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",

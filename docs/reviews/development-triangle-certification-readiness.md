@@ -11,9 +11,9 @@ verdict: CERTIFIED — all SC-CERT gates pass, promoted via DEC-060
 ## Current status
 
 ```
-Tier:            candidate
-Target release:  0.0.0.33
-Since:           unreleased
+Tier:            certified
+Release:         0.0.0.33
+Since:           0.0.0.33
 ```
 
 ## SC-CERT gate assessment
