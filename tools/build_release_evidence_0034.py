@@ -31,16 +31,12 @@ def now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8", errors="replace")).hexdigest()
+
+
+def sha256_bytes(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest()
 
 
 def rel(path: Path) -> str:
@@ -74,6 +70,21 @@ def portable_record_text(value: str) -> str:
 
 def git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
+
+
+def git_blob(commit: str, path: Path) -> bytes | None:
+    """Read a tracked source artifact exactly as stored in the tagged Git tree."""
+    process = subprocess.run(
+        ["git", "show", f"{commit}:{rel(path)}"],
+        cwd=ROOT,
+        capture_output=True,
+    )
+    return process.stdout if process.returncode == 0 else None
+
+
+def source_artifact_bytes(commit: str, path: Path) -> bytes:
+    blob = git_blob(commit, path)
+    return path.read_bytes() if blob is None else blob
 
 
 def require_clean_tagged_source() -> str:
@@ -266,13 +277,14 @@ def artifact_kind(path: Path) -> str:
     return "other"
 
 
-def artifact(path: Path) -> dict[str, object]:
+def artifact(path: Path, source_commit: str) -> dict[str, object]:
+    content = source_artifact_bytes(source_commit, path)
     return {
         "name": path.name,
         "kind": artifact_kind(path),
         "path": rel(path),
-        "sha256": sha256(path),
-        "bytes": path.stat().st_size,
+        "sha256": sha256_bytes(content),
+        "bytes": len(content),
     }
 
 
@@ -339,7 +351,14 @@ def main() -> int:
             target = ROOT / item["location"]
             if not target.is_file():
                 raise RuntimeError(f"implemented evidence is missing: {item['id']} -> {item['location']}")
-            evidence.append({"id": item["id"], "status": "passed", "path": rel(target), "sha256": sha256(target)})
+            evidence.append(
+                {
+                    "id": item["id"],
+                    "status": "passed",
+                    "path": rel(target),
+                    "sha256": sha256_bytes(source_artifact_bytes(commit, target)),
+                }
+            )
             evidence_paths.add(target)
 
         extra = {
@@ -375,7 +394,7 @@ def main() -> int:
         if any(not path.is_file() for path in paths):
             missing = [rel(path) for path in paths if not path.is_file()]
             raise RuntimeError(f"release artifacts missing: {', '.join(missing)}")
-        artifacts = [artifact(path) for path in paths]
+        artifacts = [artifact(path, commit) for path in paths]
 
         risk_registry = yaml.safe_load((ROOT / "docs/governance/risk-register.yaml").read_text(encoding="utf-8"))
         risks = []
@@ -435,7 +454,7 @@ def main() -> int:
             hashes_path,
             "".join(f"{entry['sha256']}  {entry['path']}\n" for entry in artifacts),
         )
-        manifest["artifacts"].append(artifact(hashes_path))
+        manifest["artifacts"].append(artifact(hashes_path, commit))
         manifest_path = RC_DIR / "manifest.json"
         write_json(manifest_path, manifest)
 

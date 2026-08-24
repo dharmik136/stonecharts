@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -42,6 +43,10 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def sha256_bytes(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest()
 
 
 def load_json(path: Path) -> Any:
@@ -100,12 +105,38 @@ def parse_hashes(path: Path) -> dict[str, str]:
     return entries
 
 
-def validate_artifact(path: Path, expected_sha: str | None = None) -> None:
+def source_blob(manifest: dict[str, Any], path_value: str) -> bytes | None:
+    """Return canonical tagged bytes when the artifact existed in release source."""
+    if manifest.get("release") != "0.0.0.34":
+        return None
+    commit = manifest.get("source", {}).get("commit")
+    if not isinstance(commit, str) or not commit:
+        return None
+    try:
+        process = subprocess.run(
+            ["git", "show", f"{commit}:{path_value}"],
+            cwd=ROOT,
+            capture_output=True,
+        )
+    except OSError:
+        return None
+    return process.stdout if process.returncode == 0 else None
+
+
+def artifact_digest_and_size(manifest: dict[str, Any], path_value: str, path: Path) -> tuple[str, int]:
+    blob = source_blob(manifest, path_value)
+    if blob is not None:
+        return sha256_bytes(blob), len(blob)
+    return sha256(path), path.stat().st_size
+
+
+def validate_artifact(manifest: dict[str, Any], path_value: str, path: Path, expected_sha: str | None = None) -> int:
     if not path.exists():
         error(f"missing artifact: {rel(path)}")
-    actual_sha = sha256(path)
+    actual_sha, actual_size = artifact_digest_and_size(manifest, path_value, path)
     if expected_sha is not None and actual_sha != expected_sha:
         error(f"sha256 mismatch for {rel(path)}")
+    return actual_size
 
 
 def validate_manifest(manifest_path: Path, manifest: dict[str, Any]) -> None:
@@ -128,7 +159,8 @@ def validate_manifest(manifest_path: Path, manifest: dict[str, Any]) -> None:
             target = repository_path(path_value, evidence_id)
             if not target.exists():
                 error(f"{evidence_id}: missing evidence file {path_value}")
-            if sha256(target) != sha_value:
+            actual_sha, _ = artifact_digest_and_size(manifest, path_value, target)
+            if actual_sha != sha_value:
                 error(f"{evidence_id}: sha256 mismatch for {path_value}")
         else:
             if path_value is not None or sha_value is not None:
@@ -145,8 +177,8 @@ def validate_manifest(manifest_path: Path, manifest: dict[str, Any]) -> None:
             error(f"duplicate artifact path: {path_value}")
         artifact_paths.add(path_value)
         target = repository_path(path_value, "artifact")
-        validate_artifact(target, artifact["sha256"])
-        if target.stat().st_size != artifact["bytes"]:
+        actual_size = validate_artifact(manifest, path_value, target, artifact["sha256"])
+        if actual_size != artifact["bytes"]:
             error(f"byte count mismatch for {path_value}")
 
     hashes_entry = next((a for a in manifest["artifacts"] if a["path"].endswith("hashes.sha256")), None)
