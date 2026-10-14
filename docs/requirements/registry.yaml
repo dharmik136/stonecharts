@@ -455,7 +455,7 @@ requirements:
     rationale: DEC-061 authorizes heatmap as chart type #37 and the foundational opener of Family C (Matrix / Grid); heatmap pays the matrix substrate foundation tax once so that subsequent Family C siblings reuse the grid layout, color scale engine, and gradient legend with zero architectural duplication.
     kind: functional
     priority: must
-    status: approved
+    status: verified
     owner: maintainer
     target: 0.0.0.35
     source: SC-ARCH-008
