@@ -1,7 +1,7 @@
 ---
 id: SC-ARCH-ADR-0004
 title: Separate Runtime Semantics from Adaptive Placement
-status: proposed
+status: approved
 classification: normative
 owner: maintainer
 approver: product-owner
@@ -9,8 +9,8 @@ review_mode: self
 applies_to: 0.0.0.1 and later
 requirements: [REQ-RUNTIME-001, REQ-A11Y-001]
 evidence: [TEST-RUNTIME-BROWSER, REVIEW-ACCESSIBILITY-MANUAL]
-last_reviewed: "2026-07-18"
-review_due: "2026-09-18"
+last_reviewed: "2026-10-14"
+review_due: "2027-01-14"
 supersedes: null
 superseded_by: null
 ---

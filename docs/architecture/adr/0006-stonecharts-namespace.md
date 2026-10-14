@@ -1,7 +1,7 @@
 ---
 id: SC-ARCH-ADR-0006
 title: Adopt the StoneCharts Namespace Before Alpha
-status: proposed
+status: approved
 classification: normative
 owner: product-owner
 approver: maintainer
@@ -9,8 +9,8 @@ review_mode: self
 applies_to: 0.0.0.1 and later
 requirements: [REQ-DET-001, REQ-RUNTIME-001]
 evidence: [TEST-DOCS-CONTROL, TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS]
-last_reviewed: "2026-07-18"
-review_due: "2026-09-18"
+last_reviewed: "2026-10-14"
+review_due: "2027-01-14"
 supersedes: null
 superseded_by: null
 ---
