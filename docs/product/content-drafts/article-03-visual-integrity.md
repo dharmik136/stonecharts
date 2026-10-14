@@ -1,7 +1,7 @@
 ---
 id: SC-PROD-013
 title: "Content Draft: Visual Integrity Article"
-status: draft
+status: approved
 classification: informative
 owner: product-owner
 approver: maintainer
@@ -9,8 +9,8 @@ review_mode: self
 applies_to: 0.0.0.5
 requirements: []
 evidence: []
-last_reviewed: "2026-08-07"
-review_due: "2026-09-07"
+last_reviewed: "2026-10-14"
+review_due: "2027-01-14"
 supersedes: null
 superseded_by: null
 ---

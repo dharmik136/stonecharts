@@ -3362,7 +3362,7 @@ items:
 - id: WORK-GTM-014
   title: Execute DEC-012 name-clearance due diligence
   item_type: Work Package
-  status: In Progress
+  status: Done
   priority: P1
   workstream: WS-01 Governance
   stage: S5 Expansion
