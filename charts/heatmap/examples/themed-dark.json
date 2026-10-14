@@ -1,0 +1,38 @@
+{
+  "type": "heatmap",
+  "title": "Server Heatmap (Dark)",
+  "theme": "dark",
+  "xAxis": {
+    "title": "Cluster Node",
+    "categories": ["Node-1", "Node-2", "Node-3"]
+  },
+  "yAxis": {
+    "title": "Rack",
+    "categories": ["Rack-A", "Rack-B", "Rack-C"]
+  },
+  "colorAxis": {
+    "min": 10,
+    "max": 90,
+    "stops": [
+      [0.0, "#2c7bb6"],
+      [0.5, "#ffffbf"],
+      [1.0, "#d7191c"]
+    ]
+  },
+  "series": [
+    {
+      "name": "CPU Temp",
+      "data": [
+        {"x": 0, "y": 0, "value": 25},
+        {"x": 1, "y": 0, "value": 45},
+        {"x": 2, "y": 0, "value": 65},
+        {"x": 0, "y": 1, "value": 35},
+        {"x": 1, "y": 1, "value": 55},
+        {"x": 2, "y": 1, "value": 85},
+        {"x": 0, "y": 2, "value": 30},
+        {"x": 1, "y": 2, "value": 40},
+        {"x": 2, "y": 2, "value": 50}
+      ]
+    }
+  ]
+}

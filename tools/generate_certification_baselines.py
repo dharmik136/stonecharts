@@ -137,8 +137,8 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="Verify all committed baseline bundles")
     args = parser.parse_args()
     chart_ids = load_chart_ids()
-    if len(chart_ids) != 36:
-        print(f"expected 36 certified charts, found {len(chart_ids)}", file=sys.stderr)
+    if len(chart_ids) != 37:
+        print(f"expected 37 certified charts, found {len(chart_ids)}", file=sys.stderr)
         return 1
 
     if args.generate:

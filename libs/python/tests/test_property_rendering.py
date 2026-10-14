@@ -420,6 +420,31 @@ def _specs():
 
         yield spec
 
+    for case in range(8):
+        nx = rng.randint(2, 6)
+        ny = rng.randint(2, 5)
+        x_cats = [f"Col-{c}" for c in range(nx)]
+        y_cats = [f"Row-{r}" for r in range(ny)]
+        data = []
+        for x in range(nx):
+            for y in range(ny):
+                if rng.random() < 0.8:
+                    val = round(rng.uniform(0, 100), 2)
+                    if rng.choice([True, False]):
+                        data.append([x, y, val])
+                    else:
+                        data.append({"x": x, "y": y, "value": val})
+        spec = {
+            "type": "heatmap",
+            "title": f"heatmap property {case}",
+            "xAxis": {"categories": x_cats},
+            "yAxis": {"categories": y_cats},
+            "series": [{"name": f"Heatmap {case}", "data": data}],
+        }
+        if rng.random() < 0.5:
+            spec["colorAxis"] = {"min": 0, "max": 100, "reversed": rng.choice([True, False])}
+        yield spec
+
 
 def _has_marks(spec_dict: dict) -> bool:
     # development-triangle has no series

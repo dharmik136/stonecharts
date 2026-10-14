@@ -458,6 +458,44 @@ func vdatumXYZ(v interface{}, path string, errs *[]string) {
 	}
 }
 
+func vdatumHeatmap(v interface{}, path string, errs *[]string) {
+	switch e := v.(type) {
+	case []interface{}:
+		if len(e) != 3 {
+			*errs = append(*errs, path+": expected a 3-element [x,y,value] array, received "+itoa(len(e))+" elements")
+		} else {
+			vintnum(e[0], path+"[0]", errs)
+			vnonneg(e[0], path+"[0]", errs)
+			vintnum(e[1], path+"[1]", errs)
+			vnonneg(e[1], path+"[1]", errs)
+			vnum(e[2], path+"[2]", errs)
+		}
+	case map[string]interface{}:
+		for _, key := range []string{"x", "y", "value"} {
+			if val, ok := has(e, key); !ok {
+				*errs = append(*errs, path+"."+key+": required")
+			} else if key == "x" || key == "y" {
+				vintnum(val, path+"."+key, errs)
+				vnonneg(val, path+"."+key, errs)
+			} else {
+				vnum(val, path+"."+key, errs)
+			}
+		}
+		extra := []string{}
+		for k := range e {
+			if k != "x" && k != "y" && k != "value" {
+				extra = append(extra, k)
+			}
+		}
+		sort.Strings(extra)
+		for _, k := range extra {
+			*errs = append(*errs, path+"."+k+": unknown field")
+		}
+	default:
+		*errs = append(*errs, path+": expected [x,y,value] or {x,y,value}, received "+jtype(v))
+	}
+}
+
 func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	m, ok := v.(map[string]interface{})
 	if !ok {
@@ -496,6 +534,10 @@ func vseries(v interface{}, path string, errs *[]string, chartType string) {
 	} else if chartType == "bubble" {
 		for i, e := range arr {
 			vdatumXYZ(e, path+".data["+itoa(i)+"]", errs)
+		}
+	} else if chartType == "heatmap" {
+		for i, e := range arr {
+			vdatumHeatmap(e, path+".data["+itoa(i)+"]", errs)
 		}
 	} else {
 		for i, e := range arr {
@@ -742,6 +784,7 @@ var knownTypes = map[string]bool{
 	"technical-indicators":  true,
 	"xrange":                true,
 	"development-triangle":  true,
+	"heatmap":               true,
 }
 
 // validate returns validation errors ([] = valid). Same order/text as validate.py.
@@ -843,6 +886,9 @@ func validate(v interface{}) []string {
 			}
 		}
 	}
+	if raw, ok := has(d, "colorAxis"); ok {
+		vColorAxis(raw, "$.colorAxis", &errs)
+	}
 	for _, gk := range []string{"gaugeMin", "gaugeMax"} {
 		if x, ok := has(d, gk); ok {
 			vnum(x, "$."+gk, &errs)
@@ -893,6 +939,8 @@ func validate(v interface{}) []string {
 	}
 	if chartTypeStr == "development-triangle" {
 		vTriangle(d, &errs)
+	} else if chartTypeStr == "heatmap" {
+		vHeatmap(d, &errs)
 	}
 	if x, ok := has(d, "stacking"); ok {
 		if s, ok := x.(string); ok && s == "percent" {
@@ -1470,3 +1518,151 @@ func vTriangle(d map[string]interface{}, errs *[]string) {
 		}
 	}
 }
+
+func vColorAxis(v interface{}, path string, errs *[]string) {
+	ca, ok := v.(map[string]interface{})
+	if !ok {
+		*errs = append(*errs, path+": expected object, received "+jtype(v))
+		return
+	}
+	if minVal, ok := has(ca, "min"); ok {
+		vnum(minVal, path+".min", errs)
+	}
+	if maxVal, ok := has(ca, "max"); ok {
+		vnum(maxVal, path+".max", errs)
+	}
+	minVal, hasMin := has(ca, "min")
+	maxVal, hasMax := has(ca, "max")
+	if hasMin && hasMax {
+		minF, minOk := minVal.(float64)
+		maxF, maxOk := maxVal.(float64)
+		if minOk && maxOk && !math.IsNaN(minF) && !math.IsInf(minF, 0) && !math.IsNaN(maxF) && !math.IsInf(maxF, 0) {
+			if minF > maxF {
+				*errs = append(*errs, path+": min must be <= max")
+			}
+		}
+	}
+	if minColor, ok := has(ca, "minColor"); ok {
+		vcolor(minColor, path+".minColor", errs)
+	}
+	if maxColor, ok := has(ca, "maxColor"); ok {
+		vcolor(maxColor, path+".maxColor", errs)
+	}
+	if nullColor, ok := has(ca, "nullColor"); ok {
+		vcolor(nullColor, path+".nullColor", errs)
+	}
+	if rev, ok := has(ca, "reversed"); ok {
+		vbool(rev, path+".reversed", errs)
+	}
+	if vis, ok := has(ca, "visible"); ok {
+		vbool(vis, path+".visible", errs)
+	}
+	if stopsVal, ok := has(ca, "stops"); ok {
+		stops, ok := stopsVal.([]interface{})
+		if !ok || len(stops) == 0 {
+			*errs = append(*errs, path+".stops: expected non-empty array, received "+jtype(stopsVal))
+		} else {
+			for i, st := range stops {
+				sp := path + ".stops[" + itoa(i) + "]"
+				stArr, ok := st.([]interface{})
+				if !ok || len(stArr) != 2 {
+					*errs = append(*errs, sp+": expected 2-element [offset, color] array")
+				} else {
+					vnum(stArr[0], sp+"[0]", errs)
+					if f, ok := stArr[0].(float64); ok && !math.IsNaN(f) && !math.IsInf(f, 0) {
+						if f < 0.0 || f > 1.0 {
+							*errs = append(*errs, sp+"[0]: offset must be between 0.0 and 1.0, received "+fmtNum(f))
+						}
+					}
+					vcolor(stArr[1], sp+"[1]", errs)
+				}
+			}
+		}
+	}
+}
+
+func vHeatmap(d map[string]interface{}, errs *[]string) {
+	var nx, ny int
+	xAxis, xOk := has(d, "xAxis")
+	if !xOk {
+		*errs = append(*errs, "$.xAxis.categories: required for heatmap")
+	} else if xm, ok := xAxis.(map[string]interface{}); !ok {
+		*errs = append(*errs, "$.xAxis.categories: required for heatmap")
+	} else if xCats, ok := has(xm, "categories"); !ok {
+		*errs = append(*errs, "$.xAxis.categories: required for heatmap")
+	} else if arr, ok := xCats.([]interface{}); !ok || len(arr) == 0 {
+		*errs = append(*errs, "$.xAxis.categories: required for heatmap")
+	} else {
+		nx = len(arr)
+	}
+
+	yAxis, yOk := has(d, "yAxis")
+	if !yOk {
+		*errs = append(*errs, "$.yAxis.categories: required for heatmap")
+	} else if ym, ok := yAxis.(map[string]interface{}); !ok {
+		*errs = append(*errs, "$.yAxis.categories: required for heatmap")
+	} else if yCats, ok := has(ym, "categories"); !ok {
+		*errs = append(*errs, "$.yAxis.categories: required for heatmap")
+	} else if arr, ok := yCats.([]interface{}); !ok || len(arr) == 0 {
+		*errs = append(*errs, "$.yAxis.categories: required for heatmap")
+	} else {
+		ny = len(arr)
+	}
+
+	if nx > 0 && ny > 0 {
+		totalCells := nx * ny
+		if totalCells > 10000 {
+			*errs = append(*errs, "maximum cell limit exceeded: "+itoa(totalCells)+" cells (limit 10000)")
+		}
+
+		if sRaw, ok := has(d, "series"); ok {
+			if series, ok := sRaw.([]interface{}); ok {
+				for sIdx, s := range series {
+					if sm, ok := s.(map[string]interface{}); ok {
+						if dRaw, ok := has(sm, "data"); ok {
+							if dArr, ok := dRaw.([]interface{}); ok {
+								for pIdx, pt := range dArr {
+									hasPX, hasPY := false, false
+									var px, py int
+									switch pVal := pt.(type) {
+									case []interface{}:
+										if len(pVal) >= 2 {
+											if f0, ok := pVal[0].(float64); ok && !math.IsNaN(f0) && !math.IsInf(f0, 0) && f0 == math.Trunc(f0) {
+												px = int(f0)
+												hasPX = true
+											}
+											if f1, ok := pVal[1].(float64); ok && !math.IsNaN(f1) && !math.IsInf(f1, 0) && f1 == math.Trunc(f1) {
+												py = int(f1)
+												hasPY = true
+											}
+										}
+									case map[string]interface{}:
+										if vx, ok := has(pVal, "x"); ok {
+											if f0, ok := vx.(float64); ok && !math.IsNaN(f0) && !math.IsInf(f0, 0) && f0 == math.Trunc(f0) {
+												px = int(f0)
+												hasPX = true
+											}
+										}
+										if vy, ok := has(pVal, "y"); ok {
+											if f1, ok := vy.(float64); ok && !math.IsNaN(f1) && !math.IsInf(f1, 0) && f1 == math.Trunc(f1) {
+												py = int(f1)
+												hasPY = true
+											}
+										}
+									}
+									if hasPX && (px < 0 || px >= nx) {
+										*errs = append(*errs, "$.series["+itoa(sIdx)+"].data["+itoa(pIdx)+"].x: coordinate "+itoa(px)+" out of bounds [0, "+itoa(nx-1)+"]")
+									}
+									if hasPY && (py < 0 || py >= ny) {
+										*errs = append(*errs, "$.series["+itoa(sIdx)+"].data["+itoa(pIdx)+"].y: coordinate "+itoa(py)+" out of bounds [0, "+itoa(ny-1)+"]")
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+

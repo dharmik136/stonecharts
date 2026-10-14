@@ -49,6 +49,7 @@ SEMANTIC_IDS = {
     "nightingale": ["SC-SEM-GENERIC", "SC-SEM-032"],
     "radial-bar": ["SC-SEM-GENERIC", "SC-SEM-033"],
     "parliament": ["SC-SEM-GENERIC", "SC-SEM-034"],
+    "heatmap": ["SC-SEM-GENERIC", "SC-SEM-035"],
     "development-triangle": [
         "SC-SEM-GENERIC",
         "DT-SEM-001",
@@ -207,7 +208,7 @@ def main() -> int:
         if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != generated:
             print("certification ledger is stale; run with --generate", file=sys.stderr)
             return 1
-        print("certification ledger PASS: 36 charts x 8 SC-CERT gates")
+        print("certification ledger PASS: 37 charts x 8 SC-CERT gates")
     return 0
 
 

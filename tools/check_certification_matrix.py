@@ -76,8 +76,8 @@ def structural_checks() -> list[str]:
     actual = [entry.get("id") for entry in entries]
     if ledger.get("release") != RELEASE:
         failures.append(f"ledger release must be {RELEASE}")
-    if ledger.get("chartCount") != 36 or len(expected) != 36 or actual != expected:
-        failures.append("ledger and capability registry must contain the same ordered 36-chart inventory")
+    if ledger.get("chartCount") != 37 or len(expected) != 37 or actual != expected:
+        failures.append("ledger and capability registry must contain the same ordered 37-chart inventory")
 
     property_namespace = runpy.run_path(str(ROOT / "libs/python/tests/test_property_rendering.py"))
     property_counts: dict[str, int] = {}
@@ -148,7 +148,7 @@ def structural_checks() -> list[str]:
                 failures.append(f"{chart_id}: {semantic_id} missing from a language suite")
 
         browser_fixture = chart_root / "examples" / f"{entry.get('browserFixture')}.json"
-        if not browser_fixture.exists() or "fixtures.length, 36" not in browser_test:
+        if not browser_fixture.exists() or "fixtures.length, 37" not in browser_test:
             failures.append(f"{chart_id}: browser fixture or portfolio assertion missing")
 
         baseline_passed, detail = baseline_ok(chart_id)
@@ -208,7 +208,7 @@ def main() -> int:
                 print(f"certification matrix FAILED: {' '.join(command)}", file=sys.stderr)
                 return 1
 
-    print("certification matrix PASS: 36 charts x 8 executable SC-CERT gates")
+    print("certification matrix PASS: 37 charts x 8 executable SC-CERT gates")
     return 0
 
 

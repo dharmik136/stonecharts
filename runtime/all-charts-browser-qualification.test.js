@@ -84,10 +84,10 @@ function serveDirectory(rootDir) {
   });
 }
 
-test("all 36 certified charts satisfy the browser and accessibility contract", { timeout: 120000 }, async (t) => {
+test("all 37 certified charts satisfy the browser and accessibility contract", { timeout: 120000 }, async (t) => {
   const tmpDir = makeTempDir();
   const fixtures = renderAllFixtureHtml(tmpDir);
-  assert.equal(fixtures.length, 36, "capability registry must produce exactly 36 browser fixtures");
+  assert.equal(fixtures.length, 37, "capability registry must produce exactly 37 browser fixtures");
 
   const { server, baseUrl } = await serveDirectory(tmpDir);
   const browser = await chromium.launch({ headless: true });

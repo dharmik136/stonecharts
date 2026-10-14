@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VERIFY = ROOT / "tools" / "stonecharts_verify.py"
-EXPECTED_CERTIFIED_CHARTS = 36
+EXPECTED_CERTIFIED_CHARTS = 37
 
 
 class EvidenceRegressionError(RuntimeError):

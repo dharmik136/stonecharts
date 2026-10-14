@@ -175,6 +175,52 @@ type ColorScaleConfig struct {
 	Domain string `json:"domain,omitempty"`
 }
 
+// HeatmapDatum is one matrix cell observation (x, y, value).
+type HeatmapDatum struct {
+	X     int     `json:"x"`
+	Y     int     `json:"y"`
+	Value float64 `json:"value"`
+}
+
+// ColorAxisStop defines one gradient stop for the matrix color scale.
+type ColorAxisStop struct {
+	Offset float64 `json:"offset"`
+	Color  string  `json:"color"`
+}
+
+// ColorAxis controls the continuous numerical color scale and gradient legend.
+type ColorAxis struct {
+	Min       *float64        `json:"min,omitempty"`
+	Max       *float64        `json:"max,omitempty"`
+	MinColor  string          `json:"minColor,omitempty"`
+	MaxColor  string          `json:"maxColor,omitempty"`
+	Stops     []ColorAxisStop `json:"-"`
+	NullColor string          `json:"nullColor,omitempty"`
+	Reversed  bool            `json:"reversed,omitempty"`
+	Visible   *bool           `json:"visible,omitempty"`
+}
+
+func (ca *ColorAxis) UnmarshalJSON(b []byte) error {
+	type alias ColorAxis
+	aux := struct {
+		Stops [][]interface{} `json:"stops"`
+		*alias
+	}{alias: (*alias)(ca)}
+	if err := json.Unmarshal(b, &aux); err != nil {
+		return err
+	}
+	for _, rawStop := range aux.Stops {
+		if len(rawStop) >= 2 {
+			offset, ok1 := rawStop[0].(float64)
+			color, ok2 := rawStop[1].(string)
+			if ok1 && ok2 {
+				ca.Stops = append(ca.Stops, ColorAxisStop{Offset: offset, Color: color})
+			}
+		}
+	}
+	return nil
+}
+
 // TriangleAnnotation is a cell-level note on a development triangle.
 type TriangleAnnotation struct {
 	Origin string `json:"origin"`
@@ -254,8 +300,9 @@ type Series struct {
 	Length      []float64       `json:"length,omitempty"`
 	Spans       []SpanDatum     `json:"spans,omitempty"`
 	Frames      []FrameDatum    `json:"frames,omitempty"`
-	Volume     []float64   `json:"volume,omitempty"`
-	Indicators []Indicator `json:"indicators,omitempty"`
+	Volume      []float64      `json:"volume,omitempty"`
+	Indicators  []Indicator    `json:"indicators,omitempty"`
+	HeatmapData []HeatmapDatum `json:"-"`
 }
 
 type FrameDatum struct {
@@ -294,20 +341,27 @@ func (s *Series) UnmarshalJSON(b []byte) error {
 	}
 	nums := make([]float64, 0, len(aux.Data))
 	points := make([]Datum, 0, len(aux.Data))
+	heatpoints := make([]HeatmapDatum, 0, len(aux.Data))
 	allNumeric := true
 	for i, raw := range aux.Data {
 		trimmed := bytes.TrimSpace(raw)
 		switch {
 		case len(trimmed) > 0 && trimmed[0] == '{':
 			var obj struct {
-				X float64  `json:"x"`
-				Y float64  `json:"y"`
-				Z *float64 `json:"z"`
+				X     float64  `json:"x"`
+				Y     float64  `json:"y"`
+				Z     *float64 `json:"z"`
+				Value *float64 `json:"value"`
 			}
 			if err := json.Unmarshal(raw, &obj); err != nil {
 				return err
 			}
 			points = append(points, Datum{X: obj.X, Y: obj.Y, Z: obj.Z})
+			val := obj.Y
+			if obj.Value != nil {
+				val = *obj.Value
+			}
+			heatpoints = append(heatpoints, HeatmapDatum{X: int(obj.X), Y: int(obj.Y), Value: val})
 			allNumeric = false
 		case len(trimmed) > 0 && trimmed[0] == '[':
 			var tuple []float64
@@ -315,11 +369,14 @@ func (s *Series) UnmarshalJSON(b []byte) error {
 				return err
 			}
 			d := Datum{X: tuple[0], Y: tuple[1]}
+			val := 0.0
 			if len(tuple) > 2 {
 				z := tuple[2]
 				d.Z = &z
+				val = tuple[2]
 			}
 			points = append(points, d)
+			heatpoints = append(heatpoints, HeatmapDatum{X: int(tuple[0]), Y: int(tuple[1]), Value: val})
 			allNumeric = false
 		default:
 			var v float64
@@ -336,6 +393,7 @@ func (s *Series) UnmarshalJSON(b []byte) error {
 		s.Data = nil
 	}
 	s.DataPoints = points
+	s.HeatmapData = heatpoints
 	return nil
 }
 
@@ -606,6 +664,7 @@ type ChartSpec struct {
 	Factors                *FactorsConfig       `json:"factors,omitempty"`
 	ColorScaleCfg          *ColorScaleConfig    `json:"colorScale,omitempty"`
 	Annotations            []TriangleAnnotation `json:"annotations,omitempty"`
+	ColorAxis              *ColorAxis           `json:"colorAxis,omitempty"`
 }
 
 // applyDefaults mirrors the Python ChartSpec defaults so the two libraries
@@ -669,6 +728,9 @@ func (c *ChartSpec) applyDefaults() {
 				}
 			}
 		}
+	}
+	if c.ColorAxis != nil && c.ColorAxis.NullColor == "" {
+		c.ColorAxis.NullColor = "#f0f0f0"
 	}
 }
 

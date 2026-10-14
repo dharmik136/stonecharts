@@ -448,3 +448,23 @@ requirements:
     contracts: []
     verification: [TEST-STONEVERIFY-SEMANTIC-DIFF]
     implementation: [tools/stonecharts_verify.py, spec/svg-contract.md]
+
+  - id: REQ-HEATMAP-001
+    title: Admit heatmap as a certified 0.0.0.35 chart type
+    statement: Heatmap MUST be admitted through the full chart admission checklist (SC-ARCH-011) and reach Certified status per the renderer constitution before 0.0.0.35 documentation may describe it as supported. Because heatmap lands the shared matrix substrate (2-D categorical grid layout, continuous color scale interpolation, and color-axis gradient legend), every existing golden fixture MUST remain byte-identical after the change, proven by diff, not asserted.
+    rationale: DEC-061 authorizes heatmap as chart type #37 and the foundational opener of Family C (Matrix / Grid); heatmap pays the matrix substrate foundation tax once so that subsequent Family C siblings reuse the grid layout, color scale engine, and gradient legend with zero architectural duplication.
+    kind: functional
+    priority: must
+    status: approved
+    owner: maintainer
+    target: 0.0.0.35
+    source: SC-ARCH-008
+    acceptance:
+      - Schema, Python, and Go accept and reject heatmap specs identically.
+      - Heatmap output byte-matches its golden corpus in both languages, and the direct cross-render sweep includes heatmap with zero diff.
+      - Accessible data table renders the 2-D categorical grid accurately in lockstep in both languages.
+      - Chart admission checklist phases 0 through 9 are closed.
+    decisions: []
+    contracts: []
+    verification: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, TEST-DIRECT-CROSS-RENDER, TEST-XSS-ESCAPING, TEST-RUNTIME-BROWSER, BENCH-RENDER-BASELINE]
+    implementation: [charts/heatmap/design.md]

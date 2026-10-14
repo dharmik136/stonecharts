@@ -46,9 +46,10 @@
         "nightingale",
         "parliament",
         "radial-bar",
-        "development-triangle"
+        "development-triangle",
+        "heatmap"
       ],
-        "description": "Chart type id for the active release scope; all 36 chart types are requalified in 0.0.0.34 and map to the released chart design and renderer pair."
+        "description": "Chart type id for the active release scope; all 37 chart types map to the released chart design and renderer pair."
     },
     "id": {
       "type": "string",
@@ -323,6 +324,32 @@
           "text": { "type": "string" }
         }
       }
+    },
+    "colorAxis": {
+      "type": "object",
+      "description": "Continuous color scale and gradient legend for matrix/heatmap charts (Family C, DEC-061).",
+      "properties": {
+        "min": { "type": "number", "description": "Minimum value of the color domain. Inferred from series data if omitted." },
+        "max": { "type": "number", "description": "Maximum value of the color domain. Inferred from series data if omitted." },
+        "minColor": { "type": "string", "description": "Color for the minimum value (#rgb or #rrggbb)." },
+        "maxColor": { "type": "string", "description": "Color for the maximum value (#rgb or #rrggbb)." },
+        "stops": {
+          "type": "array",
+          "description": "Piecewise color gradient stops: [[0.0, color0], [offset, color], ..., [1.0, colorN]].",
+          "items": {
+            "type": "array",
+            "items": [
+              { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              { "type": "string" }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "nullColor": { "type": "string", "default": "#f0f0f0", "description": "Color for cells with null or missing values." },
+        "reversed": { "type": "boolean", "default": false, "description": "When true, inverts the color ramp." },
+        "visible": { "type": "boolean", "default": true, "description": "When false, suppresses the color-axis gradient legend." }
+      }
     }
   },
   "allOf": [
@@ -369,7 +396,7 @@
         "not": {
           "required": ["type"],
           "properties": {
-            "type": { "enum": ["scatter", "bubble"] }
+            "type": { "enum": ["scatter", "bubble", "heatmap"] }
           }
         }
       },
@@ -449,6 +476,64 @@
                           "x": { "type": "number" },
                           "y": { "type": "number" },
                           "z": { "type": "number" }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["type"],
+        "properties": {
+          "type": { "const": "heatmap" }
+        }
+      },
+      "then": {
+        "required": ["xAxis", "yAxis"],
+        "properties": {
+          "xAxis": {
+            "type": "object",
+            "required": ["categories"],
+            "properties": {
+              "categories": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "yAxis": {
+            "type": "object",
+            "required": ["categories"],
+            "properties": {
+              "categories": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "series": {
+            "items": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "oneOf": [
+                      { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+                      {
+                        "type": "object",
+                        "required": ["x", "y", "value"],
+                        "additionalProperties": false,
+                        "properties": {
+                          "x": { "type": "number" },
+                          "y": { "type": "number" },
+                          "value": { "type": "number" }
                         }
                       }
                     ]
@@ -768,10 +853,20 @@
                   "y": { "type": "number" },
                   "z": { "type": "number" }
                 }
+              },
+              {
+                "type": "object",
+                "required": ["x", "y", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "x": { "type": "number" },
+                  "y": { "type": "number" },
+                  "value": { "type": "number" }
+                }
               }
             ]
           },
-          "description": "y-values; x comes from xAxis.categories (or 0..n-1). scatter (0.0.0.3, DEC-015) additionally accepts the point model: a positional [x,y] pair or an {x,y} object. bubble (0.0.0.4, DEC-016) additionally accepts [x,y,z] / {x,y,z}. Every other chart type is restricted back to a plain number, and scatter/bubble are each restricted to their own shape, by the type-conditional rules below."
+          "description": "y-values; x comes from xAxis.categories (or 0..n-1). scatter accepts [x,y] / {x,y}. bubble accepts [x,y,z] / {x,y,z}. heatmap accepts [x,y,value] / {x,y,value}. Every other chart type is restricted back to a plain number, and scatter/bubble/heatmap are each restricted to their own shape, by the type-conditional rules below."
         },
         "color": {
           "description": "Series color: a hex string, or a linear-gradient object (fades between stops). Gradient applies to the stroke and area fill; markers/legend use the first stop's color.",

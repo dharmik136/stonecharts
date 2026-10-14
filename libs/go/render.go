@@ -57,6 +57,9 @@ func dataTable(spec *ChartSpec) string {
 	if spec.Type == "development-triangle" && spec.Triangle != nil {
 		return devTriangleDataTable(spec)
 	}
+	if spec.Type == "heatmap" {
+		return heatmapDataTable(spec)
+	}
 	if spec.Type == "technical-indicators" {
 		return tiDataTable(spec)
 	}
@@ -382,6 +385,8 @@ func RenderSVG(spec *ChartSpec) (string, error) {
 		svg = renderFunnelSVG(spec)
 	case "gauge":
 		svg = renderGaugeSVG(spec)
+	case "heatmap":
+		svg = renderHeatmapSVG(spec)
 	case "solid-gauge":
 		svg = renderSolidGaugeSVG(spec)
 	case "candlestick":

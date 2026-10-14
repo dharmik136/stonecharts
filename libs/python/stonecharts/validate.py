@@ -318,6 +318,32 @@ def _datum_xyz(v: Any, path: str, errs: list[str]) -> None:
         errs.append(f"{path}: expected number, [x,y,z], or {{x,y,z}}, received {_jtype(v)}")
 
 
+def _datum_heatmap(v: Any, path: str, errs: list[str]) -> None:
+    if isinstance(v, list):
+        if len(v) != 3:
+            errs.append(f"{path}: expected a 3-element [x,y,value] array, received {len(v)} elements")
+        else:
+            _intnum(v[0], f"{path}[0]", errs)
+            _nonneg_num(v[0], f"{path}[0]", errs)
+            _intnum(v[1], f"{path}[1]", errs)
+            _nonneg_num(v[1], f"{path}[1]", errs)
+            _num(v[2], f"{path}[2]", errs)
+    elif isinstance(v, dict):
+        for key in ("x", "y", "value"):
+            if key not in v:
+                errs.append(f"{path}.{key}: required")
+            elif key in ("x", "y"):
+                _intnum(v[key], f"{path}.{key}", errs)
+                _nonneg_num(v[key], f"{path}.{key}", errs)
+            else:
+                _num(v[key], f"{path}.{key}", errs)
+        extra = sorted(set(v.keys()) - {"x", "y", "value"})
+        for k in extra:
+            errs.append(f"{path}.{k}: unknown field")
+    else:
+        errs.append(f"{path}: expected [x,y,value] or {{x,y,value}}, received {_jtype(v)}")
+
+
 def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
     if not isinstance(v, dict):
         errs.append(f"{path}: expected object, received {_jtype(v)}")
@@ -346,6 +372,9 @@ def _series(v: Any, path: str, errs: list[str], chart_type: Any = None) -> None:
     elif chart_type == "bubble":
         for i, e in enumerate(v["data"]):
             _datum_xyz(e, f"{path}.data[{i}]", errs)
+    elif chart_type == "heatmap":
+        for i, e in enumerate(v["data"]):
+            _datum_heatmap(e, f"{path}.data[{i}]", errs)
     else:
         for i, e in enumerate(v["data"]):
             _num(e, f"{path}.data[{i}]", errs)
@@ -660,6 +689,125 @@ def _validate_triangle(d: dict, errs: list[str]) -> None:
                             errs.append(f'{ap}: period {pval} has no value for origin "{ann_origin}"')
 
 
+def _validate_color_axis(ca: Any, path: str, errs: list[str]) -> None:
+    if not isinstance(ca, dict):
+        errs.append(f"{path}: expected object, received {_jtype(ca)}")
+        return
+    if "min" in ca:
+        _num(ca["min"], f"{path}.min", errs)
+    if "max" in ca:
+        _num(ca["max"], f"{path}.max", errs)
+    if (
+        "min" in ca
+        and "max" in ca
+        and isinstance(ca["min"], (int, float))
+        and isinstance(ca["max"], (int, float))
+        and not isinstance(ca["min"], bool)
+        and not isinstance(ca["max"], bool)
+        and math.isfinite(ca["min"])
+        and math.isfinite(ca["max"])
+        and ca["min"] > ca["max"]
+    ):
+        errs.append(f"{path}: min must be <= max")
+    if "minColor" in ca:
+        _color(ca["minColor"], f"{path}.minColor", errs)
+    if "maxColor" in ca:
+        _color(ca["maxColor"], f"{path}.maxColor", errs)
+    if "nullColor" in ca:
+        _color(ca["nullColor"], f"{path}.nullColor", errs)
+    if "reversed" in ca:
+        _bool(ca["reversed"], f"{path}.reversed", errs)
+    if "visible" in ca:
+        _bool(ca["visible"], f"{path}.visible", errs)
+    if "stops" in ca:
+        stops = ca["stops"]
+        if not isinstance(stops, list) or len(stops) == 0:
+            errs.append(f"{path}.stops: expected non-empty array, received {_jtype(stops)}")
+        else:
+            for i, st in enumerate(stops):
+                sp = f"{path}.stops[{i}]"
+                if not isinstance(st, list) or len(st) != 2:
+                    errs.append(f"{sp}: expected 2-element [offset, color] array")
+                else:
+                    _num(st[0], f"{sp}[0]", errs)
+                    if (
+                        isinstance(st[0], (int, float))
+                        and not isinstance(st[0], bool)
+                        and math.isfinite(st[0])
+                        and (st[0] < 0.0 or st[0] > 1.0)
+                    ):
+                        errs.append(f"{sp}[0]: offset must be between 0.0 and 1.0, received {fmt_num(float(st[0]))}")
+                    _color(st[1], f"{sp}[1]", errs)
+
+
+def _validate_heatmap(d: dict, errs: list[str]) -> None:
+    x_axis = d.get("xAxis")
+    x_cats = x_axis.get("categories") if isinstance(x_axis, dict) else None
+    nx = 0
+    if not isinstance(x_cats, list) or len(x_cats) == 0:
+        errs.append("$.xAxis.categories: required for heatmap")
+    else:
+        nx = len(x_cats)
+
+    y_axis = d.get("yAxis")
+    y_cats = y_axis.get("categories") if isinstance(y_axis, dict) else None
+    ny = 0
+    if not isinstance(y_cats, list) or len(y_cats) == 0:
+        errs.append("$.yAxis.categories: required for heatmap")
+    else:
+        ny = len(y_cats)
+
+    if nx > 0 and ny > 0:
+        total_cells = nx * ny
+        if total_cells > 10000:
+            errs.append(f"maximum cell limit exceeded: {total_cells} cells (limit 10000)")
+
+        if "series" in d and isinstance(d["series"], list):
+            for s_idx, s in enumerate(d["series"]):
+                if isinstance(s, dict) and isinstance(s.get("data"), list):
+                    for p_idx, pt in enumerate(s["data"]):
+                        px, py = None, None
+                        if isinstance(pt, list) and len(pt) >= 2:
+                            if (
+                                isinstance(pt[0], (int, float))
+                                and not isinstance(pt[0], bool)
+                                and math.isfinite(pt[0])
+                                and float(pt[0]).is_integer()
+                            ):
+                                px = int(pt[0])
+                            if (
+                                isinstance(pt[1], (int, float))
+                                and not isinstance(pt[1], bool)
+                                and math.isfinite(pt[1])
+                                and float(pt[1]).is_integer()
+                            ):
+                                py = int(pt[1])
+                        elif isinstance(pt, dict):
+                            vx, vy = pt.get("x"), pt.get("y")
+                            if (
+                                isinstance(vx, (int, float))
+                                and not isinstance(vx, bool)
+                                and math.isfinite(vx)
+                                and float(vx).is_integer()
+                            ):
+                                px = int(vx)
+                            if (
+                                isinstance(vy, (int, float))
+                                and not isinstance(vy, bool)
+                                and math.isfinite(vy)
+                                and float(vy).is_integer()
+                            ):
+                                py = int(vy)
+                        if px is not None and (px < 0 or px >= nx):
+                            errs.append(
+                                f"$.series[{s_idx}].data[{p_idx}].x: coordinate {px} out of bounds [0, {nx - 1}]"
+                            )
+                        if py is not None and (py < 0 or py >= ny):
+                            errs.append(
+                                f"$.series[{s_idx}].data[{p_idx}].y: coordinate {py} out of bounds [0, {ny - 1}]"
+                            )
+
+
 _KNOWN_TYPES = {
     "area",
     "arearange",
@@ -697,6 +845,7 @@ _KNOWN_TYPES = {
     "streamgraph",
     "xrange",
     "development-triangle",
+    "heatmap",
 }
 
 
@@ -750,6 +899,8 @@ def validate(d: Any) -> list[str]:
             _series(s, f"$.series[{i}]", errs, d.get("type"))
     if _chart_type == "development-triangle":
         _validate_triangle(d, errs)
+    elif _chart_type == "heatmap":
+        _validate_heatmap(d, errs)
     if "flags" in d:
         fl = d["flags"]
         if not isinstance(fl, list):
@@ -775,6 +926,8 @@ def validate(d: Any) -> list[str]:
             for j, p in enumerate(pn):
                 if not isinstance(p, dict):
                     errs.append(f"$.panes[{j}]: expected object, received {_jtype(p)}")
+    if "colorAxis" in d:
+        _validate_color_axis(d["colorAxis"], "$.colorAxis", errs)
     for gk in ("gaugeMin", "gaugeMax"):
         if gk in d:
             _num(d[gk], f"$.{gk}", errs)

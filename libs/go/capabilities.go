@@ -55,6 +55,7 @@ var activeCapabilities = CapabilityManifest{
 		"flame-chart":          {Tier: "certified", Since: "0.0.0.23"},
 		"funnel":               {Tier: "certified", Since: "0.0.0.15"},
 		"gauge":                {Tier: "certified", Since: "0.0.0.25"},
+		"heatmap":              {Tier: "certified", Since: "0.0.0.35"},
 		"histogram":            {Tier: "certified", Since: "0.0.0.6"},
 		"line":                 {Tier: "certified", Since: "0.0.0.1"},
 		"lollipop":             {Tier: "certified", Since: "0.0.0.13"},

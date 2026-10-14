@@ -1,0 +1,39 @@
+{
+  "type": "heatmap",
+  "title": "\"><script>alert('xss')</script>",
+  "subtitle": "Special chars & < > \" ' test",
+  "xAxis": {
+    "title": "X & <Title>",
+    "categories": ["A&1", "B<2>", "C\"3\""]
+  },
+  "yAxis": {
+    "title": "Y & 'Title'",
+    "categories": ["R&A", "R<B>", "R\"C\""]
+  },
+  "colorAxis": {
+    "min": -50.5,
+    "max": 150.25,
+    "reversed": true,
+    "stops": [
+      [0.0, "#000000"],
+      [0.5, "#777777"],
+      [1.0, "#ffffff"]
+    ]
+  },
+  "series": [
+    {
+      "name": "Adversarial & Series",
+      "data": [
+        [0, 0, -50.5],
+        [1, 0, 0.0],
+        [2, 0, 25.125],
+        {"x": 0, "y": 1, "value": 50.0},
+        {"x": 1, "y": 1, "value": 75.5},
+        {"x": 2, "y": 1, "value": 100.0},
+        [0, 2, 125.75],
+        [1, 2, 150.25],
+        [2, 2, -10.0]
+      ]
+    }
+  ]
+}

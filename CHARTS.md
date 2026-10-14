@@ -51,7 +51,7 @@ schema), and the one render call — nothing more is needed.
 | Proportional **seat allocation** as a semicircular hemicycle of dots | `parliament` |
 | A single **KPI against a scale** with colored range bands | `gauge` / `solid-gauge` |
 | **Before/after** or min–max gap across categories | `dumbbell` |
-| Value across a **2-D grid** (matrix) | `heatmap` _(planned)_ |
+| Value across a **2-D grid** (matrix) | `heatmap` |
 
 ## Catalog
 
@@ -99,7 +99,13 @@ schema), and the one render call — nothing more is needed.
 | `radial-bar` | categories[N] + one-or-more series of N values | categorical progress/completion as concentric rings (KPI dashboards, SLO meters) | bullet (single KPI bar), gauge (single dial), pie (part-to-whole) | **certified** (0.0.0.31) | [design.md](charts/radial-bar/design.md) |
 | `parliament` | categories[N] + single series of N integer seat counts | proportional allocation as a semicircular hemicycle of unit dots (board seats, voting, committee composition) | pie (part-to-whole arcs), bar (category comparison), radial-bar (progress rings) | **certified** (0.0.0.33) | [design.md](charts/parliament/design.md) |
 
-_All 36 listed types are implemented and certified in 0.0.0.33, including the complete Cartesian and Polar/radial families plus development-triangle. Other families (heatmap/matrix, treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
+### Family C — Heatmap / Matrix
+
+| Type | Data shape | When to use | Don't use when (use _this_ instead) | Status | Design |
+|------|-----------|-------------|--------------------------------------|--------|--------|
+| `heatmap` | categories on x and y + series with heatmapData [x, y, value] | 2D matrix of values mapped to continuous or threshold color scale | 1D categories (bar/column), continuous correlation (scatter), hierarchy (treemap) | **certified** (0.0.0.35) | [design.md](charts/heatmap/design.md) |
+
+_All 37 listed types are implemented and certified, including Cartesian, Polar/radial, Family C heatmap, plus development-triangle. Other families (treemap/hierarchy, sankey/flow, geo, KPI) open later per the roadmap in [docs/roadmap/chart-families.md](docs/roadmap/chart-families.md)._
 
 ## Add a chart (for contributors / agents extending this)
 

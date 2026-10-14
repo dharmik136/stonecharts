@@ -22,7 +22,7 @@ marketing, and pilot documents should link here instead of restating release sco
 
 ## Current technical capabilities
 
-36 chart types, all requalified in `0.0.0.34` through the executable eight-gate
+37 chart types, all requalified in `0.0.0.34` through the executable eight-gate
 SC-CERT model.
 
 <!-- BEGIN:GENERATED:capabilities -->
@@ -70,6 +70,7 @@ SC-CERT model.
 | Radial Bar | Certified | 0.0.0.31 | Concentric progress rings for categorical progress views. |
 | Parliament | Certified | 0.0.0.32 | Semicircular hemicycle of unit dots for proportional allocation. |
 | Development Triangle | Certified | 0.0.0.33 | Actuarial loss development triangle for reserve adequacy and IBNR estimation. |
+| Heatmap | Certified | 0.0.0.35 | Discrete 2D matrix colored by value with continuous/threshold color legend. |
 <!-- END:GENERATED:capabilities -->
 
 ## Commercial pilot scope
@@ -78,7 +79,7 @@ The next pilot scope is intentionally narrower than the full design roadmap:
 
 - insurance reporting and actuarial workflows;
 - Python and Go only;
-- all 36 certified chart types unless a specific pilot workflow constrains the subset;
+- all 37 certified chart types unless a specific pilot workflow constrains the subset;
 - local evidence bundles stored by the customer, not hosted StoneVault storage;
 - StoneVerify-style conformance checks before new chart-family breadth.
 

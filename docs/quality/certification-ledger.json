@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "release": "0.0.0.34",
-  "chartCount": 36,
+  "chartCount": 37,
   "seedCharts": [
     "line",
     "column",
@@ -2835,6 +2835,82 @@
           "status": "qualified",
           "evidence": [
             "evidence-baselines/development-triangle/manifest.json"
+          ]
+        }
+      }
+    },
+    {
+      "id": "heatmap",
+      "directory": "heatmap",
+      "tier": "certified",
+      "since": "0.0.0.35",
+      "examples": [
+        "adversarial",
+        "basic",
+        "themed-dark"
+      ],
+      "invalidFixtureCount": 12,
+      "propertyCaseCount": 8,
+      "semanticInvariants": [
+        "SC-SEM-GENERIC",
+        "SC-SEM-035"
+      ],
+      "browserFixture": "basic",
+      "gates": {
+        "SC-CERT-01": {
+          "status": "qualified",
+          "evidence": [
+            "spec/chart-spec.schema.json",
+            "charts/heatmap/invalid-fixtures.json"
+          ]
+        },
+        "SC-CERT-02": {
+          "status": "qualified",
+          "evidence": [
+            "charts/heatmap/golden",
+            "tools/check_direct_cross_render.py"
+          ]
+        },
+        "SC-CERT-03": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_renderer_purity.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-04": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_property_rendering.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-05": {
+          "status": "qualified",
+          "evidence": [
+            "charts/heatmap/invalid-fixtures.json",
+            "libs/python/tests/test_certification_portfolio.py"
+          ]
+        },
+        "SC-CERT-06": {
+          "status": "qualified",
+          "evidence": [
+            "libs/python/tests/test_semantic_invariants.py",
+            "libs/python/tests/test_certification_portfolio.py",
+            "libs/go/render_test.go"
+          ]
+        },
+        "SC-CERT-07": {
+          "status": "qualified",
+          "evidence": [
+            "runtime/all-charts-browser-qualification.test.js",
+            "charts/heatmap/examples/basic.json"
+          ]
+        },
+        "SC-CERT-08": {
+          "status": "qualified",
+          "evidence": [
+            "evidence-baselines/heatmap/manifest.json"
           ]
         }
       }

@@ -42,6 +42,15 @@ def _normalize_datum(v: object, index: int) -> Datum:
     return Datum(x=float(index), y=float(v))  # type: ignore[arg-type]
 
 
+def _normalize_heatmap_datum(v: object) -> HeatmapDatum:
+    """Normalize a matrix cell observation into a HeatmapDatum (Family C, DEC-061)."""
+    if isinstance(v, dict):
+        return HeatmapDatum(x=int(v["x"]), y=int(v["y"]), value=float(v["value"]))
+    if isinstance(v, (list, tuple)):
+        return HeatmapDatum(x=int(v[0]), y=int(v[1]), value=float(v[2]))
+    raise ValueError(f"unsupported heatmap datum shape: {type(v).__name__}")
+
+
 @dataclass
 class Marker:
     enabled: bool = True
@@ -185,6 +194,29 @@ class ColorScaleConfig:
 
 
 @dataclass
+class HeatmapDatum:
+    """One matrix cell observation (x, y, value)."""
+
+    x: int
+    y: int
+    value: float
+
+
+@dataclass
+class ColorAxisConfig:
+    """Continuous color-scale configuration for matrix/heatmap charts (Family C, DEC-061)."""
+
+    min: float | None = None
+    max: float | None = None
+    min_color: str | None = None
+    max_color: str | None = None
+    stops: list[tuple[float, str]] | None = None
+    null_color: str = "#f0f0f0"
+    reversed: bool = False
+    visible: bool = True
+
+
+@dataclass
 class TriangleAnnotation:
     origin: str
     period: int
@@ -266,6 +298,7 @@ class Series:
     frames: list[FrameDatum] | None = None  # flame-chart — per-series call frames
     volume: list[float] | None = None
     indicators: list[Indicator] | None = None
+    heatmap_data: list[HeatmapDatum] | None = None  # heatmap matrix cells
 
 
 @dataclass
@@ -433,6 +466,11 @@ class ChartSpec:
                 if s.data_points is None:
                     s.data_points = [_normalize_datum(v, i) for i, v in enumerate(s.data)]
                     s.data = []
+        elif self.type == "heatmap":
+            for s in self.series:
+                if s.heatmap_data is None and s.data:
+                    s.heatmap_data = [_normalize_heatmap_datum(v) for v in s.data]
+                    s.data = []
 
     normalization: str = "frequency"
 
@@ -481,6 +519,7 @@ class ChartSpec:
     factors_config: FactorsConfig | None = None
     color_scale: ColorScaleConfig | None = None
     triangle_annotations: list[TriangleAnnotation] | None = None
+    color_axis: ColorAxisConfig | None = None
 
     @staticmethod
     def from_dict(d: dict, *, raw_size_hint: int | None = None) -> ChartSpec:
@@ -540,12 +579,19 @@ class ChartSpec:
             if chart_type in ("scatter", "bubble"):
                 data_points = [_normalize_datum(v, j) for j, v in enumerate(s["data"])]
                 data_field: list[float] = []
+                heatmap_data = None
+            elif chart_type == "heatmap":
+                heatmap_data = [_normalize_heatmap_datum(v) for v in s.get("data", [])]
+                data_points = None
+                data_field = []
             elif "data" not in s:
                 data_points = None
                 data_field = []
+                heatmap_data = None
             else:
                 data_points = None
                 data_field = [float(v) for v in s["data"]]
+                heatmap_data = None
             box_data_raw = s.get("boxData")
             box_data = None
             if isinstance(box_data_raw, list):
@@ -659,6 +705,7 @@ class ChartSpec:
                     else None,
                     volume=s.get("volume"),
                     indicators=indicators,
+                    heatmap_data=heatmap_data,
                 )
             )
         xa = d.get("xAxis") or {}
@@ -906,5 +953,23 @@ class ChartSpec:
                 for a in d["annotations"]
             ]
             if isinstance(d.get("annotations"), list)
+            else None,
+            color_axis=ColorAxisConfig(
+                min=_opt_float(d["colorAxis"], "min"),
+                max=_opt_float(d["colorAxis"], "max"),
+                min_color=d["colorAxis"].get("minColor"),
+                max_color=d["colorAxis"].get("maxColor"),
+                stops=[
+                    (float(st[0]), str(st[1]))
+                    for st in d["colorAxis"]["stops"]
+                    if isinstance(st, (list, tuple)) and len(st) >= 2
+                ]
+                if isinstance(d["colorAxis"].get("stops"), list)
+                else None,
+                null_color=d["colorAxis"].get("nullColor", "#f0f0f0"),
+                reversed=bool(d["colorAxis"].get("reversed", False)),
+                visible=bool(d["colorAxis"].get("visible", True)),
+            )
+            if isinstance(d.get("colorAxis"), dict)
             else None,
         )

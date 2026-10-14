@@ -4059,3 +4059,100 @@ items:
     - Test suite covers each new detection class
   verification:
     - python tools/check_schema_compat.py with adversarial test schemas
+- id: DEC-061
+  title: Family C matrix substrate and heatmap admission
+  item_type: Decision
+  status: Done
+  priority: P0
+  workstream: WS-08 Expansion
+  stage: S5 Expansion
+  target: Post-0.0.0.1
+  outcome: Admit heatmap as chart type #37, opening Family C matrix substrate with Python and Go parity.
+  traceability:
+    - SC-ARCH-008
+    - SC-ARCH-011
+    - REQ-HEATMAP-001
+  risks: []
+  evidence:
+    - TEST-DOCS-CONTROL
+  dependencies: []
+  compatibility: Introduces Family C matrix substrate and heatmap chart type.
+  areas:
+    - python
+    - go
+    - spec
+    - docs
+  acceptance:
+    - Decision approved in docs/project/decisions.md.
+  verification:
+    - Approved decision in decisions.md
+- id: REQ-HEATMAP-001
+  title: Admit heatmap as a certified 0.0.0.35 chart type
+  item_type: Requirement
+  status: In Progress
+  priority: P1
+  workstream: WS-08 Expansion
+  stage: S5 Expansion
+  target: Post-0.0.0.1
+  outcome: Heatmap reaches Certified status per the renderer constitution before 0.0.0.35 documentation describes it as supported.
+  traceability:
+    - REQ-HEATMAP-001
+    - SC-ARCH-008
+    - SC-ARCH-011
+  risks: []
+  evidence:
+    - TEST-PYTHON-GOLDENS
+    - TEST-GO-GOLDENS
+    - TEST-DIRECT-CROSS-RENDER
+    - TEST-XSS-ESCAPING
+    - TEST-RUNTIME-BROWSER
+    - BENCH-RENDER-BASELINE
+  dependencies:
+    - DEC-061
+  compatibility: Introduces Family C matrix substrate and heatmap chart type without altering existing charts.
+  areas:
+    - python
+    - go
+    - spec
+    - docs
+  acceptance:
+    - Schema, Python, and Go accept and reject heatmap specs identically.
+    - Heatmap output byte-matches its golden corpus in both languages, and the direct cross-render sweep includes heatmap with zero diff.
+    - Accessible data table renders the 2-D categorical grid accurately in lockstep in both languages.
+    - Chart admission checklist phases 0 through 9 are closed.
+  verification:
+    - Fresh re-run of the full qualification suite against the exact commit under review
+- id: WORK-CHART-061
+  title: Add heatmap chart type (DEC-061)
+  item_type: Work Package
+  status: In Progress
+  priority: P1
+  workstream: WS-08 Expansion
+  stage: S5 Expansion
+  target: Post-0.0.0.1
+  outcome: Implement heatmap in Python and Go with byte-parity, opening Family C matrix substrate.
+  traceability:
+    - DEC-061
+    - REQ-HEATMAP-001
+    - SC-ARCH-008
+    - SC-ARCH-011
+  risks: []
+  evidence:
+    - TEST-PYTHON-GOLDENS
+    - TEST-GO-GOLDENS
+    - TEST-DIRECT-CROSS-RENDER
+  dependencies:
+    - DEC-061
+  compatibility: Fully backwards compatible.
+  areas:
+    - python
+    - go
+    - spec
+    - docs
+  acceptance:
+    - Python tests pass
+    - Go tests pass
+    - Golden tests pass
+    - Cross-render tests pass
+  verification:
+    - automated testing

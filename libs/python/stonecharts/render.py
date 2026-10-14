@@ -28,6 +28,7 @@ from .charts import error_bar as _error_bar
 from .charts import flame_chart as _flame_chart
 from .charts import funnel as _funnel
 from .charts import gauge as _gauge
+from .charts import heatmap as _heatmap
 from .charts import histogram as _histogram
 from .charts import line as _line
 from .charts import lollipop as _lollipop
@@ -71,6 +72,7 @@ _RENDERERS: dict[str, Callable[[ChartSpec], str]] = {
     "flame-chart": _flame_chart.render_svg,
     "funnel": _funnel.render_svg,
     "gauge": _gauge.render_svg,
+    "heatmap": _heatmap.render_svg,
     "solid-gauge": _solid_gauge.render_svg,
     "histogram": _histogram.render_svg,
     "line": _line.render_svg,
@@ -332,6 +334,28 @@ def _data_table(spec: ChartSpec) -> str:
                 f"<td>{esc(fmt_num(row[j]))}</td>" if j < len(row) else "<td></td>" for j in range(len(tri.periods))
             )
             rows.append(f'<tr><th scope="row">{esc(origin)}</th>{cells}</tr>')
+        return (
+            f'<table class="sc-visually-hidden">{caption}'
+            f"<thead><tr><td></td>{head}</tr></thead>"
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+    if spec.type == "heatmap":
+        x_cats = spec.x_axis.categories or []
+        y_cats = spec.y_axis.categories or []
+        grid: dict[tuple[int, int], float] = {}
+        for s in spec.series:
+            for pt in s.heatmap_data or []:
+                grid[(pt.x, pt.y)] = pt.value
+        head = "".join(f'<th scope="col">{esc(c)}</th>' for c in x_cats)
+        rows = []
+        for y, y_cat in enumerate(y_cats):
+            cells = []
+            for x in range(len(x_cats)):
+                if (x, y) in grid:
+                    cells.append(f"<td>{esc(fmt_num(grid[(x, y)]))}</td>")
+                else:
+                    cells.append("<td></td>")
+            rows.append(f'<tr><th scope="row">{esc(y_cat)}</th>{"".join(cells)}</tr>')
         return (
             f'<table class="sc-visually-hidden">{caption}'
             f"<thead><tr><td></td>{head}</tr></thead>"

@@ -490,6 +490,7 @@ func TestAllExampleSpecsValidate(t *testing.T) {
 		"scatter":    {"basic", "correlation", "regression", "themed-dark", "adversarial", "xy-points"},
 		"bubble":     {"basic", "multi-series", "themed-dark", "uniform-z", "adversarial"},
 		"combo":      {"basic", "dark", "dual-axis", "adversarial"},
+		"heatmap":    {"basic", "themed-dark", "adversarial"},
 	}
 	if len(cases) == 0 {
 		t.Fatal("no active release examples")
@@ -1155,6 +1156,22 @@ func TestRandomizedAll36Types(t *testing.T) {
 
 		validate(t, fmt.Sprintf("development-triangle/%d", c), []byte(spec))
 	}
+
+	// Heatmap
+	for c := 0; c < 8; c++ {
+		nx := rng.Intn(4) + 2
+		ny := rng.Intn(4) + 2
+		var dataStrs []string
+		for x := 0; x < nx; x++ {
+			for y := 0; y < ny; y++ {
+				val := float64(rng.Intn(10000)-2000) / 100
+				dataStrs = append(dataStrs, fmt.Sprintf("[%d,%d,%.2f]", x, y, val))
+			}
+		}
+		j := fmt.Sprintf(`{"type":"heatmap","xAxis":{"categories":%s},"yAxis":{"categories":%s},"series":[{"name":"HM","data":[%s]}]}`,
+			cats(nx, "Col"), cats(ny, "Row"), strings.Join(dataStrs, ","))
+		validate(t, fmt.Sprintf("heatmap/%d", c), []byte(j))
+	}
 }
 
 func TestCapabilityManifestAndError(t *testing.T) {
@@ -1162,7 +1179,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if caps.SpecVersion != "0.0.0.1" || caps.SVGContractVersion != "0.0.0.1" {
 		t.Fatalf("unexpected manifest versions: %+v", caps)
 	}
-	if got, want := caps.ChartTypeNames(), []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "development-triangle", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "histogram", "line", "lollipop", "nightingale", "parliament", "pie", "polar", "radar", "radial-bar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "variwide", "vector-plot", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
+	if got, want := caps.ChartTypeNames(), []string{"area", "arearange", "bar", "boxplot", "bubble", "bullet", "candlestick", "column", "columnrange", "combo", "development-triangle", "dumbbell", "error-bar", "flame-chart", "funnel", "gauge", "heatmap", "histogram", "line", "lollipop", "nightingale", "parliament", "pie", "polar", "radar", "radial-bar", "scatter", "solid-gauge", "streamgraph", "technical-indicators", "timeline", "variwide", "vector-plot", "waterfall", "wind-rose", "windbarb", "xrange"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("manifest chartTypes mismatch: got %v want %v", got, want)
 	}
 	if tier := caps.ChartTypes["line"].Tier; tier != "certified" {
@@ -1174,13 +1191,16 @@ func TestCapabilityManifestAndError(t *testing.T) {
 	if tier := caps.ChartTypes["parliament"].Tier; tier != "certified" {
 		t.Fatalf("expected parliament tier=certified, got %q", tier)
 	}
+	if tier := caps.ChartTypes["heatmap"].Tier; tier != "certified" {
+		t.Fatalf("expected heatmap tier=certified, got %q", tier)
+	}
 	spec := &ChartSpec{Type: "column", Series: []Series{{Name: "s", Data: []float64{1}}}}
 	if svg, err := RenderSVG(spec); err != nil {
 		t.Fatalf("expected column to render, got %v", err)
 	} else if !strings.HasPrefix(svg, "<svg") {
 		t.Fatalf("expected SVG output for column, got %q", svg[:min(len(svg), 64)])
 	}
-	bad := &ChartSpec{Type: "heatmap", Series: []Series{{Name: "s", Data: []float64{1}}}}
+	bad := &ChartSpec{Type: "sankey", Series: []Series{{Name: "s", Data: []float64{1}}}}
 	if _, err := RenderSVG(bad); err == nil {
 		t.Fatal("expected capability error")
 	} else {
@@ -1191,7 +1211,7 @@ func TestCapabilityManifestAndError(t *testing.T) {
 		if ce.Code != "E_CAPABILITY" || ce.Path != "$.type" {
 			t.Fatalf("unexpected capability error: %+v", ce)
 		}
-		if ce.Message != `unsupported chart type "heatmap"` {
+		if ce.Message != `unsupported chart type "sankey"` {
 			t.Fatalf("unexpected capability message: %+v", ce)
 		}
 	}
@@ -3094,6 +3114,41 @@ func TestSemanticInvariants(t *testing.T) {
 		dots := parliamentDotRe.FindAllString(svg, -1)
 		if len(dots) != 23 {
 			t.Errorf("expected 10+8+5=23 dots, got %d", len(dots))
+		}
+	})
+
+	// ── SC-SEM-035: Heatmap cell count ──
+
+	t.Run("SC-SEM-035/heatmap-cell-count", func(t *testing.T) {
+		svg := renderFile(t, "charts/heatmap/examples/basic.json")
+		cellRe := regexp.MustCompile(`<rect\s[^>]*class="sc-cell sc-point"[^>]*/>`)
+		cells := cellRe.FindAllString(svg, -1)
+		specBytes, err := os.ReadFile(root + "charts/heatmap/examples/basic.json")
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		var raw map[string]interface{}
+		if err := json.Unmarshal(specBytes, &raw); err != nil {
+			t.Fatalf("unmarshal: %v", err)
+		}
+		series := raw["series"].([]interface{})[0].(map[string]interface{})
+		data := series["data"].([]interface{})
+		if len(cells) != len(data) {
+			t.Errorf("cells %d != data %d", len(cells), len(data))
+		}
+	})
+
+	t.Run("SC-SEM-035/heatmap-constructed", func(t *testing.T) {
+		svg := renderRaw(t, `{
+			"type": "heatmap",
+			"xAxis": {"categories": ["C1", "C2"]},
+			"yAxis": {"categories": ["R1", "R2"]},
+			"series": [{"name": "M", "data": [[0, 0, 10], [0, 1, 20], [1, 0, 30], [1, 1, 40]]}]
+		}`)
+		cellRe := regexp.MustCompile(`<rect\s[^>]*class="sc-cell sc-point"[^>]*/>`)
+		cells := cellRe.FindAllString(svg, -1)
+		if len(cells) != 4 {
+			t.Errorf("expected 4 cells, got %d", len(cells))
 		}
 	})
 }

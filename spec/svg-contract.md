@@ -59,6 +59,8 @@ the runtime only adds interactivity on top.
 | `.sc-legend-item[data-series=N]` | Legend entry for series N | Click or keyboard activation → toggle every `[data-series=N]` (adds `.sc-hidden`) |
 | `.sc-crosshair` | Vertical guide line (optional) | Shown at the hovered point's `cx`, hidden on leave |
 | `.sc-tooltip` | Floating tooltip (optional; runtime creates if absent) | Filled from `data-x` / `data-series-name` / `data-y` / `data-color` |
+| `.sc-cell` | Matrix/heatmap cell mark | Focusable matrix cell carrying cell coordinates and value |
+| `.sc-color-axis` | Color-axis gradient legend | Visual calibration bar with numerical labels for continuous values |
 
 ## Required `data-*` on `.sc-point`
 

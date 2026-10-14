@@ -1254,6 +1254,65 @@ def test_parliament_constructed():
     assert len(dots) == 23, f"expected 10+8+5=23 dots, got {len(dots)}"
 
 
+# ── SC-SEM-035  Heatmap: cell count and coordinate mapping ───────────────
+
+
+def _heatmap_cells(svg: str) -> list[dict]:
+    pattern = r'<rect\s+class="sc-cell\s+sc-point"[^>]*>'
+    matches = re.findall(pattern, svg)
+    cells = []
+    for m in matches:
+        cell = {}
+        for attr in [
+            "data-series",
+            "data-series-name",
+            "data-x",
+            "data-y",
+            "data-cell-x",
+            "data-cell-y",
+            "data-value",
+            "data-color",
+        ]:
+            val = re.search(rf'{attr}="([^"]*)"', m)
+            if val:
+                cell[attr] = val.group(1)
+        cells.append(cell)
+    return cells
+
+
+def test_heatmap_cell_count():
+    """SC-SEM-035: heatmap cell count matches data points and coordinates within bounds."""
+    spec_path = ROOT / "charts" / "heatmap" / "examples" / "basic.json"
+    d = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    cells = _heatmap_cells(svg)
+    expected_cells = len(d["series"][0]["data"])
+    assert len(cells) == expected_cells, f"cells {len(cells)} != expected {expected_cells}"
+    nx = len(d["xAxis"]["categories"])
+    ny = len(d["yAxis"]["categories"])
+    for cell in cells:
+        assert 0 <= int(cell["data-cell-x"]) < nx
+        assert 0 <= int(cell["data-cell-y"]) < ny
+
+
+def test_heatmap_constructed():
+    """SC-SEM-035: heatmap with constructed spec."""
+    d = {
+        "type": "heatmap",
+        "xAxis": {"categories": ["C1", "C2"]},
+        "yAxis": {"categories": ["R1", "R2"]},
+        "series": [{"name": "Matrix", "data": [[0, 0, 10], [0, 1, 20], [1, 0, 30], [1, 1, 40]]}],
+    }
+    spec = ChartSpec.from_dict(d)
+    svg = render_svg(spec)
+    cells = _heatmap_cells(svg)
+    assert len(cells) == 4
+    for cell in cells:
+        assert int(cell["data-cell-x"]) in (0, 1)
+        assert int(cell["data-cell-y"]) in (0, 1)
+
+
 # ── DT-SEM-001  Every rendered data cell maps to exactly one supplied value ──
 
 

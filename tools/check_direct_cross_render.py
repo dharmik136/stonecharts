@@ -79,6 +79,7 @@ ACTIVE = {
         "rectangular-6x4",
         "adversarial",
     ],
+    "heatmap": ["basic", "themed-dark", "adversarial"],
 }
 
 

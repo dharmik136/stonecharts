@@ -1,0 +1,257 @@
+[
+  {
+    "description": "missing xAxis",
+    "spec": {
+      "type": "heatmap",
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 1]]
+        }
+      ]
+    },
+    "errors": [
+      "$.xAxis.categories: required for heatmap"
+    ]
+  },
+  {
+    "description": "missing yAxis",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 1]]
+        }
+      ]
+    },
+    "errors": [
+      "$.yAxis.categories: required for heatmap"
+    ]
+  },
+  {
+    "description": "xAxis.categories contains number",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": [123]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 1]]
+        }
+      ]
+    },
+    "errors": [
+      "$.xAxis.categories[0]: expected string, received number"
+    ]
+  },
+  {
+    "description": "yAxis.categories contains boolean",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": [true]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 1]]
+        }
+      ]
+    },
+    "errors": [
+      "$.yAxis.categories[0]: expected string, received boolean"
+    ]
+  },
+  {
+    "description": "scalar datum",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [42]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0]: expected [x,y,value] or {x,y,value}, received number"
+    ]
+  },
+  {
+    "description": "datum array 2 elements",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0]]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0]: expected a 3-element [x,y,value] array, received 2 elements"
+    ]
+  },
+  {
+    "description": "datum array 4 elements",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 1, 2]]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0]: expected a 3-element [x,y,value] array, received 4 elements"
+    ]
+  },
+  {
+    "description": "datum object missing value",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [{"x": 0, "y": 0}]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0].value: required"
+    ]
+  },
+  {
+    "description": "datum object unknown field",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [{"x": 0, "y": 0, "value": 1, "extra": 2}]
+        }
+      ]
+    },
+    "errors": [
+      "$.series[0].data[0].extra: unknown field"
+    ]
+  },
+  {
+    "description": "colorAxis stops offset out of range",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "colorAxis": {
+        "stops": [[1.5, "#ffffff"]]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 10]]
+        }
+      ]
+    },
+    "errors": [
+      "$.colorAxis.stops[0][0]: offset must be between 0.0 and 1.0, received 1.5"
+    ]
+  },
+  {
+    "description": "colorAxis stops 1 element array",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "colorAxis": {
+        "stops": [[0.5]]
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 10]]
+        }
+      ]
+    },
+    "errors": [
+      "$.colorAxis.stops[0]: expected 2-element [offset, color] array"
+    ]
+  },
+  {
+    "description": "colorAxis min boolean",
+    "spec": {
+      "type": "heatmap",
+      "xAxis": {
+        "categories": ["a"]
+      },
+      "yAxis": {
+        "categories": ["a"]
+      },
+      "colorAxis": {
+        "min": true
+      },
+      "series": [
+        {
+          "name": "s",
+          "data": [[0, 0, 10]]
+        }
+      ]
+    },
+    "errors": [
+      "$.colorAxis.min: expected number, received boolean"
+    ]
+  }
+]

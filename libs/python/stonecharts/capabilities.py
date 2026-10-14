@@ -26,6 +26,7 @@ _CAPABILITIES: dict[str, Any] = {
         "flame-chart": {"tier": "certified", "since": "0.0.0.23"},
         "funnel": {"tier": "certified", "since": "0.0.0.15"},
         "gauge": {"tier": "certified", "since": "0.0.0.25"},
+        "heatmap": {"tier": "certified", "since": "0.0.0.35"},
         "histogram": {"tier": "certified", "since": "0.0.0.6"},
         "line": {"tier": "certified", "since": "0.0.0.1"},
         "lollipop": {"tier": "certified", "since": "0.0.0.13"},

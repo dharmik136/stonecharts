@@ -4,7 +4,7 @@
 ![License: Proprietary](https://img.shields.io/badge/license-Proprietary-red)
 ![Python ≥3.9](https://img.shields.io/badge/python-%E2%89%A53.9-3776AB)
 ![Go ≥1.26](https://img.shields.io/badge/go-%E2%89%A51.26-00ADD8)
-![Charts: 36](https://img.shields.io/badge/chart_types-36-28a745)
+![Charts: 37](https://img.shields.io/badge/chart_types-37-28a745)
 ![Release: 0.0.0.34](https://img.shields.io/badge/release-0.0.0.34-6f42c1)
 ![Dependencies: 0](https://img.shields.io/badge/runtime_deps-0-brightgreen)
 
@@ -21,7 +21,7 @@ boundaries within the documented environment profile.
 ## Why StoneCharts
 
 - **Byte-identical cross-language output.** The same JSON spec renders to the exact
-  same SVG in Python and Go — verified by the complete 36-chart certification matrix
+  same SVG in Python and Go — verified by the complete 37-chart certification matrix
   and shared golden-test corpus.
 - **Deterministic and runtime-free.** Charts are fully rendered server-side without a
   browser, DOM, or JavaScript. The SVG is complete on its own; the interaction runtime
@@ -135,18 +135,18 @@ stonecharts.SaveHTML(spec, "chart.html", "")
 
 ## Chart Catalog
 
-**36 chart types**, all certified with byte-identical Python and Go renderers pinned
+**37 chart types**, all certified with byte-identical Python and Go renderers pinned
 by golden tests and requalified together in `0.0.0.34`. The executable
-[`36 × 8` certification ledger](docs/quality/certification-ledger.json) records the
+[`37 × 8` certification ledger](docs/quality/certification-ledger.json) records the
 evidence behind every chart and gate.
 
 | Tier | Count | Meaning |
 |------|-------|---------|
-| **Certified** | 36 | Passes all SC-CERT gates within the documented guarantee boundary |
+| **Certified** | 37 | Passes all SC-CERT gates within the documented guarantee boundary |
 | **Candidate** | 0 | No chart types are awaiting certification |
 | **Experimental** | 0 | No chart types are outside the certified tier |
 
-### Certified (36 types)
+### Certified (37 types)
 
 | Chart | ID | Release |
 |-------|----|---------|
@@ -186,6 +186,7 @@ evidence behind every chart and gate.
 | Nightingale | `nightingale` | 0.0.0.30 |
 | Radial Bar | `radial-bar` | 0.0.0.31 |
 | Parliament | `parliament` | 0.0.0.32 |
+| Heatmap | `heatmap` | 0.0.0.35 |
 
 ### Candidate (0 types)
 
@@ -287,7 +288,7 @@ request with 14 jobs:
 
 - **Lint and static analysis** — ruff, mypy, go vet, golangci-lint, CodeQL
 - **Cross-platform tests** — Python 3.9 + 3.14, Go, on Ubuntu and Windows
-- **Wheel install smoke test** — build, install, and verify all 36 chart types
+- **Wheel install smoke test** — build, install, and verify all 37 chart types
 - **Documentation validation** — structure, metadata, and cross-references
 - **Cross-language parity** — Python/Go byte-identical output verification
 - **Schema compatibility** — backward-compatibility check on PRs

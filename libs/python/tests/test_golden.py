@@ -76,6 +76,7 @@ DEVELOPMENT_TRIANGLE_CASES = [
     "rectangular-6x4",
     "adversarial",
 ]
+HEATMAP_CASES = ["basic", "themed-dark", "adversarial"]
 ACTIVE_VALIDATION_CASES = {
     "line-basic": LINE_CASES,
     "column": COLUMN_CASES,
@@ -113,6 +114,7 @@ ACTIVE_VALIDATION_CASES = {
     "vector-plot": VECTOR_PLOT_CASES,
     "xrange": XRANGE_CASES,
     "development-triangle": DEVELOPMENT_TRIANGLE_CASES,
+    "heatmap": HEATMAP_CASES,
 }
 SCHEMA = json.loads((ROOT / "spec" / "chart-spec.schema.json").read_text(encoding="utf-8"))
 SCHEMA_VALIDATOR_CLASS = jsonschema.validators.validator_for(SCHEMA)
@@ -343,6 +345,11 @@ def test_xrange_goldens():
 def test_development_triangle_goldens():
     for name in DEVELOPMENT_TRIANGLE_CASES:
         _check("development-triangle", name)
+
+
+def test_heatmap_goldens():
+    for name in HEATMAP_CASES:
+        _check("heatmap", name)
 
 
 def test_pie_goldens():
@@ -744,6 +751,7 @@ def test_capability_manifest_and_error():
         "flame-chart",
         "funnel",
         "gauge",
+        "heatmap",
         "histogram",
         "line",
         "lollipop",
@@ -768,15 +776,16 @@ def test_capability_manifest_and_error():
     assert ct["line"]["tier"] == "certified"
     assert ct["waterfall"]["tier"] == "certified"
     assert ct["parliament"]["tier"] == "certified"
+    assert ct["heatmap"]["tier"] == "certified"
     spec = ChartSpec.from_dict({"type": "column", "series": [{"name": "s", "data": [1]}]})
     assert render_svg(spec).startswith("<svg")
     try:
-        render_svg(ChartSpec(type="heatmap", series=[{"name": "s", "data": [1]}]))
+        render_svg(ChartSpec(type="sankey", series=[{"name": "s", "data": [1]}]))
         raise AssertionError("expected capability error")
     except CapabilityError as exc:
         assert exc.code == "E_CAPABILITY"
         assert exc.path == "$.type"
-        assert exc.message == 'unsupported chart type "heatmap"'
+        assert exc.message == 'unsupported chart type "sankey"'
 
 
 def test_a11y_toggle():
@@ -1020,7 +1029,7 @@ def test_validation_deep_coverage():
             '$.series[0].yAxis: expected one of 0, 1, received "2"',
         ),
         # unknown chart type
-        ({"type": "heatmap", "series": [{"data": [1]}]}, '$.type: unknown chart type "heatmap"'),
+        ({"type": "unknown-type", "series": [{"data": [1]}]}, '$.type: unknown chart type "unknown-type"'),
         # percent stacking: non-dict series item skipped
         ({"type": "line", "stacking": "percent", "series": [42]}, "$.series[0]: expected object, received number"),
         # percent stacking: non-list data skipped
