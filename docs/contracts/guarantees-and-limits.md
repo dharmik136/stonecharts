@@ -1,16 +1,16 @@
 ---
 id: SC-CON-001
 title: StoneCharts Guarantees and Limits
-status: proposed
+status: approved
 classification: normative
 owner: product-owner
 approver: maintainer
-review_mode: self
+review_mode: independent
 applies_to: 0.0.0.1 and later
 requirements: [REQ-DET-001, REQ-VIS-001, REQ-CUST-001]
 evidence: [TEST-PYTHON-GOLDENS, TEST-GO-GOLDENS, REVIEW-VISUAL-PROFILE]
-last_reviewed: "2026-07-18"
-review_due: "2026-09-18"
+last_reviewed: "2026-08-15"
+review_due: "2026-10-15"
 supersedes: null
 superseded_by: null
 ---
